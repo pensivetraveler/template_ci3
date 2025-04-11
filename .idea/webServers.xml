@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ffd3e4ea-3c41-4c84-bc13-7e62f35f8098" name="sample.thefit.dev">
+        <fileTransfer rootFolder="/var/www/sample_dev" accessType="SFTP" host="106.10.46.168" port="22" sshConfigId="0cfd9fec-682a-46d6-97a0-1da160286808" sshConfig="thefit.dev.php7.4">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

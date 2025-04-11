@@ -1,0 +1,69 @@
+@charset "utf-8";
+[lang="ko"]{word-break: keep-all}
+* {margin:0;padding:0;}
+*,::before,::after{box-sizing:border-box;border-width:0;border-style:solid;border-color:theme('borderColor.DEFAULT','currentColor')}
+::before,::after{--tw-content:''}
+
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,
+del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,article,aside,canvas,details,figcaption,figure,main,
+footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video {border:0;outline:0;background:transparent;font-size:100%;}
+h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}
+article,aside,canvas,details,figcaption,figure,main,footer,header,hgroup,menu,nav,section,summary {display:block;}
+select,input,button,textarea,button{font-family:"IBMPlexSansKR","Apple SD Gothic Neo", "Malgun Gothic", Sans-serif;}
+input, textarea, button {-webkit-appearance:none; -moz-appearance:none; appearance:none; -webkit-border-radius: 0; outline:none;}
+input, textarea, button, select {-webkit-border-radius:0; -moz-border-radius:0; -o-border-radius:0; border-radius:0; outline:none;}
+button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:inherit;color:inherit;margin:0;padding:0}
+blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{margin:0}
+
+html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:theme('fontFamily.sans',ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji")}
+body {font-size:14px;color:#000;line-height:150%;margin:0;line-height:inherit;}
+
+a, button, input, select, label {-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}
+a {margin:0;padding:0;border:0;font-size:100%;color:inherit;text-decoration:inherit;}
+
+button {background-color: transparent;cursor: pointer;-ms-touch-action: manipulation;touch-action: manipulation;}
+form, fieldset, button, img {border: 0;vertical-align: top;}
+input,select {}
+input[type="password"]{font-family:"IBMPlexSansKR" !important; }
+button,select{text-transform:none}
+button,[type='button'],[type='reset'],[type='submit'],[role="button"]{-webkit-appearance:button;background-color:transparent;background-image:none;cursor:pointer;}
+:disabled{cursor:default}
+:-moz-focusring{outline:auto}
+:-moz-ui-invalid{box-shadow:none}
+progress{vertical-align:baseline}
+::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}
+[type='search']{-webkit-appearance:textfield;outline-offset:-2px}
+::-webkit-search-decoration{-webkit-appearance:none}
+::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}
+input::placeholder,textarea::placeholder{opacity:1;color:theme('colors.gray.400',#9ca3af)}
+textarea{resize:vertical}
+
+summary{display:list-item}
+b,strong{font-weight:bolder}
+nav, ul {list-style:none;}
+blockquote,q {quotes:none;}
+blockquote:before,blockquote:after,q:before,q:after {content:"";content:none;}
+ins {color:#000;text-decoration:none;}
+mark {color:#000;font-style:italic;font-weight:700;}
+del,s {text-decoration:line-through;}
+abbr[title],dfn[title] {border-bottom:1px dotted #000;cursor:help;text-decoration:underline dotted;}
+hr {display:block;height:1px;border:0;border-top:1px solid inherit;margin:1em 0;padding:0;}
+code,kbd,samp,pre{font-family:theme('fontFamily.mono',ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace);font-size:1em}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sub{bottom:-0.25em}
+sup{top:-0.5em}
+
+table,caption,tbody,tfoot,thead,tr,th,td {outline:0;background:transparent;font-size:100%;}
+table{font-size:inherit;font:100%;text-indent:0;border-color:inherit;border-collapse:collapse;}
+th,td {}
+pre,code,kbd,samp,tt{font-family:monospace;*font-size:108%;line-height:100%;}
+address {font-style:normal;display:inline;}
+
+fieldset{margin:0;padding:0}
+legend{padding:0}
+ol,ul,menu{list-style:none;margin:0;padding:0}
+
+img,svg,video,canvas,audio,iframe,embed,object{display:block;vertical-align:middle}
+img,video{max-width:100%;height:auto}
+[hidden]{display:none}

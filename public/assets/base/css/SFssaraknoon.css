@@ -1,0 +1,11 @@
+@font-face {
+	font-family: 'SFssaraknoon';
+	src: local('SFssaraknoon'), url(../font/SFssaraknoon/SFssaraknoon-TTF.ttf) format('truetype');
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+}
+
+.font-SFssaraknoon {
+	font-family: 'SFssaraknoon';
+}

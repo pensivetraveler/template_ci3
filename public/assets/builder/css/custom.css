@@ -1,0 +1,683 @@
+/*
+* demo.css
+* File include item demo only specific css only
+******************************************************************************/
+.light-style .menu .app-brand.demo {
+	height: 64px;
+}
+
+.dark-style .menu .app-brand.demo {
+	height: 64px;
+}
+
+.app-brand-logo.demo svg {
+	width: 38px;
+	height: 20px;
+}
+
+.app-brand-text.demo {
+	font-size: 1.25rem;
+	letter-spacing: 0.15px;
+}
+
+/* ! For .layout-navbar-fixed added fix padding top tpo .layout-page */
+.layout-navbar-fixed .layout-wrapper:not(.layout-without-menu) .layout-page {
+	padding-top: 64px !important;
+}
+
+/* Navbar page z-index issue solution */
+.content-wrapper .navbar {
+	z-index: auto;
+}
+
+/*
+* Content
+******************************************************************************/
+
+.demo-blocks > * {
+	display: block !important;
+}
+
+.demo-inline-spacing > * {
+	margin: 1rem 0.375rem 0 0 !important;
+}
+
+/* ? .demo-vertical-spacing class is used to have vertical margins between elements. To remove margin-top from the first-child, use .demo-only-element class with .demo-vertical-spacing class. For example, we have used this class in forms-input-groups.html file. */
+.demo-vertical-spacing > * {
+	margin-top: 1.25rem !important;
+	margin-bottom: 0 !important;
+}
+.demo-vertical-spacing.demo-only-element > :first-child {
+	margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-lg > * {
+	margin-top: 1.875rem !important;
+	margin-bottom: 0 !important;
+}
+.demo-vertical-spacing-lg.demo-only-element > :first-child {
+	margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-xl > * {
+	margin-top: 5rem !important;
+	margin-bottom: 0 !important;
+}
+.demo-vertical-spacing-xl.demo-only-element > :first-child {
+	margin-top: 0 !important;
+}
+
+.rtl-only {
+	display: none !important;
+	text-align: left !important;
+	direction: ltr !important;
+}
+
+[dir='rtl'] .rtl-only {
+	display: block !important;
+}
+
+/* Dropdown buttons going out of small screens */
+@media (max-width: 576px) {
+	#dropdown-variation-demo .btn-group .text-truncate {
+		width: 300px;
+		position: relative;
+	}
+	#dropdown-variation-demo .btn-group .text-truncate::after {
+		position: absolute;
+		top: 45%;
+		right: 0.65rem;
+	}
+}
+/*
+* Layout demo
+******************************************************************************/
+
+.layout-demo-wrapper {
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	margin-top: 1.25rem;
+}
+.layout-demo-placeholder img {
+	width: 900px;
+}
+.layout-demo-info {
+	text-align: center;
+	margin-top: 1.25rem;
+}
+
+/**
+ * TODO side form 에만 적용이 되어야할지 검토가 필요하며, 만약 필요한 경우 offcanvas에 해당하는 parent class를 별도 선언하여 상속관계가 적용되도록 변경이 필요.
+ */
+
+.draggable {
+	-webkit-user-select:all;
+	-moz-user-select:all;
+	-ms-user-select:all;
+	user-select:all
+}
+
+.not-draggable {
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none
+}
+
+/* data-table */
+.datatables-records .img-thumbnail {
+	max-height: 60px;
+}
+
+/*********************************************
+    common
+ *********************************************/
+/* border-color */
+.border-input {
+	border-color: #cfd0d6 !important;
+}
+html[data-style="dark"] .border-input {
+
+}
+.flatpickr-side-position {
+	left: unset !important;
+	right: 6rem !important;
+}
+.absolute-center {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+.auto-linebreak {
+	white-space: pre-line;
+}
+
+
+/*********************************************
+    .form-type-* common
+ *********************************************/
+form[class*="form-type-"] .form-validation-unit {
+	position: relative;
+}
+
+form[class*="form-type-"] .form-validation-unit:not(.fv-plugins-icon-container) {
+	margin-bottom: 0.25rem;
+}
+form[class*="form-type-"] .input-group-text svg,
+form[class*="form-type-"] .input-group-text img[src*=".svg"] {
+	width: 18px;
+	height: 18px;
+}
+
+form[class*="form-type-"] .form-control.d-none~label {
+	display: none;
+}
+
+/* flatpickr */
+form[class*="form-type-"] .input-group:has(.form-control:not([type="file"]):not(.flatpickr-input):read-only) .input-group-text,
+form[class*="form-type-"] .input-group .form-control:not([type="file"]):not(.flatpickr-input):read-only {
+	background-color: #eee !important;
+}
+html[data-style="dark"] form[class*="form-type-"] .input-group:has(.form-control:not([type="file"]):not(.flatpickr-input):read-only) .input-group-text,
+html[data-style="dark"] form[class*="form-type-"] .input-group .form-control:not([type="file"]):not(.flatpickr-input):read-only {
+	background-color: #3b3e59 !important;
+}
+
+/* [type="file"] */
+form[class*="form-type-"] .input-group-merge:has(.form-control[type="file"]) .input-group-text {
+	margin-right: 3px;
+}
+form[class*="form-type-"] .input-group:has(.form-control[type="file"]:hover) .input-group-text {
+	background-color: rgba(0, 0, 0, 0.05) !important;
+	border-color: #7d808e;
+}
+form[class*="form-type-"] .input-group:has(.form-control[type="file"]:hover):focus-within .input-group-text {
+	border-color: var(--bs-primary);
+}
+form[class*="form-type-"] ul.list-unstyled {
+	border: 1px solid #cfd0d6;
+}
+form[class*="form-type-"] ul.list-unstyled + label {
+	width: auto;
+	height: auto;
+	margin-top: 0.125rem;
+	opacity: 1;
+	font-size: 0.8125rem;
+	padding: 1px 0.375rem !important;
+	margin-left: -2px;
+	transform: translateY(-0.8rem) translateX(-2px);
+	color: rgba(var(--bs-body-color-rgb), 1);
+}
+form[class*="form-type-"] ul.list-unstyled + label:after {
+	content: "";
+	inset: 0.8555rem 0.5rem;
+	height: 0.75rem;
+	border-radius: 0.5rem;
+	position: absolute;
+	width: 100%;
+	inset-inline-start: 0;
+	top: 0.35rem;
+	z-index: -1;
+	background-color: #fff !important;
+}
+form[class*="form-type-"] ul.list-unstyled.d-none + label {
+	display: none;
+}
+form[class*="form-type-"] ul.list-unstyled:hover {
+	border-color: var(--bs-primary) !important;
+	border-width: 2px;
+	padding: calc(0.5rem - 1px) !important;
+	/*margin: -1px !important;*/
+	background-color: transparent !important;
+}
+form[class*="form-type-"] ul.list-unstyled:hover + label {
+	color: var(--bs-primary);
+}
+
+/* selectpicker */
+html[data-style="dark"] form[class*="form-type-"] .bootstrap-select .dropdown-menu.show:not(.inner) {
+	/*border: 1px solid #9fa1b8;*/
+}
+
+/* input with button */
+form[class*="form-type-"] .input-group:focus-within .form-input_with-button,
+form[class*="form-type-"] .input-group .form-input_with-button.is-invalid {
+	border-width: 2px !important;
+}
+form[class*="form-type-"] .input-group .form-control.form-input_with-button {
+	margin-right: 3px;
+	padding-left: 0 !important;
+}
+form[class*="form-type-"] .input-group.focus-border-bold .form-control:focus {
+	border-width: 2px !important;
+}
+form[class*="form-type-"] .input-group:has(button) .form-control {
+	padding: calc(0.8555rem - 2px) calc(1rem - 1px) !important;
+}
+
+
+
+/* form-input_addr */
+form[class*="form-type-"] .col-sm-12 .input-group:has(.form-input_addr) {
+	margin-bottom: 0.75rem !important;
+}
+
+/* daum-addr-container */
+form[class*="form-type-"] .daum-addr-container {
+	margin: 0 !important;
+}
+form[class*="form-type-"] .daum-addr-container:has(>div[id^="daumAddrWrap"].on) {
+	margin: var(--bs-gutter-y) 0 !important;
+}
+form[class*="form-type-"] div[id^="daumAddrWrap"] {
+	display: none;
+	height: 0;
+	width: 100%;
+	position: relative;
+	padding: 0 !important;
+	overflow: hidden;
+	transition: .3s;
+}
+form[class*="form-type-"] .daum-addr-container:has(>div[id^="daumAddrWrap"].on)>div {
+	border: 1px solid #cfd0d6;
+	border-radius: 0.5rem;
+}
+form[class*="form-type-"] div[id^="daumAddrWrap"].on {
+	display: block;
+}
+
+form[class*="form-type-"] div[id^="daumAddrWrap"]>img {
+	cursor: pointer;
+	position: absolute;
+	right: 1px;
+	top: 1px;
+	z-index: 1;
+	width: 20px;
+	height: 20px;
+	border-radius: 0.5rem;
+}
+
+/* checkbox */
+form[class*="form-type-"] .choice-wrapper {
+	padding: 1rem 0 0.5rem;
+	background-clip: padding-box;
+	/*border: 1px solid #cfd0d6;*/
+	/*border-radius: 0.5rem;*/
+	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+form[class*="form-type-"] .choice-wrapper > label:not(:first-child) {
+	/*margin-right: 0.75rem;*/
+}
+form[class*="form-type-"] .choice-wrapper + label {
+	margin-left: calc(2.8555rem - 2px) !important;
+	width: auto;
+	height: auto;
+	padding: 2px 0.375rem;
+	margin-left: 0.625rem;
+	margin-top: 0.125rem;
+	transform: translateY(-0.8rem) translateX(-2px);
+	opacity: 1;
+	font-size: 0.8125rem;
+}
+form[class*="form-type-"] .choice-wrapper:has(input:checked) + label {
+	color: var(--bs-primary);
+}
+form[class*="form-type-"] .choice-wrapper + label:after {
+	content: "";
+	position: absolute;
+	height: 0.75rem;
+	width: 100%;
+	inset-inline-start: 0;
+	top: 0.35rem;
+	z-index: -1;
+	background-color: #fff !important;
+}
+
+/* select2 */
+form[class*="form-type-"] .select2-container--default .select2-selection__placeholder {
+	color: #999;
+}
+form[class*="form-type-"] .select2-dropdown {
+	padding: .5rem !important;
+	border-color: var(--bs-primary) !important;
+	border-bottom-right-radius: 0.625rem;
+	border-bottom-left-radius: 0.625rem;
+}
+
+form[class*="form-type-"] .bootstrap-select .dropdown-toggle {
+	border-radius: 0.375rem;
+}
+
+/* single-checkbox */
+form[class*="form-type-"] .choice-wrapper.single-checkbox ~ label {
+	display: none;
+}
+
+
+/*********************************************
+    .form-type-page
+ *********************************************/
+.form-type-page>.col-sm-12:not(:last-child) {
+	margin-bottom: 1.5rem !important;
+}
+/* textarea-quill */
+.form-type-page .textarea-quill {
+
+}
+
+/* [type="file"] */
+.form-type-page .input-group ul.list-unstyled {
+	width: 100%;
+}
+.form-type-page .input-group ul.list-unstyled>div {
+	width: 100%;
+}
+
+/* .form-list-item-wrap */
+.form-type-page .input-group:has(.form-list-item-wrap:not(.d-none)) {
+	margin-top: 0.75rem !important;
+}
+.form-type-page .form-text.d-none~.input-group:has(.form-list-item-wrap:not(.d-none)) {
+	margin-top: 0 !important;
+}
+.form-list-item-wrap li>div:first-child {
+	max-width: calc(100% - 60px);
+}
+.form-list-item-wrap li>div:first-child span {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	word-break: break-all;
+}
+
+/*********************************************
+    .form-type-side
+ *********************************************/
+/* 주소/상세주소와 같이 icon이 없는 텍스트 경우, 라벨을 아이콘이 있는 다른 input과 동일하게 하기 위해, margin-left 부여 */
+.form-type-side .input-group:not(:has(.input-group-text)) .form-floating.form-floating-outline > .form-control:not(:placeholder-shown) ~ label {
+	margin-left: calc(2.8555rem - 2px) !important;
+}
+/* 고객지원의 답변 작성 textarea와 같이 내용이 빈 상태로 있을 때, focus 된 후의 label에 대해 margin-left 부여 */
+.form-type-side .input-group:not(:has(.input-group-text)) .form-floating.form-floating-outline > .form-control:focus ~ label {
+	margin-left: calc(2.8555rem - 2px) !important;
+}
+.form-type-side .input-group:not(:has(.input-group-text)) .form-floating.form-floating-outline [class*="list-"] ~ label {
+	margin-left: calc(2.8555rem - 2px) !important;
+	/*padding-left: 0;*/
+}
+
+/* selectpicker */
+.form-type-side .input-group .form-floating:has(.bootstrap-select):focus-within,
+.form-type-side .input-group .form-floating:has(.select2):focus-within {
+	z-index: 10;
+}
+.form-type-side .input-group .form-floating > .bootstrap-select .btn.dropdown-toggle + .dropdown-menu,
+.form-type-side .input-group .form-floating > .select2 .btn.dropdown-toggle + .dropdown-menu {
+	z-index: 10;
+}
+.form-type-side .input-group .form-floating > .bootstrap-select + label,
+.form-type-side .input-group .form-floating > div:has(.select2) + label {
+	margin-left: calc(2.8555rem - 2px) !important;
+	z-index: 6;
+	color: rgba(var(--bs-body-color-rgb), 1);
+	background-color: white;
+}
+
+html[data-style="dark"] .form-type-side .input-group .form-floating > .bootstrap-select + label,
+html[data-style="dark"] .form-type-side .input-group .form-floating > div:has(.select2) + label {
+
+}
+
+/* select2 */
+.form-type-side .form-floating:has(.form-select.select2) > label {
+	color: rgba(var(--bs-body-color-rgb), 1);
+	transform: scale(0.867) translateY(-0.6rem) translateX(0.0625rem);
+}
+.form-type-side .form-floating.form-floating-outline:has(.form-select.select2:not(:placeholder-shown)) > label {
+	width: auto;
+	height: auto;
+	padding: 2px 0.375rem;
+	margin-left: 0.625rem;
+	margin-top: 0.125rem;
+	transform: translateY(-0.8rem) translateX(-2px);
+	opacity: 1;
+	font-size: 0.8125rem;
+}
+
+/* input with button */
+.form-type-side .input-group .input-group-text:focus~.form-floating .form-input_with-button {
+	border-width: 2px !important;
+}
+.form-type-side .input-group .form-floating:has(>.form-input_with-button)~button {
+	margin-left: 0 !important;
+}
+.form-type-side .input-group:focus-within .form-floating:has(>.form-input_with-button)~button,
+.form-type-side .input-group .form-floating:has(>.form-input_with-button.is-invalid)~button{
+	border-left-width: 0px;
+}
+.form-type-side .input-group:focus-within .form-floating .form-input_with-button {
+	border-right: 2px solid !important;
+	border-right-color: var(--bs-primary) !important;
+}
+.form-type-side .input-group .form-floating .form-input_with-button.is-invalid {
+	border-right: 2px solid !important;
+	border-right-color: var(--bs-form-invalid-color) !important;
+}
+
+/* user_password */
+.form-type-side .input-group.flex-nowrap span.input-group-text~.input-group-merge input:first-child {
+	padding-left: 0;
+	border-left: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+.form-type-side .input-group.flex-nowrap span.input-group-text~.input-group-merge .form-floating .form-control:placeholder-shown + label,
+.form-type-side .input-group.flex-nowrap span.input-group-text~.input-group-merge .form-floating .form-control:not(:focus) + label {
+	padding-left: 0;
+}
+
+/* group-repeater */
+.form-type-side [data-repeater-type]:not([data-repeater-type="0"]):not([data-repeater-type=""]) .form-validation-unit:not(:last-child) {
+	margin-bottom: 0.75rem !important;
+}
+
+/* .choice-wrapper */
+.form-type-side .choice-wrapper {
+	padding-top: 1.5rem;
+}
+
+/*********************************************
+    modal
+ *********************************************/
+#profilerModal tr td:last-child, #profilerModal code span {
+	word-break: break-all;
+}
+#profilerModal table * {
+	background-color: transparent !important;
+}
+
+/*********************************************
+    calendar
+ *********************************************/
+[data-class="dashboard"][data-method="index"] #calendar.fc .fc-view-harness {
+	min-height: unset !important;
+}
+
+/*********************************************
+    .form-type-filter
+ *********************************************/
+.form-type-filter .form-floating:has(select) > label {
+	color: rgba(var(--bs-body-color-rgb), 1);
+	transform: scale(0.867) translateY(-0.6rem) translateX(0.0625rem);
+}
+.form-type-filter .form-floating.form-floating-outline:has(select:not(:placeholder-shown)) > label {
+	width: auto;
+	height: auto;
+	padding: 2px 0.375rem;
+	margin-left: 0.625rem;
+	margin-top: 0.125rem;
+	transform: translateY(-0.8rem) translateX(-2px);
+	opacity: 1;
+	font-size: 0.8125rem;
+}
+.form-type-filter .filter-space {
+	display: none;
+}
+.form-type-filter .filter-btns>*:not(:last-child) {
+	margin-right: 1.5rem;
+}
+
+/*********************************************
+    .selectpicker
+ *********************************************/
+.form-floating.form-floating-outline > .form-select {
+	display: block !important;
+	width: 100%;
+	padding: 0.8555rem 1rem;
+	font-size: 0.9375rem;
+	font-weight: 400;
+	line-height: 1.375;
+	color: #3b4056;
+	appearance: none;
+	background-color: transparent;
+	background-clip: padding-box;
+	border: 1px solid #cfd0d6;
+	border-radius: 0.5rem;
+	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/*********************************************
+    .flatpickr
+ *********************************************/
+.light-style .form-control.flatpickr-time {
+	border: 1px solid #cfd0d6;
+}
+
+/*********************************************
+    [data-method="excel"]
+ *********************************************/
+[data-method="excel"] td.edit-required {
+	background-color: var(--bs-yellow);
+	border: 2px solid var(--bs-primary);
+	border-radius: .05rem;
+}
+
+[data-method="excel"] tr.submit-completed {
+	background-color: #cbcbcb;
+}
+
+/*********************************************
+    [data-method="view"]
+ *********************************************/
+[data-method="view"][data-onload="false"] .view-data {
+	background-color: #cbcbcb;
+	border-radius: .2rem;
+}
+[data-method="view"][data-onload="false"] #subject {
+	height: 1.75rem;
+}
+[data-method="view"] #thumbnail {
+	background-color: #eee;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+}
+[data-method="view"] .no-thumbnail-text {
+	display: none;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+[data-method="view"] #thumbnail.none~.no-thumbnail-text {
+	display: block;
+}
+[data-method="view"] #content {
+	min-height: 400px;
+}
+[data-method="view"] #created_id {
+	min-width: 6rem;
+	height: 1.375rem;
+}
+[data-method="view"] #view_count {
+	min-width: 1.75rem;
+}
+
+/*********************************************
+    #comment-container
+ *********************************************/
+#comment-container .target-comment-wrap {
+	display: none;
+}
+#comment-container .target-comment-wrap[data-loaded="true"] {
+	display: block;
+	margin-bottom: 1rem;
+}
+#comment-container .target-comment-wrap[data-loaded="true"]>div {
+	background-color: #eee;
+	padding: .5rem 1rem;
+}
+#comment-container #comment-list:not(:has(li)) {
+	display: none;
+}
+#comment-container #comment-list li {
+	padding: 1.5rem 1rem;
+	border-radius: .5rem;
+}
+#comment-container #comment-list>li:not(:first-child) {
+	margin-top: .5rem;
+	/*border-top: 1px solid #e5e6e8 !important;*/
+}
+#comment-container #comment-list .comment-info {
+	flex: 1 1 auto !important;
+	display: flex;
+}
+#comment-container .comment-reply-list {
+	background-color: #eee;
+}
+#comment-container .comment-reply-list:has(li) {
+	padding: .5rem 2rem;
+	margin: 1rem 0 0 2rem;
+}
+#comment-container .comment-reply-list li {
+	position: relative;
+}
+#comment-container .comment-reply-list li:not(:first-child) {
+	border-top: 1px dashed #cbcbcb;
+}
+#comment-container .comment-reply-list li i {
+	position: absolute;
+	top: 1rem;
+	left: -2rem;
+	height: 20px;
+	width: 20px;
+}
+@media (max-width: 576px) {
+	#comment-container #comment-list {
+		padding: .5rem 1rem !important;
+	}
+	#comment-container #comment-list li {
+		padding: .5rem 0 !important;
+	}
+	#comment-container #comment-list .comment-info>div {
+		width: 100% !important;
+		margin-right: 0 !important;
+	}
+	#comment-container #comment-list .comment-info>div {
+		margin-bottom: .5rem;
+	}
+	#comment-container #comment-list .comment-wrap {
+		flex-direction: column;
+	}
+	#comment-container #comment-list .comment-info {
+		flex-direction: column;
+	}
+	#comment-container #comment-list .comment-btns  {
+		justify-content: space-between !important;
+	}
+}

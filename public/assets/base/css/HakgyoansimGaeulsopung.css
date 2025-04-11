@@ -1,0 +1,29 @@
+@font-face {
+	font-family: 'Gaeulsopung';
+	src: local('Gaeulsopung'), url(../font/HakgyoansimGaeulsopung/HakgyoansimGaeulsopungL.ttf) format('truetype');
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+}
+
+@font-face {
+	font-family: 'Gaeulsopung';
+	src: local('Gaeulsopung'), url(../font/HakgyoansimGaeulsopung/HakgyoansimGaeulsopungB.ttf) format('truetype');
+	font-style: normal;
+	font-weight: 700;
+	font-display: block;
+}
+
+.font-gaeulsopung {
+	font-family: 'Gaeulsopung';
+}
+
+.font-gaeulsopung-l {
+	font-family: 'Gaeulsopung';
+	font-weight: 400;
+}
+
+.font-gaeulsopung-b {
+	font-family: 'Gaeulsopung';
+	font-weight: 700;
+}

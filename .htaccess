@@ -1,0 +1,28 @@
+<IfModule mod_php5.c>
+    #Session timeout
+    php_value session.cookie_lifetime 43200
+    php_value session.gc_maxlifetime 43200
+</IfModule>
+<IfModule mod_env.c>
+    #Set Environment(development,testing,production)
+    SetEnv CI_ENV development
+</IfModule>
+<IfModule mod_rewrite.c>
+    #if mod_env module not enabled in server
+    #Set Environment(development,testing,production)
+    RewriteRule ^ - [E=CI_ENV:development]
+
+    Options +FollowSymlinks -Indexes
+    RewriteEngine On
+    RewriteBase /
+    DirectoryIndex index.php
+    RewriteCond $1 !^(index\.php|images|robots\.txt|css|docs|js|system|public)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php/$1 [L,QSA]
+    #<Files ~ "\.(env|env.development|env.production|json|config.js|md|gitignore|gitattributes|lock)$">
+    <Files ~ "\.(env|env.development|env.production|config.js|md|gitignore|gitattributes|lock)$">
+        Order allow,deny
+        Deny from all
+    </Files>
+</IfModule>

@@ -1,0 +1,71 @@
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR Thin'), url(../font/NotoSansKr/NotoSansKR-Thin.ttf) format('woff');
+    font-style: normal;
+    font-weight: 100;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR ExtraLight'), url(../font/NotoSansKr/NotoSansKR-ExtraLight.ttf) format('woff');
+    font-style: normal;
+    font-weight: 200;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR Light'), url(../font/NotoSansKr/NotoSansKR-Light.ttf) format('woff');
+    font-style: normal;
+    font-weight: 300;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR Regular'), url(../font/NotoSansKr/NotoSansKR-Regular.ttf) format('woff');
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR Medium'), url(../font/NotoSansKr/NotoSansKR-Medium.ttf) format('woff');
+    font-style: normal;
+    font-weight: 500;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR Semibold'), url(../font/NotoSansKr/NotoSansKR-Semibold.ttf) format('woff');
+    font-style: normal;
+    font-weight: 600;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR Bold'), url(../font/NotoSansKr/NotoSansKR-Bold.ttf) format('woff');
+    font-style: normal;
+    font-weight: 700;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR ExtraBold'), url(../font/NotoSansKr/NotoSansKR-ExtraBold.ttf) format('woff');
+    font-style: normal;
+    font-weight: 800;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Noto Sans KR';
+    src: local('Noto Sans KR Black'), url(../font/NotoSansKr/NotoSansKR-Black.ttf) format('woff');
+    font-style: normal;
+    font-weight: 900;
+    font-display: block;
+}

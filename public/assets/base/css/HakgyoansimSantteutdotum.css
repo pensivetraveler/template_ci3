@@ -1,0 +1,29 @@
+@font-face {
+	font-family: 'Santteutdotum';
+	src: local('Santteutdotum'), url(../font/HakgyoansimSantteutdotum/HakgyoansimSantteutdotumL.ttf) format('truetype');
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+}
+
+@font-face {
+	font-family: 'Santteutdotum';
+	src: local('Santteutdotum'), url(../font/HakgyoansimSantteutdotum/HakgyoansimSantteutdotumM.ttf) format('truetype');
+	font-style: normal;
+	font-weight: 700;
+	font-display: block;
+}
+
+.font-santteutdotum {
+	font-family: 'Santteutdotum';
+}
+
+.font-santteutdotum-l {
+	font-family: 'Santteutdotum';
+	font-weight: 400;
+}
+
+.font-santteutdotum-m {
+	font-family: 'Santteutdotum';
+	font-weight: 700;
+}
