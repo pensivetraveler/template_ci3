@@ -35,12 +35,6 @@ class MY_Hooks
 		}
 	}
 
-	public function setPearPath()
-	{
-		// on Apache
-		ini_set ( 'include_path', ini_get ( 'include_path' ) . ':' . BASEPATH . 'application/web/pear/' );
-	}
-
 	public function checkPermission()
 	{
 		$CI =& get_instance();

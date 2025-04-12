@@ -61,18 +61,6 @@ $hook['pre_controller'][] = array(
 
 
 /**
- * System Of Inspection
- * 서버 점검 시, 모든 라우트에 대한 접근 제한을 해아할 경우
- */
-$hook['pre_controller'][] = array (
-	'class' => 'MY_Hooks',
-	'function' => 'setPearPath',
-	'filename' => 'MY_Hooks.php',
-	'filepath' => 'hooks'
-);
-
-
-/**
  * Permission check
  * https://www.cikorea.net/bbs/view/tip?idx=8009
  */
