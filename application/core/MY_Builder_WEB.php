@@ -856,8 +856,26 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $this->loginData = $this->validateToken();
             if(!property_exists($this->loginData, 'user_cd')) return false;
             return in_array($this->loginData->user_cd, ['USR000', 'USR001']);
+        }else{
+            $this->destroyUserData();
+            return false;
+        }
+    }
+
+    protected function destroyUserData()
+    {
+        delete_cookie('autologin');
+
+        if(count($this->session->userdata())) {
+            foreach ($this->session->userdata() as $key=>$val) {
+                $this->session->unset_userdata($key);
+            }
+            $this->session->sess_destroy();
         }
 
-        return parent::checkLogin();
+        // 세션 쿠키 삭제
+        if (isset($_COOKIE[$this->config->item('sess_cookie_name')])) {
+            setcookie($this->config->item('sess_cookie_name'), '', time() - 3600, '/');
+        }
     }
 }

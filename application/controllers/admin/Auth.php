@@ -49,25 +49,11 @@ class Auth extends Common
 
     public function logout()
     {
-		if(!$this->isLogin) redirect($this->noLoginRedirect);
+        if(!$this->isLogin) redirect($this->noLoginRedirect);
 
-        $this->Model_User_Autologin->delData([
-            'user_id' => $this->session->userdata('user_id'),
-        ]);
+        $this->destroyUserData();
 
-        delete_cookie('autologin');
-
-		foreach ($this->session->userdata() as $key=>$val) {
-			$this->session->unset_userdata($key);
-		}
-        $this->session->sess_destroy();
-
-        // 세션 쿠키 삭제
-        if (isset($_COOKIE[$this->config->item('sess_cookie_name')])) {
-            setcookie($this->config->item('sess_cookie_name'), '', time() - 3600, '/');
-        }
-
-        redirect('admin/auth');
+        redirect($this->noLoginRedirect);
     }
 
 	public function findId()

@@ -24,16 +24,17 @@ class Common extends MY_Builder_WEB
 	protected function checkLogin(): bool
 	{
 		if(parent::checkLogin()) {
-			$user = $this->Model_User->getData([], ['user_id' => $this->session->userdata('user_id')]);
-			if(!$user || !$this->isAdmin) alert(lang('Incorrect Access'), base_url('admin/auth'));
+            $user = $this->Model_User->getData([], ['user_id' => $this->session->userdata('user_id')]);
+            if(!$user || !in_array($user->user_cd, ['USR000','USR001'])) return false;
 
-			$this->userData = $user;
-			$this->headerData = [
-				'id' => $user->id,
-				'user_id' => $user->user_id,
-				'name' => $user->name,
-				'user_cd' => $user->user_cd,
-			];
+            $this->isAdmin = true;
+            $this->userData = $user;
+            $this->headerData = [
+                'id' => $user->id,
+                'user_id' => $user->user_id,
+                'name' => $user->name,
+                'user_cd' => $user->user_cd,
+            ];
 		}
 
 		return parent::checkLogin();
