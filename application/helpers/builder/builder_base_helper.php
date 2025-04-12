@@ -11,42 +11,6 @@ if ( ! function_exists('builder_view'))
 	}
 }
 
-if ( ! function_exists('get_yn'))
-{
-	function get_yn($bool): string
-	{
-		return $bool?'Y':'N';
-	}
-}
-
-if ( ! function_exists('unravel_list'))
-{
-	function unravel_list($list) : array
-	{
-		$result = [];
-		foreach ($list as $item) {
-			if(is_array($item)) {
-				foreach ($item as $subitem) {
-					$result[] = $subitem;
-				}
-			}else{
-				$result[] = $item;
-			}
-		}
-		return array_values(array_unique($result));
-	}
-}
-
-if ( ! function_exists('reformat_bool_type_list'))
-{
-	function reformat_bool_type_list($list) : array
-	{
-		return array_keys(array_filter($list, function ($value) {
-			return $value === true || $value === 1;
-		}));
-	}
-}
-
 function get_builder_html_attributes($flag): string
 {
 	$classList = [];
