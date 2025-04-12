@@ -854,8 +854,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
     {
         if($this->session->userdata('token')) {
             $this->loginData = $this->validateToken();
-            $this->isAdmin = in_array($this->loginData->user_cd, ['USR000', 'USR001']);
-            return true;
+            if(!property_exists($this->loginData, 'user_cd')) return false;
+            return in_array($this->loginData->user_cd, ['USR000', 'USR001']);
         }
 
         return parent::checkLogin();
