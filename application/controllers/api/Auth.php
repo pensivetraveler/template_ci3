@@ -10,7 +10,6 @@ class Auth extends Common
 		parent::__construct();
 
 		$this->load->model('Model_User', 'Model');
-		$this->load->model('Model_Student', 'Model_Child');
 
 		$this->setConfig = false;
 
