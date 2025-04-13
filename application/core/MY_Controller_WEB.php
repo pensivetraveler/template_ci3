@@ -63,7 +63,7 @@ class MY_Controller_WEB extends MY_Controller
 
     protected function checkLogin(): bool
     {
-        return false;
+        return true;
     }
 
     protected function validateToken()
