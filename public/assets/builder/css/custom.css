@@ -136,6 +136,11 @@
 /*********************************************
     common
  *********************************************/
+body:not([data-class="auth"]) .app-brand-logo img {
+	max-width: 100px;
+	max-height: 50px;
+}
+
 /* border-color */
 .border-input {
 	border-color: #cfd0d6 !important;
