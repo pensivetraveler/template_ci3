@@ -17,7 +17,7 @@
 			<h5 class="mb-0"><?=lang('nav.'.$titleList[1])?> 엑셀 업로드</h5>
 			<span class="small d-block mt-1 text-gray">엑셀 업로드 관리 페이지입니다.</span>
 			<div class="row mt-4">
-				<div class="col-6">
+				<div class="col-lg-6">
 					<div>
 						<h6 class="mb-1">유의사항</h6>
 						<p class="text-start mb-0">
@@ -39,11 +39,12 @@
 							- 샘플 양식을 활용 시 첫번째 행은 삭제하지 마십시오.
 						</p>
 						<p class="text-start mt-4">
-							<a href="<?=$sampleFile?>" class="btn btn-secondary p-2" download=""><i class="ri-download-line ri-14px me-2"></i><span class="small">샘플 파일 다운로드</span></a>
+							<a href="<?=$sampleFile?>" class="btn btn-info p-2" download=""><i class="ri-download-line ri-14px me-2"></i><span class="small">샘플 파일 다운로드</span></a>
+							<a href="javascript:resetExcelFile()" class="btn btn-secondary p-2" download=""><i class="ri-refresh-line ri-14px me-2"></i><span class="small">샘플 파일 리셋</span></a>
 						</p>
 					</div>
 				</div>
-				<div class="col-6">
+				<div class="col-lg-6">
 					<h6 class="mb-1">업로드 내역</h6>
 					<ul class="mt-2 p-4 rounded-3 bg-label-primary">
 						<li class="mb-2 d-flex align-items-center">
@@ -92,7 +93,7 @@
 					<tr>
 						<th>#</th>
 						<?php foreach ($excelHeaders as $item): ?>
-						<th data-field="<?=$item['field']?>" data-required="<?=$item['required']?>"><?=lang($item['label'])?></th>
+						<th data-field="<?=$item['field']?>" data-required="<?=$item['required']?>"><span><?=lang($item['label'])?></span></th>
 						<?php endforeach; ?>
 						<th>삭제</th>
 					</tr>
