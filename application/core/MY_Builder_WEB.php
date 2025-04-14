@@ -704,7 +704,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
     protected function getExcelSample($data)
     {
         $sampleUri = '';
-        $filename = $this->router->class.'_upload_sample.xlsx';;
+        $filename = $this->router->class.'_upload_sample.xlsx';
         $filepath = 'public'.DIRECTORY_SEPARATOR.'sample'.DIRECTORY_SEPARATOR;
 
         if(file_exists(FCPATH.$filepath.$filename) || count($data)) {
