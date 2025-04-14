@@ -576,6 +576,18 @@ html[data-style="dark"] .form-type-side .input-group .form-floating > div:has(.s
 	background-color: #cbcbcb;
 }
 
+[data-method="excel"] table span {
+	position: relative;
+}
+
+[data-method="excel"] table [data-required="1"] span:after {
+	content: '*';
+	color: red;
+	position: absolute;
+	right: -10px;
+	top: 0;
+}
+
 /*********************************************
     [data-method="view"]
  *********************************************/

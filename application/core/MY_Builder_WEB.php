@@ -670,19 +670,35 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function getExcelHeaders()
     {
-        $list = [];
-        foreach ($this->formColumns as $column) {
-            if(!$column['form']) continue;
-            if($column['type'] === 'hidden') continue;
-            if(in_array($column['field'], [CREATED_ID_COLUMN_NAME, CREATED_DT_COLUMN_NAME, UPDATED_ID_COLUMN_NAME, UPDATED_DT_COLUMN_NAME, DEL_YN_COLUMN_NAME, USE_YN_COLUMN_NAME, RECENT_DT_COLUMN_NAME])) continue;
-            if(preg_match('/matches\[(.*?)\]/', $column['rules'], $matches)) continue;
-            $list[] = [
-                'field' => $column['field'],
-                'required' => strpos($column['rules'], 'required')!==false,
-                'label' => lang($column['label']),
-            ];
+        $config = $this->config->item('excel_'.strtolower($this->router->class).'_config');
+
+        if($config) {
+            return array_reduce($config, function($carry, $item) {
+                if(isset($item['field'])) {
+                    if(!array_key_exists('required', $item)) {
+                        $item['required'] = false;
+                    }
+                    if(array_key_exists('label', $item) || !$item['label']) {
+                        $item['label'] = $item['field'];
+                    }
+                    $carry[] = $item;
+                }
+                return $carry;
+            }, []);
+        }else{
+            $config = [];
+            foreach ($this->formColumns as $column) {
+                if(!$column['form'] || !isset($column['field']) || $column['type'] === 'hidden') continue;
+                if(in_array($column['field'], [CREATED_ID_COLUMN_NAME, CREATED_DT_COLUMN_NAME, UPDATED_ID_COLUMN_NAME, UPDATED_DT_COLUMN_NAME, DEL_YN_COLUMN_NAME, USE_YN_COLUMN_NAME, RECENT_DT_COLUMN_NAME])) continue;
+                if(preg_match('/matches\[(.*?)\]/', $column['rules'], $matches)) continue;
+                $config[] = [
+                    'field' => $column['field'],
+                    'required' => strpos($column['rules'], 'required')!==false,
+                    'label' => $column['label']??$column['field'],
+                ];
+            }
+            return $config;
         }
-        return $list;
     }
 
     protected function getExcelSample($data)
@@ -703,7 +719,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
                 for($i = 0; $i < count($data); $i++) {
                     $alphabet = number_to_alphabet($i);
-                    $sheet->setCellValue($alphabet.'1', $data[$i]['label']);
+                    $sheet->setCellValue($alphabet.'1', lang($data[$i]['label']));
 
                     if($data[$i]['required']) {
                         $sheet->getStyle($alphabet.'1')
