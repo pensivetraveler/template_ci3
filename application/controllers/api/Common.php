@@ -68,59 +68,6 @@ class Common extends MY_Builder_API
 		return $data;
 	}
 
-	public function checkDuplicate_get()
-	{
-		$dto = $this->input->get();
-		if($this->checkDuplicate([$dto['field'] => $dto['value']])){
-			$this->response([
-				'code' => DATA_ALREADY_EXIST,
-				'dto' => $dto,
-			]);
-		}else{
-			$this->response([
-				'code' => DATA_AVAILABLE,
-				'dto' => $dto,
-			]);
-		}
-	}
-
-	public function options_get()
-	{
-
-	}
-
-	public function reorder_patch()
-	{
-		$new_index = $this->input->get('new_index') ?? null;
-		$file_id = $this->input->get('file_id') ?? null;
-
-		if(!$new_index || !$file_id) {
-			$this->response([
-				'code' => EMPTY_REQUIRED_DATA,
-			]);
-		}
-	}
-
-	public function deleteFile_patch($key = 0)
-	{
-		$type = $this->input->get('type') ?? null;
-		$file_id = $this->patch('file_id') ?? null;
-		if(!$type || !$file_id) $this->response(['code' => EMPTY_REQUIRED_DATA]);
-
-		$this->delFileData(['file_id' => $file_id]);
-
-		$this->response([
-			'code' => DATA_DELETED,
-		]);
-	}
-
-	public function deleteRepeater_patch($key = 0)
-	{
-		$this->response([
-			'code' => DATA_DELETED,
-		]);
-	}
-
 	public function message_read_patch($key)
 	{
 		$tokenData = $this->validateToken();

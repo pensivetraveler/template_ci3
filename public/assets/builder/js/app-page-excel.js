@@ -38,6 +38,32 @@ function getEditableColumns(tableSelector, excludeIndices = [0]) {
 	return editableColumns;
 }
 
+function resetExcelFile() {
+	$.ajax({
+		url: common.API_URI + '/deleteExcelFile',
+		type: "PATCH",
+		data: {
+			class: document.body.getAttribute('data-class'),
+		},
+		dataType: 'json',
+		success: function(response, textStatus, jqXHR) {
+			showAlert({
+				type: "success",
+				title: 'Complete',
+				text: 'Reset Completed',
+				callback: reload,
+			});
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR)
+			showAlert({
+				type: "error",
+				text: jqXHR.responseJSON ? jqXHR.responseJSON.msg : "Unknown Error",
+			});
+		},
+	});
+}
+
 async function validateData(dataArray, chunkSize = 50) {
 	let index = 0;
 	let valid = true;

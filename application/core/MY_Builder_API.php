@@ -914,6 +914,9 @@ class MY_Builder_API extends MY_Controller_API
         }
     }
 
+    /**
+     * Common API
+     */
     function isMyData_get($key, $model = null)
     {
         $tokenData = $this->validateToken();
@@ -939,6 +942,73 @@ class MY_Builder_API extends MY_Controller_API
 
         $this->response([
             'code' => DATA_PROCESSED,
+        ]);
+    }
+
+    public function checkDuplicate_get()
+    {
+        $dto = $this->input->get();
+        if($this->checkDuplicate([$dto['field'] => $dto['value']])){
+            $this->response([
+                'code' => DATA_ALREADY_EXIST,
+                'dto' => $dto,
+            ]);
+        }else{
+            $this->response([
+                'code' => DATA_AVAILABLE,
+                'dto' => $dto,
+            ]);
+        }
+    }
+
+    public function options_get()
+    {
+
+    }
+
+    public function reorder_patch()
+    {
+        $new_index = $this->input->get('new_index') ?? null;
+        $file_id = $this->input->get('file_id') ?? null;
+
+        if(!$new_index || !$file_id) {
+            $this->response([
+                'code' => EMPTY_REQUIRED_DATA,
+            ]);
+        }
+    }
+
+    public function deleteRepeater_patch($key = 0)
+    {
+        $this->response([
+            'code' => DATA_DELETED,
+        ]);
+    }
+
+    public function deleteFile_patch($key = 0)
+    {
+        $type = $this->input->get('type') ?? null;
+        $file_id = $this->patch('file_id') ?? null;
+        if(!$type || !$file_id) $this->response(['code' => EMPTY_REQUIRED_DATA]);
+
+        $this->delFileData(['file_id' => $file_id]);
+
+        $this->response([
+            'code' => DATA_DELETED,
+        ]);
+    }
+
+    public function deleteExcelFile_patch()
+    {
+        $class = $this->input->get('class') ?? null;
+        if(!$class) $this->response(['code' => EMPTY_REQUIRED_DATA]);
+
+        $filename = $class.'_upload_sample.xlsx';;
+        $filepath = 'public'.DIRECTORY_SEPARATOR.'sample'.DIRECTORY_SEPARATOR;
+        if(!unlink(FCPATH.$filepath.$filename)) $this->response(['code' => INTERNAL_SERVER_ERROR]);
+
+        $this->response([
+            'code' => DATA_DELETED,
         ]);
     }
 }
