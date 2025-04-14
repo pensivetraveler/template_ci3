@@ -681,6 +681,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                     if(!array_key_exists('label', $item) || !$item['label']) {
                         $item['label'] = $item['field'];
                     }
+                    $item['label'] = lang($item['label']);
                     $carry[] = $item;
                 }
                 return $carry;
@@ -694,7 +695,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 $config[] = [
                     'field' => $column['field'],
                     'required' => strpos($column['rules'], 'required')!==false,
-                    'label' => $column['label']??$column['field'],
+                    'label' => lang($column['label']??$column['field']),
                 ];
             }
             return $config;
@@ -719,7 +720,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
                 for($i = 0; $i < count($data); $i++) {
                     $alphabet = number_to_alphabet($i);
-                    $sheet->setCellValue($alphabet.'1', lang($data[$i]['label']));
+                    $sheet->setCellValue($alphabet.'1', $data[$i]['label']);
 
                     if($data[$i]['required']) {
                         $sheet->getStyle($alphabet.'1')
