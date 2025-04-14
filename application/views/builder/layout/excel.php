@@ -63,8 +63,8 @@
 					</ul>
 				</div>
 			</div>
-			<div class="row mt-8">
-				<div class="col-md-6 col-sm-12">
+			<div class="row mt-6">
+				<div class="col-md-6 col-sm-12 mt-2">
 					<div class="input-group input-group-merge">
 						<div class="form-floating form-floating-outline">
 							<input type="file" name="excelFile" id="excelFile"
@@ -74,7 +74,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-md-6 col-sm-12 d-flex align-items-center justify-content-end">
+				<div class="col-md-6 col-sm-12 d-flex align-items-center justify-content-end mt-2">
 					<button id="resetExcelForm" class="btn btn-outline-primary w-px-100 btn-reset waves-effect me-4" type="reset">초기화</button>
 					<button id="excelFormSubmit" class="btn btn-primary w-px-100 btn-search waves-effect waves-light" type="button" disabled>저장</button>
 				</div>

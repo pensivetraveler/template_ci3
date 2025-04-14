@@ -678,7 +678,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                     if(!array_key_exists('required', $item)) {
                         $item['required'] = false;
                     }
-                    if(array_key_exists('label', $item) || !$item['label']) {
+                    if(!array_key_exists('label', $item) || !$item['label']) {
                         $item['label'] = $item['field'];
                     }
                     $carry[] = $item;
