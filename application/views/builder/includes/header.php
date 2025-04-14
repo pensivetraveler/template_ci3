@@ -9,7 +9,7 @@
 						<a href="/<?=$platformName?>/dashboard?layout=side-menu" class="app-brand-link">
 							<?php if(file_exists(PLATFORM_ASSET_IMG_PATH.'logo.png')): ?>
 								<span class="app-brand-logo demo">
-										<img src="<?=base_url(PLATFORM_ASSET_IMG_URI.'logo.png')?>" alt="logo" class="w-px-100">
+										<img src="<?=base_url(PLATFORM_ASSET_IMG_URI.'logo.png')?>" alt="logo">
 									</span>
 							<?php else: ?>
 								<span class="app-brand-text demo menu-text fw-semibold ms-2 text-primary"><?=APP_NAME_KR?></span>
