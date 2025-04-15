@@ -4,7 +4,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class MY_Builder_WEB extends MY_Controller_WEB
 {
     public string $flag = '';
+    public string $apiFlag = '';
     public string $baseUri = '';
+    public string $apiUri = '';
     public array $pageConfig;
     public string $pageType;
     public bool $sideForm;
@@ -49,6 +51,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $this->baseViewPath = BUILDER_FLAGNAME."/layout/index";
         $this->baseUri = $this->flag === $this->router->routes['default_platform'] ? '' : $this->flag;
+        $this->apiUri = base_url($this->flag . DIRECTORY_SEPARATOR . $this->apiFlag . DIRECTORY_SEPARATOR);
         $this->isLoginRedirect = "$this->baseUri/{$this->config->item('platform_config.isLoginRedirect')}";
         $this->noLoginRedirect = "$this->baseUri/{$this->config->item('platform_config.noLoginRedirect')}";
 
