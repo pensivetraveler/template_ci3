@@ -16,7 +16,7 @@ class Auth extends Common
 
 		$this->formColumns = $this->setFormColumns('login');
 		$this->addJsVars([
-			'API_URI' => '/api/auth',
+			'API_URI' => $this->apiUri.'auth',
 			'API_URI_ADD' => 'login',
 			'FORM_DATA' => $this->setFormData(),
 			'FORM_REGEXP' => $this->config->item('regexp'),
@@ -62,7 +62,7 @@ class Auth extends Common
 
 		$this->formColumns = $this->setFormColumns('find_id');
 		$this->addJsVars([
-			'API_URI' => '/api/auth/',
+			'API_URI' => $this->apiUri.'auth/',
 			'API_URI_ADD' => 'findId',
 			'FORM_DATA' => $this->setFormData(),
 			'FORM_REGEXP' => $this->config->item('regexp'),
@@ -99,7 +99,7 @@ class Auth extends Common
 
 		$this->formColumns = $this->setFormColumns('find_password');
 		$this->addJsVars([
-			'API_URI' => '/api/auth/',
+			'API_URI' => $this->apiUri.'auth/',
 			'API_URI_ADD' => 'findPassword',
 			'FORM_DATA' => $this->setFormData(),
 			'FORM_REGEXP' => $this->config->item('regexp'),

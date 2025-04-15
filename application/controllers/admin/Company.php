@@ -11,7 +11,7 @@ class Company extends Common
 
         $this->titleList[] = 'Company Management';
         $this->addJsVars([
-            'API_URI' => '/api/company',
+            'API_URI' => $this->apiUri.'company',
             'API_PARAMS' => [
             ]
         ]);

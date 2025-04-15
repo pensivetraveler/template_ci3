@@ -10,7 +10,7 @@ class MyInfo extends Common
 
 		$this->titleList[] = 'MyInfo';
 		$this->addJsVars([
-			'API_URI' => '/api/users',
+			'API_URI' => $this->apiUri.'users',
 		]);
 	}
 
