@@ -10,6 +10,7 @@ class Common extends MY_Builder_WEB
 	public function __construct()
 	{
 		$this->flag = 'admin';
+		$this->apiFlag = 'api';
 
 		parent::__construct();
 
