@@ -19,12 +19,6 @@ foreach ($route['except_folders'] as $name) {
 	}else{
         if(!in_array($name, $route['api_folders'])){
             $route[$name] = $name.DIRECTORY_SEPARATOR.$route['default_controller'];
-            // 컨트롤러/메서드/파라미터 (숫자) 지원
-            $route["$name/(:any)/(:any)/(:num)"] = "$name/$1/$2/$3";
-            $route["$name/(:any)/(:num)"] = "$name/$1/index/$2";
-            // 컨트롤러/메서드 구조 지원
-            $route["$name/(:any)/(:any)"] = "$name/$1/$2";
-            $route["$name/(:any)"] = "$name/$1";
 
             foreach ($route['api_folders'] as $api) {
                 // 컨트롤러/메서드/파라미터 (숫자) 지원
@@ -34,6 +28,13 @@ foreach ($route['except_folders'] as $name) {
                 $route["$name/$api/(:any)/(:any)"] = "api/$1/$2";
                 $route["$name/$api/(:any)"] = "api/$1";
             }
+
+            // 컨트롤러/메서드/파라미터 (숫자) 지원
+            $route["$name/(:any)/(:any)/(:num)"] = "$name/$1/$2/$3";
+            $route["$name/(:any)/(:num)"] = "$name/$1/index/$2";
+            // 컨트롤러/메서드 구조 지원
+            $route["$name/(:any)/(:any)"] = "$name/$1/$2";
+            $route["$name/(:any)"] = "$name/$1";
         }else{
             $route[$name] = $name.DIRECTORY_SEPARATOR.$route['default_controller'];
             // 컨트롤러/메서드/파라미터 (숫자) 지원
