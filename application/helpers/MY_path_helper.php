@@ -12,19 +12,32 @@ if ( ! function_exists('get_path'))
 {
 	function get_path(): string
 	{
-		$ci =& get_instance();
-		$routes = $ci->router->routes;
-		$default_platform = array_key_exists('default_platform', $routes)?$routes['default_platform']:'';
-		$folder_list = $routes['except_folders'];
+        $ci =& get_instance();
+        $route = $ci->router->routes;
+        $default_platform = array_key_exists('default_platform', $route)?$route['default_platform']:'';
+        $folder_list = $route['except_folders'];
+        $api_folders = $route['api_folders'];
 
-		if(CLI_YN) {
-			return '';
-		}else{
-			$whole_uri = _HTTP.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-			$path_info = explode('/', str_replace(function_exists('base_url')?base_url():BASE_URL, '', $whole_uri));
-			$arr = array_values(array_filter($path_info));
-			return count($arr) > 0 ? in_array($arr[0], $folder_list)?$arr[0]:$default_platform : '';
-		}
+        if(CLI_YN) {
+            return '';
+        }else{
+            $whole_uri = _HTTP.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $path_info = explode('/', str_replace(function_exists('base_url')?base_url():BASE_URL, '', $whole_uri));
+            $arr = array_values(array_filter($path_info));
+            if(count($arr) > 0){
+                if(in_array($arr[0], $folder_list)) {
+                    if(count($arr) > 1 && in_array($arr[1], $api_folders)){
+                        return $arr[1];
+                    }else{
+                        return $arr[0];
+                    }
+                }else{
+                    return $default_platform;
+                }
+            }else{
+                return $default_platform;
+            }
+        }
 	}
 }
 
