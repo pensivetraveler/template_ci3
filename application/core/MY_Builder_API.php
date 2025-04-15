@@ -963,7 +963,7 @@ class MY_Builder_API extends MY_Controller_API
 
     public function options_get()
     {
-
+        show_404();
     }
 
     public function reorder_patch()
