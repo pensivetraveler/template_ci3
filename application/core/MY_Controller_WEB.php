@@ -54,7 +54,11 @@ class MY_Controller_WEB extends MY_Controller
     {
         if($this->router->class === 'common') {
             if($this->defaultController) {
-                redirect("/".(get_path()?get_path().'/':'').$this->defaultController);
+                $url = '/';
+                if(get_path() && get_path() !== $this->router->routes['default_platform']) $url .= get_path().'/';
+                $url .= $this->defaultController;
+                if($_SERVER['QUERY_STRING']) $url .= '?'.$_SERVER['QUERY_STRING'];
+                redirect($url);
             }else{
                 $this->load->view('welcome_message');
             }
