@@ -673,7 +673,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function getExcelHeaders()
     {
-        $config = $this->config->item('excel_'.strtolower($this->router->class).'_config');
+        $config = $this->config->get('excel_'.$this->pageConfig['listProperties']['excelConfig'].'_config', [], false);
+        if(empty($config)) $config = $this->config->item('excel_'.strtolower($this->router->class).'_config');
 
         if($config) {
             return array_reduce($config, function($carry, $item) {
