@@ -28,6 +28,7 @@ $config['page_base_config'] = [
 		'formType' => 'page',
 	],
 	'listProperties' => [
+		'excelConfig' => '',
 		'listConfig' => '',
 		'plugin' => 'datatable',
 		'isCheckbox' => false,
