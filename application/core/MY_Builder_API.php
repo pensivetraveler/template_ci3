@@ -679,11 +679,16 @@ class MY_Builder_API extends MY_Controller_API
             $files = $_FILES;
             foreach ($model->fileList as $key) {
                 if(is_file_posted($key)) {
+                    $config = $this->config->item($this->router->class . '_' . $key . '_upload_config')
+                        ?: $this->config->item($key . '_upload_config')
+                            ?: $this->config->item('base_upload_config');
+
+                    if(!array_key_exists('allowed_types', $config))
+                        throw new Exception('Upload config is not defined : '.$key, UPLOAD_FILE_FAIL);
+
                     $this->upload->initialize(
                         array_merge(
-                            $this->config->item($this->router->class . '_' . $key . '_upload_config')
-                                ?: $this->config->item($key . '_upload_config')
-                                ?: $this->config->item('base_upload_config'),
+                            $config,
                             [
                                 'upload_path' => $uploadPath,
                             ]
