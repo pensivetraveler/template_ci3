@@ -12,7 +12,7 @@ class MY_Controller_API extends RestController
         if($this->router->class === 'common') redirect('/welcome');
 
         $this->load->library('authorization_token', ['config' => 'extra/jwt_config']);
-        $this->lang->load('status_code', $this->config->item('language'));
+        $this->lang->load('status_code', $this->siteLang);
     }
 
     public function index_get($key = 0)
