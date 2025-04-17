@@ -47,7 +47,7 @@ class MY_Controller_WEB extends MY_Controller
         $this->jsVars = [];
         $this->perPage = 10;
 
-		$this->lang->load('form_validation', $this->config->item('language'));
+		$this->lang->load('form_validation', $this->siteLang);
     }
 
     public function index()
