@@ -56,7 +56,7 @@ class MY_Builder_API extends MY_Controller_API
 
         require_once APPPATH . 'config/extra/builder/builder_base_constants.php';
         $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_form",]);
-        $this->lang->load("builder/base", $this->config->item('language'));
+        $this->lang->load("builder/base", $this->siteLang);
 
         if(!$this->flag) show_error("Platform flag is not set.");
 
@@ -66,8 +66,8 @@ class MY_Builder_API extends MY_Controller_API
         foreach (glob(APPPATH . "config/extra/{$this->flag}/*_constants.php") as $file) {
             require_once $file;
         }
-        foreach (glob(APPPATH.'language'.DIRECTORY_SEPARATOR.$this->config->item('language').DIRECTORY_SEPARATOR.$this->flag.DIRECTORY_SEPARATOR.'*_lang.php') as $file) {
-            $this->lang->load($this->flag.DIRECTORY_SEPARATOR.str_replace('_lang.php', '', basename($file)), $this->config->item('language'));
+        foreach (glob(APPPATH.'language'.DIRECTORY_SEPARATOR.$this->siteLang.DIRECTORY_SEPARATOR.$this->flag.DIRECTORY_SEPARATOR.'*_lang.php') as $file) {
+            $this->lang->load($this->flag.DIRECTORY_SEPARATOR.str_replace('_lang.php', '', basename($file)), $this->siteLang);
         }
     }
 
