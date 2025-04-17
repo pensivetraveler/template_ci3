@@ -130,7 +130,7 @@ class MY_Controller_API extends RestController
 		header('Content-Type: application/json');
 
         if(is_empty($data, 'code') && $http_code === null)
-            show_error('response : Insufficient response data provided');
+            show_error('Insufficient response data provided');
 
         if($http_code === null) $http_code = floor((int)$data['code']/10);
         $http_big_code = floor($http_code/100);
