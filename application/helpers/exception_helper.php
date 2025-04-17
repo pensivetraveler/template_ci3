@@ -77,8 +77,8 @@ if ( ! function_exists('is_ajax'))
 
 if ( ! function_exists('get_path'))
 {
-	function get_path(): string
-	{
+    function get_path(): string
+    {
         include APPPATH.'config/extra/custom_routes.php';
 
         $default_platform = array_key_exists('default_platform', $route)?$route['default_platform']:'';
@@ -92,7 +92,7 @@ if ( ! function_exists('get_path'))
             $path_info = explode('/', str_replace(function_exists('base_url')?base_url():BASE_URL, '', $whole_uri));
             $arr = array_values(array_filter($path_info));
             if(count($arr) > 0){
-                if(in_array($arr[0], $folder_list)) {
+                if(in_array($arr[0], $folder_list) || $arr[0] === $default_platform) {
                     if(count($arr) > 1 && in_array($arr[1], $api_folders)){
                         return $arr[1];
                     }else{
@@ -105,7 +105,7 @@ if ( ! function_exists('get_path'))
                 return $default_platform;
             }
         }
-	}
+    }
 }
 
 if ( ! function_exists('is_api_call'))
