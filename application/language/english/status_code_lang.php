@@ -100,4 +100,5 @@ $lang['status_code'][CREATE_FOLDER_FAIL] = 'Failed to create folder.';
 $lang['status_code'][UPLOAD_FILE_FAIL] = 'File upload failed.';
 $lang['status_code'][WRITE_FILEDB_FAIL] = 'Failed to write data to the database.';
 $lang['status_code'][MODEL_IS_NOT_DEFINED] = 'Model Object is not defined';
+$lang['status_code'][EXTERNAL_API_ERROR] = 'External API error occurred.';
 $lang['status_code'][FOR_TEST] = 'It\'s for test';
