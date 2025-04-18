@@ -889,7 +889,7 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function beforeExcelUpload()
     {
-        $json_data = file_get_contents("php://input");
+        $json_data = $this->input->raw_input_stream;
         $data = json_decode($json_data, true);
 
         return $this->validateExcelData($data);
