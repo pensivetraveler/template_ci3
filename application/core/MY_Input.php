@@ -184,7 +184,7 @@ class MY_Input extends CI_Input
     public function patch($index = NULL, $xss_clean = NULL, $default_value = NULL)
     {
         if($this->method() === 'patch') {
-            parse_str(file_get_contents('php://input'), $_PATCH);
+            parse_str($this->raw_input_stream, $_PATCH);
             return $this->_fetch_from_array($_PATCH, $index, $xss_clean, $default_value);
         }else{
             return [];
@@ -203,7 +203,7 @@ class MY_Input extends CI_Input
     public function put($index = NULL, $xss_clean = NULL, $default_value = NULL)
     {
         if($this->method() === 'put') {
-            parse_str(file_get_contents('php://input'), $_PUT);
+            parse_str($this->raw_input_stream, $_PUT);
             return $this->_fetch_from_array($_PUT, $index, $xss_clean, $default_value);
         }else{
             return [];
@@ -222,7 +222,7 @@ class MY_Input extends CI_Input
     public function delete($index = NULL, $xss_clean = NULL, $default_value = NULL)
     {
         if($this->method() === 'delete') {
-            parse_str(file_get_contents('php://input'), $_DELETE);
+            parse_str($this->raw_input_stream, $_DELETE);
             return $this->_fetch_from_array($_DELETE, $index, $xss_clean, $default_value);
         }else{
             return [];
