@@ -15,7 +15,6 @@ if ( ! function_exists('is_empty'))
 	function is_empty($data, $key = ''): bool
 	{
         if(is_null($data)) return true;
-        if(!isset($data[$key])) return true;
         if(!trim($key)) {
             switch(gettype($data)) {
                 case 'boolean' :
