@@ -8,4 +8,4 @@ if(isset($subPage)) builder_view($subPage);
 if($includes['modalAppend']) builder_view("$platformName/includes/modal_append");
 if($includes['footer']) builder_view("$platformName/includes/footer");
 if($includes['tail']) builder_view("$platformName/includes/tail");
-exit;
+//exit;
