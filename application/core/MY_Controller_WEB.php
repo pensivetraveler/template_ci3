@@ -73,7 +73,7 @@ class MY_Controller_WEB extends MY_Controller
     protected function validateToken()
     {
         $token = $this->input->post('token')?:$this->session->userdata('token');
-        if(is_empty($token)){
+        if(empty($token)){
 			alert('토큰 값이 없습니다.', base_url($this->noLoginRedirect));
         }else{
             $decodedToken = $this->authorization_token->tokenParamCheck($token);
