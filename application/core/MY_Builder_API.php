@@ -198,7 +198,11 @@ class MY_Builder_API extends MY_Controller_API
 
         if(count($this->fileList) > 0) {
             foreach ($this->fileList as $key) {
-                if($data->{$key}){
+                if($data->{$key} === '0') {
+                    $data->{$key} = null;
+                    continue;
+                }
+                if($data->{$key}) {
                     $file_id = $data->{$key};
                     $file_dto = $this->Model_File->getList([], ['file_id' => $file_id]);
                     if($file_dto) {
