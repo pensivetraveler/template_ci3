@@ -232,14 +232,21 @@ function get_admin_form_attributes($item, $form_type): array
 	$ci =& get_instance();
 
 	// initiate
-	if(!is_empty($item['attributes'], 'placeholder')){
-		$placeholder = strpos($item['attributes']['placeholder'], 'filter.') !== false?$item['attributes']['placeholder']:'placeholder.'.$item['attributes']['placeholder'];
-	}else{
-		$placeholder = $item['label'];
-	}
+    if(!is_empty($item['attributes'], 'placeholder')){
+        $exploded = explode('.', $item['attributes']['placeholder']);
+        if(count($exploded)){
+            $placeholder = $ci->lang->line($item['attributes']['placeholder']);
+       }else{
+            $placeholder = $ci->lang->line('placeholder.'.$item['attributes']['placeholder']);
+            if($placeholder === 'placeholder.'.$item['attributes']['placeholder'])
+                $placeholder = $ci->lang->line($item['attributes']['placeholder']);
+        }
+    }else{
+        $placeholder = $ci->lang->line($item['label']);
+    }
 
 	$attributes = [
-		'placeholder' => $ci->lang->line($placeholder),
+		'placeholder' => $placeholder,
 		'aria-label' => $ci->lang->line($item['label']),
 		'aria-describedby' => $item['field'].'-ico',
 	];
