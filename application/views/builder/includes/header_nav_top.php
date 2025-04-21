@@ -81,7 +81,7 @@
 					<li>
 						<div class="d-grid px-4 pt-2 pb-1">
 							<a class="btn btn-sm btn-danger d-flex" href="<?=base_url('admin/auth/logout')?>" target="_self">
-								<small class="align-middle"><?=('Logout')?></small>
+								<small class="align-middle"><?=lang('Logout')?></small>
 								<i class="ri-logout-box-r-line ms-2 ri-16px"></i>
 							</a>
 						</div>
