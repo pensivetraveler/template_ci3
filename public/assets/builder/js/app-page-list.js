@@ -524,6 +524,7 @@ function renderColumn(data, type, full, meta, column) {
 	// inner
 	let inner;
 	if(['recent_dt', 'created_dt', 'updated_dt'].includes(column.field)) {
+		if(!data) return '-';
 		const dateObj = new Date(data);
 		inner = dateObj.getFullYear().toString() + '-' + (dateObj.getMonth()+1).toString().padStart(2, '0') + '-' + dateObj.getDate().toString().padStart(2, '0');
 	}else{
