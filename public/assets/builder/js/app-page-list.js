@@ -133,7 +133,7 @@ $(function () {
 						}
 					},
 				]
-			: []),
+				: []),
 			// ...fields,
 			...common.LIST_COLUMNS.map(function (column, index) {
 				switch (column.format) {
@@ -160,7 +160,9 @@ $(function () {
 							targets: 1+common.LIST_CHEKBOX+index,
 							searchable: false,
 							orderable: false,
-							render: renderSelectColumn,
+							render: function(data, type, full, meta) {
+								return renderSelectColumn(data, type, full, meta, column)
+							},
 						}
 					default :
 						return {
@@ -288,6 +290,12 @@ $(function () {
 			// 테이블의 draw 이벤트가 발생할 때마다 취해야 하는 action 을 실행
 			if(appPlugins.list.datatable.drawCallback !== null && typeof appPlugins.list.datatable.drawCallback === 'function'){
 				appPlugins.list.datatable.drawCallback(settings)
+			}
+
+			if($(this).find('.selectpicker').length > 0){
+				$(this).find('.selectpicker').selectpicker({
+					width: 'fit'
+				});
 			}
 		},
 		rowCallback: function (row, data, displayNum, displayIndex, dataIndex) {
@@ -552,6 +560,8 @@ function renderColumn(data, type, full, meta, column) {
 				wrap.setAttribute('data-bs-content', inner);
 				break;
 			case 'select':
+				inner = `<select onchange="">`;
+				inner += `</select>`;
 				break;
 			default :
 				inner = '-';
@@ -606,7 +616,7 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 			}
 		}
 
-		if(column.onclick.kind === 'view') wrap.classList.add('text-primary', 'text-decoration-underline')
+		if(column.onclick.kind === 'view' && column.format !== 'button') wrap.classList.add('text-primary', 'text-decoration-underline')
 	}
 
 	Object.entries(attrs).map(([key, value]) => wrap.setAttribute(key, value));
@@ -618,8 +628,29 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 
 function renderSelectColumn(data, type, full, meta, column) {
 	const wrap = document.createElement('div');
-	wrap.classList.add('bootstrap-select');
-	return data;
+	wrap.classList.add('bootstrap-select', 'position-relative', 'w-px-100')
+	const select = document.createElement('select');
+	select.classList.add('selectpicker')
+
+	if(column.hasOwnProperty('options')) {
+		for(const value of Object.keys(column.options)){
+			const option = document.createElement('option');
+			option.value = value;
+			option.innerText = column.options[value];
+			if(data === value) option.setAttribute('selected', 'selected')
+			select.appendChild(option);
+		}
+	}
+
+	let funcName = 'afterSelectColumnChange';
+	if(column.hasOwnProperty('onChange') || column.hasOwnProperty('onchange')) {
+		const key = column.hasOwnProperty('onChange')?'onChange':'onchange';
+		funcName = column[key];
+	}
+	select.setAttribute('onchange', `${funcName}(${full[common.IDENTIFIER]}, '${column.field}', this.value)`);
+
+	wrap.appendChild(select)
+	return wrap.outerHTML;
 }
 
 function renderButtonColumn(data, type, full, meta, column) {
@@ -658,12 +689,22 @@ function getColumnOnclick(data, full, column) {
 
 		switch (column[key].kind) {
 			case 'view' :
-				if(common.PAGE_VIEW_URI) {
-					return `location.href="${common.PAGE_VIEW_URI}/${full[common.IDENTIFIER]}"`;
+				let uri;
+				if(column[key].params.length && column[key].params.hasOwnProperty('uri')) {
+					uri = column[key].params.uri;
+				}else{
+					if(common.PAGE_VIEW_URI) uri = common.PAGE_VIEW_URI;
+				}
+
+				if(uri) {
+					if(column[key].attrs.target === '_blank'){
+						return `window.open('${uri}/${full[common.IDENTIFIER]}', "_blank")`
+					}else{
+						return `location.href="${uri}/${full[common.IDENTIFIER]}"`;
+					}
 				}else{
 					return `openViewModal(${full[common.IDENTIFIER]})`;
 				}
-				break;
 			case 'popup' :
 				break;
 			case 'redirect' :
@@ -919,6 +960,29 @@ function getListActions(btns, dataId) {
 	btnHtml += '</div>';
 
 	return btnHtml;
+}
+
+function afterSelectColumnChange(id, field, value) {
+	$.ajax({
+		url: common.API_URI+'/'+id,
+		method: 'patch',
+		data: { [field]: value },
+		success: function (json) {
+			showAlert({
+				type: 'success',
+				title: 'Complete',
+				text: 'Your Data Is Updated',
+				callback: $('.datatables-records').DataTable().ajax.reload(),
+				params: [null, false]
+			});
+		},
+		error: function (err) {
+			showAlert({
+				type: 'warning',
+				text: jqXHR.responseJSON.msg,
+			});
+		}
+	});
 }
 
 function openViewModal(dataId) {

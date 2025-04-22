@@ -533,6 +533,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $this->listColumns = array_reduce($config, function($carry, $item) {
             $item = array_merge($this->config->get("builder_form_base_list_attributes", []), $item);
+
+            if($item['format'] === 'select' && !is_empty($item, 'option_attributes')) {
+                $item['options'] = $this->getOptions($item['field'], $item['option_attributes']);
+            }else{
+                $item['format'] = 'text';
+            }
+
             if ($item['list']) $carry[] = $item;
             return $carry;
         }, []);
