@@ -384,7 +384,7 @@ class MY_Builder_API extends MY_Controller_API
     {
         if($validate) $this->validateFormRules($configName);
 
-        if($this->input->method('post')) {
+        if($this->input->method() === 'post') {
             if(!$model) $model = $this->Model;
 
             foreach ($this->defaultList as $field=>$default) {
