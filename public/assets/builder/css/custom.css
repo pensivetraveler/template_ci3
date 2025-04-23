@@ -720,3 +720,6 @@ html[data-style="dark"] .form-type-side .input-group .form-floating > div:has(.s
 [data-method="view"] span.no-value {
 	height: 20px !important;
 }
+[data-method="view"] .card-header>div:last-child:not(:first-child) {
+	margin-bottom: 1rem !important;
+}

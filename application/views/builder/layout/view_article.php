@@ -23,7 +23,7 @@ extract(trans_formdata_dit_type($viewData));
 		);
 		?>
 		<div class="card-header">
-			<div class="mb-4 d-flex align-items-center justify-content-between">
+			<div class="d-flex align-items-center justify-content-between">
 				<h5 id="subject" class="mb-0 w-100 view-data"><span></span></h5>
 				<div class="dropdown">
 					<button
