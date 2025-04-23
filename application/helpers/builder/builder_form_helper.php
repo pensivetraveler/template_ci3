@@ -371,7 +371,7 @@ function get_admin_form_attributes($item, $form_type): array
 
 	if($item['type'] === 'file') {
 		switch ($item['subtype']) {
-			case 'basic' :
+			case 'base' :
 			case 'single' :
 			case 'thumbnail' :
 				break;
@@ -493,7 +493,7 @@ function restructure_admin_form_data($form_data, $form_type = 'page'): array
 				'group' => $group_name,
 				'label' => $attr['label'],
 				'form_text' => $attr['form_text'],
-				'type' => $attr['type'] ?? 'basic',
+				'type' => $attr['type'] ?? 'base',
 				'attr' => $attr,
 				'data' => $data,
 			];

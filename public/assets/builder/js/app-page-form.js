@@ -427,7 +427,7 @@ function applyFrmValues(form, data, fields = []) {
 	};
 	const groupAttrs = {
 		basic : {
-			group_name : 'basic',
+			group_name : 'base',
 		}
 	};
 
@@ -441,7 +441,7 @@ function applyFrmValues(form, data, fields = []) {
 				group_name : item.group,
 			});
 		}
-		const groupName = item.group ? item.group : 'basic';
+		const groupName = item.group ? item.group : 'base';
 		if(item.category === 'custom') {
 			groups[groupName].customs.push(item.field);
 		}else{
@@ -481,7 +481,7 @@ function applyFrmValues(form, data, fields = []) {
 		}else{
 			Object.keys(dto).map((category) => {
 				if(dto[category].length > 0) {
-					if(groupName === 'basic') {
+					if(groupName === 'base') {
 						dto[category].forEach((fieldName) => {
 							applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, data);
 						});
@@ -518,7 +518,7 @@ function applyFrmValues(form, data, fields = []) {
 }
 
 function getFrmInputDto(groupAttrs, field, dataIndex = 0) {
-	const groupName = groupAttrs.group_name === 'basic'?'':groupAttrs.group_name;
+	const groupName = groupAttrs.group_name === 'base'?'':groupAttrs.group_name;
 
 	if(!groupName) {
 		return field;
@@ -547,7 +547,7 @@ function getFrmInputDto(groupAttrs, field, dataIndex = 0) {
 
 function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, data, dataIndex = 0) {
 	if(!data) return;
-	const groupName = groupAttr.group_name === 'basic'?'':groupAttr.group_name;
+	const groupName = groupAttr.group_name === 'base'?'':groupAttr.group_name;
 	const fieldIndex = fields.findIndex(item => item.field === fieldName && item.group === groupName);
 	if(fieldIndex < 0) return;
 	const field = getFrmInputDto(groupAttr, fields[fieldIndex], dataIndex);
@@ -610,7 +610,7 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
 			break;
 		case 'files' :
 			switch (field.subtype) {
-				case 'basic' :
+				case 'base' :
 				case 'thumbnail' :
 				case 'single' :
 				case 'multiple' :

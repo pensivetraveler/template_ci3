@@ -402,11 +402,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
                      * 예외 처리
                      */
                     // textarea 가 wysiwyg quill 인 경우
-                    if($this->sideForm && $item['category'] === 'basic' && $item['type'] === 'textarea' && $item['subtype'] === 'quill'){
+                    if($this->sideForm && $item['category'] === 'base' && $item['type'] === 'textarea' && $item['subtype'] === 'quill'){
                         $item['subtype'] = 'autosize';
                     }
 
-                    if($item['type'] === $item['subtype']) $item['subtype'] = 'basic';
+                    if($item['type'] === $item['subtype']) $item['subtype'] = 'base';
 
                     $carry[] = $item;
                 }
@@ -504,7 +504,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             }else{
                 // group category 예외처리
                 $item['group'] = '';
-                if($item['category'] === 'group') $item['category'] = 'basic';
+                if($item['category'] === 'group') $item['category'] = 'base';
                 $item['group_attributes'] = [];
 
                 // view type
