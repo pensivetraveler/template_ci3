@@ -324,6 +324,15 @@ $(function () {
 		});
 	});
 
+	$('#filter-search_word').on('keydown', function(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			console.log('Enter pressed! Value:', this.value);
+			// 여기에 원하는 함수 호출 등 처리
+			if($('#filter-search_category').val()) $('.btn-search').click()
+		}
+	});
+
 	if(common.SIDE_FORM) {
 		const formSelector = '#formRecord';
 		const offCanvasElement = document.querySelector('#offcanvasRecord');
