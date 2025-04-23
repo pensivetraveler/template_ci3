@@ -423,10 +423,10 @@ function applyFrmValues(form, data, fields = []) {
 		};
 	};
 	const groups = {
-		basic : initGroupProperties(),
+		base : initGroupProperties(),
 	};
 	const groupAttrs = {
-		basic : {
+		base : {
 			group_name : 'base',
 		}
 	};
