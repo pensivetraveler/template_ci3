@@ -698,3 +698,25 @@ html[data-style="dark"] .form-type-side .input-group .form-floating > div:has(.s
 		justify-content: space-between !important;
 	}
 }
+
+/*********************************************
+    #loader
+ *********************************************/
+#loader {
+	height: 100%;
+	padding-top: calc(var(--bs-gutter-y) * 0.5);
+	padding-bottom: calc(var(--bs-gutter-y) * 0.5);
+}
+#loader .bg-lighter {
+	border-radius: 0.5rem;
+}
+.row:has(#loader) #loader {
+	height: calc(100% - var(--bs-gutter-y));
+}
+
+/*********************************************
+    [data-method="view"]
+ *********************************************/
+[data-method="view"] span.no-value {
+	height: 20px !important;
+}
