@@ -9,11 +9,12 @@
 			if(is_admin_active_page($menu)) $menu['className'][] = 'active';
 			$subMenuExist = count($menu['subMenu']) > 0;
 			$href = $menu['route'] ? $menu['route'] . '?' . http_build_query($menu['params']) : '';
+			$target = $menu['target'] ?? '_self';
 			if($subMenuExist && is_admin_active_page($menu)) $menu['className'][] = 'open';
 	?>
 	<!-- Page -->
 	<li class="menu-item <?=implode(' ', $menu['className'])?>">
-		<a href="<?=$href?>" class="menu-link <?=$subMenuExist?'menu-toggle waves-effect':''?>">
+		<a href="<?=$href?>" class="menu-link <?=$subMenuExist?'menu-toggle waves-effect':''?>" target="<?=$target?>">
 			<?php if($menu['icon']): ?><i class="menu-icon tf-icons <?=$menu['icon']?>"></i><?php endif; ?>
 			<div data-i18n="<?=lang('nav.'.$menu['title'])?>"><?=lang('nav.'.$menu['title'])?></div>
 		</a>

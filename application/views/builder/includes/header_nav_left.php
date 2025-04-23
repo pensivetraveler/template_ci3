@@ -1,9 +1,9 @@
 <ul class="menu-inner py-1">
 	<?php
-		foreach ($this->config->get('admin_nav_side', $this->config->get('builder_nav_side_sample', []), false) as $menuName=>$menu):
+		foreach ($this->config->get('builder_nav_side_sample', []) as $menuName=>$menu):
 			$menu = array_merge(
-					$this->config->get('builder_nav_side_base', []),
-					$menu
+				$this->config->get('builder_nav_side_base', []),
+				$menu
 			);
 
 			if(is_admin_active_page($menu)) $menu['className'][] = 'active';
