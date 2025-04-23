@@ -46,7 +46,11 @@ function applyViewData(dataId) {
 					document.querySelector(`#${key}`).innerHTML = html;
 					break;
 				default :
-					container.querySelector(`#${key}`).innerHTML = data[key];
+					if(data[key]) {
+						container.querySelector(`#${key}`).innerHTML = data[key];
+					}else{
+						container.querySelector(`#${key}`).classList.add('no-value')
+					}
 			}
 		}
 	}
