@@ -7,17 +7,19 @@ class MY_Builder_WEB extends MY_Controller_WEB
     public string $apiFlag = '';
     public string $baseUri = '';
     public string $apiUri = '';
-    public array $pageConfig;
-    public string $pageType;
-    public bool $sideForm;
-    public array $headerData;
+    public array $pageConfig = [];
+    public string $pageType = 'form';
+    public bool $sideForm = false;
+    public array $headerData = [];
     public object $loginData;
     public string $href;
-    public array $listConfig;
-    public array $listColumns;
-    public array $listFilters;
-    public array $formConfig;
-    public array $formColumns;
+    public array $listConfig = [];
+    public array $listColumns = [];
+    public array $filterConfig = [];
+    public array $formConfig = [];
+    public array $formColumns = [];
+    public array $viewConfig = [];
+    public array $viewColumns = [];
     public string $viewPath;
     public array $navAuth;
     public bool $isLogin = false;
@@ -29,7 +31,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $this->config->load('extra/autologin_config', false);
 
-        foreach (['builder_base_config', 'builder_form_config', 'builder_nav_config', 'builder_page_config'] as $config) {
+        foreach (['builder_base_config', 'builder_form_config', 'builder_nav_config', 'builder_page_config', 'builder_view_config'] as $config) {
             $this->config->load('extra/builder/'.$config, false);
         }
 
@@ -61,8 +63,6 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->sideForm = false;
         $this->headerData = [];
         $this->href = base_url("$this->baseUri/{$this->router->class}");
-        $this->listConfig = $this->formConfig = [];
-        $this->listColumns = $this->formColumns = [];
         $this->viewPath = "$this->flag/{$this->router->class}";
         $this->jsVars = [
             'TITLE' => $this->router->class,
@@ -127,10 +127,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->titleList[] = 'View';
 
         $data['backLink'] = WEB_HISTORY_BACK;
-        $data['viewData'] = restructure_admin_form_data($this->jsVars['FORM_DATA']);
+        $data['viewData'] = $this->jsVars['VIEW_COLUMNS'];
+
         $data['identifier'] = null;
-        if(!is_null(array_search('identifier', array_column($data['viewData'], 'view')))) {
-            $data['identifier'] = $data['viewData'][array_search('identifier', array_column($data['viewData'], 'view'))];
+        if(!is_null(array_search('identifier', array_column($data['viewData']['hiddens'], 'subtype')))) {
+            $data['identifier'] = $data['viewData']['hiddens'][array_search('identifier', array_column($data['viewData'], 'subtype'))];
         }
 
         $data['isComments'] = $this->pageConfig['viewProperties']['isComments'];
@@ -146,6 +147,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
             if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
         }
         $data['actions'] = array_values($data['actions']);
+
+        $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['viewProperties']['buttons']??[]);
 
         $data['viewType'] = $this->pageConfig['viewProperties']['viewType'];
 
@@ -338,13 +341,24 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }
 
         if($this->pageConfig['properties']['formExist'] && $this->pageConfig['properties']['listExist']) {
-            $viewType = $this->pageConfig['viewProperties']['viewType'];
             $this->addJsVars([
-                'PAGE_VIEW_URI' => $viewType!=='modal'?$this->href.DIRECTORY_SEPARATOR.'view':'',
                 'PAGE_ADD_URI' => $this->sideForm?'':$this->href.DIRECTORY_SEPARATOR.'add',
                 'PAGE_EDIT_URI' => $this->sideForm?'':$this->href.DIRECTORY_SEPARATOR.'edit',
                 'PAGE_EXCEL_URI' => $this->href.DIRECTORY_SEPARATOR.'excel',
                 'SIDE_FORM' => $this->sideForm,
+            ]);
+        }
+
+        if(
+            (in_array('view', $this->pageConfig['properties']['allows'])
+                ||
+                $this->pageConfig['listProperties']['actions']['view'])
+            && $this->pageConfig['viewProperties']['viewType'] !== 'dashboard'
+        ){
+            $viewType = $this->pageConfig['viewProperties']['viewType'];
+            $this->addJsVars([
+                'PAGE_VIEW_URI' => $viewType!=='modal'?$this->href.DIRECTORY_SEPARATOR.'view':'',
+                'VIEW_COLUMNS' => $this->setViewColumns(),
             ]);
         }
 
@@ -678,6 +692,56 @@ class MY_Builder_WEB extends MY_Controller_WEB
         ];
 
         return $list;
+    }
+
+    protected function setViewColumns($name = null): array
+    {
+        $config = $viewConfig = [];
+        if(isset($name)) {
+            $viewConfig = $this->config->get($name, []);
+        }else{
+            if($name = $this->pageConfig['viewProperties']['viewConfig']) {
+                $viewConfig = $this->config->get('view_'.$name.'_config', []);
+            }else{
+                $viewConfig = restructure_admin_form_data($this->jsVars['FORM_DATA']);
+            }
+        }
+
+        if(!empty($viewConfig)) {
+            $viewConfig = array_map(function ($item) {
+                if(isset($item['subtype']) && $item['subtype'] === 'identifier') $item['type'] = 'hidden';
+                if(!isset($item['category'])) $item['category'] = 'base';
+                if(!isset($item['type'])) $item['type'] = 'text';
+                $item['id'] = $item['field'];
+                return $item;
+            }, $viewConfig);
+
+            // 기본 config와 merge
+            $config['hiddens'] = array_reduce(array_filter($viewConfig, function($item) {
+                return $item['type'] === 'hidden';
+            }), function($carry, $item) {
+                $carry[] = array_merge($this->config->get('builder_view_hidden_config'), $item);
+                return $carry;
+            }, []);
+
+            $config['fields'] = array_reduce(array_filter($viewConfig, function($item) {
+                return $item['type'] !== 'hidden';
+            }), function($carry, $item) {
+                $carry[] = array_merge($this->config->get('builder_view_field_config'), [
+                    'id' => $item['id'],
+                    'field' => $item['field'],
+                    'label' => $item['label'],
+                    'category' => 'base',
+                    'type' => 'text',
+                    'subtype' => 'base',
+                    'colspan' => $item['colspan']??6,
+                    'help_block' => $item['help_block']??[],
+                ]);
+                return $carry;
+            }, []);
+        }
+
+        return $this->viewColumns = $config;
     }
 
     protected function getExcelHeaders()
