@@ -8,6 +8,7 @@
 		'_mode' => '',
 		'_event' => '',
 	]);
+
 	foreach ($formData as $item):
 		if($item['category'] === 'group'):
 			builder_view("$platformName/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
@@ -29,66 +30,7 @@
 	<div class="input-group input-group-merge">
 		<?=get_admin_form_ico($item)?>
 		<div class="form-floating form-floating-outline">
-			<?php
-				switch ($item['type']) {
-					case 'password' :
-						echo form_password(
-							[
-								'name' => $item['field'],
-								'id' => $item['id'],
-							],
-							set_admin_form_value($item['field'], $item['default'], null),
-							$item['attributes']
-						);
-						break;
-					case 'checkbox' :
-						echo get_admin_form_choice($item, $formType);
-						break;
-					case 'radio' :
-						echo get_admin_form_radio($item, $formType);
-						break;
-					case 'select' :
-						echo form_dropdown(
-							$item['field'],
-							$item['options'] ?? [],
-							set_admin_form_value($item['field'], $item['default'], null),
-							array_merge([
-								'id' => $item['id'],
-								'data-style' => 'btn-default'
-							], $item['attributes'])
-						);
-						break;
-					case 'textarea' :
-						echo form_textarea(
-							[
-								'name' => $item['field'],
-								'id' => $item['id'],
-								'rows' => $item['attributes']['rows']
-							],
-							set_admin_form_value($item['field'], $item['default'], null),
-							$item['attributes']
-						);
-						break;
-					case 'file' :
-						echo form_upload([
-							'name' => $item['field'],
-							'id' => $item['id'],
-						], $item['attributes']);
-						break;
-					default :
-						echo form_input(
-							[
-								'type' => $item['type'],
-								'name' => $item['field'],
-								'id' => $item['id'],
-							],
-							set_admin_form_value($item['field'], $item['default'], null),
-							$item['attributes']
-						);
-				}
-				if(!(($item['type']==='checkbox'||$item['type']==='radio')&&$item['subtype']==='single'))
-					echo form_label(lang($item['label']), $item['id']);
-			?>
+			<?=get_side_form_input_by_type($item, 'side')?>
 		</div>
 		<?php
 			if($item['subtype'] === 'unique')

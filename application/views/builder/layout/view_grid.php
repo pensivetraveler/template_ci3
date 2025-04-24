@@ -16,12 +16,12 @@
 					<div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionBtns">
 						<?php
 							if(count($buttons)) :
-								echo '<hr class="my-2">';
-								foreach ($buttons as $button):
+								foreach ($buttons as $button=>$attr):
 						?>
-						<a class="dropdown-item text-center btn-view-<?=$button?>" href="javascript:void(0);"><?=lang(ucfirst($button))?></a>
+						<a class="dropdown-item text-center btn-view-<?=$button?>" href="javascript:void(0);"><?=lang($attr['text'])?></a>
 						<?php
 								endforeach;
+								echo '<hr class="my-2">';
 							endif;
 						?>
 						<?php foreach ($actions as $action): ?>
@@ -36,6 +36,7 @@
         <?php
             echo form_open_multipart('', [
                 'id' => 'formRecord',
+				'name' => 'formRecord',
                 'class' => "add-new-record needs-validation view-type-{$viewType}",
                 'onsubmit' => 'return false',
             ], [
@@ -73,9 +74,18 @@
                 <div class="col-md-<?=$item['colspan']?> mb-2" data-field-name="<?=$item['field']?>">
 					<div class="mb-3 position-relative">
 						<?=form_label(lang($item['label']), $item['id'], ['class' => 'd-block col-form-label fs-6 text-primary py-0 mb-2 fw-bolder'])?>
+						<?php if($item['type'] === 'view'): ?>
 						<p class="form-control border-0 border-bottom rounded-0 mb-0">
 							<span class="d-inline-block" id="<?=$item['id']?>"></span>
 						</p>
+						<?php else: ?>
+						<div class="input-group input-group-merge">
+							<?php
+								echo get_admin_form_ico($item);
+								echo get_page_form_input_by_type($item, 'page');
+							?>
+						</div>
+						<?php endif; ?>
 						<?php if(!empty($item['help_block'])) echo get_help_block_html($item['help_block']); ?>
 					</div>
                 </div>
@@ -86,9 +96,9 @@
         ?>
         <div class="row mt-6">
             <div class="col-sm-6 text-start">
-                <?php foreach ($buttons as $item): ?>
-                    <button type="button" class="btn btn-outline-dark waves-effect"><?=lang($item['text'])?></button>
-                <?php endforeach; ?>
+				<?php foreach ($buttons as $button=>$attr): ?>
+				<button type="button" class="btn btn-outline-dark waves-effect btn-view-<?=$button?>"><?=lang($attr['text'])?></button>
+				<?php endforeach; ?>
             </div>
             <div class="col-sm-6 text-end">
                 <?php if(in_array('list', $actions)): ?>
