@@ -47,7 +47,7 @@ class MY_Controller_WEB extends MY_Controller
         $this->jsVars = [];
         $this->perPage = 10;
 
-		$this->lang->load('form_validation', $this->config->item('language'));
+        $this->lang->load('form_validation', $this->config->item('language'));
     }
 
     public function index()
@@ -67,23 +67,23 @@ class MY_Controller_WEB extends MY_Controller
 
     protected function checkLogin(): bool
     {
-        return true;
+        return false;
     }
 
     protected function validateToken()
     {
         $token = $this->input->post('token')?:$this->session->userdata('token');
         if(empty($token)){
-			alert('토큰 값이 없습니다.', base_url($this->noLoginRedirect));
+            alert('토큰 값이 없습니다.', base_url($this->noLoginRedirect));
         }else{
             $decodedToken = $this->authorization_token->tokenParamCheck($token);
             if($decodedToken['status'] === FALSE){
-				$this->session->unset_userdata('token');
+                $this->session->unset_userdata('token');
                 switch ($decodedToken['message']) {
                     case 'Token Time Expire.':
-						alert(lang('Token Expired'), base_url($this->noLoginRedirect));
+                        alert(lang('Token Expired'), base_url($this->noLoginRedirect));
                     default:
-						alert(lang('Invalid Token'), base_url($this->noLoginRedirect));
+                        alert(lang('Invalid Token'), base_url($this->noLoginRedirect));
                 }
             }else{
                 $this->session->set_userdata('token', $token);
@@ -106,7 +106,7 @@ class MY_Controller_WEB extends MY_Controller
      * @return string     가공된 Paging 정보
      */
     protected function getPaginationLinks($url, $totalRow, $perPage, $config = []): string
-	{
+    {
         $page = $this->input->get('page');
         $page = $page ? intVal($page) : 1;
 
@@ -135,10 +135,10 @@ class MY_Controller_WEB extends MY_Controller
 
     protected function viewApp($data)
     {
-		// css, script 중복 호출 방지
-		$this->addCSS = unravel_list($this->addCSS);
-		$this->addJS['head'] = unravel_list($this->addJS['head']);
-		$this->addJS['tail'] = unravel_list($this->addJS['tail']);
+        // css, script 중복 호출 방지
+        $this->addCSS = unravel_list($this->addCSS);
+        $this->addJS['head'] = unravel_list($this->addJS['head']);
+        $this->addJS['tail'] = unravel_list($this->addJS['tail']);
 
         $data['title'] = get_site_title(APP_NAME, $this->titleList);
         $data['addCSS'] = $this->addCSS;
@@ -154,17 +154,17 @@ class MY_Controller_WEB extends MY_Controller
         $this->output->set_header('Pragma: no-cache');
         $this->output->set_header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 
-		if(!$this->baseViewPath) show_error('Base View Path is not set.');
+        if(!$this->baseViewPath) show_error('Base View Path is not set.');
         if(!$this->config->item('error_occurs')) $this->load->view($this->baseViewPath, $data);
     }
 
-	protected function addJsVars($data)
-	{
-		foreach ($data as $key => $val) {
-			$this->jsVars[$key] = $val;
-		}
-		if($this->config->item('life_cycle') === 'post_controller') {
-			$this->phptojs->append($data);
-		}
-	}
+    protected function addJsVars($data)
+    {
+        foreach ($data as $key => $val) {
+            $this->jsVars[$key] = $val;
+        }
+        if($this->config->item('life_cycle') === 'post_controller') {
+            $this->phptojs->append($data);
+        }
+    }
 }
