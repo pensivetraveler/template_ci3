@@ -25,7 +25,7 @@ class Common extends MY_Builder_WEB
 
     protected function checkLogin(): bool
     {
-        if(parent::checkLogin()) {
+        if(parent::checkLogin()){
             $user = $this->Model_User->getData([], ['user_id' => $this->session->userdata('user_id')]);
             if(!$user || !in_array($user->user_cd, ['USR000','USR001'])) return false;
 
@@ -37,8 +37,12 @@ class Common extends MY_Builder_WEB
                 'name' => $user->name,
                 'user_cd' => $user->user_cd,
             ];
-        }
 
-        return parent::checkLogin();
+            return true;
+        }else{
+            if($this->uri->uri_string !== $this->noLoginRedirect)
+                redirect(base_url($this->noLoginRedirect));
+            return false;
+        }
     }
 }
