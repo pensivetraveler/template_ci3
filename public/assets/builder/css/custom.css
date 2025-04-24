@@ -161,6 +161,9 @@ html[data-style="dark"] .border-input {
 .auto-linebreak {
 	white-space: pre-line;
 }
+.input-group.input-group-merge:has(textarea:read-only) {
+	background-color: var(--bs-light);
+}
 
 
 /*********************************************
