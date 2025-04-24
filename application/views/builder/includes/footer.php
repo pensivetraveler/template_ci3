@@ -9,7 +9,7 @@
 										<span class="footer-text">©
 										  <script>
 											document.write(new Date().getFullYear());
-										  </script>2025
+										  </script>
 										  , Made with <i class="tf-icons ri-heart-fill text-danger"></i> by
 										</span>
 										<a href="https://pixinvent.com" target="_blank" class="footer-link fw-medium footer-theme-link">Pixinvent</a>
