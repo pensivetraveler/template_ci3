@@ -25,7 +25,7 @@ $config['page_base_config'] = [
     ],
     'formProperties' => [
         'formConfig' => '',
-        'formType' => 'page',
+        'formType' => 'side',
     ],
     'listProperties' => [
         'listConfig' => '',
