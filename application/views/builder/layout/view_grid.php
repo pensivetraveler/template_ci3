@@ -66,7 +66,7 @@
 					else:
 			?>
 			<div class="col-md-<?=$item['colspan']?> mb-6 position-relative" data-field-name="<?=$item['field']??''?>">
-				<?=form_label(lang($item['label']), $item['id'], ['class' => 'd-block col-form-label fs-6 text-primary py-0 mb-2 fw-bolder'])?>
+				<?=form_label(lang($item['label']), $item['id'], ['class' => 'd-block col-form-label fs-6 text-primary py-0 mb-3 fw-bolder'])?>
 				<?php if($item['type'] === 'view'): ?>
 				<p class="form-control border-0 border-bottom rounded-0 mb-0">
 					<span class="d-inline-block" id="<?=$item['id']?>"></span>
