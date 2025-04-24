@@ -640,8 +640,8 @@ function reformat_form_data_by_type($formData, $formType = 'side'): array {
             $item['colspan'] = $formType === 'grid' ? 6 : 12;
         }
         return $item;
-    }, array_values(array_filter($formData, function($item) {
-        return $item['type'] !== 'hidden';
+    }, array_values(array_filter($formData, function($item) use ($formType) {
+        return $item['type'] !== 'hidden' && !($formType !== 'grid' && $item['type'] === 'common');
     })));
 
     switch ($formType) {
