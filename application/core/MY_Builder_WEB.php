@@ -58,10 +58,6 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->noLoginRedirect = "$this->baseUri/{$this->config->item('platform_config.noLoginRedirect')}";
 
         $this->titleList = [ucfirst($this->flag)];
-        $this->pageConfig = [];
-        $this->pageType = 'form';
-        $this->sideForm = false;
-        $this->headerData = [];
         $this->href = base_url("$this->baseUri/{$this->router->class}");
         $this->viewPath = "$this->flag/{$this->router->class}";
         $this->jsVars = [
@@ -107,11 +103,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $data['filterHelpBlock'] = $this->filterConfig['help_block'] ?? [];
         $data['columns'] = $this->jsVars['LIST_COLUMNS']??[];
 
-        $formData = [];
-        if(array_key_exists('FORM_DATA', $this->jsVars)) {
-            $formData = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
-        }
-        $data['formData'] = $formData;
+        $data['formData'] = $this->sideForm?restructure_form_data_by_type($this->jsVars['FORM_DATA']):[];
+        $data['formType'] = $this->pageConfig['formProperties']['formType'];
 
         $data['isCheckbox'] = $this->pageConfig['listProperties']['isCheckbox'];
 
@@ -139,23 +132,23 @@ class MY_Builder_WEB extends MY_Controller_WEB
     {
         if(!$key) alert(lang('Incorrect Access'));
 
-        $this->phptojs->append(['KEY' => $key]);
+        $this->addJsVars(['KEY' => $key]);
 
         $this->titleList[] = 'View';
 
         $data['backLink'] = WEB_HISTORY_BACK;
-        $data['viewData'] = $this->jsVars['VIEW_COLUMNS'];
+        $data['viewType'] = $this->pageConfig['viewProperties']['viewType'];
+        $data['viewData'] = reformat_form_data_by_type($this->jsVars['VIEW_COLUMNS'], $data['viewType']);
 
         $data['identifier'] = null;
-        if(!is_null(array_search('identifier', array_column($data['viewData']['hiddens'], 'subtype')))) {
-            $data['identifier'] = $data['viewData']['hiddens'][array_search('identifier', array_column($data['viewData'], 'subtype'))];
+        if(!is_null(array_search('identifier', array_column($this->jsVars['VIEW_COLUMNS'], 'subtype')))) {
+            $data['identifier'] = $this->jsVars['VIEW_COLUMNS'][array_search('identifier', array_column($this->jsVars['VIEW_COLUMNS'], 'subtype'))];
         }
 
-        $data['isComments'] = $this->pageConfig['viewProperties']['isComments'];
-        if($data['isComments']) {
-            $this->addJS['tail'][] = [
-                base_url('public/assets/builder/js/app-page-comment.js')
-            ];
+        if(count(array_filter($this->jsVars['VIEW_COLUMNS'], function($item) {
+            return $item['type'] !== 'view';
+        }))) {
+            $this->addFormScripts();
         }
 
         $data['actions'] = reformat_bool_type_list($this->pageConfig['viewProperties']['actions']);
@@ -167,12 +160,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['viewProperties']['buttons']??[]);
 
-        $data['viewType'] = $this->pageConfig['viewProperties']['viewType'];
-
-        if(count(array_filter($data['viewData']['fields'], function($item) {
-            return $item['type'] !== 'view';
-        }))) {
-            $this->addFormScripts();
+        $data['isComments'] = $this->pageConfig['viewProperties']['isComments'];
+        if($data['isComments']) {
+            $this->addJS['tail'][] = [
+                base_url('public/assets/builder/js/app-page-comment.js')
+            ];
         }
 
         $this->addJS['tail'][] = [
@@ -189,8 +181,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->titleList[] = 'Add';
 
         $data['backLink'] = WEB_HISTORY_BACK;
-        $data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
-        $data['formType'] = 'page';
+        $data['formType'] = $this->pageConfig['formProperties']['formType'];
+        $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType']);
 
         $data['buttons'] = [];
         if($this->pageConfig['properties']['listExist']) $data['buttons'][] = 'list';
@@ -210,13 +202,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         if(!$key) alert(lang('Incorrect Access'));
 
-        $this->phptojs->append(['KEY' => $key]);
+        $this->addJsVars(['KEY' => $key]);
 
         $this->titleList[] = 'Edit';
 
         $data['backLink'] = WEB_HISTORY_BACK;
-        $data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
-        $data['formType'] = 'page';
+        $data['formType'] = $this->pageConfig['formProperties']['formType'];
+        $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType']);
 
         $data['buttons'] = [];
         if($this->pageConfig['properties']['listExist']) $data['buttons'][] = 'list';
@@ -418,7 +410,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             return [];
         }else{
             return array_reduce($config, function($carry, $item) {
-                if(isset($item['field'])) {
+                if(isset($item['field']) || $item['type'] === 'common') {
                     $carry[] = $this->setFormColumn($item);
                 }
                 return $carry;
@@ -428,7 +420,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function setFormColumn($item)
     {
-        if(isset($item['type']) && $item['type'] === 'view') return $item;
+        if($item['type'] === 'common') return $item;
 
         $item = array_merge(
             $this->config->get("builder_form_base", []),
@@ -523,6 +515,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $groups = [];
         $attr = [];
         foreach ($this->formColumns as $i=>$item) {
+            if($item['type'] === 'common') {
+                $result[] = $item;
+                continue;
+            }
+
             if (!$item['form']) continue;
 
             if ($item['subtype'] === 'identifier' && !in_array($this->router->method, ['index', 'list'])){
@@ -675,7 +672,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $filters = array_map(function($item) {
             if(!isset($item['colspan'])) $item['colspan'] = FILTER_BASE_COLSPAN;
-            if($item['type'] === 'filter') return $item;
+            if($item['type'] === 'common') return $item;
 
             $item = array_merge($this->config->get("builder_form_filter_base"), $item);
             if(!isset($item['id'])) $item['id'] = 'filter-'.$item['field'];
@@ -697,7 +694,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 $item['form_attributes'] ?? []
             );
 
-            $item['attributes'] = get_admin_form_attributes($item, 'filter');
+            $item['attributes'] = get_admin_form_attributes($item, 'common');
 
             return $item;
         }, $this->filterConfig['filters']);
@@ -720,18 +717,18 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if($lastRowColumns + FILTER_BASE_COLSPAN > 12) {
             $rowIdx++;
             $list[$rowIdx] = [
-                ['type' => 'filter', 'subtype' => 'space', 'colspan' => 9],
+                ['type' => 'common', 'subtype' => 'space', 'colspan' => 9],
             ];
             $lastRowColumns = 9;
         }
 
         $remains = 12 - $lastRowColumns - FILTER_BASE_COLSPAN;
         if($remains > 0) {
-            $list[$rowIdx][] = ['type' => 'filter', 'subtype' => 'space', 'colspan' => $remains];
+            $list[$rowIdx][] = ['type' => 'common', 'subtype' => 'space', 'colspan' => $remains];
         }
 
         $list[$rowIdx][] = [
-            'type' => 'filter',
+            'type' => 'common',
             'subtype' => 'submit',
             'search_btn' => true,
             'reset_btn' => true,
@@ -742,14 +739,14 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function setViewColumns($name = null): array
     {
-        $config = $viewConfig = [];
+        $config = [];
         if(isset($name)) {
-            $viewConfig = $this->config->get($name, []);
+            $config = $this->config->get($name, []);
         }else{
             if($name = $this->pageConfig['viewProperties']['viewConfig']) {
-                $viewConfig = $this->config->get('view_'.$name.'_config', []);
+                $config = $this->config->get('view_'.$name.'_config', []);
             }else{
-                $viewConfig = array_map(function($item) {
+                $config = array_map(function($item) {
                     if($item['type'] !== 'hidden') {
                         $item['type'] = 'view';
                         $item['subtype'] = 'base';
@@ -759,40 +756,28 @@ class MY_Builder_WEB extends MY_Controller_WEB
             }
         }
 
-        if(!empty($viewConfig)) {
-            $viewConfig = array_map(function ($item) {
+        if(!empty($config)) {
+            $config = array_map(function ($item) {
                 if(isset($item['subtype']) && $item['subtype'] === 'identifier') $item['type'] = 'hidden';
                 if(!isset($item['category'])) $item['category'] = 'base';
                 if(!isset($item['type'])) $item['type'] = 'view';
                 if(!isset($item['subtype'])) $item['subtype'] = 'base';
+
+                if($item['type'] === 'common') return $item;
+
                 $item['id'] = $item['field'];
-                return $item;
-            }, $viewConfig);
-
-            // 기본 config와 merge
-            $config['hiddens'] = array_reduce(array_filter($viewConfig, function($item) {
-                return $item['type'] === 'hidden';
-            }), function($carry, $item) {
-                $carry[] = array_merge($this->config->get('builder_view_hidden_config'), $item);
-                return $carry;
-            }, []);
-
-            $config['fields'] = array_reduce(array_filter($viewConfig, function($item) {
-                return $item['type'] !== 'hidden';
-            }), function($carry, $item) {
-                if($item['type'] !== 'view') {
-                    $item = $this->setFormColumn($item);
-                    $item['attributes'] = get_admin_form_attributes($item, 'page');
+                if($item['type'] === 'hidden'){
+                    $item = array_merge($this->config->get('builder_view_hidden_config'), $item);
+                }else{
+                    if($item['type'] !== 'view') {
+                        $item = $this->setFormColumn($item);
+                        $item['attributes'] = get_admin_form_attributes($item, 'page');
+                    }
+                    $item = array_merge($this->config->get('builder_view_field_config'), $item);
                 }
 
-                $carry[] = array_merge($this->config->get('builder_view_field_config'),
-                    [
-                        'colspan' => $item['colspan']??6,
-                    ],
-                    $item,
-                );
-                return $carry;
-            }, []);
+                return $item;
+            }, $config);
         }
 
         return $this->viewColumns = $config;
@@ -930,7 +915,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $data['platformName'] = BUILDER_FLAGNAME;
             $data['subPage'] = 'builder/setup/set_db';
             $data['backLink'] = WEB_HISTORY_BACK;
-            $data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], false);
+            $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], 'base');
             $data['includes'] = [
                 'head' => true,
                 'header' => false,
@@ -984,7 +969,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $data['platformName'] = BUILDER_FLAGNAME;
             $data['subPage'] = 'builder/setup/add_system_user';
             $data['backLink'] = WEB_HISTORY_BACK;
-            $data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], false);
+            $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], 'base');
             $data['includes'] = [
                 'head' => true,
                 'header' => false,
