@@ -9,21 +9,23 @@
 		'_event' => '',
 	]);
 
-	foreach ($formData as $item):
+	foreach ($formData['hiddens'] as $item) :
+		echo form_input(
+			[
+				'type' => $item['type'],
+				'name' => $item['field'],
+				'id' => $item['id'],
+			],
+			set_admin_form_value($item['field'], $item['default'], null),
+			$item['attributes'],
+		);
+	endforeach;
+
+	foreach ($formData['fields'] as $item):
 		if($item['category'] === 'group'):
-			builder_view("$platformName/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
+			builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
 		elseif($item['category'] === 'custom'):
-			builder_view("$platformName/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
-		elseif($item['type'] === 'hidden'):
-			echo form_input(
-				[
-					'type' => $item['type'],
-					'name' => $item['field'],
-					'id' => $item['id'],
-				],
-				set_admin_form_value($item['field'], $item['default'], null),
-				$item['attributes'],
-			);
+			builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
 		else:
 ?>
 <div class="col-sm-12 form-validation-unit">

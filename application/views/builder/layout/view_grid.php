@@ -37,7 +37,7 @@
             echo form_open_multipart('', [
                 'id' => 'formRecord',
 				'name' => 'formRecord',
-                'class' => "add-new-record needs-validation view-type-{$viewType}",
+                'class' => "view-form needs-validation view-type-{$viewType}",
                 'onsubmit' => 'return false',
             ], [
                 '_mode' => $this->router->method,
@@ -56,49 +56,44 @@
                 );
             endforeach;
 
-            $list = [];
-            $cols = 0;
-            $rows = 0;
-            foreach (array_column($viewData['fields'], 'colspan') as $key=>$colspan){
-                if($cols + $colspan > 12) {
-                    $cols = 0;
-                    $rows++;
-                }
-                $list[$rows][] = $viewData['fields'][$key];
-                $cols += $colspan;
-            }
-            foreach ($list as $row) :
+            foreach ($viewData['fields'] as $row) :
         ?>
-            <div class="row">
-                <?php foreach ($row as $item): ?>
-                <div class="col-md-<?=$item['colspan']?> mb-2" data-field-name="<?=$item['field']?>">
-					<div class="mb-3 position-relative">
-						<?=form_label(lang($item['label']), $item['id'], ['class' => 'd-block col-form-label fs-6 text-primary py-0 mb-2 fw-bolder'])?>
-						<?php if($item['type'] === 'view'): ?>
-						<p class="form-control border-0 border-bottom rounded-0 mb-0">
-							<span class="d-inline-block" id="<?=$item['id']?>"></span>
-						</p>
-						<?php else: ?>
-						<div class="input-group input-group-merge">
-							<?php
-								echo get_admin_form_ico($item);
-								echo get_page_form_input_by_type($item, 'page');
-							?>
-						</div>
-						<?php endif; ?>
-						<?php if(!empty($item['help_block'])) echo get_help_block_html($item['help_block']); ?>
-					</div>
-                </div>
-                <?php endforeach; ?>
-            </div>
+		<div class="row">
+			<?php
+				foreach ($row as $item):
+					if($item['type'] === 'common'):
+						echo "<div class='col-md-{$item['colspan']} d-sm-block d-none'></div>";
+					else:
+			?>
+			<div class="col-md-<?=$item['colspan']?> mb-6 position-relative" data-field-name="<?=$item['field']??''?>">
+				<?=form_label(lang($item['label']), $item['id'], ['class' => 'd-block col-form-label fs-6 text-primary py-0 mb-2 fw-bolder'])?>
+				<?php if($item['type'] === 'view'): ?>
+				<p class="form-control border-0 border-bottom rounded-0 mb-0">
+					<span class="d-inline-block" id="<?=$item['id']?>"></span>
+				</p>
+				<?php else: ?>
+				<div class="input-group input-group-merge">
+					<?php
+						echo get_admin_form_ico($item);
+						echo get_page_form_input_by_type($item, 'page');
+					?>
+				</div>
+				<?php endif; ?>
+				<?php if(!empty($item['help_block'])) echo get_help_block_html($item['help_block']); ?>
+			</div>
+			<?php
+					endif;
+				endforeach;
+			?>
+		</div>
         <?php
             endforeach;
         ?>
         <div class="row mt-6">
             <div class="col-sm-6 text-start">
-				<?php foreach ($buttons as $button=>$attr): ?>
+                <?php foreach ($buttons as $button=>$attr): ?>
 				<button type="button" class="btn btn-outline-dark waves-effect btn-view-<?=$button?>"><?=lang($attr['text'])?></button>
-				<?php endforeach; ?>
+                <?php endforeach; ?>
             </div>
             <div class="col-sm-6 text-end">
                 <?php if(in_array('list', $actions)): ?>

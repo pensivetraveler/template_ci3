@@ -37,7 +37,7 @@
 			echo form_open_multipart('', [
 				'id' => 'formRecord',
 				'name' => 'formRecord',
-				'class' => "add-new-record needs-validation view-type-{$viewType}",
+				'class' => "view-form needs-validation view-type-{$viewType}",
 				'onsubmit' => 'return false',
 			], [
 				'_mode' => $this->router->method,
@@ -58,7 +58,7 @@
 
 			foreach ($viewData['fields'] as $item) :
 		?>
-		<div class="row mb-4" data-field-name="<?=$item['field']?>">
+		<div class="row mb-3" data-field-name="<?=$item['field']?>">
 			<?=form_label(lang($item['label']), $item['id'], ['class' => 'col-sm-2 col-form-label fs-6 text-primary fw-bolder py-4'])?>
 			<div class="col-sm-10">
 				<?php if($item['type'] === 'view'): ?>

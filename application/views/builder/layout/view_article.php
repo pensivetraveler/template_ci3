@@ -92,5 +92,5 @@ extract(trans_formdata_dit_type($viewData));
 		echo form_close();
 		?>
 	</div>
-	<?php if($isComments) builder_view("$platformName/layout/view_comments"); ?>
+	<?php if($isComments) builder_view("{$platformName}/layout/view_comments"); ?>
 </div>

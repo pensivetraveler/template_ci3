@@ -1,5 +1,5 @@
 <?php extract($item['data']); ?>
-<div class="row mb-4 form-validation-unit">
+<div class="row mb-3 form-validation-unit">
 	<?=form_label(lang($item['label']), '', ['class' => 'col-sm-2 col-form-label'])?>
 	<div class="col-sm-10">
 		<div class="input-group input-group-merge form-password-toggle">
@@ -17,7 +17,7 @@
 		<?=get_admin_form_text($password)?>
 	</div>
 </div>
-<div class="row mb-4 form-validation-unit">
+<div class="row mb-3 form-validation-unit">
 	<?=form_label(lang($password_confirm['label']), '', ['class' => 'col-sm-2 col-form-label'])?>
 	<div class="col-sm-10">
 		<div class="input-group input-group-merge form-password-toggle">

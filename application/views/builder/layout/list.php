@@ -21,11 +21,11 @@
 					<div class="d-flex justify-content-lg-start align-items-center row gx-5 pt-4 gap-5 gap-md-0">
 						<?php
 							foreach ($row as $item):
-								if($item['type'] === 'filter') {
+								if($item['type'] === 'common') {
 									switch ($item['subtype']) {
 										case 'space' :
 						?>
-						<div class="col-md-<?=$item['colspan']?> d-sm-block filter-space"></div>
+						<div class="col-md-<?=$item['colspan']?> d-sm-block d-none"></div>
 						<?php
 											break;
 										case 'submit' :
@@ -149,7 +149,7 @@
 							aria-label="Close"></button>
 				</div>
 				<div class="offcanvas-body flex-grow-1">
-					<?php builder_view("$platformName/layout/form_side", ['formType' => 'side', 'formData' => $formData]); ?>
+					<?php builder_view("{$platformName}/layout/form_side", ['formType' => 'side', 'formData' => $formData]); ?>
 				</div>
 			</div>
 			<!--/ Modal to add new record -->

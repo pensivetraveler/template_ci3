@@ -5,7 +5,7 @@
 	</nav>
 </div>
 <div class="row g-6 position-relative" id="view-container">
-	<?php builder_view("$platformName/layout/view_{$viewType}"); ?>
+	<?php builder_view("{$platformName}/layout/view_{$viewType}"); ?>
 	<div id="loader" class="loading w-100 position-absolute top-0">
 		<div class="opacity-50 h-100 position-relative bg-lighter"></div>
 		<div class="position-absolute translate-middle" style="top:50%;left:50%">
