@@ -227,7 +227,7 @@ function get_admin_form_ico_classname($item): ?string
     return get_icon_classname_by_type($item['type']);
 }
 
-function get_admin_form_attributes($item, $form_type): array
+function get_admin_form_attributes($item, $form_type = 'side'): array
 {
     $ci =& get_instance();
 
@@ -304,7 +304,7 @@ function get_admin_form_attributes($item, $form_type): array
                 break;
             default :
                 $classList[] = 'h-px-100';
-                $attributes['rows'] = $form_type === 'page'?5:3;
+                $attributes['rows'] = $form_type === 'side'?3:5;
                 break;
         }
     }
@@ -449,12 +449,12 @@ function get_admin_form_attributes($item, $form_type): array
     return array_merge($item['attributes'], $attributes);
 }
 
-function restructure_admin_form_data($form_data, $form_type = 'page'): array
+function restructure_admin_form_data($form_data, $form_type = 'side'): array
 {
     // attributes 처리
     $form_data = array_map(function($item) use($form_type) {
         unset($item['list_attributes']);
-        $item['attributes'] = get_admin_form_attributes($item, $form_type);
+        if($item['type'] !== 'common') $item['attributes'] = get_admin_form_attributes($item, $form_type);
         return $item;
     }, $form_data);
 
@@ -620,4 +620,49 @@ function get_side_form_input_by_type($item, $formType): string {
     if(!(($item['type']==='checkbox'||$item['type']==='radio')&&$item['subtype']==='single'))
         $html .= form_label(lang($item['label']), $item['id']);
     return $html;
+}
+
+function restructure_form_data_by_type($formData, $formType = 'side'): array {
+    $formData = restructure_admin_form_data($formData, $formType);
+    return reformat_form_data_by_type($formData, $formType);
+}
+
+function reformat_form_data_by_type($formData, $formType = 'side'): array {
+    $data = [
+        'hiddens' => array_values(array_filter($formData, function($item) {
+            return $item['type'] === 'hidden';
+        })),
+        'fields' => [],
+    ];
+
+    $fields = array_map(function($item) use ($formType) {
+        if(is_empty($item, 'colspan')) {
+            $item['colspan'] = $formType === 'grid' ? 6 : 12;
+        }
+        return $item;
+    }, array_values(array_filter($formData, function($item) {
+        return $item['type'] !== 'hidden';
+    })));
+
+    switch ($formType) {
+        case 'grid' :
+            $cols = 0;
+            $rows = 0;
+            foreach (array_column($fields, 'colspan') as $key=>$colspan){
+                if($cols + $colspan > 12) {
+                    $cols = 0;
+                    $rows++;
+                }
+                $data['fields'][$rows][] = $fields[$key];
+                $cols += $colspan;
+            }
+            break;
+        case 'custom' :
+            return trans_formdata_dit_type($formData);
+        default :
+            $data['fields'] = $fields;
+            break;
+    }
+
+    return $data;
 }
