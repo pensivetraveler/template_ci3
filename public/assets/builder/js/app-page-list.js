@@ -279,9 +279,8 @@ $(function () {
 					$('.form-type-filter')[0].reset();
 					if($('.form-type-filter').find('.form-select').length) {
 						$('.form-type-filter').find('.form-select').trigger('change')
-					}else{
-						dt.ajax.reload();
 					}
+					dt.ajax.reload();
 				});
 			}
 		},
@@ -292,9 +291,10 @@ $(function () {
 				appPlugins.list.datatable.drawCallback(settings)
 			}
 
-			if($(this).find('.selectpicker').length > 0){
-				$(this).find('.selectpicker').selectpicker({
-					width: 'fit'
+			if($(this).find('.datatable-selectpicker').length > 0){
+				$(this).find('.datatable-selectpicker').selectpicker({
+					width: 'fit',
+					container: 'body',
 				});
 			}
 		},
@@ -637,9 +637,9 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 
 function renderSelectColumn(data, type, full, meta, column) {
 	const wrap = document.createElement('div');
-	wrap.classList.add('bootstrap-select', 'position-relative', 'w-px-100')
+	wrap.classList.add('bootstrap-select', 'w-px-100')
 	const select = document.createElement('select');
-	select.classList.add('selectpicker')
+	select.classList.add('datatable-selectpicker','w-px-100')
 
 	if(column.hasOwnProperty('options')) {
 		for(const value of Object.keys(column.options)){
