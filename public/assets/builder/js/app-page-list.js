@@ -295,6 +295,7 @@ $(function () {
 				$(this).find('.datatable-selectpicker').selectpicker({
 					width: 'fit',
 					container: 'body',
+					style: 'btn-outline-primary p-2',
 				});
 			}
 		},
