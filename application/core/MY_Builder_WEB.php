@@ -420,7 +420,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function setFormColumn($item)
     {
-        if($item['type'] === 'common') return $item;
+        if(isset($item['type']) && $item['type'] === 'common') return $item;
 
         $item = array_merge(
             $this->config->get("builder_form_base", []),
@@ -515,7 +515,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $groups = [];
         $attr = [];
         foreach ($this->formColumns as $i=>$item) {
-            if($item['type'] === 'common') {
+            if(isset($item['type']) && $item['type'] === 'common') {
                 $result[] = $item;
                 continue;
             }
