@@ -50,7 +50,8 @@ function applyViewData(dataId) {
 						if(data[key]) {
 							container.querySelector(`#${key}`).innerHTML = data[key];
 						}else{
-							container.querySelector(`#${key}`).classList.add('no-value')
+							// container.querySelector(`#${key}`).classList.add('no-value')
+							container.querySelector(`#${key}`).innerHTML = '-';
 						}
 					}else{
 						if(data[key]) container.querySelector(`#${key}`).value = data[key];
