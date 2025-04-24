@@ -115,6 +115,53 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $data['isCheckbox'] = $this->pageConfig['listProperties']['isCheckbox'];
 
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables.bootstrap5.css'),
+            base_url('public/assets/builder/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css'),
+            base_url('public/assets/builder/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css'),
+            base_url('public/assets/builder/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css'),
+        ];
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables-bootstrap5.js'),
+        ];
+
+        if($this->sideForm) {
+            $this->addCSS[] = [
+                base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
+                base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
+                base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
+            ];
+
+            // wysiwig
+            $this->addCSS[] = [
+                base_url('public/assets/builder/vendor/libs/quill/typography.css'),
+                base_url('public/assets/builder/vendor/libs/quill/katex.css'),
+                base_url('public/assets/builder/vendor/libs/quill/editor.css'),
+            ];
+
+            $this->addJS['tail'][] = [
+                base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
+                base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
+                base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
+                base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
+                base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
+                base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
+                base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
+                base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
+            ];
+
+            // wysiwig
+            $this->addJS['tail'][] = [
+                base_url('public/assets/builder/vendor/libs/quill/katex.js'),
+                base_url('public/assets/builder/vendor/libs/quill/quill.js'),
+            ];
+        }
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-list.js'),
+        ];
+
         $this->viewApp($data);
     }
 
@@ -152,6 +199,41 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $data['viewType'] = $this->pageConfig['viewProperties']['viewType'];
 
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
+        ];
+
+        // wysiwig
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
+            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
+            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
+        ];
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
+            base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
+            base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
+            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
+            base_url('public/assets/builder/js/app-page-edit.js'),
+        ];
+
+        // wysiwig
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/quill/katex.js'),
+            base_url('public/assets/builder/vendor/libs/quill/quill.js'),
+        ];
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-view.js'),
+        ];
+
         $this->viewApp($data);
     }
 
@@ -167,6 +249,37 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $data['buttons'] = [];
         if($this->pageConfig['properties']['listExist']) $data['buttons'][] = 'list';
+
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
+        ];
+
+        // wysiwig
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
+            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
+            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
+        ];
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
+            base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
+            base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
+            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
+            base_url('public/assets/builder/js/app-page-add.js'),
+        ];
+
+        // wysiwig
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/quill/katex.js'),
+            base_url('public/assets/builder/vendor/libs/quill/quill.js'),
+        ];
 
         $this->viewApp($data);
     }
@@ -187,6 +300,37 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $data['buttons'] = [];
         if($this->pageConfig['properties']['listExist']) $data['buttons'][] = 'list';
+
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
+        ];
+
+        // wysiwig
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
+            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
+            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
+        ];
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
+            base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
+            base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
+            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
+            base_url('public/assets/builder/js/app-page-edit.js'),
+        ];
+
+        // wysiwig
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/quill/katex.js'),
+            base_url('public/assets/builder/vendor/libs/quill/quill.js'),
+        ];
 
         $this->viewApp($data);
     }
@@ -353,7 +497,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             (in_array('view', $this->pageConfig['properties']['allows'])
                 ||
                 $this->pageConfig['listProperties']['actions']['view'])
-            && $this->pageConfig['viewProperties']['viewType'] !== 'dashboard'
+            && $this->pageConfig['viewProperties']['viewType'] !== 'custom'
         ){
             $viewType = $this->pageConfig['viewProperties']['viewType'];
             $this->addJsVars([
@@ -380,53 +524,60 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }else{
             return array_reduce($config, function($carry, $item) {
                 if(isset($item['field'])) {
-                    $item = array_merge(
-                        $this->config->get("builder_form_base", []),
-                        ['label' => 'lang:'.$this->router->class.'.'.$item['field']],
-                        $item
-                    );
-
-                    if(sscanf($item['label'], 'lang:%s', $line) === 1)
-                        $item['label'] = $line;
-
-                    $item = $this->setColumnErrors($item);
-
-                    // list attributes
-                    $item['list_attributes'] = array_merge(
-                        $this->config->get("builder_form_base_list_attributes", []),
-                        $item['list_attributes']
-                    );
-
-                    // option attributes
-                    if(isset($item['option_attributes']) && count($item['option_attributes'])) {
-                        $item['option_attributes'] = array_merge(
-                            $this->config->get("builder_form_base_option_attributes", []),
-                            $item['option_attributes']
-                        );
-                        $item['options'] = $this->getOptions($item['option_attributes']['option_field'] ?? $item['field'], $item['option_attributes']);
-                    }
-
-                    // form attributes
-                    $item['form_attributes'] = array_merge(
-                        $this->config->get("builder_form_base_form_attributes", []),
-                        $item['form_attributes']
-                    );
-
-                    /**
-                     * 예외 처리
-                     */
-                    // textarea 가 wysiwyg quill 인 경우
-                    if($this->sideForm && $item['category'] === 'base' && $item['type'] === 'textarea' && $item['subtype'] === 'quill'){
-                        $item['subtype'] = 'autosize';
-                    }
-
-                    if($item['type'] === $item['subtype']) $item['subtype'] = 'base';
-
-                    $carry[] = $item;
+                    $carry[] = $this->setFormColumn($item);
                 }
                 return $carry;
             }, []);
         }
+    }
+
+    protected function setFormColumn($item)
+    {
+        if(isset($item['type']) && $item['type'] === 'view') return $item;
+
+        $item = array_merge(
+            $this->config->get("builder_form_base", []),
+            ['label' => 'lang:'.$this->router->class.'.'.$item['field']],
+            $item
+        );
+
+        if(sscanf($item['label'], 'lang:%s', $line) === 1)
+            $item['label'] = $line;
+
+        $item = $this->setColumnErrors($item);
+
+        // list attributes
+        $item['list_attributes'] = array_merge(
+            $this->config->get("builder_form_base_list_attributes", []),
+            $item['list_attributes']
+        );
+
+        // option attributes
+        if(isset($item['option_attributes']) && count($item['option_attributes'])) {
+            $item['option_attributes'] = array_merge(
+                $this->config->get("builder_form_base_option_attributes", []),
+                $item['option_attributes']
+            );
+            $item['options'] = $this->getOptions($item['option_attributes']['option_field'] ?? $item['field'], $item['option_attributes']);
+        }
+
+        // form attributes
+        $item['form_attributes'] = array_merge(
+            $this->config->get("builder_form_base_form_attributes", []),
+            $item['form_attributes']
+        );
+
+        /**
+         * 예외 처리
+         */
+        // textarea 가 wysiwyg quill 인 경우
+        if($this->sideForm && $item['category'] === 'base' && $item['type'] === 'textarea' && $item['subtype'] === 'quill'){
+            $item['subtype'] = 'autosize';
+        }
+
+        if($item['type'] === $item['subtype']) $item['subtype'] = 'base';
+
+        return $item;
     }
 
     protected function setColumnErrors($item)
@@ -703,7 +854,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
             if($name = $this->pageConfig['viewProperties']['viewConfig']) {
                 $viewConfig = $this->config->get('view_'.$name.'_config', []);
             }else{
-                $viewConfig = restructure_admin_form_data($this->jsVars['FORM_DATA']);
+                $viewConfig = array_map(function($item) {
+                    if($item['type'] !== 'hidden') {
+                        $item['type'] = 'view';
+                        $item['subtype'] = 'base';
+                    }
+                    return $item;
+                }, $this->jsVars['FORM_DATA']);
             }
         }
 
@@ -711,7 +868,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $viewConfig = array_map(function ($item) {
                 if(isset($item['subtype']) && $item['subtype'] === 'identifier') $item['type'] = 'hidden';
                 if(!isset($item['category'])) $item['category'] = 'base';
-                if(!isset($item['type'])) $item['type'] = 'text';
+                if(!isset($item['type'])) $item['type'] = 'view';
+                if(!isset($item['subtype'])) $item['subtype'] = 'base';
                 $item['id'] = $item['field'];
                 return $item;
             }, $viewConfig);
@@ -727,16 +885,17 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $config['fields'] = array_reduce(array_filter($viewConfig, function($item) {
                 return $item['type'] !== 'hidden';
             }), function($carry, $item) {
-                $carry[] = array_merge($this->config->get('builder_view_field_config'), [
-                    'id' => $item['id'],
-                    'field' => $item['field'],
-                    'label' => $item['label'],
-                    'category' => 'base',
-                    'type' => 'text',
-                    'subtype' => 'base',
-                    'colspan' => $item['colspan']??6,
-                    'help_block' => $item['help_block']??[],
-                ]);
+                if($item['type'] !== 'view') {
+                    $item = $this->setFormColumn($item);
+                    $item['attributes'] = get_admin_form_attributes($item, 'page');
+                }
+
+                $carry[] = array_merge($this->config->get('builder_view_field_config'),
+                    [
+                        'colspan' => $item['colspan']??6,
+                    ],
+                    $item,
+                );
                 return $carry;
             }, []);
         }
