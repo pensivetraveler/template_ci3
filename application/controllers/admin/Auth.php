@@ -8,43 +8,46 @@ class Auth extends Common
     public function __construct()
     {
         parent::__construct();
+
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/css/pages/page-auth.css'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
+        ];
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
+        ];
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-auth.js'),
+        ];
+
+        $this->addJsVars([
+            'API_URI' => $this->apiUri.'auth/',
+            'FORM_REGEXP' => $this->config->item('regexp'),
+        ]);
     }
 
     public function login()
     {
-		if($this->isLogin) redirect($this->isLoginRedirect);
+        if($this->isLogin) redirect($this->isLoginRedirect);
 
-		$this->formColumns = $this->setFormColumns('login');
-		$this->addJsVars([
-			'API_URI' => $this->apiUri.'auth',
-			'API_URI_ADD' => 'login',
-			'FORM_DATA' => $this->setFormData(),
-			'FORM_REGEXP' => $this->config->item('regexp'),
+        $this->formColumns = $this->setFormColumns('login');
+        $this->addJsVars([
+            'API_URI_ADD' => 'login',
+            'FORM_DATA' => $this->setFormData(),
             'REDIRECT_URI' => base_url($this->isLoginRedirect)
-		]);
+        ]);
 
-		$this->addCSS[] = [
-			base_url('public/assets/builder/vendor/css/pages/page-auth.css'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
-			base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
-		];
+        $data['subPage'] = 'admin/auth/login';
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
 
-		$this->addJS['tail'][] = [
-			base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
-			base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
-		];
-
-		$this->addJS['tail'][] = [
-			base_url('public/assets/builder/js/app-page-auth.js'),
-		];
-
-		$data['subPage'] = 'admin/auth/login';
-		$data['backLink'] = WEB_HISTORY_BACK;
-		$data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
-
-		$this->viewApp($data);
+        $this->viewApp($data);
     }
 
     public function logout()
@@ -56,77 +59,39 @@ class Auth extends Common
         redirect($this->noLoginRedirect);
     }
 
-	public function findId()
-	{
-		if($this->isLogin) redirect($this->isLoginRedirect);
+    public function findId()
+    {
+        if($this->isLogin) redirect($this->isLoginRedirect);
 
-		$this->formColumns = $this->setFormColumns('find_id');
-		$this->addJsVars([
-			'API_URI' => $this->apiUri.'auth/',
-			'API_URI_ADD' => 'findId',
-			'FORM_DATA' => $this->setFormData(),
-			'FORM_REGEXP' => $this->config->item('regexp'),
-			'REDIRECT_URI' => '/admin/auth/login'
-		]);
+        $this->formColumns = $this->setFormColumns('find_id');
+        $this->addJsVars([
+            'API_URI_ADD' => 'findId',
+            'FORM_DATA' => $this->setFormData(),
+            'REDIRECT_URI' => base_url($this->noLoginRedirect)
+        ]);
 
-		$this->addCSS[] = [
-			base_url('public/assets/builder/vendor/css/pages/page-auth.css'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
-			base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
-		];
+        $data['subPage'] = 'admin/auth/find_id';
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
 
-		$this->addJS['tail'][] = [
-			base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
-			base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
-		];
+        $this->viewApp($data);
+    }
 
-		$this->addJS['tail'][] = [
-			base_url('public/assets/builder/js/app-page-auth.js'),
-		];
+    public function findPassword()
+    {
+        if($this->isLogin) redirect($this->isLoginRedirect);
 
-		$data['subPage'] = 'admin/auth/find_id';
-		$data['backLink'] = WEB_HISTORY_BACK;
-		$data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
+        $this->formColumns = $this->setFormColumns('find_password');
+        $this->addJsVars([
+            'API_URI_ADD' => 'findPassword',
+            'FORM_DATA' => $this->setFormData(),
+            'REDIRECT_URI' => base_url($this->noLoginRedirect)
+        ]);
 
-		$this->viewApp($data);
-	}
+        $data['subPage'] = 'admin/auth/find_password';
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
 
-	public function findPassword()
-	{
-		if($this->isLogin) redirect($this->isLoginRedirect);
-
-		$this->formColumns = $this->setFormColumns('find_password');
-		$this->addJsVars([
-			'API_URI' => $this->apiUri.'auth/',
-			'API_URI_ADD' => 'findPassword',
-			'FORM_DATA' => $this->setFormData(),
-			'FORM_REGEXP' => $this->config->item('regexp'),
-			'REDIRECT_URI' => '/admin/auth/login'
-		]);
-
-		$this->addCSS[] = [
-			base_url('public/assets/builder/vendor/css/pages/page-auth.css'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
-			base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
-		];
-
-		$this->addJS['tail'][] = [
-			base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
-			base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
-			base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
-		];
-
-		$this->addJS['tail'][] = [
-			base_url('public/assets/builder/js/app-page-auth.js'),
-		];
-
-		$data['subPage'] = 'admin/auth/find_password';
-		$data['backLink'] = WEB_HISTORY_BACK;
-		$data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], $this->sideForm?'side':'page');
-
-		$this->viewApp($data);
-	}
+        $this->viewApp($data);
+    }
 }
