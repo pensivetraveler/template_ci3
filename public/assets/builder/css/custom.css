@@ -533,9 +533,6 @@ html[data-style="dark"] .form-type-side .input-group .form-floating > div:has(.s
 	opacity: 1;
 	font-size: 0.8125rem;
 }
-.form-type-filter .filter-space {
-	display: none;
-}
 .form-type-filter .filter-btns>*:not(:last-child) {
 	margin-right: 1.5rem;
 }
