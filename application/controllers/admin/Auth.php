@@ -20,7 +20,7 @@ class Auth extends Common
 			'API_URI_ADD' => 'login',
 			'FORM_DATA' => $this->setFormData(),
 			'FORM_REGEXP' => $this->config->item('regexp'),
-			'REDIRECT_URI' => '/admin/dashboard'
+            'REDIRECT_URI' => base_url($this->isLoginRedirect)
 		]);
 
 		$this->addCSS[] = [
