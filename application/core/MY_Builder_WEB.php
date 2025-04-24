@@ -126,37 +126,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables-bootstrap5.js'),
         ];
 
-        if($this->sideForm) {
-            $this->addCSS[] = [
-                base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
-                base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
-                base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
-            ];
-
-            // wysiwig
-            $this->addCSS[] = [
-                base_url('public/assets/builder/vendor/libs/quill/typography.css'),
-                base_url('public/assets/builder/vendor/libs/quill/katex.css'),
-                base_url('public/assets/builder/vendor/libs/quill/editor.css'),
-            ];
-
-            $this->addJS['tail'][] = [
-                base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
-                base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
-                base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
-                base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
-                base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
-                base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
-                base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
-                base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
-            ];
-
-            // wysiwig
-            $this->addJS['tail'][] = [
-                base_url('public/assets/builder/vendor/libs/quill/katex.js'),
-                base_url('public/assets/builder/vendor/libs/quill/quill.js'),
-            ];
-        }
+        if($this->sideForm) $this->addFormScripts();
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-list.js'),
@@ -199,36 +169,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $data['viewType'] = $this->pageConfig['viewProperties']['viewType'];
 
-        $this->addCSS[] = [
-            base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
-            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
-        ];
-
-        // wysiwig
-        $this->addCSS[] = [
-            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
-            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
-            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
-        ];
-
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
-            base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
-            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
-            base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
-            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
-            base_url('public/assets/builder/js/app-page-edit.js'),
-        ];
-
-        // wysiwig
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/vendor/libs/quill/katex.js'),
-            base_url('public/assets/builder/vendor/libs/quill/quill.js'),
-        ];
+        if(count(array_filter($data['viewData']['fields'], function($item) {
+            return $item['type'] !== 'view';
+        }))) {
+            $this->addFormScripts();
+        }
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-view.js'),
@@ -250,35 +195,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $data['buttons'] = [];
         if($this->pageConfig['properties']['listExist']) $data['buttons'][] = 'list';
 
-        $this->addCSS[] = [
-            base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
-            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
-        ];
-
-        // wysiwig
-        $this->addCSS[] = [
-            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
-            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
-            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
-        ];
+        $this->addFormScripts();
 
         $this->addJS['tail'][] = [
-            base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
-            base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
-            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
-            base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
-            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
             base_url('public/assets/builder/js/app-page-add.js'),
-        ];
-
-        // wysiwig
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/vendor/libs/quill/katex.js'),
-            base_url('public/assets/builder/vendor/libs/quill/quill.js'),
         ];
 
         $this->viewApp($data);
@@ -301,35 +221,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $data['buttons'] = [];
         if($this->pageConfig['properties']['listExist']) $data['buttons'][] = 'list';
 
-        $this->addCSS[] = [
-            base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
-            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
-        ];
-
-        // wysiwig
-        $this->addCSS[] = [
-            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
-            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
-            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
-        ];
+        $this->addFormScripts();
 
         $this->addJS['tail'][] = [
-            base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
-            base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
-            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
-            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
-            base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
-            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
             base_url('public/assets/builder/js/app-page-edit.js'),
-        ];
-
-        // wysiwig
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/vendor/libs/quill/katex.js'),
-            base_url('public/assets/builder/vendor/libs/quill/quill.js'),
         ];
 
         $this->viewApp($data);
@@ -1130,5 +1025,38 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if (isset($_COOKIE[$this->config->item('sess_cookie_name')])) {
             setcookie($this->config->item('sess_cookie_name'), '', time() - 3600, '/');
         }
+    }
+
+    protected function addFormScripts()
+    {
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/tagify/tagify.css'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
+        ];
+
+        // wysiwig
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
+            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
+            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
+        ];
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
+            base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
+            base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
+            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
+        ];
+
+        // wysiwig
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/quill/katex.js'),
+            base_url('public/assets/builder/vendor/libs/quill/quill.js'),
+        ];
     }
 }

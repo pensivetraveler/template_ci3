@@ -234,9 +234,9 @@ function get_admin_form_attributes($item, $form_type): array
 	// initiate
     if(!is_empty($item['attributes'], 'placeholder')){
         $exploded = explode('.', $item['attributes']['placeholder']);
-        if(count($exploded)){
+        if(count($exploded) > 1){
             $placeholder = $ci->lang->line($item['attributes']['placeholder']);
-       }else{
+        }else{
             $placeholder = $ci->lang->line('placeholder.'.$item['attributes']['placeholder']);
             if($placeholder === 'placeholder.'.$item['attributes']['placeholder'])
                 $placeholder = $ci->lang->line($item['attributes']['placeholder']);
