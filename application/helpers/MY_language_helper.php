@@ -76,3 +76,12 @@ function make_ellipsis($str, $length)
     }
     return $str;
 }
+
+function __($key = null, $replace = [], $locale = null)
+{
+    if (is_null($key)) {
+        return $key;
+    }
+
+    return lang($key);
+}
