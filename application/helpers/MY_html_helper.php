@@ -230,7 +230,7 @@ function get_help_block_html($data = []) {
 
         // class
         $class = implode('.', array_merge([
-            'fs-xsmall', 'd-block', 'mt-3'
+            'fs-xsmall', 'd-block', 'mt-3', 'help-block', 'text-secondary'
         ], explode(' ', $data['attr']['class']??'')));
         if($class) $class = '.'.$class;
 
