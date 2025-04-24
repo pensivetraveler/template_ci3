@@ -1035,13 +1035,6 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
         ];
 
-        // wysiwig
-        $this->addCSS[] = [
-            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
-            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
-            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
-        ];
-
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/vendor/libs/autosize/autosize.js'),
             base_url('public/assets/builder/vendor/libs/tagify/tagify.js'),
@@ -1051,6 +1044,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
             base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
             base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
+        ];
+
+        // wysiwig
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/libs/quill/typography.css'),
+            base_url('public/assets/builder/vendor/libs/quill/katex.css'),
+            base_url('public/assets/builder/vendor/libs/quill/editor.css'),
         ];
 
         // wysiwig
