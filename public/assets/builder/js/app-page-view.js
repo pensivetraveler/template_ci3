@@ -46,14 +46,34 @@ function applyViewData(dataId) {
 					document.querySelector(`#${key}`).innerHTML = html;
 					break;
 				default :
-					if(data[key]) {
-						container.querySelector(`#${key}`).innerHTML = data[key];
+					if(container.querySelector(`#${key}`).tagName === 'SPAN') {
+						if(data[key]) {
+							container.querySelector(`#${key}`).innerHTML = data[key];
+						}else{
+							container.querySelector(`#${key}`).classList.add('no-value')
+						}
 					}else{
-						container.querySelector(`#${key}`).classList.add('no-value')
+						if(data[key]) container.querySelector(`#${key}`).value = data[key];
 					}
 			}
 		}
 	}
+
+	if(document.querySelector('.view-form')){
+		preparePlugins(document.querySelector('.view-form'))
+
+		document.querySelector('.view-form').dispatchEvent(
+			new CustomEvent('fetchViewData', {
+				bubbles : false,
+				cancelable : true,
+				composed : false,
+				detail: {},
+			}),
+		);
+
+		refreshPlugins();
+	}
+
 
 	document.body.setAttribute('data-onload', true);
 }
