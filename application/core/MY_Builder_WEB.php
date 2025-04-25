@@ -479,8 +479,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $option = reset($matches);
             if (preg_match('/^required_mod\[(.*?)\]$/', $option, $matches)) {
                 $item['attributes']['required-mod'] = $matches[1];
-                if(in_array($this->router->method, explode('|', $matches[1])))
+                if(in_array($this->router->method, explode('|', $matches[1]))){
                     $item['rules'] = str_replace($matches[0], 'required', $item['rules']);
+                    $item['attributes']['required'] = 'required';
+                }
             }
         }
 
