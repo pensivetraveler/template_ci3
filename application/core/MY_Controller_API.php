@@ -86,7 +86,7 @@ class MY_Controller_API extends RestController
 
     protected function beforePut($key, $model = null)
     {
-		return $this->put();
+        return $this->put()??$this->input->json();
     }
 
     protected function afterPut($key, $dto)
@@ -100,7 +100,7 @@ class MY_Controller_API extends RestController
 
     protected function beforePatch($key, $model = null)
     {
-		return $this->patch();
+        return $this->patch()??$this->input->json();
     }
 
     protected function afterPatch($key, $dto)
