@@ -319,4 +319,9 @@ class MY_Input extends CI_Input
 			$this->delete(null, true),
 		);
 	}
+
+    public function json()
+    {
+        return json_decode($this->input->raw_input_stream, true);
+    }
 }
