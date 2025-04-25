@@ -539,7 +539,8 @@ function trans_formdata_dit_type($form_data)
     return $list;
 }
 
-function get_form_input_by_type($item, $formType): string {
+function get_form_input_by_type($item, $formType): string
+{
     switch ($item['type']) {
         case 'password' :
             return form_password(
@@ -596,7 +597,8 @@ function get_form_input_by_type($item, $formType): string {
     }
 }
 
-function get_page_form_input_by_type($item, $formType): string {
+function get_page_form_input_by_type($item, $formType): string
+{
     $html = get_form_input_by_type($item, $formType);
     if($item['form_attributes']['with_btn']) {
         switch ($item['form_attributes']['btn_type']) {
@@ -615,19 +617,22 @@ function get_page_form_input_by_type($item, $formType): string {
     return $html;
 }
 
-function get_side_form_input_by_type($item, $formType): string {
+function get_side_form_input_by_type($item, $formType): string
+{
     $html = get_form_input_by_type($item, $formType);
     if(!(($item['type']==='checkbox'||$item['type']==='radio')&&$item['subtype']==='single'))
         $html .= form_label(lang($item['label']), $item['id']);
     return $html;
 }
 
-function restructure_form_data_by_type($formData, $formType = 'side'): array {
+function restructure_form_data_by_type($formData, $formType = 'side'): array
+{
     $formData = restructure_admin_form_data($formData, $formType);
     return reformat_form_data_by_type($formData, $formType);
 }
 
-function reformat_form_data_by_type($formData, $formType = 'side'): array {
+function reformat_form_data_by_type($formData, $formType = 'side'): array
+{
     $data = [
         'hiddens' => array_values(array_filter($formData, function($item) {
             return $item['type'] === 'hidden';
@@ -665,4 +670,12 @@ function reformat_form_data_by_type($formData, $formType = 'side'): array {
     }
 
     return $data;
+}
+
+function get_builder_form_label($item, $attr = []): string
+{
+    $required = isset($item['attributes']['required']) && $item['attributes']['required'] === 'required';
+    $id = $item['id']??'';
+    $label = lang($item['label']).($required?'<span class="ms-2 text-danger">*</span>':'');
+    return form_label($label, $id, $attr);
 }
