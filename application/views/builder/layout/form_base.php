@@ -46,10 +46,19 @@
     endforeach;
 ?>
 <div class="row">
-    <div class="col-sm-12 text-end">
-        <button type="button" class="btn btn-outline-dark waves-effect" onclick="<?=WEB_HISTORY_BACK?>"><?=lang('List')?></button>
-        <button type="submit" class="btn btn-primary waves-effect waves-light"><?=lang('Submit')?></button>
-        <button type="button" class="btn btn-outline-danger btn-delete-event btn-delete d-none"><?=lang('Delete')?></button>
-    </div>
+	<div class="col-sm-6 text-start">
+		<?php foreach ($buttons as $button=>$attr): ?>
+		<button type="button" class="btn btn-outline-dark waves-effect btn-view-<?=$button?>"><?=lang($attr['text'])?></button>
+		<?php endforeach; ?>
+	</div>
+	<div class="col-sm-12 text-end">
+		<?php if(in_array('list', $actions)): ?>
+		<button type="button" class="btn btn-outline-dark waves-effect" onclick="<?=WEB_HISTORY_BACK?>"><?=lang('List')?></button>
+		<?php endif; ?>
+		<button type="submit" class="btn btn-primary waves-effect waves-light"><?=lang('Submit')?></button>
+		<?php if(in_array('delete', $actions)): ?>
+		<button type="button" class="btn btn-outline-danger btn-delete-event btn-delete d-none"><?=lang('Delete')?></button>
+		<?php endif; ?>
+	</div>
 </div>
 <?=form_close();?>
