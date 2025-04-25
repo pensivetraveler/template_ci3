@@ -342,12 +342,20 @@ function deleteRepeater(repeater, deleteElement) {
 	});
 }
 
-function getData(dataId = null) {
+function getData(dataId = null, params = {}) {
 	if(!dataId) throw new Error(`dataId is not defined`);
+
+	let dataParams;
+	if(common.API_PARAMS.length === 0){
+		dataParams = params;
+	}else{
+		dataParams = { ...common.API_PARAMS, ...params };
+	}
+
 	let data = null;
 	$.ajax({
 		async: false,
-		url : common.API_URI + '/' + dataId + '?' + new URLSearchParams(common.API_PARAMS).toString(),
+		url : common.API_URI + '/' + dataId + '?' + new URLSearchParams(dataParams).toString(),
 		headers: {
 			'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
 		},
