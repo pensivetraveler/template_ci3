@@ -35,7 +35,7 @@
 			else:
 	?>
 	<div class="col-md-<?=$item['colspan']?> mb-6 form-validation-unit" data-field-name="<?=$item['field']??''?>">
-		<?=form_label(lang($item['label']), $item['id'], ['class' => 'd-block col-form-label fs-6 text-primary py-0 mb-2 fw-bolder'])?>
+		<?=get_builder_form_label($item, ['class' => 'd-block col-form-label fs-6 text-primary py-0 mb-2 fw-bolder'])?>
 		<div class="input-group input-group-merge">
 			<?php
 			echo get_admin_form_ico($item);
