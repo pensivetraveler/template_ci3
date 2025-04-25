@@ -723,3 +723,18 @@ html[data-style="dark"] .form-type-side .input-group .form-floating > div:has(.s
 [data-method="view"] .card-header>div:last-child:not(:first-child) {
 	margin-bottom: 1rem !important;
 }
+
+/*********************************************
+    [required="required"]
+ *********************************************/
+.form-type-side .input-group.input-group-merge:has([required="required"]):after {
+	content: '';
+	height: 5px;
+	width: 5px;
+	background-color: red;
+	position: absolute;
+	display: block;
+	top: 5px;
+	right: 5px;
+	border-radius: 50%;
+}
