@@ -14,7 +14,9 @@ function setViewListItemFile(item) {
 }
 
 function applyViewData(dataId) {
-	const data = getData(dataId);
+	const data = getData(dataId, {
+		_mode : 'view',
+	});
 	const container = document.getElementById('view-container');
 	if(!container) return;
 
