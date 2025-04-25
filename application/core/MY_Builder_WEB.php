@@ -119,7 +119,17 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables-bootstrap5.js'),
         ];
 
-        if($this->sideForm) $this->addFormScripts();
+        if($this->sideForm) {
+            $this->addFormScripts();
+
+            $data['actions'] = reformat_bool_type_list($this->pageConfig['formProperties']['actions']);
+            foreach ($data['actions'] as $i=>$action) {
+                if($action === 'delete') continue;
+                if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
+            }
+            $data['actions'] = array_values($data['actions']);
+            $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['formProperties']['buttons']??[]);
+        }
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-list.js'),
@@ -157,7 +167,6 @@ class MY_Builder_WEB extends MY_Controller_WEB
             if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
         }
         $data['actions'] = array_values($data['actions']);
-
         $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['viewProperties']['buttons']??[]);
 
         $data['isComments'] = $this->pageConfig['viewProperties']['isComments'];
@@ -184,8 +193,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $data['formType'] = $this->pageConfig['formProperties']['formType'];
         $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType']);
 
-        $data['buttons'] = [];
-        if($this->pageConfig['properties']['listExist']) $data['buttons'][] = 'list';
+        $data['actions'] = reformat_bool_type_list($this->pageConfig['formProperties']['actions']);
+        foreach ($data['actions'] as $i=>$action) {
+            if($action === 'delete') continue;
+            if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
+        }
+        $data['actions'] = array_values($data['actions']);
+        $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['formProperties']['buttons']??[]);
 
         $this->addFormScripts();
 
@@ -210,8 +224,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $data['formType'] = $this->pageConfig['formProperties']['formType'];
         $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType']);
 
-        $data['buttons'] = [];
-        if($this->pageConfig['properties']['listExist']) $data['buttons'][] = 'list';
+        $data['actions'] = reformat_bool_type_list($this->pageConfig['formProperties']['actions']);
+        foreach ($data['actions'] as $i=>$action) {
+            if($action === 'delete') continue;
+            if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
+        }
+        $data['actions'] = array_values($data['actions']);
+        $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['formProperties']['buttons']??[]);
 
         $this->addFormScripts();
 
