@@ -26,6 +26,11 @@ $config['page_base_config'] = [
     'formProperties' => [
         'formConfig' => '',
         'formType' => 'side',
+        'buttons' => [],
+        'actions' => [
+            'list' => true,
+            'delete' => true,
+        ],
     ],
     'listProperties' => [
         'listConfig' => '',
