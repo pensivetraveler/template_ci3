@@ -18,8 +18,10 @@ class MY_Builder_API extends MY_Controller_API
     protected bool $setConfig = true;
     protected array $listConfig = [];
     protected array $formConfig = [];
+    protected array $viewConfig = [];
     protected string $listConfigName = '';
     protected string $formConfigName = '';
+    protected string $viewConfigName = '';
 
     protected array $validateMessages = [];
     protected array $validateCallback = [];
@@ -34,12 +36,43 @@ class MY_Builder_API extends MY_Controller_API
         $this->identifier = '';
         $this->listConfigName = 'list_'.strtolower($this->router->class).'_config';
         $this->formConfigName = 'form_'.strtolower($this->router->class).'_config';
+        $this->viewConfigName = 'view_'.strtolower($this->router->class).'_config';
         $this->validateMessages = [];
         $this->validateCallback = [];
         $this->exceptValidateKeys = ['_mode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
         $this->transTargetKeys = [];
         $this->indexAPI = true;
         $this->loadConfigs();
+    }
+
+    public function index_get($key = 0)
+    {
+        if(!$this->indexAPI) show_404();
+        parent::index_get($key);
+    }
+
+    public function index_post($key = 0)
+    {
+        if(!$this->indexAPI) show_404();
+        parent::index_post($key);
+    }
+
+    public function index_put($key = 0)
+    {
+        if(!$this->indexAPI) show_404();
+        parent::index_put($key);
+    }
+
+    public function index_patch($key = 0)
+    {
+        if(!$this->indexAPI) show_404();
+        parent::index_patch($key);
+    }
+
+    public function index_delete($key = 0)
+    {
+        if(!$this->indexAPI) show_404();
+        parent::index_delete($key);
     }
 
     protected function loadConfigs()
@@ -184,12 +217,26 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function viewAfter($data)
     {
-        if($this->input->get('_mode') && $this->input->get('_mode') !== 'form' && $this->listConfig) {
-            foreach ($this->transTargetKeys as $key) {
-                if(!property_exists($data, $key)) continue;
-                if($idx = array_search($key, array_column($this->listConfig, 'field'))){
-                    $item = $this->listConfig[$idx];
-                    if(empty($item['option_attributes'])) continue;
+        if($this->input->get('_mode') && $this->input->get('_mode') !== 'form') {
+            $transTargetKeys = [];
+            $targetConfig = [];
+
+            switch ($this->input->get('_mode')) {
+                case 'list' :
+                    $transTargetKeys = $this->transTargetKeys['list']??[];
+                    $targetConfig = $this->listConfig;
+                    break;
+                case 'view' :
+                    $transTargetKeys = $this->transTargetKeys['view']??[];
+                    $targetConfig = $this->viewConfig;
+                    break;
+            }
+
+            foreach ($transTargetKeys as $key) {
+                if(!property_exists($data, $key) || !$data->{$key}) continue;
+                if($idx = array_search($key, array_column($targetConfig, 'field'))){
+                    $item = $targetConfig[$idx];
+                    if(!isset($item['option_attributes'])) continue;
                     $options = $this->getOptions($key, $item['option_attributes']);
                     $data->{$key} = $options[$data->{$key}];
                 }
@@ -761,6 +808,7 @@ class MY_Builder_API extends MY_Controller_API
         if($this->setConfig) {
             $this->listConfig = $this->config->get($this->listConfigName, [], false);
             $this->formConfig = $this->config->get($this->formConfigName, [], false);
+            $this->viewConfig = $this->config->get($this->viewConfigName, [], false);
 
             if($this->input->method === 'get') {
                 if(is_empty($this->listConfig)) {
@@ -1009,7 +1057,7 @@ class MY_Builder_API extends MY_Controller_API
 
     public function deleteExcelFile_patch()
     {
-        $class = $this->input->get('class') ?? null;
+        $class = $this->input->patch('class') ?? null;
         if(!$class) $this->response(['code' => EMPTY_REQUIRED_DATA]);
 
         $filename = $class.'_upload_sample.xlsx';;
