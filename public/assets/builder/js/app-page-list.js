@@ -26,7 +26,7 @@ $(function () {
 
 	// Datatable
 	if(!dt_table.length) throw new Error(`dt_table is not defined!`);
-	if(!common.LIST_COLUMNS.length) throw new Error(`check common LIST_COLUMNS.`);
+	if(!common.hasOwnProperty('LIST_COLUMNS') || !common.LIST_COLUMNS.length) throw new Error(`check common LIST_COLUMNS.`);
 	if(dt_table.find('thead th').length !== 1+common.LIST_CHEKBOX+common.LIST_COLUMNS.length)
 		throw new Error(`th and LIST_COLUMNS length are not matched.`);
 
