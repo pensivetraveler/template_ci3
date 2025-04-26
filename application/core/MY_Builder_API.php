@@ -34,9 +34,9 @@ class MY_Builder_API extends MY_Controller_API
         parent::__construct();
 
         $this->identifier = '';
-        $this->listConfigName = 'list_'.strtolower($this->router->class).'_config';
-        $this->formConfigName = 'form_'.strtolower($this->router->class).'_config';
-        $this->viewConfigName = 'view_'.strtolower($this->router->class).'_config';
+        $this->listConfigName = $this->listConfigName??'list_'.strtolower($this->router->class).'_config';
+        $this->formConfigName = $this->formConfigName??'form_'.strtolower($this->router->class).'_config';
+        $this->viewConfigName = $this->viewConfigName??'view_'.strtolower($this->router->class).'_config';
         $this->validateMessages = [];
         $this->validateCallback = [];
         $this->exceptValidateKeys = ['_mode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
@@ -234,7 +234,8 @@ class MY_Builder_API extends MY_Controller_API
 
             foreach ($transTargetKeys as $key) {
                 if(!property_exists($data, $key) || !$data->{$key}) continue;
-                if($idx = array_search($key, array_column($targetConfig, 'field'))){
+                if(array_search($key, array_column($targetConfig, 'field')) !== false) {
+                    $idx = array_search($key, array_column($targetConfig, 'field'));
                     $item = $targetConfig[$idx];
                     if(!isset($item['option_attributes'])) continue;
                     $options = $this->getOptions($key, $item['option_attributes']);
