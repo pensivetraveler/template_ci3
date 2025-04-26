@@ -34,9 +34,9 @@ class MY_Builder_API extends MY_Controller_API
         parent::__construct();
 
         $this->identifier = '';
-        $this->listConfigName = $this->listConfigName??'list_'.strtolower($this->router->class).'_config';
-        $this->formConfigName = $this->formConfigName??'form_'.strtolower($this->router->class).'_config';
-        $this->viewConfigName = $this->viewConfigName??'view_'.strtolower($this->router->class).'_config';
+        if($this->listConfigName === '') $this->listConfigName = 'list_'.strtolower($this->router->class).'_config';
+        if($this->formConfigName === '') $this->formConfigName = 'form_'.strtolower($this->router->class).'_config';
+        if($this->viewConfigName === '') $this->viewConfigName = 'view_'.strtolower($this->router->class).'_config';
         $this->validateMessages = [];
         $this->validateCallback = [];
         $this->exceptValidateKeys = ['_mode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
