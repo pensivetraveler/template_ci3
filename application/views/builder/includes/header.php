@@ -6,7 +6,7 @@
 				<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 					<div class="app-brand demo">
 						<!-- Logo -->
-						<a href="/<?=$platformName?>/dashboard?layout=side-menu" class="app-brand-link">
+						<a href="<?=base_url($this->isLoginRedirect)?>" class="app-brand-link">
 							<?php if(file_exists(PLATFORM_ASSET_IMG_PATH.'logo.png')): ?>
 								<span class="app-brand-logo demo">
 										<img src="<?=base_url(PLATFORM_ASSET_IMG_URI.'logo.png')?>" alt="logo">
