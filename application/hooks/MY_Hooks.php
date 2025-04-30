@@ -27,7 +27,7 @@ class MY_Hooks
 		define("APP_NAME_KR", getenv('APP_NAME_KR'));
 	}
 
-	public function SystemOfInspection()
+	public function systemOfInspection()
 	{
 		if(getenv('SYSTEM_INSPECTION') === 'true') {
 			echo '시스템 점검 중입니다.';
