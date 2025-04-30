@@ -11,12 +11,12 @@ class MY_Controller extends CI_Controller
     {
         parent::__construct();
 
-        $this->encryption->initialize(
-            array(
-                'cipher' => 'aes-256',
-                'mode' => 'ctr',
-            )
-        );
+        $this->load->library('encryption', array(
+            'driver' => 'openssl',
+            'cipher' => 'aes-256',
+            'mode' => 'ctr',
+            'key' => getenv('APP_NAME')
+        ));
 
         $this->devMode = ENVIRONMENT !== 'production';
         $this->switchLang();
@@ -30,11 +30,6 @@ class MY_Controller extends CI_Controller
         $this->load->view($view, $array);
         $this->load->view("includes/View_modal");
         $this->load->view("includes/View_footer");
-    }
-
-    function _view_pwd_reset($view, $array = [])
-    {
-        $this->load->view($view, $array);
     }
 
     function response($data = NULL, $http_code = NULL)
