@@ -73,24 +73,24 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     public function index()
     {
-        $this->setupBuilderDB();
+        if($this->isBuilderAvailable()){
+            parent::index();
 
-        parent::index();
+            if(empty($this->pageConfig)) {
+                $data['subPage'] = '';
+                $data['backLink'] = WEB_HISTORY_BACK;
+                $this->viewApp($data);
+            }else{
+                if(!$this->pageConfig['properties']['allowNoLogin'] && !$this->isLogin){
+                    redirect($this->noLoginRedirect);
+                }
 
-        if(empty($this->pageConfig)) {
-            $data['subPage'] = '';
-            $data['backLink'] = WEB_HISTORY_BACK;
-            $this->viewApp($data);
-        }else{
-            if(!$this->pageConfig['properties']['allowNoLogin'] && !$this->isLogin){
-                redirect($this->noLoginRedirect);
+                if($this->router->class === 'common') {
+                    redirect("$this->baseUri/$this->defaultController");
+                }
+
+                $this->{"{$this->pageConfig['properties']['baseMethod']}"}();
             }
-
-            if($this->router->class === 'common') {
-                redirect("$this->baseUri/$this->defaultController");
-            }
-
-            $this->{"{$this->pageConfig['properties']['baseMethod']}"}();
         }
     }
 
@@ -897,13 +897,33 @@ class MY_Builder_WEB extends MY_Controller_WEB
         return $sampleUri;
     }
 
-    protected function setupBuilderDB()
+    protected function isBuilderAvailable(): bool
     {
-        if($this->Model_Common->getTableCount()) {
-            $this->addSystemUser();
-            return;
+        // 1. 캐시가 존재하면 바로 true 반환
+        if ($this->cache->file->get('init_done') === true) {
+            return true;
         }
 
+        // 2. DB 테이블 존재 여부 확인
+        if($this->Model_Common->getTableCount() === 0) {
+            $this->setupBuilderDB();
+            return false;
+        }
+
+        // 3. 시스템 사용자 존재 여부 확인
+        if(!$this->Model_Common->checkSystemUserExist()) {
+            $this->addSystemUser();
+            return false;
+        }
+
+        // 4. 모든 조건 통과 → 캐시 저장 (1일 유효)
+        $this->cache->file->save('init_done', true, 86400); // 86400초 = 1일
+
+        return true;
+    }
+
+    protected function setupBuilderDB()
+    {
         if($this->input->post('sql')){
             $this->load->library('sql_parser');
             $sql = $this->sql_parser->parsing($this->input->post('sql'));
@@ -952,12 +972,6 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     public function addSystemUser()
     {
-        $cnt = $this->db
-            ->where(['user_cd' => 'USR000'])
-            ->from(USER_TABLE_NAME)
-            ->count_all_results();
-        if($cnt) return;
-
         $userColumns = [];
         $columns = $this->Model_Common->getNotNullColumns(USER_TABLE_NAME);
         if(empty($columns)) show_error(lang('Check The User Table'));
