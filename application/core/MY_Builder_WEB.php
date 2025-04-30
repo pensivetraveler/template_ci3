@@ -29,6 +29,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
     {
         parent::__construct();
 
+        $this->load->driver('cache');
+
         $this->config->load('extra/autologin_config', false);
 
         foreach (['builder_base_config', 'builder_form_config', 'builder_nav_config', 'builder_page_config', 'builder_view_config'] as $config) {

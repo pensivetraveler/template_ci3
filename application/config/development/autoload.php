@@ -80,7 +80,7 @@ $autoload['libraries'] = array('email', 'session', 'encryption', 'database', 'us
 |	$autoload['drivers'] = array('cache' => 'cch');
 |
 */
-$autoload['drivers'] = array('cache');
+$autoload['drivers'] = array();
 
 /*
 | -------------------------------------------------------------------
