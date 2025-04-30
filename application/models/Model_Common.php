@@ -310,4 +310,12 @@ DEALLOCATE PREPARE stmt;
 SET FOREIGN_KEY_CHECKS = 1;
 		");
     }
+
+    public function checkSystemUserExist(): bool
+    {
+        return $this->db
+                ->where(['user_cd' => 'USR000'])
+                ->from(USER_TABLE_NAME)
+                ->count_all_results() > 0;
+    }
 }
