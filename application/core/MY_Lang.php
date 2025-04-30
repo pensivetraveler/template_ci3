@@ -63,264 +63,258 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class MY_Lang extends CI_Lang {
 
-	/**
-	 * Refactor: base language provided inside system/language
-	 *
-	 * @var string
-	 */
-	public $base_language = 'english';
+    /**
+     * Refactor: base language provided inside system/language
+     *
+     * @var string
+     */
+    public $base_language = 'english';
 
-	/**
-	 * Class constructor
-	 *
-	 * @return	void
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-	}
+    /**
+     * Class constructor
+     *
+     * @return	void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-	// --------------------------------------------------------------------
+    // --------------------------------------------------------------------
 
-	/**
-	 * Load a language file, with fallback to english.
-	 *
-	 * @param	mixed	$langfile	Language file name
-	 * @param	string	$idiom		Language name (english, etc.)
-	 * @param	bool	$return		Whether to return the loaded array of translations
-	 * @param 	bool	$add_suffix	Whether to add suffix to $langfile
-	 * @param 	string	$alt_path	Alternative path to look for the language file
-	 *
-	 * @return	void|string[]	Array containing translations, if $return is set to TRUE
-	 */
-	public function load($langfile, $idiom = '', $return = FALSE, $add_suffix = TRUE, $alt_path = '')
-	{
-		if (is_array($langfile))
-		{
-			foreach ($langfile as $value)
-			{
-				$this->load($value, $idiom, $return, $add_suffix, $alt_path);
-			}
+    /**
+     * Load a language file, with fallback to english.
+     *
+     * @param	mixed	$langfile	Language file name
+     * @param	string	$idiom		Language name (english, etc.)
+     * @param	bool	$return		Whether to return the loaded array of translations
+     * @param 	bool	$add_suffix	Whether to add suffix to $langfile
+     * @param 	string	$alt_path	Alternative path to look for the language file
+     *
+     * @return	void|string[]	Array containing translations, if $return is set to TRUE
+     */
+    public function load($langfile, $idiom = '', $return = FALSE, $add_suffix = TRUE, $alt_path = '')
+    {
+        if (is_array($langfile))
+        {
+            foreach ($langfile as $value)
+            {
+                $this->load($value, $idiom, $return, $add_suffix, $alt_path);
+            }
 
-			return;
-		}
+            return;
+        }
 
-		$langfile = str_replace('.php', '', $langfile);
+        $langfile = str_replace('.php', '', $langfile);
 
-		if ($add_suffix === TRUE)
-		{
-			$langfile = preg_replace('/_lang$/', '', $langfile) . '_lang';
-		}
+        if ($add_suffix === TRUE)
+        {
+            $langfile = preg_replace('/_lang$/', '', $langfile) . '_lang';
+        }
 
-		$langfile .= '.php';
+        $langfile .= '.php';
 
-		if (empty($idiom) OR ! preg_match('/^[a-z_-]+$/i', $idiom))
-		{
-			$config = & get_config();
-			$idiom = empty($config['language']) ? $this->base_language : $config['language'];
-		}
+        if (empty($idiom) OR ! preg_match('/^[a-z_-]+$/i', $idiom))
+        {
+            $config = & get_config();
+            $idiom = empty($config['language']) ? $this->base_language : $config['language'];
+        }
 
-		if ($return === FALSE && isset($this->is_loaded[$langfile]) && $this->is_loaded[$langfile] === $idiom)
-		{
-			return;
-		}
+        if ($return === FALSE && isset($this->is_loaded[$langfile]) && $this->is_loaded[$langfile] === $idiom)
+        {
+            return;
+        }
 
-		// load the default language first, if necessary
-		// only do this for the language files under system/
+        // load the default language first, if necessary
+        // only do this for the language files under system/
         $basepath = SYSDIR . DIRECTORY_SEPARATOR . 'language/' . $this->base_language . '/' . $langfile;
-		if (($found = file_exists($basepath)) === TRUE)
-		{
-			include($basepath);
-		}
+        if (($found = file_exists($basepath)) === TRUE)
+        {
+            include($basepath);
+        }
 
-		// Load the base file, so any others found can override it
-		$basepath = BASEPATH . 'language/' . $idiom . '/' . $langfile;
-		if (($found = file_exists($basepath)) === TRUE)
-		{
-			include($basepath);
-		}
+        // Load the base file, so any others found can override it
+        $basepath = BASEPATH . 'language/' . $idiom . '/' . $langfile;
+        if (($found = file_exists($basepath)) === TRUE)
+        {
+            include($basepath);
+        }
 
-		// Do we have an alternative path to look in?
-		if ($alt_path !== '')
-		{
-			$alt_path .= 'language/' . $idiom . '/' . $langfile;
-			if (file_exists($alt_path))
-			{
-				include($alt_path);
-				$found = TRUE;
-			}
-		} else
-		{
-			foreach (get_instance()->load->get_package_paths(TRUE) as $package_path)
-			{
-				$package_path .= 'language/' . $idiom . '/' . $langfile;
-				if ($basepath !== $package_path && file_exists($package_path))
-				{
-					include($package_path);
-					$found = TRUE;
-					break;
-				}
-			}
-		}
+        // Do we have an alternative path to look in?
+        if ($alt_path !== '')
+        {
+            $alt_path .= 'language/' . $idiom . '/' . $langfile;
+            if (file_exists($alt_path))
+            {
+                include($alt_path);
+                $found = TRUE;
+            }
+        } else
+        {
+            foreach (get_instance()->load->get_package_paths(TRUE) as $package_path)
+            {
+                $package_path .= 'language/' . $idiom . '/' . $langfile;
+                if ($basepath !== $package_path && file_exists($package_path))
+                {
+                    include($package_path);
+                    $found = TRUE;
+                    break;
+                }
+            }
+        }
 
-		if ($found !== TRUE)
-		{
-			show_error('Unable to load the requested language file: language/' . $idiom . '/' . $langfile);
-		}
+        if ($found !== TRUE)
+        {
+            show_error('Unable to load the requested language file: language/' . $idiom . '/' . $langfile);
+        }
 
-		if (!isset($lang) OR ! is_array($lang))
-		{
-			log_message('error', 'Language file contains no data: language/' . $idiom . '/' . $langfile);
+        if (!isset($lang) OR ! is_array($lang))
+        {
+            log_message('error', 'Language file contains no data: language/' . $idiom . '/' . $langfile);
 
-			if ($return === true)
-			{
-				return array();
-			}
-			return;
-		}
+            if ($return === true)
+            {
+                return array();
+            }
+            return;
+        }
 
-		if ($return === true)
-		{
-			return $lang;
-		}
+        if ($return === true)
+        {
+            return $lang;
+        }
 
-		$this->is_loaded[$langfile] = $idiom;
-		$this->language = array_merge($this->language, $lang);
+        $this->is_loaded[$langfile] = $idiom;
+        $this->language = array_merge($this->language, $lang);
 
-		log_message('info', 'Language file loaded: language/' . $idiom . '/' . $langfile);
-		return true;
-	}
+        log_message('info', 'Language file loaded: language/' . $idiom . '/' . $langfile);
+        return true;
+    }
 
-	public function line($line, $log_errors = true)
-	{
-		if(is_array($line)) {
-			if(is_list_type($line)) {
-				return array_reduce($line, function($carry, $item) use ($log_errors) {
-					$carry .= $this->line($item, $log_errors);
-					return $carry;
-				}, '');
-			}else{
-				return $this->line_arr($line, $log_errors);
-			}
-		}
+    public function line($line, $log_errors = true)
+    {
+        if(is_array($line)) {
+            if(is_list_type($line)) {
+                return array_reduce($line, function($carry, $item) use ($log_errors) {
+                    $carry .= $this->line($item, $log_errors);
+                    return $carry;
+                }, '');
+            }else{
+                return $this->line_arr($line, $log_errors);
+            }
+        }
 
-		if(strpos($line, 'lang:') !== false) $line = str_replace('lang:', '', $line);
-		$value = $this->line_exists($line, $this->language, $log_errors);
+        if(strpos($line, 'lang:') !== false) $line = str_replace('lang:', '', $line);
+        $value = $this->line_exists($line, $this->language, $log_errors);
 
-		return $value === false?$line:$value;
-	}
+        return $value === false?$line:$value;
+    }
 
-	public function status($code)
-	{
-		$value = $this->line_exists('status_code.'.$code, $this->language);
-		if(!$value && (int)$code % 10 === 0) {
-			$code = strval((int)$code/10);
-			$value = $this->line_exists('status_code.'.$code, $this->language);
-		}
-		return $value === false?$code:$value;
-	}
+    public function status($code)
+    {
+        $value = $this->line_exists('status_code.'.$code, $this->language);
+        if(!$value && (int)$code % 10 === 0) {
+            $code = strval((int)$code/10);
+            $value = $this->line_exists('status_code.'.$code, $this->language);
+        }
+        return $value === false?$code:$value;
+    }
 
-	public function line_exists($line, $languages = [], $log_errors = true)
-	{
-		if(empty($languages)) $languages = $this->language;
+    public function line_exists($line, $languages = [], $log_errors = true)
+    {
+        if(empty($languages)) $languages = $this->language;
 
-		$CI =& get_instance();
+        $CI =& get_instance();
 
-		$value = $this->find_line($line, $languages);
+        $value = $this->find_line($line, $languages);
 
-		// Because killer robots like unicorns!
-		if ($value === false && $log_errors === true)
-		{
-			log_message('error', "Could not find the language line '$line' in {$CI->config->config['language']}");
-		}
+        if($value === false) {
+            if($CI->config->config['language'] !== $this->base_language) {
+                $alternates = [];
+                foreach ($this->is_loaded as $langfile=>$language) {
+                    if($language !== $this->base_language) $alternates = array_merge($alternates, $this->load($langfile, $this->base_language, true));
+                }
+                $value = $this->find_line($line, $alternates);
+            }
+        }
 
-		if($value === false) {
-			if($CI->config->config['language'] !== $this->base_language) {
-				$alternates = [];
-				foreach ($this->is_loaded as $langfile=>$language) {
-					if($language !== $this->base_language) $alternates = array_merge($alternates, $this->load($langfile, $this->base_language, true));
-				}
-				$value = $this->find_line($line, $alternates);
-			}
-		}
+        // Because killer robots like unicorns!
+        if ($value === false && $log_errors === true)
+        {
+            log_message('error', "Could not find the language line '$line' in {$this->base_language}");
+        }
 
-		// Because killer robots like unicorns!
-		if ($value === false && $log_errors === true)
-		{
-			log_message('error', "Could not find the language line '$line' in {$this->base_language}");
-		}
+        return $value;
+    }
 
-		return $value;
-	}
+    protected function find_line($line, $languages)
+    {
+        if(!str_contains($line, '.') || str_ends_with($line, '.')){
+            $value = $languages[$line] ?? false;
+        }else{
+            $keys = explode('.', $line);
 
-	protected function find_line($line, $languages)
-	{
-		if(!str_contains($line, '.') || str_ends_with($line, '.')){
-			$value = $languages[$line] ?? false;
-		}else{
-			$keys = explode('.', $line);
+            $value = $languages;
+            foreach ($keys as $key) {
+                if(isset($value[$key])) {
+                    $value = $value[$key];
+                }else{
+                    $value = false;
+                    break;
+                }
+            }
 
-			$value = $languages;
-			foreach ($keys as $key) {
-				if(isset($value[$key])) {
-					$value = $value[$key];
-				}else{
-					$value = false;
-					break;
-				}
-			}
+            if($value === false) {
+                $keys[0] = 'common';
+                foreach ($keys as $key) {
+                    if(isset($value[$key])) {
+                        $value = $value[$key];
+                    }else{
+                        $value = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return $value;
+    }
 
-			if($value === false) {
-				$keys[0] = 'common';
-				foreach ($keys as $key) {
-					if(isset($value[$key])) {
-						$value = $value[$key];
-					}else{
-						$value = false;
-						break;
-					}
-				}
-			}
-		}
-		return $value;
-	}
+    protected function line_arr($data, $log_errors = true): string
+    {
+        $line = $data['line'];
+        $replace = $data['replace'] ?? [];
 
-	protected function line_arr($data, $log_errors = true): string
-	{
-		$line = $data['line'];
-		$replace = $data['replace'] ?? [];
+        return $this->nline($line, $replace, $log_errors);
+    }
 
-		return $this->nline($line, $replace, $log_errors);
-	}
+    public function nline($line, $replace = '', $log_errors = true): string
+    {
+        $line = $this->line($line, $log_errors);
+        $count = substr_count($line, '%s');
 
-	public function nline($line, $replace = '', $log_errors = true): string
-	{
-		$line = $this->line($line, $log_errors);
-		$count = substr_count($line, '%s');
+        if($count > 0) {
+            if(is_array($replace)) {
+                $replace = array_slice($replace, 0, $count);
+                if($count > count($replace)) {
+                    $start_index = count($replace);
+                    $fill_count = $count - count($replace);
+                    $replace = array_merge($replace, array_fill($start_index, $fill_count, '%s'));
+                }
+                $line = vsprintf($line, $replace);
+            }else{
+                $line = sprintf($line, $replace);
+            }
+        }
 
-		if($count > 0) {
-			if(is_array($replace)) {
-				$replace = array_slice($replace, 0, $count);
-				if($count > count($replace)) {
-					$start_index = count($replace);
-					$fill_count = $count - count($replace);
-					$replace = array_merge($replace, array_fill($start_index, $fill_count, '%s'));
-				}
-				$line = vsprintf($line, $replace);
-			}else{
-				$line = sprintf($line, $replace);
-			}
-		}
+        return $line;
+    }
 
-		return $line;
-	}
-
-	public function line_icon($line, $icon_type = '', $icon = true, $log_errors = true):string
-	{
-		$value = $this->nline($line, strtoupper($icon_type), $log_errors);
-		if($icon) $value = get_icon_by_type($icon_type)."<span class='ms-1'>$value</span>";
-		return $value;
-	}
+    public function line_icon($line, $icon_type = '', $icon = true, $log_errors = true):string
+    {
+        $value = $this->nline($line, strtoupper($icon_type), $log_errors);
+        if($icon) $value = get_icon_by_type($icon_type)."<span class='ms-1'>$value</span>";
+        return $value;
+    }
 }
 
 // --------------------------------------------------------------------
