@@ -15,7 +15,7 @@
 							'_mode' => $this->router->method,
 							'_event' => '',
 					]);
-					foreach ($formData as $item):
+					foreach ($formData['fields'] as $item):
 				?>
 				<div class="row mb-4 form-validation-unit">
 					<?=form_label(ucfirst($item['label']), $item['id'], ['class' => 'col-sm-2 col-form-label'])?>
