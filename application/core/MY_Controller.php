@@ -349,7 +349,8 @@ class MY_Controller extends CI_Controller
                                 'like' => [],
                                 'limit' => [],
                                 'orderBy' => [],
-                            ], $data['params'] ?? []);
+                            ], array_intersect_key($data['params'] ?? [], array_flip(['select', 'where', 'like', 'limit', 'orderBy'])));
+
                             $list = call_user_func_array([$this->{$data['model']}, $data['method']], $params);
                             $options = $this->getOptionsFromDBList($list, $render);
                             break;
