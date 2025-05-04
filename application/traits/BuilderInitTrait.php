@@ -23,7 +23,9 @@ trait BuilderInitTrait
         }
 
         // 4. 모든 조건 통과 → 캐시 저장 (1일 유효)
-        $this->cache->file->save('init_done', true, 86400); // 86400초 = 1일
+        if($this->cache->file->save('init_done', true, 86400)) {
+            show_error('Cache File is not generated. Please Check The Permission of Document Root');
+        }
 
         return true;
     }
