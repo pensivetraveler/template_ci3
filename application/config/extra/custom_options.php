@@ -19,7 +19,16 @@ $config['options'] = [
 		'M' => '남',
 		'F' => '여',
 	],
-    'search_category' => [
+    'cfg_type' => [
+        'text' => '텍스트',
+        'password' => '비밀번호',
+    ],
+];
 
+$config['options']['search_category'] = [
+    'administrators' => [
+        'id' => '아이디',
+        'name' => '이름',
+        'email' => '이메일',
     ],
 ];
