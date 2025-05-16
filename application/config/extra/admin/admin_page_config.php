@@ -3,22 +3,44 @@
 $config['admin_page_config_loaded'] = true;
 
 $config['page_config'] = [
-	'auth' => [
-		'category' => 'auth',
-		'type' => 'page',
-		'properties' => [
-			'baseMethod' => 'login',
-			'allowNoLogin' => true,
-			'includes' => [
-				'head' => true,
-				'header' => false,
-				'modalPrepend' => true,
-				'modalAppend' => false,
-				'footer' => false,
-				'tail' => true,
-			],
-		],
-	],
+    'auth' => [
+        'category' => 'page',
+        'type' => 'base',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'login',
+            'allowNoLogin' => true,
+            'includes' => [
+                'head' => true,
+                'header' => false,
+                'modalPrepend' => true,
+                'modalAppend' => false,
+                'footer' => false,
+                'tail' => true,
+            ],
+        ],
+        'methods' => [
+            'login' => [
+                'type' => 'form',
+                'subtype' => 'auth',
+            ],
+            'findId' => [
+                'type' => 'form',
+                'subtype' => 'auth',
+            ],
+            'findPassword' => [
+                'type' => 'form',
+                'subtype' => 'auth',
+            ],
+            'logout' => [
+                'type' => 'action',
+                'properties' => [
+                    'perform'     => 'logoutUser',      // 컨트롤러 메소드 이름
+                    'redirectUri' => '/admin/auth',    // 실행 후 이동할 URI
+                ],
+            ],
+        ],
+    ],
 	'dashboard' => [
 		'category' => 'page',
 		'type' => 'page',
@@ -40,98 +62,83 @@ $config['page_config'] = [
 			'formType' => '',
 		],
 	],
-    'company' => [
-        'category' => 'page',
-        'type' => 'page',
-        'subType' => 'base',
-        'properties' => [
-            'baseMethod' => 'list',
-            'allows' => ['list'],
-            'formExist' => true,
-            'listExist' => true,
-        ],
-        'formProperties' => [
-            'formConfig' => 'company',
-            'formType' => 'side',
-        ],
-        'listProperties' => [
-            'listConfig' => 'company',
-            'plugin' => 'datatable',
-            'actions' => [
-                'view' => false,
-            ],
-            'buttons' => [
-                'excel' => true,
-            ],
-        ],
-    ],
-    'project' => [
-        'category' => 'page',
-        'type' => 'page',
-        'subType' => 'base',
-        'properties' => [
-            'baseMethod' => 'list',
-            'allows' => ['list'],
-            'formExist' => true,
-            'listExist' => true,
-        ],
-        'formProperties' => [
-            'formConfig' => 'project',
-            'formType' => 'side',
-        ],
-        'listProperties' => [
-            'listConfig' => 'project',
-            'plugin' => 'datatable',
-            'actions' => [
-                'view' => false,
-            ],
-            'buttons' => [
-                'excel' => true,
-            ],
-        ],
-    ],
     'administrators' => [
         'category' => 'page',
-        'type' => 'page',
-        'subType' => 'base',
+        'type' => 'base',
+        'subtype' => 'base',
         'properties' => [
             'baseMethod' => 'list',
-            'allows' => ['list','add','edit'],
-            'formExist' => true,
-            'listExist' => true,
         ],
-        'formProperties' => [
-            'formConfig' => 'administrators',
-            'formType' => 'side',
-        ],
-        'listProperties' => [
-            'listConfig' => 'administrators',
-            'plugin' => 'datatable',
-            'buttons' => [
-                'excel' => false,
-            ],
-            'actions' => [
-                'view' => false,
+        'methods' => [
+            'list' => [
+                'type' => 'list',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => false,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => true,
+                ],
             ],
         ],
     ],
-	'myinfo' => [
-		'category' => 'page',
-		'type' => 'page',
-		'subType' => 'base',
-		'properties' => [
-			'baseMethod' => 'edit',
-			'allows' => ['edit'],
-			'formExist' => true,
-			'listExist' => false,
-		],
-		'formProperties' => [
-			'formConfig' => 'myinfo',
-			'formType' => 'page',
-		],
-		'listProperties' => [
-			'listConfig' => '',
-			'plugin' => '',
-		],
-	],
+    'myinfo' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subType' => 'base',
+        'properties' => [
+            'baseMethod' => 'edit',
+        ],
+        'methods' => [
+            'edit' => [
+                'type' => 'form',
+                'subtype' => 'base',
+                'config' => 'myinfo',
+            ],
+        ],
+    ],
+    'system' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subType' => 'base',
+        'properties' => [
+            'noIdentifier' => true,
+            'baseMethod' => 'sysCfg',
+        ],
+        'methods' => [
+            'sysCfg' => [
+                'type' => 'form',
+                'subType' => 'side',
+                'config' => 'system_config',
+            ],
+            'sysCode' => [
+                'type' => 'list',
+                'subtype' => 'datatable',
+                'config' => 'system_code',
+                'actions' => [
+                    'edit' => true,
+                ],
+                'buttons' => [
+                    'add' => true,
+                    'excel' => false,
+                    'editBigCd' => [
+                        'text' => 'Edit Big Cd',
+                        'classes' => 'edit-big-cd btn btn-outline-primary waves-effect waves-light me-4',
+                    ],
+                    'deleteBigCd' => [
+                        'text' => 'Delete Big Cd',
+                        'classes' => 'delete-big-cd btn btn-outline-danger waves-effect waves-light me-4',
+                    ],
+                ],
+                'properties' => [
+                    'formExist' => true,
+                    'formConfig' => 'system_code'
+                ],
+            ],
+        ],
+    ],
 ];
