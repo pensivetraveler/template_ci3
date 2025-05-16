@@ -69,11 +69,3 @@ $config['builder_view_hidden_config'] = array_replace_recursive($config['builder
     'type' => 'hidden',
     'subtype' => 'base',
 ]);
-
-$config['builder_view_actions_config'] = [
-    'list' => true,
-    'edit' => true,
-    'delete' => true,
-];
-
-$config['builder_view_buttons_config'] = [];
