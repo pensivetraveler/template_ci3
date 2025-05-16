@@ -1,5 +1,5 @@
 <?php
-function reorder($list, $addData = [], $sortKey = 'sort_order')
+function reorder($list, $addData = [], $sortKey = 'sort_order', $notPermitSpace = false, $start = 1)
 {
     $lastKey = count($list);
     if(empty($addData)) {
@@ -14,6 +14,18 @@ function reorder($list, $addData = [], $sortKey = 'sort_order')
         $addKey = (int)is_array($addData)?$addData[$sortKey]:$addData->{$sortKey};
         if($addKey > $lastKey) {
             $list[] = $addData;
+
+            if($notPermitSpace) {
+                $j = $start;
+                for($i = 0; $i < count($list); $i++) {
+                    if(is_array($list[$i])) {
+                        $list[$i][$sortKey] = $j;
+                    }else{
+                        $list[$i]->{$sortKey} = $j;
+                    }
+                    $j++;
+                }
+            }
         }else{
             for($i = count($list); $i > -1; $i--){
                 if($i > $addKey-1) {
@@ -49,9 +61,9 @@ function getWhereList($where, $tablename, $columnList)
 {
     $keys_with_prefix = array_map(function ($key) use ($tablename, $columnList) {
         return
-			!str_contains($key, '.') && !empty($columnList) && in_array($key, $columnList)
-				? $tablename.".".$key
-				: $key;
+            !str_contains($key, '.') && !empty($columnList) && in_array($key, $columnList)
+                ? $tablename.".".$key
+                : $key;
     }, array_keys($where));
     return array_combine($keys_with_prefix, $where);
 }
