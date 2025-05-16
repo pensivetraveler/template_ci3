@@ -120,7 +120,7 @@ if ( ! function_exists('get_group_field_id'))
             if ($group_attr['group_repeater']) $list[] = $index;
         }
 
-        $prefix = $CI->sideForm?$CI->config->item('form_side_prefix'):$CI->config->item('form_page_prefix');
+        $prefix = $CI->listForm?$CI->config->item('form_side_prefix'):$CI->config->item('form_page_prefix');
         return $prefix.array_to_hyphens($list);
     }
 }
