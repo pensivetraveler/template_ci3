@@ -95,10 +95,6 @@ function plural(str) {
     return result;
 }
 
-function camelize(str) {
-    return str.replace(/_([a-z]?)/g, (m, g) => g.toUpperCase());
-}
-
 /**
  * Camelize
  *
@@ -107,7 +103,19 @@ function camelize(str) {
  * @param	string	str	Input string
  * @return	string
  */
-function uncamelize(str) {
+function camelize(str) {
+    return str.replace(/_([a-z]?)/g, (m, g) => g.toUpperCase());
+}
+
+/**
+ * Snakeize
+ *
+ * Reverse camelized string to snakeized
+ *
+ * @param	string	$str	Input string
+ * @return	string
+ */
+function snakeize(str) {
     return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 }
 
