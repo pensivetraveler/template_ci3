@@ -1,3 +1,13 @@
+                            <!-- View Modal -->
+                            <div class="modal fade" id="viewRecordModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / View Modal -->
+
                             <!-- Youtube Modal -->
                             <div class="modal fade" id="youTubeModal" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -7,3 +17,4 @@
                                 </div>
                             </div>
                             <!-- / Youtube Modal -->
+
