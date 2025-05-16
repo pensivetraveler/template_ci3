@@ -6,13 +6,13 @@ class MY_Config extends CI_Config
     public function __construct()
     {
         parent::__construct();
-    }
+	}
 
     public function get($item, $default = null, $triggerError = true)
     {
-        $CI =& get_instance();
+		$CI =& get_instance();
 
-        if(is_null($this->item($item))) $CI->logger("MY_Config-get : $item does not exist.", E_USER_ERROR, $triggerError);
+		if(is_null($this->item($item))) $CI->logger("MY_Config-get : $item does not exist.", E_USER_ERROR, $triggerError);
 
         if($this->item($item) === null) {
             return $default;
@@ -22,6 +22,25 @@ class MY_Config extends CI_Config
             }else{
                 return $this->item($item);
             }
+        }
+    }
+
+    public function get2($item1, $item2, $default = null, $triggerError = true)
+    {
+        $CI =& get_instance();
+
+        if($this->item($item1) === null || empty($this->item($item1))) {
+            $CI->logger("MY_Config-get : $item1 does not exist.", E_USER_ERROR, false);
+
+            if($this->item($item2) === null || empty($this->item($item2))) {
+                $CI->logger("MY_Config-get : $item1 and $item2 does not exist.", E_USER_ERROR, $triggerError);
+
+                return $default;
+            }else{
+                return $this->item($item2);
+            }
+        }else{
+            return $this->item($item1);
         }
     }
 
