@@ -25,6 +25,9 @@ $config['builder_nav_top_sample'] = [
 
 ];
 
+/***
+ * sample configs
+ */
 $config['builder_nav_side_sample'] = [
 	'dashboard' => [
 		'icon' => 'ri-home-smile-line',
