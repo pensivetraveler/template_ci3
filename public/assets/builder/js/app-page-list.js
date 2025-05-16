@@ -133,10 +133,10 @@ $(function () {
 						}
 					},
 				]
-				: []),
+			: []),
 			// ...fields,
 			...common.LIST_COLUMNS.map(function (column, index) {
-				switch (column.format) {
+				switch (column.type) {
 					case 'row_num' : // Row Num
 						return {
 							targets: 1+common.LIST_CHEKBOX,
@@ -152,7 +152,7 @@ $(function () {
 							searchable: false,
 							orderable: false,
 							render: function (data, type, full, meta) {
-								return getListActions(common.LIST_ACTIONS, common.IDENTIFIER?full[common.IDENTIFIER]:'');
+								return getListActions(common.LIST_ACTIONS, full, common.IDENTIFIER);
 							}
 						}
 					case 'select' :
@@ -181,7 +181,7 @@ $(function () {
 									// page 별 custom js 파일에 render func 가 정의된 경우
 									return window[`renderColumn${pascalize(column.field)}`](data, type, full, meta, column);
 								}else {
-									// if(column.format === 'button') {
+									// if(column.type === 'button') {
 									//     return renderButtonColumn(data, type, full, meta, column);
 									// }else if{
 									// if(full[column.field]) {
@@ -197,7 +197,7 @@ $(function () {
 		],
 		order: [[1+common.LIST_CHEKBOX, 'desc']],
 		dom:
-			'<"card-header d-flex border-top rounded-0 flex-wrap pb-md-0 pt-0 justify-content-end"' +
+			'<"card-header d-flex rounded-0 flex-wrap pb-md-0 pt-0 justify-content-end"' +
 			// '<"d-flex justify-content-start align-items-center me-5 ms-n2"<"search-category-wrap me-2">f>' +
 			// '<"me-5 ms-n2"f>' +
 			'<"d-flex justify-content-start justify-content-md-end align-items-baseline"<"dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4"lB>>' +
@@ -308,18 +308,17 @@ $(function () {
 	});
 
 	$('.dataTables_wrapper').on('click', '.view-record', function() {
-		if(!common.IDENTIFIER) throw new Error(`Identifier is not defined`);
+		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 		if(common.PAGE_VIEW_URI) {
-			location.href = common.PAGE_VIEW_URI + '/' + $(this).data('id');
+			location.href = getRedirectActionUrl(this, common.PAGE_VIEW_URI, common.IDENTIFIER);
 		}else{
-			openViewModal($(this).data('id'));
+			openViewModal(getRedirectActionData(this, common.IDENTIFIER));
 		}
 	});
 
 	$('.dataTables_wrapper tbody').on('click', '.delete-record', function () {
-		if(!common.IDENTIFIER) throw new Error(`Identifier is not defined`);
-		const id = $(this).data('id');
-		deleteData(id, {
+		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
+		deleteData(getRedirectActionData(this, common.IDENTIFIER), {
 			callback: dt.ajax.reload,
 			params: [null, false]
 		});
@@ -334,15 +333,21 @@ $(function () {
 		}
 	});
 
-	if(common.SIDE_FORM) {
+	if(common.FORM_EXIST) {
 		const formSelector = '#formRecord';
 		const offCanvasElement = document.querySelector('#offcanvasRecord');
 		if(offCanvasElement === null) throw new Error(`offCanvasElement is not exist`);
+
+		const formRecord = document.querySelector(formSelector);
+		if(formRecord === null) throw new Error(`formRecord is not exist`);
+		preparePlugins(formRecord);
+
 		offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
 
 		offCanvasElement.addEventListener('show.bs.offcanvas', function(e) {
 			console.log('offcanvas show');
-			refreshPlugins();
+			refreshPlugins(formRecord);
+			document.getElementById('offcanvasLabel').textContent = getLocale(`${capitalize(this.querySelector(formSelector)['_mode'].value)} Record`, common.LOCALE);
 		});
 
 		offCanvasElement.addEventListener('shown.bs.offcanvas', function(e) {
@@ -364,24 +369,20 @@ $(function () {
 			}
 		});
 
-		const formRecord = document.querySelector(formSelector);
-		if(formRecord === null) throw new Error(`formRecord is not exist`);
-		preparePlugins(formRecord);
-
 		$('.dataTables_wrapper').on('click', '.edit-record', function() {
-			if(!common.IDENTIFIER) throw new Error(`Identifier is not defined`);
+			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 			readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
-			fetchFrmValues(document.querySelector(formSelector), $(this).data('id'));
+			fetchFrmValues(document.querySelector(formSelector), getRedirectActionData(this, common.IDENTIFIER));
 		});
 
 		formRecord.addEventListener('readyFrmInputs', (e) => {
-			offCanvasEl.show();
+			if(formRecord._mode.value !== 'edit') offCanvasEl.show();
 		});
 
 		formRecord.addEventListener("fetchFrmValues", (e) => {
 			readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
 			applyFrmValues(formRecord, record, common.FORM_DATA);
-			refreshPlugins();
+			refreshPlugins(formRecord);
 			offCanvasEl.show();
 		});
 
@@ -506,22 +507,16 @@ $(function () {
 		});
 	}else{
 		$('.dataTables_wrapper').on('click', '.edit-record', function() {
-			if(!common.IDENTIFIER) throw new Error(`Identifier is not defined`);
+			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 			if(!common.PAGE_EDIT_URI.length) throw new Error(`PAGE_EDIT_URI is not defined`);
-			location.href = common.PAGE_EDIT_URI + '/' + $(this).data('id');
-		});
-
-		$('.dataTables_wrapper').on('click', '.view-record', function() {
-			if(!common.IDENTIFIER) throw new Error(`Identifier is not defined`);
-			if(!common.PAGE_VIEW_URI.length) throw new Error(`PAGE_VIEW_URI is not defined`);
-			location.href = common.PAGE_VIEW_URI + '/' + $(this).data('id');
+			location.href = getRedirectActionUrl(this, common.PAGE_EDIT_URI, common.IDENTIFIER);
 		});
 	}
 });
 
 function renderColumn(data, type, full, meta, column) {
 	let wrap;
-	switch (column.format) {
+	switch (column.type) {
 		case 'button':
 			wrap = document.createElement('button');
 			wrap.classList.add('btn', 'btn-sm', 'btn-info', 'waves-effect', 'waves-light', 'pe-3', 'ps-3');
@@ -553,7 +548,7 @@ function renderColumn(data, type, full, meta, column) {
 			column.text = 'Download';
 		}
 
-		switch (column.format) {
+		switch (column.type) {
 			case 'text':
 				inner = column.text?getLocale(column.text, common.LOCALE):data;
 				break;
@@ -601,7 +596,7 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 	const attrs = {
 		...Object.fromEntries(
 			Object.entries({
-				identifier : full[common.IDENTIFIER],
+				identifiers : getIdentifiersData(full, common.IDENTIFIER, true),
 				value : value,
 			}).map(([key, value]) => [`data-${key}`, value])
 		)
@@ -626,7 +621,7 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 			}
 		}
 
-		if(column.onclick.kind === 'view' && column.format !== 'button') wrap.classList.add('text-primary', 'text-decoration-underline')
+		if(column.onclick.kind === 'view' && column.type !== 'button') wrap.classList.add('text-primary', 'text-decoration-underline')
 	}
 
 	Object.entries(attrs).map(([key, value]) => wrap.setAttribute(key, value));
@@ -657,7 +652,7 @@ function renderSelectColumn(data, type, full, meta, column) {
 		const key = column.hasOwnProperty('onChange')?'onChange':'onchange';
 		funcName = column[key];
 	}
-	select.setAttribute('onchange', `${funcName}(${full[common.IDENTIFIER]}, '${column.field}', this.value)`);
+	select.setAttribute('onchange', `${funcName}(${getIdentifiersData(full, common.IDENTIFIER, true)}, '${column.field}', this.value)`);
 
 	wrap.appendChild(select)
 	return wrap.outerHTML;
@@ -700,21 +695,32 @@ function getColumnOnclick(data, full, column) {
 		switch (column[key].kind) {
 			case 'view' :
 				let uri;
-				if(column[key].params.length && column[key].params.hasOwnProperty('uri')) {
-					uri = column[key].params.uri;
-				}else{
-					if(common.PAGE_VIEW_URI) uri = common.PAGE_VIEW_URI;
+				if(Object.hasOwn(column[key], 'attrs')) {
+					if(Object.keys(column[key].attrs).length && column[key].attrs.hasOwnProperty('href')) {
+						uri = column[key].attrs.href;
+					}else if(common.PAGE_VIEW_URI) {
+						uri = common.PAGE_VIEW_URI;
+					}
+
+					if(uri) {
+						let url = getUrlWithIdentifiers(uri, getIdentifiersData(full, column[key].params??common.IDENTIFIER));
+						if(Object.hasOwn(column[key], 'attrs')) {
+							let target = column[key].attrs.target??'_self';
+							switch (target) {
+								case '_blank' :
+									return `window.open('${url}', "_blank")`;
+								case '_self' :
+									return `location.href="${url}"`;
+								default :
+									return `openViewModal(${getIdentifiersData(full, column[key].params??common.IDENTIFIER, true)}, '${target}')`;
+							}
+						}else{
+							return `location.href="${url}"`;
+						}
+					}
 				}
 
-				if(uri) {
-					if(column[key].attrs.target === '_blank'){
-						return `window.open('${uri}/${full[common.IDENTIFIER]}', "_blank")`
-					}else{
-						return `location.href="${uri}/${full[common.IDENTIFIER]}"`;
-					}
-				}else{
-					return `openViewModal(${full[common.IDENTIFIER]})`;
-				}
+				return `openViewModal(${getIdentifiersData(full, column[key].params??common.IDENTIFIER, true)})`;
 			case 'popup' :
 				break;
 			case 'redirect' :
@@ -752,11 +758,30 @@ function getColumnOnclick(data, full, column) {
 function getListButtons() {
 	const data = getListExports();
 
+	for(const btnName of Object.keys(common.LIST_BUTTONS)) {
+		if(['excel', 'add'].includes(btnName)) continue;
+
+		const btnObj = common.LIST_BUTTONS[btnName];
+		data.push(
+			{
+				text: '<span class="d-none d-sm-inline-block">' + getLocale(btnObj.text, common.LOCALE) + '</span>',
+				className: btnObj.classes.length?btnObj.classes:'btn btn-primary waves-effect waves-light me-4',
+				action: function () {
+					if(btnObj.action !== undefined && btnObj.action.length) {
+						window[btnObj.action](this, btnObj.params??null);
+					}else{
+						console.warn(`${btnName} Action is not Defined`);
+					}
+				}
+			}
+		);
+	}
+
 	if(common.LIST_BUTTONS.hasOwnProperty('excel') && common.LIST_BUTTONS['excel']) {
 		data.push(
 			{
 				text: '<i class="ri-add-line ri-16px me-0 me-sm-2 align-baseline"></i><span class="d-none d-sm-inline-block">' + getLocale('Upload Excel', common.LOCALE) + '</span>',
-				className: 'add-new btn btn-primary waves-effect waves-light me-4',
+				className: 'btn btn-primary waves-effect waves-light me-4',
 				action: function () {
 					if (common.PAGE_EXCEL_URI.length) {
 						location.href = common.PAGE_EXCEL_URI;
@@ -772,9 +797,9 @@ function getListButtons() {
 		data.push(
 			{
 				text: '<i class="ri-add-line ri-16px me-0 me-sm-2 align-baseline"></i><span class="d-none d-sm-inline-block">'+getLocale('Add New Record', common.LOCALE)+'</span>',
-				className: 'add-new btn btn-primary waves-effect waves-light',
+				className: 'btn btn-primary waves-effect waves-light',
 				action: function () {
-					if(!common.SIDE_FORM && common.PAGE_ADD_URI.length) {
+					if(!common.FORM_EXIST && common.PAGE_ADD_URI.length) {
 						location.href = common.PAGE_ADD_URI;
 					}else{
 						readyFrmInputs(formRecord, 'add', common.FORM_DATA);
@@ -951,7 +976,7 @@ function getListExports() {
 	}
 }
 
-function getListActions(btns, dataId) {
+function getListActions(btns, full, identifiers = []) {
 	let btnIcons = {
 		edit : '<i class="ri-edit-box-line"></i>',
 		view : '<i class="ri-eye-line ri-20px"></i>',
@@ -965,16 +990,33 @@ function getListActions(btns, dataId) {
 			continue;
 		}
 		const title = pascalize(btn);
-		btnHtml += `<a href="javascript:;" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect ${btn}-record" data-bs-toggle="tooltip" title="${title} Record" data-id="${dataId}">${btnIcons[btn]}</a>`;
+
+		const a = document.createElement('a');
+		a.href = 'javascript:void(0);';
+		a.classList.add('btn', 'btn-sm', 'btn-icon', 'btn-text-secondary', 'rounded-pill', 'waves-effect', `${btn}-record`);
+		a.setAttribute('data-bs-toggle', 'tooltip');
+		a.setAttribute('title', `${title} Record`);
+		a.innerHTML = btnIcons[btn];
+
+		if(identifiers.length) {
+			const idData = getIdentifiersData(full, identifiers);
+			if(Object.keys(idData).length === 1) {
+				a.setAttribute('data-id', Object.values(idData)[0]);
+			}else{
+				for(const field of Object.keys(idData)) a.setAttribute('data-'+field, idData[field]);
+			}
+		}
+
+		btnHtml += a.outerHTML;
 	}
 	btnHtml += '</div>';
 
 	return btnHtml;
 }
 
-function afterSelectColumnChange(id, field, value) {
+function afterSelectColumnChange(idData, field, value) {
 	$.ajax({
-		url: common.API_URI+'/'+id,
+		url: getUrlWithIdentifiers(common.API_URI, idData),
 		method: 'patch',
 		data: { [field]: value },
 		success: function (json) {
@@ -995,7 +1037,8 @@ function afterSelectColumnChange(id, field, value) {
 	});
 }
 
-function openViewModal(dataId) {
+function openViewModal(dataId, modalId = '') {
+	console.log(dataId)
 	const data = getData(dataId);
 	console.log(data)
 }

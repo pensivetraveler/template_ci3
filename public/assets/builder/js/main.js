@@ -402,7 +402,7 @@ if (document.getElementById('layout-menu')) {
         }, 100);
       }
 
-      window.Helpers.navTabsAnimation();
+      // window.Helpers.navTabsAnimation();
     },
     true
   );

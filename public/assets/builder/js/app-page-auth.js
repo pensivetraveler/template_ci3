@@ -8,7 +8,7 @@ $(function() {
 	preparePlugins(formRecord);
 	resetFrmInputs(formRecord, common.FORM_DATA);
 	readyFrmInputs(formRecord, 'add', common.FORM_DATA);
-	refreshPlugins();
+	refreshPlugins(formRecord);
 
 	for(const rule of Object.keys(customValidatorsPreset.validators))
 		FormValidation.validators[rule] = customValidatorsPreset.validators[rule];

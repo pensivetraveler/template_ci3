@@ -1,7 +1,7 @@
 let record;
 let editors = {};
 
-common.FORM_LIFECYCLE = {
+const FORM_LIFECYCLE = {
 	preparePlugins : false,
 	resetFrmInputs : false,
 	readyFrmInputs : false,
@@ -12,10 +12,15 @@ common.FORM_LIFECYCLE = {
 	transFrmValues : false,
 };
 
+common.FORM_LIFECYCLE = [];
 common.FORM_REPEATER = [];
 
 function updateFormLifeCycle(state, form = null, detail = {}) {
-	common.FORM_LIFECYCLE[state] = true;
+	if(common.FORM_LIFECYCLE[form.name] === undefined) {
+		common.FORM_LIFECYCLE[form.name] = FORM_LIFECYCLE;
+	}
+
+	common.FORM_LIFECYCLE[form.name][state] = true;
 
 	// Event trigger
 	const target = form ?? window;
@@ -260,9 +265,9 @@ function preparePlugins(form) {
  */
 function resetFrmInputs(form, fields = []) {
 	record = null;
-	Object.keys(common.FORM_LIFECYCLE).forEach((v, k) => {
+	Object.keys(common.FORM_LIFECYCLE[form.name]).forEach((v, k) => {
 		if(!k) return;
-		common.FORM_LIFECYCLE[v] = false;
+		common.FORM_LIFECYCLE[form.name][v] = false;
 	});
 
 	form.querySelectorAll('input, textarea, select').forEach(function(node) {
@@ -367,12 +372,12 @@ function readyFrmInputs(form, mode, fields = []) {
  * @param key
  * @returns {*}
  */
-function fetchFrmValues(form = null, key = '', params = {}) {
+function fetchFrmValues(form = null, key = {}, params = {}) {
 	let data;
 
 	executeAjax({
 		async: false,
-		url : common.API_URI + '/' + key + '?' + new URLSearchParams(common.API_PARAMS).toString(),
+		url : getUrlWithIdentifiers(common.API_URI, key, common.API_PARAMS),
 		data: {
 			_mode : 'form',
 			...params,
@@ -682,19 +687,19 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
 	}
 }
 
-function refreshPlugins() {
+function refreshPlugins(form) {
 	// Select Picker
-	if($('.selectpicker').length) {
-		$('.selectpicker').selectpicker('refresh');
+	if($(form).find('.selectpicker').length){
+		$(form).find('.selectpicker').selectpicker('refresh');
 	}
 
 	// Select2
-	if($('.select2').length) $('.select2').trigger('change');
-	if($('.select2-repeater').length) $('.select2-repeater').trigger('change');
+	if($(form).find('.select2').length) $(form).find('.select2').trigger('change');
+	if($(form).find('.select2-repeater').length) $(form).find('.select2-repeater').trigger('change');
 
 	// textarea-autosize
-	if($('.textarea-autosize').length) {
-		$('.textarea-autosize').each(function() {
+	if($(form).find('.textarea-autosize').length) {
+		$(form).find('.textarea-autosize').each(function() {
 			if(this.scrollHeight > this.clientHeight) {
 				//textarea height 확장
 				this.style.height = this.scrollHeight + "px";
@@ -708,8 +713,8 @@ function refreshPlugins() {
 	}
 
 	// textarea-quill
-	if($('.textarea-quill').length) {
-		$('.textarea-quill').each(function() {
+	if($(form).find('.textarea-quill').length) {
+		$(form).find('.textarea-quill').each(function() {
 			editors[this.id] = new Quill(`#${this.id}`, {
 				bounds: `#${this.id}`,
 				placeholder: 'Type Something...',
@@ -726,11 +731,11 @@ function refreshPlugins() {
 		})
 	}
 
-	$('.form-list-item-wrap').each(function() {
+	$(form).find('.form-list-item-wrap').each(function() {
 		if(!this.children.length) this.classList.add('d-none');
 	});
 
-	updateFormLifeCycle('refreshPlugins');
+	updateFormLifeCycle('refreshPlugins', form);
 }
 
 function setFormListItem(selector, data, field) {

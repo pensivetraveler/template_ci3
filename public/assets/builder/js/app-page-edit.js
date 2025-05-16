@@ -12,7 +12,7 @@ $(function () {
 	readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
 	fetchFrmValues(formRecord, common.KEY);
 	applyFrmValues(formRecord, record, common.FORM_DATA);
-	refreshPlugins();
+	refreshPlugins(formRecord);
 
 	for(const rule of Object.keys(customValidatorsPreset.validators))
 		FormValidation.validators[rule] = customValidatorsPreset.validators[rule];

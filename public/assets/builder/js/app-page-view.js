@@ -63,9 +63,11 @@ function applyViewData(dataId) {
 	}
 
 	if(document.querySelector('.view-form')){
-		preparePlugins(document.querySelector('.view-form'))
+		const form = document.querySelector('.view-form');
 
-		document.querySelector('.view-form').dispatchEvent(
+		preparePlugins(form)
+
+		form.dispatchEvent(
 			new CustomEvent('fetchViewData', {
 				bubbles : false,
 				cancelable : true,
@@ -74,7 +76,7 @@ function applyViewData(dataId) {
 			}),
 		);
 
-		refreshPlugins();
+		refreshPlugins(form);
 	}
 
 
@@ -99,7 +101,7 @@ $(function() {
 	});
 
 	$('.btn-view-edit').on('click', function(e) {
-		if(common.PAGE_EDIT_URI) location.href = common.PAGE_EDIT_URI + '/' + common.KEY;
+		if(common.PAGE_EDIT_URI) location.href = getUrlWithIdentifiers(common.PAGE_EDIT_URI, common.KEY);
 	});
 
 	$('.btn-view-delete').on('click', function(e) {

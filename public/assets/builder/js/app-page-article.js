@@ -1,12 +1,12 @@
 function setViewCount() {
-	$.ajax({
+	executeAjax({
 		async: false,
 		url: '/api/articleRead/',
 		method: 'put',
 		headers: {
 			'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
 		},
-		data: {
+		data: isObject(common.KEY) ? common.KEY : {
 			article_id : common.KEY,
 		},
 		dataType: 'json',
@@ -30,12 +30,18 @@ $(function() {
 	});
 
 	$('.btn-article-edit').on('click', function(e) {
-		const isMine = isMyData(common.KEY);
-		if(isMine) location.href = common.PAGE_EDIT_URI + '/' + common.KEY;
+		if(isMyData(common.KEY)) {
+			location.href = getUrlWithIdentifiers(common.PAGE_EDIT_URI, common.KEY)
+		}
 	});
 
 	$('.btn-article-delete').on('click', function(e) {
-		const isMine = isMyData(common.KEY);
-		if(isMine) location.href = common.PAGE_EDIT_URI + '/' + common.KEY;
+		if(!common.KEY) throw new Error(`KEY is not defined`);
+		if(isMyData(common.KEY)) {
+			deleteData(common.KEY, {
+				callback: redirect,
+				params: common.PAGE_LIST_URI,
+			});
+		}
 	});
 });
