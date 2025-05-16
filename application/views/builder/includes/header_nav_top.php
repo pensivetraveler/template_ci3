@@ -71,7 +71,7 @@
 						</a>
 					</li>
 					<li>
-						<a class="dropdown-item" href="<?=base_url("/{$this->flag}/settings")?>">
+						<a class="dropdown-item" href="<?=base_url("/{$this->flag}/system")?>">
 							<i class="ri-settings-4-line ri-22px me-3"></i><span class="align-middle"><?=lang('Settings')?></span>
 						</a>
 					</li>
