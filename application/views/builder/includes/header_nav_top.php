@@ -1,6 +1,6 @@
 <nav
-		class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-		id="layout-navbar">
+	class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+	id="layout-navbar">
 	<div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
 		<a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
 			<i class="ri-menu-fill ri-22px"></i>
@@ -55,7 +55,7 @@
 				</a>
 				<ul class="dropdown-menu dropdown-menu-end">
 					<li>
-						<a class="dropdown-item" href="pages-account-settings-account.html">
+						<a class="dropdown-item" href="<?=base_url('/admin/myInfo')?>">
 							<div class="d-flex justify-content-between">
 								<span class="fw-medium d-block small"><?=$headerData['name']?></span>
 								<small class="text-muted"><?=$headerData['id']?></small>
@@ -66,12 +66,12 @@
 						<div class="dropdown-divider"></div>
 					</li>
 					<li>
-						<a class="dropdown-item" href="pages-profile-user.html">
-							<i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle"><?=lang('My Profile')?></span>
+						<a class="dropdown-item" href="<?=base_url("/{$this->flag}/myInfo")?>">
+							<i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle"><?=lang('My Info')?></span>
 						</a>
 					</li>
 					<li>
-						<a class="dropdown-item" href="pages-account-settings-account.html">
+						<a class="dropdown-item" href="<?=base_url("/{$this->flag}/settings")?>">
 							<i class="ri-settings-4-line ri-22px me-3"></i><span class="align-middle"><?=lang('Settings')?></span>
 						</a>
 					</li>
@@ -80,7 +80,7 @@
 					</li>
 					<li>
 						<div class="d-grid px-4 pt-2 pb-1">
-							<a class="btn btn-sm btn-danger d-flex" href="<?=base_url('admin/auth/logout')?>" target="_self">
+							<a class="btn btn-sm btn-danger d-flex" href="javascript:logout();" target="_self">
 								<small class="align-middle"><?=lang('Logout')?></small>
 								<i class="ri-logout-box-r-line ms-2 ri-16px"></i>
 							</a>
