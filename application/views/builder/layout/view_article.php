@@ -12,15 +12,18 @@ extract(trans_formdata_dit_type($viewData));
 				'_mode' => 'view',
 				'_event' => '',
 		]);
-		echo form_input(
+
+		foreach ($identifier as $item) {
+			echo form_input(
 				[
-						'type' => $identifier['type'],
-						'name' => $identifier['field'],
-						'id' => $identifier['id'],
+					'type' => $item['type'],
+					'name' => $item['field'],
+					'id' => $item['id'],
 				],
-				set_admin_form_value($identifier['field'], $identifier['default'], null),
-				$identifier['attributes'],
-		);
+				set_admin_form_value($item['field'], $item['default'], null),
+				$item['attributes'],
+			);
+		}
 		?>
 		<div class="card-header">
 			<div class="d-flex align-items-center justify-content-between">

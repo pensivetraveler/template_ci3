@@ -1,5 +1,5 @@
 <div class="row mb-3 form-validation-unit">
-	<?=get_builder_form_label($item, ['class' => 'col-sm-2 col-form-label'])?>
+	<?=get_builder_form_label($item, ['class' => 'col-sm-2 col-form-label text-primary fw-bolder'])?>
 	<div class="col-sm-10">
 		<?php
 			echo form_input(

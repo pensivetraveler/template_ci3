@@ -1,7 +1,7 @@
 <?php
 	echo form_open_multipart('', [
-		'id' => 'formRecord',
-		'name' => 'formRecord',
+		'id' => $formName??'formRecord',
+		'name' => $formName??'formRecord',
 		'class' => "add-new-record pt-0 row g-3 needs-validation form-type-{$formType}",
 		'onsubmit' => 'return false',
 	], [

@@ -10,14 +10,18 @@ extract(trans_formdata_dit_type($formData));
 				<div class="app-brand justify-content-center mt-5">
 					<a href="/admin" class="app-brand-link gap-2">
 						<span class="app-brand-logo demo">
-							<img src="//placehold.co/400x200?text=Logo" alt="">
+							<?php if(file_exists(PLATFORM_ASSET_IMG_PATH.'logo.png')): ?>
+							<img src="<?=base_url(PLATFORM_ASSET_IMG_URI.'logo.png')?>" alt="logo">
+							<?php else: ?>
+							<img src="//placehold.co/400x200?text=Logo" alt="logo-sample">
+							<?php endif; ?>
 						</span>
 					</a>
 				</div>
 				<!-- /Logo -->
 
 				<div class="card-body mt-1">
-					<p class="mb-5 text-center"><?=lang('Login')?></p>
+					<p class="mb-5 text-center"><?=lang('Verify Admin Account')?></p>
 					<?php
 						echo form_open('', [
 							'id' => 'formAuth',
@@ -76,11 +80,11 @@ extract(trans_formdata_dit_type($formData));
 									?>
 								</div>
 								<div>
-									<a href="/builder/auth/findId" class="float-start mb-1 mt-2">
+									<a href="<?=base_url($this->flag.'/auth/findId')?>" class="float-start mb-1 mt-2">
 										<span><?=lang('Find ID')?></span>
 									</a>
 									<span class="d-inline-block mb-1 mt-2 text-primary">&nbsp;|&nbsp;</span>
-									<a href="/builder/auth/findPassword" class="float-end mb-1 mt-2">
+									<a href="<?=base_url($this->flag.'/auth/findPassword')?>" class="float-end mb-1 mt-2">
 										<span><?=lang('Find Password')?></span>
 									</a>
 								</div>

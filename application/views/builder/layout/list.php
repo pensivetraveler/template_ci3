@@ -129,7 +129,7 @@
 				</table>
 			</div>
 
-			<?php if($this->sideForm): ?>
+			<?php if($formExist): ?>
 			<!-- Modal to add new record -->
 			<div
 				class="offcanvas offcanvas-end"
@@ -140,7 +140,7 @@
 				data-bs-keyboard="false"
 				aria-labelledby="offcanvasLabel">
 				<div class="offcanvas-header border-bottom">
-					<h5 class="offcanvas-title" id="offcanvasLabel"><?=lang('New Record')?></h5>
+					<h5 class="offcanvas-title" id="offcanvasLabel"><?=lang('Add Record')?></h5>
 					<button
 							inert
 							type="button"
