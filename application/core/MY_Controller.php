@@ -234,6 +234,20 @@ class MY_Controller extends CI_Controller
         return $this->Model_Sys_Code->getList([], $dto);
     }
 
+    protected function reorderCodeList($big_cd, $add = [], $list = [])
+    {
+        $where = ['big_cd' => $big_cd];
+        $this->db->where_not_in('sml_cd', ['000']);
+        if(empty($list)) $list = $this->Model_Sys_Code->getList([], $where);
+
+        $list = reorder($list, $add, 'cd_srt', true);
+
+        $this->db->where_not_in('sml_cd', ['000']);
+        $this->Model_Sys_Code->delData($where);
+
+        $this->Model_Sys_Code->addList($list);
+    }
+
     protected function getArticleFileLink($dto)
     {
         $this->db->select('article_attachment.*');
@@ -422,6 +436,47 @@ class MY_Controller extends CI_Controller
             ], true);
         }
         return $token;
+    }
+
+    public function switchLang($language = "")
+    {
+        $this->load->model('Model_Language_Code');
+
+        if($language) {
+            $data = $this->Model_Language_Code->getData([], [
+                'path' => $language,
+                'use_yn' => 'Y',
+            ]);
+            $this->langCode = $data->code;
+        }else{
+            $code = $this->input->get('lang')??explode('.', $_SERVER['HTTP_HOST'])[0];
+            $data = $this->Model_Language_Code->getData([], [
+                'code' => strtoupper($code),
+                'use_yn' => 'Y',
+            ]);
+            if($data) {
+                $this->langCode = $code;
+                $language = strtolower($data->path);
+            }else{
+                if($this->session->userdata('site_lang')) {
+                    $language = $this->session->userdata('site_lang');
+                    $this->langCode = $this->session->userdata('lang_code');
+                }else{
+                    $language = $this->config->item('language');
+                    $data = $this->Model_Language_Code->getData([], [
+                        'path' => $language,
+                        'use_yn' => 'Y',
+                    ]);
+                    $this->langCode = $data->code;
+                }
+            }
+        }
+
+        $this->siteLang = $language;
+        if($this->session->userdata('site_lang') !== $language) {
+            $this->session->set_userdata('site_lang', $language);
+            $this->session->set_userdata('lang_code', $this->langCode);
+        }
     }
 }
 
