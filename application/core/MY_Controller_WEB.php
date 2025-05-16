@@ -133,7 +133,7 @@ class MY_Controller_WEB extends MY_Controller
         return $this->pagination->create_links();
     }
 
-    protected function viewApp($data)
+    protected function viewApp($data = [])
     {
         // css, script 중복 호출 방지
         $this->addCSS = unravel_list($this->addCSS);
