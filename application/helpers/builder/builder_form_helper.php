@@ -679,23 +679,3 @@ function get_builder_form_label($item, $attr = []): string
     $label = lang($item['label']).($required?'<span class="ms-2 text-danger">*</span>':'');
     return form_label($label, $id, $attr);
 }
-
-function get_system_config_input_by_type($item, $formType): string
-{
-    $html = get_form_input_by_type($item, $formType);
-    if($item['form_attributes']['with_btn']) {
-        switch ($item['form_attributes']['btn_type']) {
-            case 'dup_check' :
-                $html .= form_button([
-                    'data-rel-field' => $item['field'],
-                    'type' => 'button',
-                    'class' => 'btn btn-outline-primary waves-effect btn-dup-check',
-                ], lang('Check'), [
-                    'onclick' => "checkDuplicate(this)",
-                    'disabled' => 'disabled',
-                ]);
-                break;
-        }
-    }
-    return $html;
-}
