@@ -23,3 +23,9 @@ $lang['filter'] = [
 	'search_word' => 'Search Word',
 	'Enter The Search Word' => 'Enter The Search Word.',
 ];
+
+$lang['form_text'] = [
+    'Please Repeat The Password' => 'Please Repeat The Password.',
+    'Please enter at least 4 characters' => 'Please enter at least 4 characters.',
+    'Please enter 4 to 15 characters, including letters and numbers' => 'Please enter 4 to 15 characters, including letters and numbers.',
+];

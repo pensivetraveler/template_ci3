@@ -30,13 +30,6 @@ $lang['user'] = [
 	'withdraw_dt' => 'Withdraw Date',
 ];
 
-$lang['student'] = [
-	'code' => 'Student Code',
-	'grade' => 'Student Grade',
-	'disabilities_yn' => 'Enrolled Disabilities Class',
-	'aac_yn' => 'Enrolled AAC Class',
-];
-
 $lang['board'] = [
 	'board_id' => 'Board',
 	'board_name' => 'Board Name',
@@ -66,4 +59,21 @@ $lang['company'] = [
     'comp_addr1' => 'Address',
     'comp_addr2' => 'Detail Address',
     'comp_memo' => 'Memo',
+];
+
+$lang['system'] = [
+    'cmb_cfg' => 'Config Key',
+    'big_cfg' => 'Category',
+    'sml_cfg' => 'Sub Category',
+    'cfg_name' => 'Config Name',
+    'cfg_val' => 'Config Value',
+    'cfg_desc' => 'Config Desc.',
+    'cmb_cd' => 'Code Key',
+    'big_cd' => 'Category',
+    'sml_cd' => 'Sub Category',
+    'cd_name' => 'Code Name',
+    'cd_val' => 'Code Value',
+    'cd_desc' => 'Code Desc.',
+    'cd_nick' => 'Code Nickname',
+    'cd_srt' => 'Code Sequence',
 ];

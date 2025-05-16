@@ -10,16 +10,13 @@ $lang['nav']['Excel'] = 'Batch Registration';
 $lang['nav']['Administrators'] = 'Administrators';
 $lang['nav']['Administrators Management'] = 'Administrators Management';
 
-$lang['nav']['Students'] = 'Students';
-$lang['nav']['Students Management'] = 'Students Management';
+$lang['nav']['System'] = 'System';
+$lang['nav']['System Management'] = 'System Management';
 
-$lang['nav']['Works'] = 'Works';
-$lang['nav']['Works Management'] = 'Works Management';
+$lang['nav']['SysCfg'] = 'System Config';
+$lang['nav']['SysCfg Management'] = $lang['nav']['SysCfg'];
 
-$lang['nav']['Notices'] = 'Notices';
-$lang['nav']['Notices Management'] = 'Notices Management';
-
-$lang['nav']['Inquiries'] = 'Inquiries';
-$lang['nav']['Inquiries Management'] = 'Inquiries Management';
+$lang['nav']['SysCode'] = 'System Codes';
+$lang['nav']['SysCode Management'] = $lang['nav']['SysCode'];
 
 $lang['nav']['MyInfo'] = 'MyInfo';

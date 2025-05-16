@@ -62,3 +62,25 @@ $lang['Add Event'] = 'Add Event';
 $lang['System Administrator Registration'] = 'System Administrator Registration';
 $lang['ADD DB SQL'] = 'Set DB';
 $lang['Check The User Table'] = 'The User table is empty.';
+$lang['Verify Admin Account'] = 'Verify Your Admin Username And Password';
+$lang['Settings'] = 'Settings';
+$lang['Add Record'] = 'New Record';
+$lang['Edit Record'] = 'Edit Record';
+
+/**
+ * add system user
+ */
+$lang['id'] = 'ID';
+$lang['password'] = 'Password';
+$lang['name'] = 'Name';
+
+/**
+ * System Code
+ */
+$lang['Caution'] = 'Caution';
+$lang['Add Big Cd'] = 'Add Category';
+$lang['Edit Big Cd'] = 'Edit Category';
+$lang['Delete Big Cd'] = 'Delete Category';
+$lang['You Should Delete Codes In The Category'] = 'You Should Delete Codes In The Category.';
+$lang['What is System Code'] = 'What is System Code ?';
+$lang['What is System Config'] = 'What is System Config ?';

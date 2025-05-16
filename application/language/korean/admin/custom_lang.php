@@ -1,11 +1,4 @@
 <?php
-$lang['status_code'][DATA_CREATED] = '반영되었습니다.';
-$lang['status_code'][DATA_EDITED] = '수정되었습니다.';
-$lang['status_code'][DATA_DELETED] = '삭제되었습니다.';
-$lang['Registered Successfully'] = '반영되었습니다.';
-$lang['Your Data Is Updated'] = '수정되었습니다.';
-$lang['Delete Completed'] = '삭제되었습니다.';
-
 $lang['placeholder'] = [
 	'Select The Student' => '학생을 선택하세요.',
 	'Select The Program' => '프로그램을 선택하세요.',
@@ -32,7 +25,6 @@ $lang['filter'] = [
 ];
 
 $lang['form_text'] = [
-	'Enter The Student Code' => '학번을 입력하세요.',
 	'Please Repeat The Password' => '비밀번호를 한 번 더 입력해주세요.',
 	'Please enter at least 4 characters' => '4글자 이상으로 입력해주세요.',
 	'Please enter 4 to 15 characters, including letters and numbers' => '영문, 숫자를 포함한 4글자 이상 15글자 이하로 입력해주세요.'

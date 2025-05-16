@@ -30,13 +30,6 @@ $lang['user'] = [
 	'withdraw_dt' => '탈퇴일자',
 ];
 
-$lang['student'] = [
-	'code' => '학번',
-	'grade' => '학년',
-	'disabilities_yn' => '지체장애학생교육 수강 여부',
-	'aac_yn' => 'AAC 제작 특강 수강 여부',
-];
-
 $lang['board'] = [
     'board_id' => '게시판',
     'board_name' => '게시판 명',
@@ -66,4 +59,22 @@ $lang['company'] = [
     'comp_addr1' => '주소',
     'comp_addr2' => '상세주소',
     'comp_memo' => '비고',
+];
+
+$lang['system'] = [
+    'cmb_cfg' => '환경설정 Key',
+    'big_cfg' => '대구분',
+    'sml_cfg' => '소구분',
+    'cfg_name' => '환경설정 명',
+    'cfg_val' => '환경설정 값',
+    'cfg_desc' => '환경설정 설명',
+    'cfg_type' => '환경설정 유형',
+    'cmb_cd' => '코드 Key',
+    'big_cd' => '대구분',
+    'sml_cd' => '소구분',
+    'cd_name' => '코드 명',
+    'cd_val' => '코드 값',
+    'cd_desc' => '코드 설명',
+    'cd_nick' => '코드 별명',
+    'cd_srt' => '코드 순서',
 ];

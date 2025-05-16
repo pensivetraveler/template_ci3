@@ -62,3 +62,25 @@ $lang['Add Event'] = '일정 등록';
 $lang['System Administrator Registration'] = '시스템 관리자 추가';
 $lang['ADD DB SQL'] = 'DB 셋업';
 $lang['Check The User Table'] = 'User 테이블을 점검해주세요.';
+$lang['Verify Admin Account'] = '관리자 계정을 입력해주세요.';
+$lang['Settings'] = '설정';
+$lang['Add Record'] = '등록';
+$lang['Edit Record'] = '수정';
+
+/**
+ * add system user
+ */
+$lang['id'] = '아이디';
+$lang['password'] = '비밀번호';
+$lang['name'] = '이름';
+
+/**
+ * System Code
+ */
+$lang['Caution'] = '주의';
+$lang['Add Big Cd'] = '카테고리 등록';
+$lang['Edit Big Cd'] = '카테고리 수정';
+$lang['Delete Big Cd'] = '카테고리 삭제';
+$lang['You Should Delete Codes In The Category'] = '카테고리 내 등록된 코드를 먼저 삭제해주세요.';
+$lang['What is System Code'] = '시스템 코드란 ?';
+$lang['What is System Config'] = '환경값 설정이란 ?';
