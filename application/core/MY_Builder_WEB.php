@@ -2,10 +2,12 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 require_once APPPATH . 'traits/BuilderInitTrait.php';
+require_once APPPATH . 'traits/BuilderCommonTrait.php';
 
 class MY_Builder_WEB extends MY_Controller_WEB
 {
     use BuilderInitTrait;
+    use BuilderCommonTrait;
 
     public string $flag = '';
     public string $apiFlag = '';
