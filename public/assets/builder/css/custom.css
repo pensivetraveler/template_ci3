@@ -136,6 +136,15 @@
 /*********************************************
     common
  *********************************************/
+body[data-class="auth"] .app-brand-logo {
+	max-width: 80%;
+	margin: 0 auto;
+}
+
+body[data-class="auth"] .app-brand-logo img {
+	width: 100%;
+}
+
 body:not([data-class="auth"]) .app-brand-logo img {
 	max-width: 100px;
 	max-height: 50px;
