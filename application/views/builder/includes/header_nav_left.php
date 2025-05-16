@@ -1,23 +1,12 @@
 <ul class="menu-inner py-1">
-	<?php
-		foreach ($this->config->get('builder_nav_side_sample', []) as $menuName=>$menu):
-			$menu = array_merge(
-				$this->config->get('builder_nav_side_base', []),
-				$menu
-			);
-
-			if(is_admin_active_page($menu)) $menu['className'][] = 'active';
-			$subMenuExist = count($menu['subMenu']) > 0;
-			$href = $menu['route'] ? $menu['route'] . '?' . http_build_query($menu['params']) : '';
-			if($subMenuExist && is_admin_active_page($menu)) $menu['className'][] = 'open';
-	?>
+	<?php foreach ($menus as $menuName=>$menu): ?>
 	<!-- Page -->
 	<li class="menu-item <?=implode(' ', $menu['className'])?>">
-		<a href="<?=$href?>" class="menu-link <?=$subMenuExist?'menu-toggle waves-effect':''?>">
+		<a href="<?=$menu['href']?>" class="menu-link <?=$menu['subMenuExist']?'menu-toggle waves-effect':''?>" <?=$menu['subMenuExist']?'':'target="'.$menu['target'].'"'?>>
 			<?php if($menu['icon']): ?><i class="menu-icon tf-icons <?=$menu['icon']?>"></i><?php endif; ?>
 			<div data-i18n="<?=lang('nav.'.$menu['title'])?>"><?=lang('nav.'.$menu['title'])?></div>
 		</a>
-		<?php if($subMenuExist): ?>
+		<?php if($menu['subMenuExist']): ?>
 		<ul class="menu-sub">
 			<?php
 				foreach ($menu['subMenu'] as $submenuName=>$submenu):
@@ -26,7 +15,7 @@
 			?>
 			<li class="menu-item <?=$active?>">
 				<a href="<?=$submenuHref?>" class="menu-link">
-					<?php if($submenu['icon']): ?><i class="menu-icon tf-icons <?=$submenu['icon']?>"></i><?php endif; ?>
+					<?php if($submenu['icon']): ?><i class="menu-icon tf-icons <?=$submenu['icon']?> me-2"></i><?php endif; ?>
 					<div data-i18n="<?=lang('nav.'.$submenu['title'])?>"><?=lang('nav.'.$submenu['title'])?></div>
 				</a>
 			</li>
@@ -36,7 +25,5 @@
 		</ul>
 		<?php endif; ?>
 	</li>
-	<?php
-		endforeach;
-	?>
+	<?php endforeach; ?>
 </ul>
