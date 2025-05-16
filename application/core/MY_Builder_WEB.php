@@ -11,18 +11,18 @@ class MY_Builder_WEB extends MY_Controller_WEB
     public string $apiFlag = '';
     public string $baseUri = '';
     public string $apiUri = '';
+    public array $routeConfig = [];
+    public array $methodConfig = [];
     public array $pageConfig = [];
     public string $pageType = 'form';
-    public bool $sideForm = false;
+    public bool $listForm = false;
+    public array $userData = [];
     public array $headerData = [];
     public object $loginData;
     public string $href;
-    public array $listConfig = [];
     public array $listColumns = [];
     public array $filterConfig = [];
-    public array $formConfig = [];
     public array $formColumns = [];
-    public array $viewConfig = [];
     public array $viewColumns = [];
     public string $viewPath;
     public array $navAuth;
@@ -35,12 +35,12 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $this->config->load('extra/autologin_config', false);
 
-        foreach (['builder_base_config', 'builder_form_config', 'builder_nav_config', 'builder_page_config', 'builder_view_config'] as $config) {
+        foreach (['builder_base_config', 'builder_form_config', 'builder_nav_config', 'builder_page_config', 'builder_list_config', 'builder_view_config'] as $config) {
             $this->config->load('extra/builder/'.$config, false);
         }
 
         require_once APPPATH . 'config/extra/builder/builder_base_constants.php';
-        $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_form",]);
+        $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_form"]);
         $this->lang->load("builder/base", $this->config->item('language'));
 
         if(!$this->flag) show_error("Platform flag is not set.");
@@ -66,13 +66,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->viewPath = "$this->flag/{$this->router->class}";
         $this->jsVars = [
             'TITLE' => $this->router->class,
+            'API_BASE_URI' => $this->apiUri,
             'API_URI' => '',
             'API_PARAMS' => [],
         ];
 
-        $this->isLogin = $this->checkLogin();
-        if($this->router->class !== 'common') $this->setProperties();
-        if(ENVIRONMENT === 'development') $this->output->enable_profiler(TRUE);
+        $this->setRouteConfig();
+        $this->setProperties();
     }
 
     public function index()
@@ -80,12 +80,12 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if($this->isBuilderAvailable()){
             parent::index();
 
-            if(empty($this->pageConfig)) {
+            if(empty($this->routeConfig['methods'])) {
                 $data['subPage'] = '';
                 $data['backLink'] = WEB_HISTORY_BACK;
                 $this->viewApp($data);
             }else{
-                if(!$this->pageConfig['properties']['allowNoLogin'] && !$this->isLogin){
+                if(!$this->routeConfig['properties']['allowNoLogin'] && !$this->isLogin){
                     redirect($this->noLoginRedirect);
                 }
 
@@ -93,7 +93,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                     redirect("$this->baseUri/$this->defaultController");
                 }
 
-                $this->{"{$this->pageConfig['properties']['baseMethod']}"}();
+                $this->{"{$this->routeConfig['properties']['baseMethod']}"}();
             }
         }
     }
@@ -106,11 +106,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $data['filters'] = $this->jsVars['LIST_FILTERS']??[];
         $data['filterHelpBlock'] = $this->filterConfig['help_block'] ?? [];
         $data['columns'] = $this->jsVars['LIST_COLUMNS']??[];
-
-        $data['formData'] = $this->sideForm?restructure_form_data_by_type($this->jsVars['FORM_DATA']):[];
-        $data['formType'] = $this->pageConfig['formProperties']['formType'];
-
-        $data['isCheckbox'] = $this->pageConfig['listProperties']['isCheckbox'];
+        $data['isCheckbox'] = $this->methodConfig['properties']['isCheckbox'];
 
         $this->addCSS[] = [
             base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables.bootstrap5.css'),
@@ -123,16 +119,21 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables-bootstrap5.js'),
         ];
 
-        if($this->sideForm) {
-            $this->addFormScripts();
+        $data['actions'] = reformat_bool_type_list($this->methodConfig['actions']);
+        $data['buttons'] = $this->methodConfig['buttons']??[];
 
-            $data['actions'] = reformat_bool_type_list($this->pageConfig['formProperties']['actions']);
+        $data['formExist'] = false;
+        if($this->methodConfig['properties']['formExist']) {
+            $data['formExist'] = true;
+            $data['formData'] = count($this->formColumns)>0?restructure_form_data_by_type($this->jsVars['FORM_DATA']):[];
+            $data['formType'] = count($this->formColumns)>0?$this->methodConfig['properties']['formType']:'';
+            $this->addFormScripts();
+        }else{
             foreach ($data['actions'] as $i=>$action) {
                 if($action === 'delete') continue;
-                if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
+                if(!in_array($action, $this->routeConfig['properties']['allows'])) unset($data['actions'][$i]);
             }
             $data['actions'] = array_values($data['actions']);
-            $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['formProperties']['buttons']??[]);
         }
 
         $this->addJS['tail'][] = [
@@ -144,36 +145,30 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     public function view($key = 0)
     {
-        if(!$key) alert(lang('Incorrect Access'));
-
-        $this->addJsVars(['KEY' => $key]);
+        $this->checkIdentifierExist($key);
 
         $this->titleList[] = 'View';
 
         $data['backLink'] = WEB_HISTORY_BACK;
-        $data['viewType'] = $this->pageConfig['viewProperties']['viewType'];
+        $data['viewType'] = $this->methodConfig['subtype'];
         $data['viewData'] = reformat_form_data_by_type($this->jsVars['VIEW_COLUMNS'], $data['viewType']);
 
-        $data['identifier'] = null;
-        if(!is_null(array_search('identifier', array_column($this->jsVars['VIEW_COLUMNS'], 'subtype')))) {
-            $data['identifier'] = $this->jsVars['VIEW_COLUMNS'][array_search('identifier', array_column($this->jsVars['VIEW_COLUMNS'], 'subtype'))];
-        }
+        $data['identifier'] = array_filter($this->viewColumns, function ($item) {
+            return array_key_exists('field', $item)&&in_array($item['field'], $this->jsVars['IDENTIFIER']);
+        });
 
-        if(count(array_filter($this->jsVars['VIEW_COLUMNS'], function($item) {
+        $data['actions'] = array_values(array_filter(reformat_bool_type_list($this->methodConfig['actions']), function ($action) {
+            return $action === 'delete' || in_array($action, $this->routeConfig['properties']['allows']);
+        }));
+        $data['buttons'] = $this->methodConfig['buttons']??[];
+
+        if(count(array_filter($this->viewColumns, function($item) {
             return $item['type'] !== 'view';
         }))) {
             $this->addFormScripts();
         }
 
-        $data['actions'] = reformat_bool_type_list($this->pageConfig['viewProperties']['actions']);
-        foreach ($data['actions'] as $i=>$action) {
-            if($action === 'delete') continue;
-            if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
-        }
-        $data['actions'] = array_values($data['actions']);
-        $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['viewProperties']['buttons']??[]);
-
-        $data['isComments'] = $this->pageConfig['viewProperties']['isComments'];
+        $data['isComments'] = $this->methodConfig['properties']['isComments'];
         if($data['isComments']) {
             $this->addJS['tail'][] = [
                 base_url('public/assets/builder/js/app-page-comment.js')
@@ -189,23 +184,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     public function add()
     {
-        if($this->sideForm) show_404();
+        if($this->listForm) show_404();
 
         $this->titleList[] = 'Add';
 
-        $data['backLink'] = WEB_HISTORY_BACK;
-        $data['formType'] = $this->pageConfig['formProperties']['formType'];
-        $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType']);
-
-        $data['actions'] = reformat_bool_type_list($this->pageConfig['formProperties']['actions']);
-        foreach ($data['actions'] as $i=>$action) {
-            if($action === 'delete') continue;
-            if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
-        }
-        $data['actions'] = array_values($data['actions']);
-        $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['formProperties']['buttons']??[]);
-
-        $this->addFormScripts();
+        $data = $this->prepareFormData();
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-add.js'),
@@ -216,27 +199,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     public function edit($key = 0)
     {
-        if($this->sideForm) show_404();
+        if($this->listForm) show_404();
 
-        if(!$key) alert(lang('Incorrect Access'));
-
-        $this->addJsVars(['KEY' => $key]);
+        $this->checkIdentifierExist($key);
 
         $this->titleList[] = 'Edit';
 
-        $data['backLink'] = WEB_HISTORY_BACK;
-        $data['formType'] = $this->pageConfig['formProperties']['formType'];
-        $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType']);
-
-        $data['actions'] = reformat_bool_type_list($this->pageConfig['formProperties']['actions']);
-        foreach ($data['actions'] as $i=>$action) {
-            if($action === 'delete') continue;
-            if(!in_array($action, $this->pageConfig['properties']['allows'])) unset($data['actions'][$i]);
-        }
-        $data['actions'] = array_values($data['actions']);
-        $data['buttons'] = array_merge($this->config->get('builder_view_buttons_config'), $this->pageConfig['formProperties']['buttons']??[]);
-
-        $this->addFormScripts();
+        $data = $this->prepareFormData();
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-edit.js'),
@@ -264,11 +233,28 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->viewApp($data);
     }
 
-    protected function viewApp($data)
+    protected function prepareFormData(): array
+    {
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['formType'] = $this->methodConfig['subtype'];
+        $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType']);
+
+        $data['actions'] = array_values(array_filter(reformat_bool_type_list($this->methodConfig['actions']), function ($action) {
+            return $action === 'delete' || in_array($action, $this->routeConfig['properties']['allows']);
+        }));
+        $data['buttons'] = $this->methodConfig['buttons']??[];
+
+        $this->addFormScripts();
+
+        return $data;
+
+    }
+
+    protected function viewApp($data = [])
     {
         if(!array_key_exists('subPage', $data)) {
             $view = null;
-            $method = $this->router->method === 'index'?$this->pageConfig['properties']['baseMethod']:$this->router->method;
+            $method = $this->router->method === 'index'?$this->routeConfig['properties']['baseMethod']:$this->router->method;
 
             foreach ([get_path(), BUILDER_FLAGNAME] as $firstPath) {
                 if(!file_exists(VIEWPATH.$firstPath)) continue;
@@ -289,8 +275,9 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if($this->baseViewPath===$data['subPage']) trigger_error('view file is not set.', E_USER_ERROR);
 
         $data['hideBack'] = element('hideBack', $data);
+        $data['userData'] = $this->userData;
         $data['headerData'] = $this->headerData;
-        $data['includes'] = $this->pageConfig['properties']['includes'];
+        $data['includes'] = $this->routeConfig['properties']['includes'];
 
         if(!file_exists(PLATFORM_ASSET_CSS_PATH.'style.css')){
             $file = fopen(PLATFORM_ASSET_CSS_PATH.'style.css',"w");
@@ -330,115 +317,201 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $data['htmlAttrs'] = get_builder_html_attributes($this->flag);
         $data['bodyAttrs'] = get_builder_body_attributes(ENVIRONMENT !== 'production');
 
+        // menu
+        $data['menus'] = $this->setMenuData();
+
         parent::viewApp($data);
     }
 
-    protected function setProperties($data = [])
+    protected function setRouteConfig(): void
     {
-        $pageConfig = [];
+        $routeConfig = [];
         if(
             !is_empty($this->config->item("page_config"), $this->router->class)
             ||
             !is_empty($this->config->item("page_config"), strtolower($this->router->class))
         ){
-            $pageConfig = $this->config->get("page_config")[$this->router->class]??$this->config->get("page_config")[strtolower($this->router->class)];
-            if(is_empty($pageConfig, 'properties')) $pageConfig['properties'] = [];
-            if(!array_key_exists( 'allows', $pageConfig['properties'])) $pageConfig['properties']['allows'] = [];
-            if(empty($pageConfig['properties']['allows'])) $pageConfig['properties']['allows'][] = $pageConfig['properties']['baseMethod'];
+            $routeConfig = $this->config->get("page_config")[$this->router->class]??$this->config->get("page_config")[strtolower($this->router->class)];
+            if(is_empty($routeConfig, 'properties')) $routeConfig['properties'] = [];
+            if(!array_key_exists( 'allows', $routeConfig['properties'])) $routeConfig['properties']['allows'] = [];
+            if(empty($routeConfig['properties']['allows'])) $routeConfig['properties']['allows'][] = $routeConfig['properties']['baseMethod'];
         }
+
         foreach ($this->config->get("page_base_config", []) as $key=>$val) {
-            if(!array_key_exists($key, $pageConfig)) {
-                $pageConfig[$key] = $val;
+            if(!array_key_exists($key, $routeConfig)) {
+                $routeConfig[$key] = $val;
             }else{
                 if(is_array($val)) {
                     foreach ($val as $subKey=>$subVal) {
-                        if(!array_key_exists($subKey, $pageConfig[$key])) {
-                            $pageConfig[$key][$subKey] = $subVal;
+                        if(!array_key_exists($subKey, $routeConfig[$key])) {
+                            $routeConfig[$key][$subKey] = $subVal;
                             continue;
                         }
                         if(is_array($subVal)) {
-                            $pageConfig[$key][$subKey] = array_merge($subVal, $pageConfig[$key][$subKey]);
+                            $routeConfig[$key][$subKey] = array_merge($subVal, $routeConfig[$key][$subKey]);
                         }
                     }
                 }else{
-                    $pageConfig[$key] = $pageConfig[$key]??$val;
+                    $routeConfig[$key] = $routeConfig[$key]??$val;
                 }
             }
         }
-        $this->pageConfig = $pageConfig;
+        $routeConfig['properties']['allows'] = array_keys($routeConfig['methods']);
 
-        $this->pageType = $this->pageConfig['type'];
-        if($this->pageConfig['properties']['formExist']) $this->sideForm = $this->pageConfig['formProperties']['formType'] === 'side';
+        $this->routeConfig = $routeConfig;
+    }
 
-        if($this->pageConfig['properties']['formExist']) {
-            $this->formColumns = $this->setFormColumns(
-                $this->pageConfig['formProperties']['formConfig'] ? : strtolower($this->router->class)
-            );
-            $this->addJsVars([
-                'IDENTIFIER' => $this->setIdentifier(),
-                'FORM_DATA' => $this->setFormData(),
-                'FORM_REGEXP' => $this->config->item('regexp'),
-            ]);
+    protected function setProperties($data = []): void
+    {
+        if(empty($this->routeConfig['methods'])) return;
+
+        $method = $this->router->method === 'index' ? $this->routeConfig['properties']['baseMethod'] : $this->router->method;
+        if(!array_key_exists($method, $this->routeConfig['methods'])) show_404();
+
+        $methodConfig = $this->routeConfig['methods'][$method];
+        if($methodConfig['type'] === 'action') {
+            $this->methodConfig = $methodConfig;
+            return;
         }
 
-        if($this->pageConfig['properties']['listExist']) {
-            $this->addJsVars([
-                'PAGE_LIST_URI' => $this->href,
-                'LIST_COLUMNS' => $this->setListColumns(),
-                'LIST_PLUGIN' => $this->pageConfig['listProperties']['plugin'],
-                'LIST_FILTERS' => $this->setListFilters(),
-                'LIST_BUTTONS' => $this->pageConfig['listProperties']['buttons'],
-                'LIST_ACTIONS' => reformat_bool_type_list($this->pageConfig['listProperties']['actions']),
-                'LIST_EXPORTS' => reformat_bool_type_list($this->pageConfig['listProperties']['exports']),
-                'LIST_CHEKBOX' => $this->pageConfig['listProperties']['isCheckbox'],
-            ]);
+        $type = array_key_exists('type', $methodConfig)?$methodConfig['type']:'base';
+        $subtype = array_key_exists('subtype', $methodConfig)?$methodConfig['subtype']:'base';
+
+        $baseMethodConfig = [];
+        if($this->config->item("page_{$method}_base_config")) {
+            $baseMethodConfig = $this->config->item("page_{$method}_base_config");
+        }elseif ($this->config->item("page_{$type}_{$subtype}_config")) {
+            $baseMethodConfig = $this->config->item("page_{$type}_{$subtype}_config");
+        }elseif ($this->config->item("page_{$type}_base_config")) {
+            $baseMethodConfig = $this->config->item("page_{$type}_base_config");
+        }
+        if(!count($baseMethodConfig)) show_error('Method Config is empty');
+
+        foreach ($baseMethodConfig as $key=>$value) {
+            if(array_key_exists($key, $methodConfig)){
+                if(is_array($value)) {
+                    $methodConfig[$key] = array_merge($value, $methodConfig[$key]);
+                }
+            }else{
+                $methodConfig[$key] = $value;
+            }
+        }
+        $this->methodConfig = $methodConfig;
+
+        // method 별.
+        $formType = 'base';
+        $viewType = 'base';
+        switch ($methodConfig['type']) {
+            case 'list' :
+                $this->addJsVars([
+                    'LIST_COLUMNS' => $this->setListColumns(),
+                    'LIST_PLUGIN' => $methodConfig['properties']['plugin'],
+                    'LIST_FILTERS' => $this->setListFilters(),
+                    'LIST_BUTTONS' => $methodConfig['buttons'],
+                    'LIST_ACTIONS' => reformat_bool_type_list($methodConfig['actions']),
+                    'LIST_OPTIONS' => $methodConfig['properties'],
+                    'LIST_EXPORTS' => reformat_bool_type_list($methodConfig['properties']['exports']),
+                    'LIST_CHEKBOX' => $methodConfig['properties']['isCheckbox'],
+                ]);
+
+                if($methodConfig['properties']['formExist']) {
+                    $this->listForm = true;
+                    $this->formColumns = $this->setFormColumns($methodConfig['properties']['formConfig']);
+                    $this->addJsVars([
+                        'FORM_DATA' => $this->setFormData(),
+                        'FORM_REGEXP' => $this->config->item('regexp'),
+                        'FORM_TYPE' => $methodConfig['properties']['formType'],
+                        'FORM_EXIST' => true,
+                    ]);
+                }
+                break;
+            case 'view' :
+                $this->addJsVars([
+                    'VIEW_COLUMNS' => $this->setViewColumns(),
+                    'VIEW_TYPE' => $methodConfig['subtype'],
+                ]);
+                break;
+            case 'form' :
+                $this->formColumns = $this->setFormColumns($methodConfig['config']);
+                $this->addJsVars([
+                    'FORM_DATA' => $this->setFormData(),
+                    'FORM_REGEXP' => $this->config->item('regexp'),
+                    'FORM_TYPE' => $methodConfig['subtype']??'base',
+                ]);
+                break;
         }
 
-        if($this->pageConfig['properties']['formExist'] && $this->pageConfig['properties']['listExist']) {
-            $this->addJsVars([
-                'PAGE_ADD_URI' => $this->sideForm?'':$this->href.DIRECTORY_SEPARATOR.'add',
-                'PAGE_EDIT_URI' => $this->sideForm?'':$this->href.DIRECTORY_SEPARATOR.'edit',
-                'PAGE_EXCEL_URI' => $this->href.DIRECTORY_SEPARATOR.'excel',
-                'SIDE_FORM' => $this->sideForm,
-            ]);
+        $this->addJsVars([
+            'IDENTIFIER' => $this->setIdentifier(),
+        ]);
+
+        $uris = [];
+        $methodButtons = array_merge($methodConfig['actions'], $methodConfig['buttons']);
+        foreach (['list','add','edit','view','excel',] as $action) {
+            $add = true;
+            if(array_key_exists($action, $methodButtons)) {
+                if($methodButtons[$action]){
+                    switch ($action) {
+                        case 'add' :
+                        case 'edit' :
+                            if($methodConfig['type'] === 'list' && !empty($methodConfig['properties']['formConfig'])) {
+                                $add = false;
+                            }
+                            break;
+                        case 'view' :
+                            if($methodConfig['type'] === 'list' && !empty($methodConfig['properties']['viewConfig'])) {
+                                $add = false;
+                            }
+                            break;
+                    }
+                }else{
+                    $add = false;
+                }
+            }
+
+            if($add && in_array($action, $this->routeConfig['properties']['allows'])) {
+                $uris['PAGE_'.strtoupper($action).'_URI'] = $this->href.DIRECTORY_SEPARATOR.$action;
+            }else{
+                $uris['PAGE_'.strtoupper($action).'_URI'] = '';
+            }
         }
 
-        if(
-            (in_array('view', $this->pageConfig['properties']['allows'])
-                ||
-                $this->pageConfig['listProperties']['actions']['view'])
-            && $this->pageConfig['viewProperties']['viewType'] !== 'custom'
-        ){
-            $viewType = $this->pageConfig['viewProperties']['viewType'];
-            $this->addJsVars([
-                'PAGE_VIEW_URI' => $viewType!=='modal'?$this->href.DIRECTORY_SEPARATOR.'view':'',
-                'VIEW_COLUMNS' => $this->setViewColumns(),
-            ]);
-        }
+        $this->addJsVars(array_merge($uris, $data));
 
-        $this->addJsVars($data);
+        if(ENVIRONMENT === 'development') $this->output->enable_profiler(TRUE);
     }
 
     protected function setFormColumns($configData = null): array
     {
         $config = [];
-        if(is_array($configData)) {
+        if(is_array($configData) && count($configData)) {
             $config = $configData;
-        }elseif(is_string($configData)){
-            $config = $this->config->item('form_'.$configData.'_config');
+        }elseif(is_string($configData) && strlen($configData)){
+            $config = $this->config->get('form_'.$configData.'_config', []);
         }
 
-        if(is_null($configData) || empty($config)){
-            $this->logger("setFormColumns : config does not exist.", E_USER_WARNING, false);
-            return [];
-        }else{
-            return array_reduce($config, function($carry, $item) {
-                if(isset($item['field']) || $item['type'] === 'common') {
-                    $carry[] = $this->setFormColumn($item);
-                }
-                return $carry;
-            }, []);
+        if(empty($config)){
+            $method = $this->router->method;
+            if($this->router->method === 'index' && $this->routeConfig['properties']['baseMethod']) {
+                $method = $this->routeConfig['properties']['baseMethod'];
+            }
+            $config = $this->config->get2(
+                'form_'.snakeize($this->router->class).'_config'
+                , 'form_'.$method.'_config'
+                , [], false);
+
+            if(empty($config)) {
+                $this->logger("setFormColumns : config does not exist.", E_USER_WARNING, false);
+                return $config;
+            }
         }
+
+        return array_reduce($config, function($carry, $item) {
+            if(isset($item['field']) || $item['type'] === 'common') {
+                $carry[] = $this->setFormColumn($item);
+            }
+            return $carry;
+        }, []);
     }
 
     protected function setFormColumn($item)
@@ -481,7 +554,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
          * 예외 처리
          */
         // textarea 가 wysiwyg quill 인 경우
-        if($this->sideForm && $item['category'] === 'base' && $item['type'] === 'textarea' && $item['subtype'] === 'quill'){
+        if($this->listForm && $item['category'] === 'base' && $item['type'] === 'textarea' && $item['subtype'] === 'quill'){
             $item['subtype'] = 'autosize';
         }
 
@@ -528,18 +601,33 @@ class MY_Builder_WEB extends MY_Controller_WEB
         return $item;
     }
 
-    protected function setIdentifier(): string
+    protected function setIdentifier(): array
     {
-        $idx = array_search('identifier', array_column($this->formColumns, 'subtype'));
-        return $idx === false?'':$this->formColumns[$idx]['field'];
+        $identifiers = [];
+        if (count($this->routeConfig['properties']['identifier'])) {
+            $identifiers = $this->routeConfig['properties']['identifier'];
+        } elseif (count($this->methodConfig['properties']['identifier'])) {
+            $identifiers = $this->methodConfig['properties']['identifier'];
+        } else {
+            if(property_exists($this, $this->methodConfig['type'].'Columns')){
+                return array_values(array_map(function ($item) {
+                    return $item['field'];
+                }, array_filter($this->{$this->methodConfig['type'].'Columns'}, function ($item) {
+                    return $item['subtype'] === 'identifier';
+                })));
+            }
+        }
+        return $identifiers;
     }
 
-    protected function setFormData(): array
+    protected function setFormData($formColumns = []): array
     {
+        if(empty($formColumns)) $formColumns = $this->formColumns;
+
         $result = [];
         $groups = [];
         $attr = [];
-        foreach ($this->formColumns as $i=>$item) {
+        foreach ($formColumns as $i=>$item) {
             if(isset($item['type']) && $item['type'] === 'common') {
                 $result[] = $item;
                 continue;
@@ -592,7 +680,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 // view type
                 $item['view'] = $item['subtype'];
 
-                $item['id'] = ($this->sideForm?$this->config->item('form_side_prefix'):$this->config->item('form_page_prefix')).$item['field'];
+                $item['id'] = ($this->listForm?$this->config->item('form_side_prefix'):$this->config->item('form_page_prefix')).$item['field'];
                 $item['name'] = $item['field'];
             }
 
@@ -608,41 +696,39 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if(isset($name)) {
             $config = $this->config->get($name, []);
         }else{
-            if($name = $this->pageConfig['listProperties']['listConfig']) {
-                $config = $this->config->get('list_'.$name.'_config', []);
-            }
+            $config = $this->config->get2('list_'.$this->methodConfig['config'].'_config'
+                , 'list_'.snakeize($this->router->class).'_config'
+                , [], false);
         }
+        if(empty($config)) show_error("getListColumns: List Config '$config' is Empty");
 
         $this->listColumns = array_reduce($config, function($carry, $item) {
             $item = array_merge($this->config->get("builder_form_base_list_attributes", []), $item);
 
-            if($item['format'] === 'select') {
-                if(!is_empty($item, 'option_attributes')) {
-                    $item['options'] = $this->getOptions($item['field'], $item['option_attributes']);
-                }else{
-                    $item['format'] = 'text';
-                }
-            }
+            if(!is_empty($item, 'option_attributes'))
+                $item['options'] = $this->getOptions($item['field'], $item['option_attributes']);
 
-            if ($item['list']) $carry[] = $item;
+            if($item['type'] === 'hidden') $item['list'] = false;
+
+            $carry[] = $item;
             return $carry;
         }, []);
 
-        return array_column($this->listColumns, 'field');
+        return array_column(array_filter($this->listColumns, function ($item) {
+            return $item['list'];
+        }), 'field');
     }
 
     protected function setListColumns(): array
     {
         $columns = $this->getListColumns();
 
-        $baseData = empty($this->listColumns) ? $this->formColumns : $this->listColumns;
-
-        $list = array_reduce(array_keys($columns), function($carry, $key) use($columns, $baseData) {
+        $list = array_reduce(array_keys($columns), function($carry, $key) use($columns) {
             $field = $columns[$key];
-            $idx = array_search($field, array_column($baseData, 'field'));
+            $idx = array_search($field, array_column($this->listColumns, 'field'));
             if($idx === false) return $carry;
 
-            $item = $baseData[$idx];
+            $item = $this->listColumns[$idx];
 
             $attributes = array_merge(
                 $this->config->get("builder_form_base_list_attributes", []),
@@ -670,19 +756,19 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 $this->config->get("builder_form_base_list_attributes", []),
                 [
                     'label' => 'common.row_num',
-                    'format' => 'row_num',
+                    'type' => 'row_num',
                 ]
             )
         );
 
-        if(!empty(array_filter($this->pageConfig['listProperties']['actions'], function ($value) {
+        if(!empty(array_filter($this->methodConfig['actions'], function ($value) {
             return $value === true;
         }))) {
             $list[] = array_merge(
                 $this->config->get('builder_form_base_list_attributes', []),
                 [
                     'label' => 'common.actions',
-                    'format' => 'actions',
+                    'type' => 'actions',
                 ]
             );
         }
@@ -692,7 +778,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function setListFilters(): array
     {
-        $this->filterConfig = $this->config->get('filter_'.$this->pageConfig['listProperties']['listConfig'].'_config', [], false);
+        $this->filterConfig = $this->config->get2(
+            'filter_'.$this->methodConfig['properties']['filterConfig'].'_config'
+            , 'filter_'.snakeize($this->router->class).'_config'
+            , [], false);
         if(empty($this->filterConfig) || empty($this->filterConfig['filters'])) return [];
 
         $filters = array_map(function($item) {
@@ -768,7 +857,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if(isset($name)) {
             $config = $this->config->get($name, []);
         }else{
-            if($name = $this->pageConfig['viewProperties']['viewConfig']) {
+            if($name = $this->methodConfig['config']) {
                 $config = $this->config->get('view_'.$name.'_config', []);
             }else{
                 $config = array_map(function($item) {
@@ -810,7 +899,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function getExcelHeaders()
     {
-        $config = $this->config->get('excel_'.$this->pageConfig['listProperties']['excelConfig'].'_config', [], false);
+        $config = $this->config->get2(
+            'excel_'.$this->methodConfig['config'].'_config'
+            ,'excel_'.snakeize($this->router->class).'_config'
+            , [], false);
         if(empty($config)) $config = $this->config->item('excel_'.strtolower($this->router->class).'_config');
 
         if($config) {
@@ -905,28 +997,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
     {
         if($this->session->userdata('token')) {
             $this->loginData = $this->validateToken();
-            if(!property_exists($this->loginData, 'user_cd')) return false;
-            return in_array($this->loginData->user_cd, ['USR000', 'USR001']);
+            return true;
         }else{
-            $this->destroyUserData();
-            return false;
-        }
-    }
-
-    protected function destroyUserData()
-    {
-        delete_cookie('autologin');
-
-        if(count($this->session->userdata())) {
-            foreach ($this->session->userdata() as $key=>$val) {
-                $this->session->unset_userdata($key);
+            if(!$this->routeConfig['properties']['allowNoLogin']) {
+                $this->destroyUserData();
+                redirect(base_url($this->noLoginRedirect));
             }
-            $this->session->sess_destroy();
-        }
-
-        // 세션 쿠키 삭제
-        if (isset($_COOKIE[$this->config->item('sess_cookie_name')])) {
-            setcookie($this->config->item('sess_cookie_name'), '', time() - 3600, '/');
+            return false;
         }
     }
 
@@ -961,5 +1038,66 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url('public/assets/builder/vendor/libs/quill/katex.js'),
             base_url('public/assets/builder/vendor/libs/quill/quill.js'),
         ];
+    }
+
+    public function _remap($method, $params = [])
+    {
+        $this->isLogin = $this->checkLogin();
+
+        if(!method_exists($this, $method)) {
+            // 1) perform 메소드 실행
+            if(!is_empty($this->methodConfig['properties'], 'perform')) {
+                if (method_exists($this, $this->methodConfig['properties']['perform'])) {
+                    $this->{$this->methodConfig['properties']['perform']}();
+                }else{
+                    show_error('Performing Method is not defined : '.$this->methodConfig['properties']['perform']);
+                }
+            }
+
+            // 2) redirect
+            if(!is_empty($this->methodConfig['properties'], 'redirectUri')) {
+                redirect(base_url($this->methodConfig['properties']['redirectUri']));
+            }
+        }
+
+        // 3) 본래 메소드 실행
+        if (method_exists($this, $method)) {
+            return call_user_func_array([$this, $method], $params);
+        }
+
+        show_404();
+    }
+
+    protected function checkIdentifierExist($key = 0)
+    {
+        if( !($this->routeConfig['properties']['noIdentifier'] || $this->methodConfig['properties']['noIdentifier']) ) {
+            $idData = $this->getIdentifierData($key, $this->jsVars['IDENTIFIER']);
+
+            if(empty($idData)) alert(lang('Incorrect Access'));
+
+            $this->addJsVars(['KEY' => count($idData)===1?array_values($idData)[0]:$idData]);
+        }
+    }
+
+    protected function setMenuData()
+    {
+        $menuConfig = $this->config->get("{$this->flag}_nav_side", $this->config->get('builder_nav_side_sample', []), false);
+        return array_combine(
+            array_keys($menuConfig),
+            array_map(function($item) {
+                $item = array_merge(
+                    $this->config->get('builder_nav_side_base', []),
+                    $item
+                );
+                if(is_admin_active_page($item)) $item['className'][] = 'active';
+                $item['subMenuExist'] = count($item['subMenu']) > 0;
+                $item['href'] = $item['route'] ? $item['route'] . '?' . http_build_query($item['params']) : '';
+                $item['target'] = $item['target'] ?? '_self';
+
+                if($item['router'] === $this->router->class) $item['className'][] = 'active';
+                if($item['subMenuExist'] && is_admin_active_page($item)) $item['className'][] = 'open';
+                return $item;
+            }, $menuConfig)
+        );
     }
 }
