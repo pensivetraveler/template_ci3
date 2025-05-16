@@ -51,4 +51,36 @@ $config['admin_nav_side'] = [
         'className' => [],
         'subMenu' => [],
     ],
+    'System' => [
+        'icon' => 'ri-function-line',
+        'title' => 'System',
+        'route' => '',
+        'params' => [
+            'layout' => 'side-menu',
+        ],
+        'className' => [],
+        'authCheck' => true,
+        'subMenu' => [
+            'SysCfg' => [
+                'icon' => '',
+                'title' => 'SysCfg Management',
+                'route' => '/admin/system/sysCfg',
+                'params' => [
+                    'layout' => 'side-menu',
+                    'isSuper' => 0,
+                ],
+                'className' => [],
+            ],
+            'SysCode' => [
+                'icon' => '',
+                'title' => 'SysCode Management',
+                'route' => '/admin/system/sysCode',
+                'params' => [
+                    'layout' => 'side-menu',
+                    'isSuper' => 0,
+                ],
+                'className' => [],
+            ],
+        ],
+    ],
 ];
