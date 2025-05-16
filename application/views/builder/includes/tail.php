@@ -17,13 +17,14 @@
 
 		<?php if(!isset($status_code) || !in_array($status_code, [404, 500])): ?>
 		<!-- Main JS -->
-		<script src="<?php echo base_url('public/assets/builder/js/front-main.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/js/main.js');?>"></script>
 
 		<!-- Page JS -->
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-ajax.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-form.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-event.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-validators.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/js/app-page-common.js');?>"></script>
 		<?php if(isset($addJS['tail'])) add_javascript($addJS['tail']); ?>
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-onload.js');?>"></script>
 
