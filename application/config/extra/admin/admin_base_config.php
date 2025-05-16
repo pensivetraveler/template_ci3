@@ -7,3 +7,17 @@ $config['platform_config'] = [
 	'isLoginRedirect' => 'dashboard',
 	'noLoginRedirect' => 'auth',
 ];
+
+$config['options'] = array_merge(
+    $config['options'],
+    [
+
+    ]
+);
+
+$config['options']['search_category'] = array_merge(
+    $config['options']['search_category'],
+    [
+
+    ]
+);
