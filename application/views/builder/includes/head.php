@@ -80,20 +80,29 @@
 	<script src="<?php echo base_url('public/assets/builder/js/app-page-errors.js');?>"></script>
 
 	<?php if(!isset($status_code) || !in_array($status_code, [404, 500])): ?>
-		<script>
-			const appName = '<?=$this->config->config['phptojs']['namespace']?>';
-			window.<?=$this->config->config['phptojs']['namespace']?> = window.<?=$this->config->config['phptojs']['namespace']?> || {};
-		</script>
-		<script src="<?php echo base_url('public/assets/builder/js/builder-common.js');?>"></script>
+	<script>
+		const appName = '<?=$this->config->config['phptojs']['namespace']?>';
+		window.<?=$this->config->config['phptojs']['namespace']?> = window.<?=$this->config->config['phptojs']['namespace']?> || {};
+	</script>
+	<script src="<?php echo base_url('public/assets/builder/js/builder-common.js');?>"></script>
 
-		<?php if(isset($addJS['head'])) add_javascript($addJS['head']); ?>
-		<?php if(property_exists($this, 'phptojs')) echo $this->phptojs->getJsVars(); ?>
+	<?php if(isset($addJS['head'])) add_javascript($addJS['head']); ?>
+	<?php
+		if(property_exists($this, 'phptojs')):
+			echo $this->phptojs->getJsVars();
+	?>
+	<script>
+		if(!Object.hasOwn(window[appName], 'API_PARAMS') || !isObject(window[appName].API_PARAMS)) window[appName].API_PARAMS = {};
+	</script>
+	<?php
+		endif;
+	?>
 	<?php endif; ?>
 
 	<?php if(ENVIRONMENT === 'production'): ?>
-		<script>
-			document.oncontextmenu = function(){return false;}
-		</script>
+	<script>
+		document.oncontextmenu = function(){return false;}
+	</script>
 	<?php endif; ?>
 </head>
 <body <?=$bodyAttrs??''?>>
