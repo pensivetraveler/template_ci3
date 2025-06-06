@@ -6,5 +6,4 @@ $config['admin_base_config_loaded'] = true;
 $config['platform_config'] = [
 	'isLoginRedirect' => 'dashboard',
 	'noLoginRedirect' => 'auth',
-    'containerFluid' => false,
 ];
