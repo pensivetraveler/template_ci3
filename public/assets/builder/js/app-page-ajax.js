@@ -37,7 +37,7 @@ function getAjaxOptions(obj = {}) {
 		};
 
 		for(const key of ['headers', 'complete', 'contentType', 'processData']){
-			if(obj.hasOwnProperty(key)) ajaxOption[key] = obj[key];
+			if(Object.hasOwn(obj, key)) ajaxOption[key] = obj[key];
 		}
 
 		return ajaxOption;
@@ -113,13 +113,18 @@ function executeAjax(obj = {}, test = false) {
 
 function submitAjax(selector, options = {}, queryString = false, test = false) {
 	const form = document.querySelector(selector);
-	const formData = options.hasOwnProperty('data') ? options.data : getFormData(form);
+	const formData = Object.hasOwn(options, 'data') ? options.data : getFormData(form);
 
 	let url;
-	if(!options.hasOwnProperty('url')) {
+	if(!Object.hasOwn(options, 'url')) {
 		url = common.API_URI;
-		if(common.hasOwnProperty('API_URI_ADD')&&common.API_URI_ADD.length>0) url += '/'+common.API_URI_ADD;
-		url = getUrlWithIdentifiers(url, getIdentifiersData(form, common.IDENTIFIER), common.API_PARAMS)
+		if(Object.hasOwn(common, 'API_URI_ADD')&&common.API_URI_ADD.length>0) url += '/'+common.API_URI_ADD;
+		url = getUrlWithIdentifiers(url
+			, getIdentifiersDataFromForm(form
+				, common.IDENTIFIER
+				, false
+				, Object.hasOwn(form, '_mode')?form._mode.value === 'add':false)
+			, common.API_PARAMS)
 	}else{
 		url = options.url;
 	}

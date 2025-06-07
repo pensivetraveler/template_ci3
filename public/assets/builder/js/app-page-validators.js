@@ -1,7 +1,7 @@
 const customValidatorsPreset = {
 	inflector: function(name) {
 		let res = '';
-		if(this.rules.hasOwnProperty(name) && this.rules[name].hasOwnProperty('validatorName')){
+		if(Object.hasOwn(this.rules, name) && Object.hasOwn(this.rules[name], 'validatorName')){
 			res = this.rules[name].validatorName;
 		}
 		return res;
@@ -164,6 +164,16 @@ const customValidatorsPreset = {
 			validatorName : 'dropzoneRequired',
 			message : '최소 1개의 파일을 업로드하세요.'
 		},
+		concat : {
+			regex : '^concat\\[(.*?)\\]$',
+			options : function(form, item, matches) {
+				return {
+					fields: matches[1].split('|')[0],
+					separator: matches[1].split('|')[1],
+				};
+			},
+			validatorName : 'concatFields',
+		},
 	},
 	validators : {
 		baseValidator : function () {
@@ -179,20 +189,18 @@ const customValidatorsPreset = {
 						valid: valid,
 					};
 				},
-				message : 'hi',
 			}
 		},
 		requiredIfValue : function() {
 			return {
 				validate: function(input) {
-					let valid = false;
+					let valid = true;
 					const node = input.element;
 					const form = node.closest('form');
 
 					const field = input.options.field;
 					const value = input.options.value;
 
-					valid = true;
 					if(form.querySelector(`[name=${field}]`)) {
 						if(form.querySelector(`[name=${field}]`).value === value) valid = isEmpty(node.value);
 					}
@@ -203,7 +211,6 @@ const customValidatorsPreset = {
 						valid: valid,
 					};
 				},
-				message : 'hi',
 			}
 		},
 		requiredMod : function() {
@@ -352,6 +359,35 @@ const customValidatorsPreset = {
 						valid: valid,
 						count: wrapper?wrapper.files.length:0,
 					}
+				}
+			}
+		},
+		concatFields : function () {
+			return {
+				validate: function (input) {
+					const node = input.element;
+					const form = node.closest('form');
+
+					const fields = input.options.fields.split(',');
+					const separator = input.options.separator;
+					let valid = fields.length > 0;
+					const values = [];
+
+					if(valid) {
+						for(const field of fields) {
+							if(!form[field].value.length) valid = false;
+							values.push(form[field].value);
+						}
+						if(valid) form[node.name].value = values.join(separator === undefined?'':entityToLiteral(separator));
+					}
+
+					return {
+						fields: fields,
+						concat: values.join(separator),
+						node: node,
+						form: form,
+						valid: valid,
+					};
 				}
 			}
 		}

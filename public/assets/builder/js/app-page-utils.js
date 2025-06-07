@@ -17,7 +17,7 @@ function getLocale(key, locale = []) {
 		let result = locale;
 
 		if(key.indexOf('.') === -1 || key.substring(key.length-1,key.length) === '.'){
-			result = locale.hasOwnProperty(key) ? result[key] : undefined;
+			result = Object.hasOwn(locale, key) ? result[key] : undefined;
 		}else{
 			const keys = key.split('.');
 
@@ -187,7 +187,7 @@ function showSwalAlert(obj) {
 		},
 	}).then(function (result) {
 		if(obj.callback !== undefined) {
-			if(obj.hasOwnProperty('params') && obj.params !== null){
+			if(Object.hasOwn(obj, 'params') && obj.params !== null){
 				callUserFunc(obj.callback, obj.params);
 			}else{
 				obj.callback();
@@ -306,13 +306,136 @@ function reformatFormData(form, data, regexp = {}, side = false) {
 						item.validators['regexp'] = {
 							regexp: new RegExp(regexp[rule].exp, regexp[rule].flags)
 						};
-						if(curr.errors.hasOwnProperty(rule)) item.validators['regexp'].message = curr.errors[rule];
+						if(Object.hasOwn(curr.errors, rule)) item.validators['regexp'].message = curr.errors[rule];
 					}else{
 						console.warn(`reformatFormData : ${rule} validator is not set.`);
 					}
 				}
 			}
 		});
+
+		acc[curr.field] = item;
+		return acc; // 항상 acc를 반환
+	}, {});
+}
+
+function reformatFormData2(form, data, regexp = {}, side = false) {
+	if(data === undefined) {
+		data = [];
+		for(const input of form.querySelectorAll('input')) {
+			if(['hidden','button'].includes(input.type)) continue;
+			data.push({
+				field: input.name,
+				rules: 'required',
+				errors: [],
+			});
+		}
+	}
+	console.log(data)
+
+	return data.reduce((acc, curr, i) => {
+		if(curr.type === 'hidden') return acc;
+
+		let selector;
+		if(form.querySelector(`[name="${curr.field}"]`)) {
+			selector = `[name="${curr.field}"]`;
+		}else if(form.querySelector(`[name="${curr.field}[]"]`)) {
+			selector = `[name="${curr.field}[]"]`;
+		}else if(curr.group) {
+			const groupName = curr.group;
+			const inputName = curr.field;
+			if(curr.group_attributes.envelope_name) {
+				selector = `[name^="${groupName}"][name$="[${inputName}]"]`;
+			}else{
+				selector = `[name^="${inputName}"]`;
+			}
+			selector = isValidSelector(selector) ? selector : null;
+		}else if(isValidSelector(`#${curr.id}`) && form.querySelector(`#${curr.id}`)) {
+			selector = `#${curr.id}`;
+		}
+		if(!selector) return acc;
+
+		const item = {
+			selector : selector,
+			validators : {},
+		};
+
+		for(const key of Object.keys(curr.errors)){
+			switch(key) {
+				case 'required':
+					item.validators.notEmpty = {
+						message: curr.errors[key]
+					};
+					break;
+			}
+		}
+
+		if(curr.type === 'date') {
+			item.validators.date = {
+				format: 'YYYY-MM-DD',
+			};
+		}
+
+		if(curr.type === 'file') {
+			console.log(curr.attributes.accept)
+			item.validators.file = {
+				extension: curr.attributes.extension??null,
+				maxFiles : curr.attributes.max??null,
+				type : curr.attributes.accept??null,
+				message : '유효한 파일을 업로드해주세요.',
+			};
+		}
+
+		curr.rules.split(/\|(?![^\[]*\])/).forEach(raw => {
+			if(!raw.length) return;
+			if(['required', 'trim'].includes(raw)) return;
+			const rule = raw.match(/^[a-zA-Z_]+/)?.[0];
+
+			if (!rule || ![...Object.keys(customValidatorsPreset.rules), ...Object.keys(regexp)].includes(rule)) {
+				console.warn(`reformatFormData : Rule '${rule || raw}' of '${curr.field}' doesn't have any matched validator.`);
+				// item.validators['baseValidator'] = {
+				// 	message: `The field id not valid (${camelize(rule)})`,
+				// }
+				return;
+			}else{
+				if (customValidatorsPreset.inflector(rule)) {
+					const validatorName = customValidatorsPreset.inflector(rule)
+					const { regex, options: getOptions, message: getMessage } = customValidatorsPreset.rules[rule];
+
+					let message;
+					if(getMessage === undefined) {
+						message = curr.errors?.[rule] && curr.errors[rule];
+					}else{
+						message = getMessage;
+					}
+
+					if (!regex) {
+						console.warn(`${rule} regex is not set.`);
+						item.validators[validatorName] = {
+							...(message && { message: message })
+						};
+					}else{
+						if(customValidatorsPreset.extractor(regex, raw)){
+							item.validators[validatorName] = {
+								...item.validators[validatorName],
+								...getOptions(form, item, customValidatorsPreset.extractor(regex, raw)),
+								...(message && { message: message })
+							};
+						}
+					}
+				}else{
+					if(Object.keys(regexp).includes(rule)) {
+						item.validators['regexp'] = {
+							regexp: new RegExp(regexp[rule].exp, regexp[rule].flags)
+						};
+						if(Object.hasOwn(curr.errors, rule)) item.validators['regexp'].message = curr.errors[rule];
+					}else{
+						console.warn(`reformatFormData : ${rule} validator is not set.`);
+					}
+				}
+			}
+		});
+		console.log(item)
 
 		acc[curr.field] = item;
 		return acc; // 항상 acc를 반환

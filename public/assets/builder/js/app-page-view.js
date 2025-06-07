@@ -21,7 +21,7 @@ function applyViewData(dataId) {
 	if(!container) return;
 
 	for(const key of Object.keys(data)){
-		if(appPlugins.view !== null && appPlugins.view.hasOwnProperty(key)) {
+		if(appPlugins.view !== null && Object.hasOwn(appPlugins.view, key)) {
 			console.log(key)
 		}else{
 			if(container.querySelector(`#${key}`) === null) continue;

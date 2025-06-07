@@ -19,7 +19,7 @@ function getFormData(form = null) {
                         }
                     }
                 }
-            }else{
+            }else {
                 formData.append(node.name, node.value);
             }
         }
@@ -73,7 +73,7 @@ function checkDuplicate(button) {
         if(!fieldName) throw new Error(`checkDuplicate : fieldName is not defined !`);
 
         const form = button.closest('form');
-        if(!form.hasOwnProperty(fieldName)) throw new Error(`checkDuplicate : fieldName is not valid !`);
+        if(!Object.hasOwn(form, fieldName)) throw new Error(`checkDuplicate : fieldName is not valid !`);
 
         const input = form[fieldName];
         const hidden = form.querySelector(`[name="${input.name}_unique"]`);
@@ -314,32 +314,27 @@ function getIdentifiersData(data, identifiers = [], asString = false) {
     return asString?JSON.stringify(obj):obj;
 }
 
-function getIdentifiersDataFromForm(form, identifiers = [], asString = false) {
-    const obj = {};
-    if(identifiers.length) {
-        for(const field of identifiers) {
-            if(form[field] === undefined) continue;
-            obj[field] = form[field].value;
-        }
-    }
-    return asString?JSON.stringify(obj):obj;
+function getIdentifiersDataFromForm(form, identifiers = [], asString = false, add = true) {
+    return add?{}:getIdentifiersData(form, identifiers, asString);
 }
 
 function getUrlWithIdentifiers(url, identifierData = {}, addParams = {}) {
+    const params = copyObject(addParams);
+
     if(isObject(identifierData)){
         if(Object.keys(identifierData).length) {
             if(Object.keys(identifierData).length === 1 && !isNaN(Object.values(identifierData)[0])){
                 url += '/' + Object.values(identifierData)[0];
             }else{
-                Object.assign(addParams, identifierData);
+                Object.assign(params, identifierData);
             }
         }
     }else{
         url += '/' + identifierData;
     }
 
-    if(Object.keys(addParams).length)
-        url += (url.indexOf('?') === -1 ? '?' : '&') + new URLSearchParams(addParams).toString();
+    if(Object.keys(params).length)
+        url += (url.indexOf('?') === -1 ? '?' : '&') + new URLSearchParams(params).toString();
 
     return url;
 }

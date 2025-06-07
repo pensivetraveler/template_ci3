@@ -287,7 +287,7 @@ $(function() {
 			});
 
 			$('#inline-editable').on('change', 'input.tabledit-input', function() {
-				const index = getNodeIndexInParent(this);
+				const index = getIndexInParent(this);
 				const required = requiredList.includes(fieldList[index-1]);
 				const wrap = this.closest('td');
 				this.value = this.value.trim();

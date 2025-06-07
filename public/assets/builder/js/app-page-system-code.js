@@ -1,9 +1,5 @@
 let fvBigCd, offCanvasBigCd;
 
-function deleteBigCd() {
-    console.log(common.API_PARAMS.big_cd)
-}
-
 $(function () {
     $('.datatables-records').DataTable().responsive.recalc()   // DOM 크기 변경 등에 맞춰 리스판시브 재계산
         .columns.adjust()      // 컬럼 폭도 다시 맞추고
@@ -21,6 +17,8 @@ $(function () {
         if($(this).data('id')){
             common.API_PARAMS.big_cd = $(this).data('id');
             $('.datatables-records').DataTable().ajax.reload(null, false);
+        }else{
+            delete common.API_PARAMS.big_cd;
         }
     })
 
@@ -184,7 +182,7 @@ $(function () {
                 console.warn(jqXHR.responseJSON)
                 if(jqXHR.status === 422) {
                     jqXHR.responseJSON.errors.forEach(error => {
-                        if(fv.fields.hasOwnProperty(error.param)) {
+                        if(Object.hasOwn(fv.fields, error.param)) {
                             fv.updateFieldStatus(error.param, 'Invalid', customValidatorsPreset.inflector(error.type));
                         }
                     });

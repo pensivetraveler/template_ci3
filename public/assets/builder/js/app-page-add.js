@@ -136,7 +136,7 @@ $(function () {
                 console.warn(jqXHR.responseJSON)
                 if(jqXHR.status === 422) {
                     jqXHR.responseJSON.errors.forEach(error => {
-                        if(fv.fields.hasOwnProperty(error.param)) {
+                        if(Object.hasOwn(fv.fields, error.param)) {
 							fv.updateFieldStatus(error.param, 'Invalid', customValidatorsPreset.inflector(error.type));
                         }
                     });

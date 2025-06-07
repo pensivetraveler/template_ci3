@@ -51,21 +51,7 @@ function preparePlugins(form) {
 	// select2
 	if ($(form).find('.select2').length) {
 		$(form).find('.select2').each(function () {
-			var $this = $(this);
-			$this.prepend('<option value="" disabled selected></option>');
-			select2Focus($this);
-
-			const option = {
-				allowClear: true,
-				placeholder: $this.attr('placeholder'),
-				dropdownParent: $this.parent()
-			}
-
-			if(appPlugins.hasOwnProperty('select2') && appPlugins.select2.hasOwnProperty(this.name)) {
-				Object.assign(option, appPlugins.select2[this.name]);
-			}
-
-			$this.wrap('<div class="position-relative w-100"></div>').select2(option);
+			prepareSelect2(this);
 		});
 	}
 
@@ -254,6 +240,20 @@ function preparePlugins(form) {
 		setCleave(this);
 	})
 
+	$(form).find('.tagify').each(function () {
+		new Tagify(this,
+			Object.hasOwn(appPlugins.form, 'tagify') && Object.hasOwn(appPlugins.form.tagify, this.name)
+				? appPlugins.form.tagify[this.name]
+				: {
+					// valuesArr 는 [{value:…}, {value:…}, …]
+					originalInputValueFormat: valuesArr => {
+						// ["aa","bb"] 형태의 배열을 JSON 문자열로
+						return valuesArr.map(item => item.value);
+					}
+				}
+		);
+	})
+
 	updateFormLifeCycle('preparePlugins', form)
 }
 
@@ -440,30 +440,26 @@ function applyFrmValues(form, data, fields = []) {
 	 * classify cloneFields into groups
 	 */
 	cloneFields.forEach((item) => {
-		if(item.group && !groups.hasOwnProperty(item.group)) {
+		if(item.group && !Object.hasOwn(groups, item.group)) {
 			groups[item.group] = initGroupProperties();
 			groupAttrs[item.group] = Object.assign(item.group_attributes, {
 				group_name : item.group,
 			});
 		}
 		const groupName = item.group ? item.group : 'base';
-		if(item.category === 'custom') {
-			groups[groupName].customs.push(item.field);
-		}else{
-			switch (item.type) {
-				case 'select' : groups[groupName].selects.push(item.field); break;
-				case 'checkbox' : groups[groupName].checkboxes.push(item.field); break;
-				case 'radio' : groups[groupName].radios.push(item.field); break;
-				case 'textarea' : groups[groupName].textareas.push(item.field); break;
-				case 'file' : groups[groupName].files.push(item.field); break;
-				case 'custom' : groups[groupName].customs.push(item.field); break;
-				default :
-					if(['password'].includes(item.type)) {
-						groups[groupName].excepts.push(item.field);
-					}else{
-						groups[groupName].inputs.push(item.field);
-					}
-			}
+		switch (item.type) {
+			case 'select' : groups[groupName].selects.push(item.field); break;
+			case 'checkbox' : groups[groupName].checkboxes.push(item.field); break;
+			case 'radio' : groups[groupName].radios.push(item.field); break;
+			case 'textarea' : groups[groupName].textareas.push(item.field); break;
+			case 'file' : groups[groupName].files.push(item.field); break;
+			case 'custom' : groups[groupName].customs.push(item.field); break;
+			default :
+				if(['password'].includes(item.type)) {
+					groups[groupName].excepts.push(item.field);
+				}else{
+					groups[groupName].inputs.push(item.field);
+				}
 		}
 	});
 
@@ -492,7 +488,7 @@ function applyFrmValues(form, data, fields = []) {
 						});
 					}else{
 						if(groupAttrs[groupName].envelope_name) {
-							if(!data.hasOwnProperty(groupName)) return;
+							if(!Object.hasOwn(data, groupName)) return;
 
 							let frmData = data[groupName];
 							if(groupAttrs[groupName].group_repeater) {
@@ -520,6 +516,8 @@ function applyFrmValues(form, data, fields = []) {
 			});
 		}
 	});
+
+	updateFormLifeCycle('applyFrmValues', form);
 }
 
 function getFrmInputDto(groupAttrs, field, dataIndex = 0) {
@@ -552,7 +550,7 @@ function getFrmInputDto(groupAttrs, field, dataIndex = 0) {
 
 function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, data, dataIndex = 0) {
 	if(!data) return;
-	const groupName = groupAttr.group_name === 'base'?'':groupAttr.group_name;
+	const groupName = groupAttr.group_name;
 	const fieldIndex = fields.findIndex(item => item.field === fieldName && item.group === groupName);
 	if(fieldIndex < 0) return;
 	const field = getFrmInputDto(groupAttr, fields[fieldIndex], dataIndex);
@@ -569,11 +567,19 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
 			break;
 		case 'selects' :
 			switch (field.subtype) {
+				case 'select2':
+					if(Object.hasOwn(appPlugins.form, 'select2') &&
+						Object.hasOwn(appPlugins.form.select2, name) &&
+						Object.hasOwn(appPlugins.form.select2[name], 'beforeHand')
+					) {
+						appPlugins.form.select2[name].beforeHand();
+					}
 				default:
 					if(form[name] && data[fieldName]) {
 						form[name].value = data[fieldName];
 						form[name].setAttribute('data-original-value', data[fieldName]);
 						$(form[name]).val(data[fieldName]).trigger('change');
+						// $(form[name]).val(data[fieldName]).trigger('change.select2');
 					}
 					break;
 			}
@@ -602,7 +608,6 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
 				default:
 					if(!data[fieldName]) return;
 					form.querySelectorAll(`[name="${name}"]`).forEach((input) => {
-						console.log(input)
 						if(input.value == data[fieldName]) input.checked = true;
 					});
 			}
@@ -632,6 +637,9 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
 			break;
 		case 'customs' :
 			switch (field.subtype) {
+				case 'tag' :
+					form[name].value = data[fieldName];
+					break;
 				case 'youtube' :
 					setFormListItem(`#${id}-list`, data, field);
 					break;
@@ -747,7 +755,7 @@ function setFormListItem(selector, data, field) {
 		let list = [];
 		isArray(data[key]) ? list = data[key] : list.push(data[key]);
 		list.forEach((item) => {
-			if(common.IDENTIFIER && data.hasOwnProperty(common.IDENTIFIER)) item[common.IDENTIFIER] = data[common.IDENTIFIER];
+			if(common.IDENTIFIER && Object.hasOwn(data, common.IDENTIFIER)) item[common.IDENTIFIER] = data[common.IDENTIFIER];
 			const identifier = common.IDENTIFIER?data[common.IDENTIFIER]:null;
 			switch (field.form_attributes.list_type ?? field.subtype) {
 				case 'thumbnail' :
@@ -779,7 +787,7 @@ function setFormListItemFile(field, item, identifier = '') {
 	const fullItem = JSON.stringify(item).replace(/"/g, "'");
 	const articleId = item.article_id ?? '';
 	const fileId = item.file_id;
-	if(field.form_attributes.hasOwnProperty('list_sorter') && field.form_attributes.list_sorter) {
+	if(Object.hasOwn(field.form_attributes, 'list_sorter') && field.form_attributes.list_sorter) {
 		let output = `
             <li class="form-list-item list-group-item d-flex justify-content-between align-items-center px-2" data-identifier-val="${identifier}" data-full-item="${fullItem}" data-article-id="${articleId}" data-file-id="${fileId}">
                 <div class="d-flex justify-content-between align-items-center pe-4">
@@ -879,4 +887,92 @@ function setFormListItemReplyList(field, item, identifier = '') {
             <p class="text-end mb-0">${item.created_id} ${item.created_dt}</p>
         </li>
     `;
+}
+
+function prepareSelect2(node, addOption = {}) {
+	let defaultValue;
+	if(node.value) defaultValue = node.value;
+
+	var $this = $(node);
+	if(!defaultValue) $this.prepend('<option value="" disabled selected></option>');
+	select2Focus($this);
+
+	const option = {
+		allowClear: true,
+		placeholder: $this.attr('placeholder'),
+		dropdownParent: $this.parent(),
+		onHandler: {
+			change(e) {
+				if(node.dataset.changeafter){
+					const changeafter = JSON.parse(node.dataset.changeafter.replace(/'/g, '"'));
+					if(window[changeafter.callback]) window[changeafter.callback](node, changeafter.params??{})
+				}
+				// console.log(`[${node.name}] changed →`, e.target.value);
+			},
+			// select2 고유 이벤트 (옵션이 선택됐을 때)
+			'select2:select'(e) {
+				// console.log(`[${node.name}] select2:select →`, e.params.data);
+			}
+		},
+		processResults: function(json) {
+			return {
+				results: json.data
+					.filter(row => row.id != null && row.text && row.text.trim() !== '')
+					.map(row => ({
+						id:   row.id,
+						text: row.text
+					}))
+			};
+		}
+	}
+
+	if(Object.hasOwn(appPlugins.form, 'select2') && Object.hasOwn(appPlugins.form.select2, node.name)) {
+		Object.assign(option, appPlugins.form.select2[node.name]);
+	}
+
+	if(Object.keys(addOption).length) {
+		Object.assign(option, addOption);
+	}
+
+	$this.wrap('<div class="position-relative w-100"></div>').select2(option).on(option.onHandler);
+}
+
+function setDynamicSelect2Options(node, params) {
+	if(!node.value) return;
+
+	const $select2 = $(params.target);
+	const data = {[node.name] : node.value}
+
+	let url;
+	if(Object.hasOwn(params, 'url')) {
+		url = params.url;
+	}else if(Object.hasOwn(params, 'add_uri')){
+		url = common.API_URI + '/' + params.add_uri;
+	}else{
+		return;
+	}
+
+	const selectedValue = $select2.attr('data-original-value'); // 원래 선택값
+
+	// 2) AJAX로 method 리스트를 가져온다
+	$.get(url, data)
+		.done(function(json) {
+			// 3) <select> 안의 기존 <option> 전부 제거
+			$select2.empty();
+
+			// 4) 새로 가져온 row마다 <option> 생성
+			json.data.forEach(function(row) {
+				const isSelected = String(row.id) === String(selectedValue);
+				// new Option(text, value, defaultSelected, selected)
+				const option = new Option(row.text, row.id, false, isSelected);
+				$select2.append(option);
+			});
+
+			// 5) select2에게 "내부 <select>이 바뀌었음" 알리기
+			$select2.trigger('change.select2');
+			// —> dropdown은 열리지 않고, 원하는 option만 selected 상태로 갱신됩니다.
+		})
+		.fail(function() {
+			console.error(`${params.target} 리스트 로드 실패`);
+		});
 }

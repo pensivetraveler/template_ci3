@@ -26,7 +26,7 @@ $(function () {
 
 	// Datatable
 	if(!dt_table.length) throw new Error(`dt_table is not defined!`);
-	if(!common.hasOwnProperty('LIST_COLUMNS') || !common.LIST_COLUMNS.length) throw new Error(`check common LIST_COLUMNS.`);
+	if(!Object.hasOwn(common, 'LIST_COLUMNS') || !common.LIST_COLUMNS.length) throw new Error(`check common LIST_COLUMNS.`);
 	if(dt_table.find('thead th').length !== 1+common.LIST_CHEKBOX+common.LIST_COLUMNS.length)
 		throw new Error(`th and LIST_COLUMNS length are not matched.`);
 
@@ -35,6 +35,7 @@ $(function () {
 		scrollCollapse: true,
 		processing: true,
 		serverSide: true,
+		paging: common.LIST_PAGING,
 		ajax: getAjaxOptions({
 			url: common.API_URI,
 			headers: {
@@ -386,19 +387,30 @@ $(function () {
 			offCanvasEl.show();
 		});
 
-		formRecord.addEventListener('transFrmValues', (e) => {
+		formRecord.addEventListener("transFrmValues", (e) => {
 			offCanvasEl.hide();
 		});
 
 		for(const rule of Object.keys(customValidatorsPreset.validators))
 			FormValidation.validators[rule] = customValidatorsPreset.validators[rule];
 
+		const dropzoneList = common.FORM_DATA.filter((item) => item.subtype.indexOf('dropzone') !== -1);
+
 		// Form validation for Add new record
 		fv = FormValidation.formValidation(
 			formRecord,
 			{
-				fields: reformatFormData(formRecord, common.FORM_DATA, common.FORM_REGEXP, true),
+				fields: reformatFormData(formRecord, common.FORM_DATA, common.FORM_REGEXP, false),
 				plugins: {
+					message: new FormValidation.plugins.Message({
+						container: function (field, element) {
+							// Dropzone 필드 메시지를 특정 컨테이너에 표시
+							if (dropzoneList.find((item) => item.field === field)) {
+								return document.querySelector(`#${field}-dropzone-container`);
+							}
+							return element.closest('.form-validation-unit');
+						},
+					}),
 					trigger: new FormValidation.plugins.Trigger(),
 					bootstrap5: new FormValidation.plugins.Bootstrap5({
 						// Use this for enabling/changing valid/invalid class
@@ -418,6 +430,10 @@ $(function () {
 				},
 				init: instance => {
 					instance.on('plugins.message.placed', function (e) {
+						// 중복된 fv-plugins-message-container 제거
+						const containers = e.element.closest('.form-validation-unit').querySelectorAll('.fv-plugins-message-container');
+						if (containers.length > 1) containers[1].remove();
+
 						//* Move the error message out of the `input-group` element
 						if (e.element.parentElement.classList.contains('input-group')) {
 							// `e.field`: The field name
@@ -489,7 +505,7 @@ $(function () {
 					console.warn(jqXHR.responseJSON)
 					if(jqXHR.status === 422) {
 						jqXHR.responseJSON.errors.forEach(error => {
-							if(fv.fields.hasOwnProperty(error.param)) {
+							if(Object.hasOwn(fv.fields, error.param)) {
 								fv.updateFieldStatus(error.param, 'Invalid', customValidatorsPreset.inflector(error.type));
 							}
 						});
@@ -541,7 +557,7 @@ function renderColumn(data, type, full, meta, column) {
 		const dateObj = new Date(data);
 		inner = dateObj.getFullYear().toString() + '-' + (dateObj.getMonth()+1).toString().padStart(2, '0') + '-' + dateObj.getDate().toString().padStart(2, '0');
 	}else{
-		if(column.onclick.hasOwnProperty('kind')
+		if(Object.hasOwn(column.onclick, 'kind')
 			&& column.onclick.kind === 'download'
 			&& !column.text
 		) {
@@ -560,13 +576,28 @@ function renderColumn(data, type, full, meta, column) {
 				inner = `<i class="${column.icon}"></i>`;
 				break;
 			case 'img':
-				if(data === null || !data.length || !data[0].hasOwnProperty('file_link')) return '-';
+				if(data === null || !data.length || !Object.hasOwn(data[0], 'file_link')) return '-';
 				inner = `<img class="img-thumbnail d-inline rounded-2 overflow-hidden" src="${data[0].file_link}">`;
 				wrap.setAttribute('data-bs-content', inner);
 				break;
 			case 'select':
 				inner = `<select onchange="">`;
 				inner += `</select>`;
+				break;
+			case 'checkbox':
+				switch (column.subtype) {
+					case 'boolean' :
+						inner = `
+							<input
+								type="checkbox"
+								value="1"
+								${data===1?'checked':''}
+								onchange="afterCheckboxColumnChange(${getIdentifiersData(full, common.IDENTIFIER, true)}, '${column.field}', this.value)"
+								class="form-check-input"
+							>
+						`;
+						break;
+				}
 				break;
 			default :
 				inner = '-';
@@ -606,7 +637,7 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 		wrap.classList.add('cursor-pointer');
 		attrs.onclick = getColumnOnclick(data, full, column);
 
-		if(!column.onclick.hasOwnProperty('noValue')) {
+		if(!Object.hasOwn(column.onclick, 'noValue')) {
 			column.onclick.noValue = false;
 		}
 
@@ -614,7 +645,7 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 
 		if(column.onclick.kind === 'bs') {
 			if(column.onclick.noValue || value !== '') {
-				if(!column.onclick.hasOwnProperty('attrs')) column.onclick.attrs = {};
+				if(!Object.hasOwn(column.onclick, 'attrs')) column.onclick.attrs = {};
 				if(Object.keys(column.onclick.attrs).length) {
 					Object.entries(column.onclick.attrs).map(([key, value]) => attrs[`data-bs-${key}`] = value )
 				}
@@ -637,7 +668,7 @@ function renderSelectColumn(data, type, full, meta, column) {
 	const select = document.createElement('select');
 	select.classList.add('datatable-selectpicker','w-px-100')
 
-	if(column.hasOwnProperty('options')) {
+	if(Object.hasOwn(column, 'options')) {
 		for(const value of Object.keys(column.options)){
 			const option = document.createElement('option');
 			option.value = value;
@@ -648,8 +679,8 @@ function renderSelectColumn(data, type, full, meta, column) {
 	}
 
 	let funcName = 'afterSelectColumnChange';
-	if(column.hasOwnProperty('onChange') || column.hasOwnProperty('onchange')) {
-		const key = column.hasOwnProperty('onChange')?'onChange':'onchange';
+	if(Object.hasOwn(column, 'onChange') || Object.hasOwn(column, 'onchange')) {
+		const key = Object.hasOwn(column, 'onChange')?'onChange':'onchange';
 		funcName = column[key];
 	}
 	select.setAttribute('onchange', `${funcName}(${getIdentifiersData(full, common.IDENTIFIER, true)}, '${column.field}', this.value)`);
@@ -666,7 +697,7 @@ function renderButtonColumn(data, type, full, meta, column) {
 	if(column.classes.length)
 		for(const className of classed) wrap.classList.add(className);
 
-	if(column.onclick.hasOwnProperty('kind')
+	if(Object.hasOwn(column.onclick, 'kind')
 		&& column.onclick.kind === 'download'
 		&& !column.text
 	) {
@@ -688,15 +719,15 @@ function renderButtonColumn(data, type, full, meta, column) {
 
 function getColumnOnclick(data, full, column) {
 	let onClick = '';
-	if(column.hasOwnProperty('onClick') || column.hasOwnProperty('onclick')) {
-		const key = column.hasOwnProperty('onClick')?'onClick':'onclick';
+	if(Object.hasOwn(column.onclick, 'onClick') || Object.hasOwn(column.onclick, 'onclick')) {
+		const key = Object.hasOwn(column, 'onClick')?'onClick':'onclick';
 		if(!column[key].kind) throw new Error(`getColumnOnclick : onclick kind is not defined. (${column.field})`);
 
 		switch (column[key].kind) {
 			case 'view' :
 				let uri;
 				if(Object.hasOwn(column[key], 'attrs')) {
-					if(Object.keys(column[key].attrs).length && column[key].attrs.hasOwnProperty('href')) {
+					if(Object.keys(column[key].attrs).length && Object.hasOwn(column[key].attrs, 'href')) {
 						uri = column[key].attrs.href;
 					}else if(common.PAGE_VIEW_URI) {
 						uri = common.PAGE_VIEW_URI;
@@ -724,7 +755,7 @@ function getColumnOnclick(data, full, column) {
 			case 'popup' :
 				break;
 			case 'redirect' :
-				if(column[key].hasOwnProperty('params') && column[key].attrs.hasOwnProperty('target'))
+				if(Object.hasOwn(column[key], 'params') && Object.hasOwn(column[key].attrs, 'target'))
 					if(column[key].attrs.target === '_blank') return `window.open('${data}', "_blank")`;
 				return `location.href="${data}"`;
 			case 'download' :
@@ -777,7 +808,7 @@ function getListButtons() {
 		);
 	}
 
-	if(common.LIST_BUTTONS.hasOwnProperty('excel') && common.LIST_BUTTONS['excel']) {
+	if(Object.hasOwn(common.LIST_BUTTONS, 'excel') && common.LIST_BUTTONS['excel']) {
 		data.push(
 			{
 				text: '<i class="ri-add-line ri-16px me-0 me-sm-2 align-baseline"></i><span class="d-none d-sm-inline-block">' + getLocale('Upload Excel', common.LOCALE) + '</span>',
@@ -793,7 +824,7 @@ function getListButtons() {
 		);
 	}
 
-	if(common.LIST_BUTTONS.hasOwnProperty('add') && common.LIST_BUTTONS['add']) {
+	if(Object.hasOwn(common.LIST_BUTTONS, 'add') && common.LIST_BUTTONS['add']) {
 		data.push(
 			{
 				text: '<i class="ri-add-line ri-16px me-0 me-sm-2 align-baseline"></i><span class="d-none d-sm-inline-block">'+getLocale('Add New Record', common.LOCALE)+'</span>',
@@ -1019,7 +1050,7 @@ function afterSelectColumnChange(idData, field, value) {
 		url: getUrlWithIdentifiers(common.API_URI, idData),
 		method: 'patch',
 		data: { [field]: value },
-		success: function (json) {
+		success: function (response) {
 			showAlert({
 				type: 'success',
 				title: 'Complete',
@@ -1028,7 +1059,7 @@ function afterSelectColumnChange(idData, field, value) {
 				params: [null, false]
 			});
 		},
-		error: function (err) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			showAlert({
 				type: 'warning',
 				text: jqXHR.responseJSON.msg,
@@ -1041,4 +1072,27 @@ function openViewModal(dataId, modalId = '') {
 	console.log(dataId)
 	const data = getData(dataId);
 	console.log(data)
+}
+
+function afterCheckboxColumnChange(idData, field, value) {
+	$.ajax({
+		url: getUrlWithIdentifiers(common.API_URI, idData),
+		method: 'patch',
+		data: { [field]: value },
+		success: function (response) {
+			showAlert({
+				type: 'success',
+				title: 'Complete',
+				text: 'Your Data Is Updated',
+				callback: $('.datatables-records').DataTable().ajax.reload(),
+				params: [null, false]
+			});
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			showAlert({
+				type: 'warning',
+				text: jqXHR.responseJSON.msg,
+			});
+		}
+	});
 }
