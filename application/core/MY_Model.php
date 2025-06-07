@@ -12,8 +12,9 @@ class MY_Model extends CI_Model
     public array $strList = [];
     public array $intList = [];
     public array $fileList = [];
+    public array $defaultOrderBy = [];
 
-	public bool    $isAutoincrement = false;
+	public bool    $isAutoIncrement = false;
 	public bool    $isDelYn = false;
 	public bool    $isUseYn = false;
 	public bool    $isCreatedDt = false;
@@ -209,61 +210,202 @@ class MY_Model extends CI_Model
     | 사용 공통 함수
     |--------------------------------------------------------------------------
     */
-	public function where($table, $where, $like = [])
+    public function where($table, $data)
     {
-		if(count($where) > 0) {
-			foreach ($where as $key=>$val) {
-				if(is_numeric($key)) {
-					$this->db->where($table.'.'.$val);
-				}else{
-					if(is_array($val)) {
-						$this->db->where_in($table.'.'.$key, $val);
-					}else{
-						$this->db->where($table.'.'.$key, $val);
-					}
-				}
-			}
-		}
+		if(!empty($data)) {
+            if(is_list_type($data)) {
+                foreach ($data as $item) {
+                    $this->where($table, $item);
+                }
+            }else{
+                foreach ($data as $key=>$val) {
+                    if(is_array($val)) {
+                        $this->db->where_in($table.'.'.$key, $val);
+                    }else{
+                        $this->db->where($table.'.'.$key, $val);
+                    }
+                }
+            }
+        }
+        if($this->isDelYn) $this->db->where($table.".".DEL_YN_COLUMN_NAME, 'N');
+        if($this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $data)) $this->db->where($table.".".USE_YN_COLUMN_NAME, 'Y');
+    }
 
-        if(count($like) > 0) {
+    public function like($table, $data = [])
+    {
+        if(!empty($data)) {
+            if(is_list_type($data)) {
+                foreach ($data as $item) {
+                    $this->like($table, $item);
+                }
+            }else{
+                foreach ($data as $key=>$val) {
+                    if(is_array($val)) {
+                        $this->db->group_start();
+                        foreach ($val as $i=>$subVal) {
+                            if($i === 0) {
+                                $this->db->like($table.'.'.$key, $subVal, 'both');
+                            }else{
+                                $this->db->or_like($table.'.'.$key, $subVal, 'both');
+                            }
+                        }
+                        $this->db->group_end();
+                    }else{
+                        $this->db->where($table.'.'.$key, $val);
+                    }
+                }
+            }
+        }
+    }
+
+    public function orLike($table, $keys, $vals)
+    {
+        if(count($keys) > 0) {
             $this->db->group_start();
-            foreach ($like as $key=>$val) {
-                if($key === 0) $this->db->like($key, $val, 'both');
-                $this->db->or_like($key, $val, 'both');
+            if(is_array($keys) && is_array($vals)) {
+                show_error('Only One among Keys and Vals can be array type.');
+            }elseif (is_array($keys) && !is_array($vals)) {
+                foreach ($keys as $i=>$key) {
+                    if($i === 0) {
+                        $this->db->like($table.'.'.$key, $vals, 'both');
+                    }else{
+                        $this->db->or_like($table.'.'.$key, $vals, 'both');
+                    }
+                }
+            }elseif (!is_array($keys) && is_array($vals)) {
+                foreach ($vals as $i=>$val) {
+                    if($i === 0) {
+                        $this->db->like($table.'.'.$keys, $val, 'both');
+                    }else{
+                        $this->db->or_like($table.'.'.$keys, $val, 'both');
+                    }
+                }
+            }else{
+                $this->like($table, [$keys => $vals]);
             }
             $this->db->group_end();
         }
     }
 
-    public function limit($data)
+    public function whereIn($table, $data = [])
     {
-        if(count($data) > 0){
-            if(array_key_exists('limit', $data)){
-                $offset = (array_key_exists('offset', $data))?$data['offset']:0;
-                $this->db->limit($data['limit'], $offset);
-			}else{
-				$this->db->limit($data[0], $data[1]);
-			}
+        if(!empty($data)) {
+            if(is_list_type($data)) {
+                foreach ($data as $item) {
+                    $this->whereIn($table, $item);
+                }
+            }else{
+                foreach ($data as $key=>$val) {
+                    if(is_array($val)) {
+                        $this->db->where_in($table.'.'.$key, $val);
+                    }else{
+                        $this->db->where_in($table.'.'.$key, [$val]);
+                    }
+                }
+            }
         }
     }
 
-    public function orderBy($data)
+    public function whereNot($table, $data = [])
     {
-        if(count($data) > 0) {
-            if(is_list_type($data)) {
-                foreach ($data as $k=>$v) {
-                    foreach ($v as $key => $value) $this->db->order_by($key, $value);
-                }
-            }else{
-                foreach ($data as $key => $value) $this->db->order_by($key, $value);
+        if(is_list_type($data)) {
+            foreach ($data as $item) {
+                $this->whereNot($table, $item);
             }
         }else{
-			if($this->identifier && $this->isAutoincrement === true) {
-				$this->orderBy(["$this->table.$this->identifier" => 'DESC']);
-			}else if($this->isCreatedDt) {
-				$this->orderBy(["$this->table.".CREATED_DT_COLUMN_NAME => 'DESC']);
-			}
-		}
+            foreach ($data as $key=>$val) {
+                if(is_array($val)) {
+                    $this->db->where_not_in($table.'.'.$key, $val);
+                }else{
+                    $this->db->where_not_in($table.'.'.$key, [$val]);
+                }
+            }
+        }
+    }
+
+    public function limit($data)
+    {
+        if(!empty($data)) {
+            if(array_key_exists('limit', $data)){
+                $offset = (array_key_exists('offset', $data))?$data['offset']:0;
+                $this->db->limit($data['limit'], $offset);
+            }else{
+                $this->db->limit($data[0], $data[1]);
+            }
+        }
+    }
+
+    public function join($table, $data = [])
+    {
+        if(!empty($data)) {
+            if(is_list_type($data)){
+                foreach ($data as $item) $this->join($table, $item);
+            }else{
+                if(is_empty($data, 'select')) {
+                    foreach ($data['matches'] as $key=>$val) {
+                        $this->db->select($data['table'].'.'.$key);
+                    }
+                }else if(is_string($data['select'])){
+                    $this->db->select($data['table'].'.'.$data['select']);
+                }else{
+                    foreach ($data['select'] as $select) {
+                        $this->db->select($data['table'].'.'.$select);
+                    }
+                }
+
+                $matchQuery = '';
+                $i = 0;
+                foreach ($data['matches'] as $key=>$val) {
+                    if($i > 0) $matchQuery .= " AND ";
+                    $matchQuery .= " {$data['table']}.{$key} = {$table}.{$val} ";
+                    $i++;
+                }
+
+                $this->db->join(
+                    $data['table'],
+                    $matchQuery,
+                    $data['direction']??'left'
+                );
+            }
+        }
+    }
+
+    public function orderBy($table, $data = [])
+    {
+        if(!empty($data)) {
+            if(is_list_type($data)) {
+                foreach ($data as $item) {
+                    foreach ($item as $key => $val) {
+                        $this->db->order_by($table.'.'.$key, $val);
+                    }
+                }
+            }else{
+                foreach ($data as $key => $val) {
+                    $this->db->order_by($table.'.'.$key, $val);
+                }
+            }
+        }else{
+            if(!empty($defaultOrderBy)) {
+                $this->orderBy($defaultOrderBy);
+            }else if($this->identifier && $this->isAutoIncrement === true) {
+                $this->db->order_by("$table.$this->identifier", 'DESC');
+            }else if($this->isCreatedDt) {
+                $this->db->order_by("$table.".CREATED_DT_COLUMN_NAME, 'DESC');
+            }
+        }
+    }
+
+    public function groupBy($table, $data = [])
+    {
+        if(!empty($data)) {
+            if(is_array($data)) {
+                foreach ($data as $item) {
+                    $this->groupBy($table, $item);
+                }
+            }else{
+                $this->db->group_by($table.'.'.$data);
+            }
+        }
     }
 
     /*
