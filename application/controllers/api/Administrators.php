@@ -1,4 +1,5 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed');
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
 
 require_once __DIR__.'/Common.php';
 
@@ -8,12 +9,15 @@ class Administrators extends Common
 	{
 		parent::__construct();
 
-		$this->load->model('Model_User', 'Model');
+        $this->load->model('Model_User', 'Model');
+//		$this->load->model('Model_Administrator', 'Model');
+//		$this->load->model('Model_User', 'Model_Parent');
 
 		$this->setProperties($this->Model);
 
 		$this->defaultList = [
 			'user_cd' => 'USR001',
+			'use_yn' => 'Y',
 			'del_yn' => 'N',
 			'approve_yn' => 'Y',
 			'withdraw_yn' => 'N',
