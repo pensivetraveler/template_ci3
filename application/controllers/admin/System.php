@@ -16,19 +16,19 @@ class System extends Common
     {
         $this->titleList[] = 'SysCfg';
 
-        $data = $this->prepareFormData();
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['subPage'] = 'builder/system/system_config';
+        $data = $this->prepareFormData($data);
 
         $this->load->model('Model_Sys_Cfg');
         $data['data'] = $this->Model_Sys_Cfg->getListByBig();
-
-        $data['subPage'] = 'builder/system/system_config';
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-system-config.js'),
         ];
 
         $this->addJsVars([
-            'API_URI' => $this->apiUri.'system/sysCfg',
+            'API_URI' => $this->apiUri.'sysCfg',
             'FORM_REGEXP' => $this->config->item('regexp'),
         ]);
 
@@ -39,16 +39,16 @@ class System extends Common
     {
         $this->titleList[] = 'SysCode';
 
-        $this->load->model('Model_Sys_Code');
-
-        $data = $this->prepareFormData();
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['subPage'] = 'builder/system/system_codes';
+        $data = $this->prepareFormData($data);
 
         $bigCdColumns = $this->setFormColumns('big_code');
         $bigCdFormData = $this->setFormData($bigCdColumns);
 
+        $this->load->model('Model_Sys_Code');
         $data['category'] = $this->Model_Sys_Code->getBigCodeList();
         $data['data'] = $this->Model_Sys_Code->getListByBig();
-        $data['subPage'] = 'builder/system/system_codes';
         $data['bigCdFormData'] = restructure_form_data_by_type($bigCdFormData);
 
         $this->addCSS[] = [
@@ -82,10 +82,58 @@ class System extends Common
 
         $this->addJsVars([
             'API_PARAMS' => ['big_cd' => $data['category'][0]->big_cd],
-            'API_URI' => $this->apiUri.'system/sysCode',
+            'API_URI' => $this->apiUri.'sysCode',
             'FORM_REGEXP' => $this->config->item('regexp'),
             'EXTRA_FORMDATA' => $bigCdFormData,
         ]);
+
+        $this->viewApp($data);
+    }
+
+    public function menuList()
+    {
+        $this->titleList[] = 'MenuList';
+
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['subPage'] = 'builder/system/'.snakeize($this->router->method);
+        $data = $this->prepareFormData($data);
+
+        $data['menuConfList'] = $this->getMenuList();
+        $data['menuCachedList'] = $this->cache->file->get('menu_done')===false?[]:$this->cache->file->get('menu_done');
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
+            base_url('public/assets/builder/js/app-page-menu-list.js'),
+        ];
+
+        $this->addJsVars([
+            'API_URI' => $this->apiUri.'menuList',
+            'FORM_REGEXP' => $this->config->item('regexp'),
+        ]);
+
+        $this->viewApp($data);
+    }
+
+    public function menuAuth()
+    {
+        $this->titleList[] = 'MenuAuth';
+
+        $this->addJsVars([
+            'API_URI' => $this->apiUri.'menuAuth',
+            'FORM_REGEXP' => $this->config->item('regexp'),
+            'API_PARAMS' => [
+                'user_cd' => 'USR001'
+            ],
+            'LIST_PAGING' => false,
+        ]);
+
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data = $this->prepareListData($data);
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-menu-auth.js'),
+            base_url('public/assets/builder/js/app-page-list.js'),
+        ];
 
         $this->viewApp($data);
     }
