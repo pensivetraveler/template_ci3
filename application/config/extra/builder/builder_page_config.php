@@ -2,44 +2,44 @@
 $config['builder_page_config_loaded'] = true;
 
 $config['base_includes_config'] = [
-	'head' => true,
-	'header' => true,
-	'modalPrepend' => true,
-	'modalAppend' => true,
-	'footer' => true,
-	'tail' => true,
+    'head' => true,
+    'header' => true,
+    'modalPrepend' => true,
+    'modalAppend' => true,
+    'footer' => true,
+    'tail' => true,
 ];
 
 $config['page_base_config'] = [
-	'category' => 'page',
-	'type' => 'page',
-	'subtype' => 'base',
-	'properties' => [
-		'baseMethod' => '',
-		'allows' => [],
-		'noIndex' => false,
-		'formExist' => false,
-		'listExist' => false,
-		'includes' => $config['base_includes_config'],
-		'allowNoLogin' => false,
+    'category' => 'page',
+    'type' => 'page',
+    'subtype' => 'base',
+    'properties' => [
+        'baseMethod' => '',
+        'allows' => [],
+        'noIndex' => false,
+        'formExist' => false,
+        'listExist' => false,
+        'includes' => $config['base_includes_config'],
+        'allowNoLogin' => false,
         'identifier' => [],
         'noIdentifier' => false,
-	],
+    ],
     'methods' => [],
 ];
 
 $config['modal_base_config'] = array_replace_recursive($config['page_base_config'], [
-	'category' => 'modal',
-	'properties' => [
-		'includes' => [
-			'head' => false,
-			'header' => false,
-			'modalPrepend' => false,
-			'modalAppend' => false,
-			'footer' => false,
-			'tail' => false,
-		],
-	],
+    'category' => 'modal',
+    'properties' => [
+        'includes' => [
+            'head' => false,
+            'header' => false,
+            'modalPrepend' => false,
+            'modalAppend' => false,
+            'footer' => false,
+            'tail' => false,
+        ],
+    ],
 ]);
 
 $config['page_method_base_config'] = [
@@ -101,6 +101,7 @@ $config['page_view_base_config'] = array_replace_recursive($config['page_method_
     ],
     'properties' => [
         'formConfig' => '',
+        'formType' => '',
         'isComments' => false,
     ],
 ]);
@@ -120,26 +121,6 @@ $config['page_form_auth_config'] = array_replace_recursive($config['page_method_
     'subtype' => 'auth',
     'config' => '',
 ]);
-
-//$config['page_add_base_config'] = array_replace_recursive($config['page_method_base_config'], [
-//    'type' => 'form',
-//    'subtype' => 'base',
-//    'config' => '',
-//    'actions' => [
-//        'list' => true,
-//        'delete' => true,
-//    ],
-//]);
-//
-//$config['page_edit_base_config'] = array_replace_recursive($config['page_method_base_config'], [
-//    'type' => 'form',
-//    'subtype' => 'base',
-//    'config' => '',
-//    'actions' => [
-//        'list' => true,
-//        'delete' => true,
-//    ],
-//]);
 
 $config['page_excel_base_config'] = array_replace_recursive($config['page_method_base_config'], [
     'type' => 'excel',
