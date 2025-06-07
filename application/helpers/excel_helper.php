@@ -32,7 +32,7 @@ function next_alphabet($alphabet): string
     return number_to_alphabet($current_numb+1);
 }
 
-function get_alphabet_rang($start_alphabet, $end_alphabet): array
+function get_alphabet_range($start_alphabet, $end_alphabet): array
 {
     $range = array();
     $start_numb = alphabet_to_number($start_alphabet);
