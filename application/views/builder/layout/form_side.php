@@ -22,9 +22,9 @@
 	endforeach;
 
 	foreach ($formData['fields'] as $item):
-		if($item['category'] === 'group'):
+		if($item['group'] !== 'base'):
 			builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
-		elseif($item['category'] === 'custom'):
+		elseif($item['type'] === 'custom'):
 			builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
 		else:
 ?>
@@ -34,17 +34,6 @@
 		<div class="form-floating form-floating-outline">
 			<?=get_side_form_input_by_type($item, 'side')?>
 		</div>
-		<?php
-			if($item['subtype'] === 'unique')
-				echo form_button([
-					'data-rel-field' => $item['field'],
-					'type' => 'button',
-					'class' => 'btn btn-outline-primary waves-effect btn-dup-check',
-				], lang('Check'), [
-					'onclick' => "checkDuplicate(this)",
-					'disabled' => "disabled",
-				]);
-		?>
 	</div>
 	<?=get_admin_form_text($item)?>
 	<?=get_admin_form_list_item($item, $formType)?>

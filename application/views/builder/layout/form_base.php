@@ -22,9 +22,9 @@
 	endforeach;
 
     foreach ($formData['fields'] as $item):
-        if($item['category'] === 'group'):
+        if($item['group'] !== 'base'):
             builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
-        elseif($item['category'] === 'custom'):
+        elseif($item['type'] === 'custom'):
             builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
         else:
 ?>

@@ -6,13 +6,13 @@
 							<div class="footer-bottom py-5">
 								<div class="container d-flex flex-wrap justify-content-between flex-md-row flex-column text-center text-md-start">
 									<div class="mb-2 mb-md-0">
-										<span class="footer-text"><?=APP_NAME?> ©
+										<span class="footer-text"><span class="text-primary"><?=APP_NAME?></span> ©
 										  <script>
 											document.write(new Date().getFullYear());
 										  </script>
 										  , Made by
 										</span>
-										<a href="https://pixinvent.com" target="_blank" class="footer-link fw-medium footer-theme-link"><?=COMP_NAME?></a>
+										<a href="https://pixinvent.com" target="_blank" class="footer-link fw-medium footer-theme-link text-primary"><?=COMP_NAME?></a>
 									</div>
 									<div>
 										<a href="https://github.com/pixinvent" class="footer-link me-4" target="_blank"><i class="ri-github-fill"></i></a>

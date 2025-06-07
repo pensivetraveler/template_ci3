@@ -15,7 +15,11 @@
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 	<meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no"/>
+	<?php if(file_exists(PLATFORM_ASSET_PATH.'favicon.ico')): ?>
+	<link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url(PLATFORM_ASSET_URI.'/favicon.ico');?>">
+	<?php else: ?>
 	<link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url('public/assets/builder/img/favicon/favicon.ico');?>">
+	<?php endif; ?>
 
 	<!-- Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">

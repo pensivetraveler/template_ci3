@@ -26,11 +26,11 @@
 <div class="row">
 	<?php
 		foreach ($row as $item):
-			if($item['type'] === 'common'):
-				echo "<div class='col-md-{$item['colspan']} d-sm-block d-none'></div>";
-			elseif($item['category'] === 'group'):
+			if($item['group'] !== 'base'):
 				builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
-			elseif($item['category'] === 'custom'):
+			elseif($item['type'] === 'common'):
+				echo "<div class='col-md-{$item['colspan']} d-sm-block d-none'></div>";
+			elseif($item['type'] === 'custom'):
 				builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
 			else:
 	?>
