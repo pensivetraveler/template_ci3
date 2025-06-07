@@ -15,14 +15,9 @@ class Model_User extends Model_Common
 	public array   $intList = ['user_id',];
 	public array   $fileList = [];
 
-	public bool    $isAutoincrement = true;
+	public bool    $isAutoIncrement = true;
 	public bool    $isDelYn = true;
 	public bool    $isCreatedDt = true;
 	public bool    $isCreatedId = true;
 	public bool    $isUpdatedDt = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }

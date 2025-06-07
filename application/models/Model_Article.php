@@ -15,16 +15,11 @@ class Model_Article extends Model_Common
 	public array   $intList = ['article_id','board_id','view_count'];
 	public array   $fileList = ['thumbnail'];
 
-	public bool    $isAutoincrement = true;
+	public bool    $isAutoIncrement = true;
 	public bool    $isDelYn = true;
 	public bool    $isCreatedDt = true;
 	public bool    $isCreatedId = true;
 	public bool    $isUpdatedDt = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 
 	public function getDashboardArticleList($adminList)
 	{
@@ -37,10 +32,15 @@ class Model_Article extends Model_Common
 			$this->db->select("(SELECT COUNT(*) FROM tbl_article_prefer WHERE tbl_article_prefer.article_id = tbl_article.article_id AND tbl_article_prefer.user_id IN ($adminList)) AS feedback_cnt");
 		}
 
-		$articleList = $this->Model_Article->getList([], [
-			'board_id' => 3,
-			'open_yn' => 'Y',
-		], [], [], ['created_dt' => 'desc']);
+		$articleList = $this->getList([], [
+            'where' => [
+                'board_id' => 3,
+                'open_yn' => 'Y',
+            ],
+            'orderBy' => [
+                'created_dt' => 'desc'
+            ]
+		]);
 
 		$list = [];
 		$cnt = 0;

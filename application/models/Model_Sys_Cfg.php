@@ -14,14 +14,18 @@ class Model_Sys_Cfg extends Model_Common
 	public array   $strList = ['cmb_cfg','big_cfg','sml_cfg','cfg_name','cfg_type','cfg_val','cfg_desc',];
 	public array   $intList = [];
 	public array   $fileList = [];
+    public array   $defaultOrderBy = [
+        ['big_cfg' => 'ASC'],
+        ['sml_cfg' => 'ASC'],
+    ];
 
 	public bool    $isCreatedDt = true;
 	public bool    $isCreatedId = true;
 	public bool    $isUpdatedDt = true;
 
-    public function getListByBig($select = [], $where = [], $like = [], $limit = [], $orderBy = [], $filter = [])
+    public function getListByBig($select = [], $dto = [])
     {
-        return array_reduce($this->getList($select, $where, $like, $limit, $orderBy, $filter), function ($carry, $item) {
+        return array_reduce($this->getList($select, $dto), function ($carry, $item) {
             $carry[$item->big_cfg][] = (array)$item;
             return $carry;
         });

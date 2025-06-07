@@ -15,10 +15,5 @@ class Model_User_Autologin extends Model_Common
 	public array   $intList = ['aul_id','user_id'];
 	public array   $fileList = [];
 
-	public bool    $isAutoincrement = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
+	public bool    $isAutoIncrement = true;
 }

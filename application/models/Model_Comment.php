@@ -15,14 +15,9 @@ class Model_Comment extends Model_Common
 	public array   $intList = ['comment_id','article_id','parent_id','depth'];
 	public array   $fileList = [];
 
-	public bool    $isAutoincrement = true;
+	public bool    $isAutoIncrement = true;
 	public bool    $isDelYn = true;
 	public bool    $isCreatedDt = true;
 	public bool    $isCreatedId = true;
 	public bool    $isUpdatedDt = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }

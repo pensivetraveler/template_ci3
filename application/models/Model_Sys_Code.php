@@ -14,28 +14,17 @@ class Model_Sys_Code extends Model_Common
 	public array   $strList = ['cmb_cd','big_cd','sml_cd','cd_name','cd_val','cd_desc','cd_nick','use_yn',];
 	public array   $intList = ['cd_srt',];
 	public array   $fileList = [];
+    public array   $defaultOrderBy = [
+        'cd_srt' => 'ASC'
+    ];
 
 	public bool    $isCreatedDt = true;
 	public bool    $isCreatedId = true;
 	public bool    $isUpdatedDt = true;
 
-	function __construct()
-	{
-		parent::__construct();
-	}
-
-	function getList($select = [], $where = [], $like = [], $limit = [], $orderBy = [], $filter = [])
-	{
-		if(count($orderBy) === 0) {
-			$orderBy = ['cd_srt' => 'ASC'];
-		}
-
-		return parent::getList($select, $where, $like, $limit, $orderBy, $filter);
-	}
-
-    public function getListByBig($select = [], $where = [], $like = [], $limit = [], $orderBy = [], $filter = [])
+    public function getListByBig($select = [], $dto = [])
     {
-        return array_reduce($this->getList($select, $where, $like, $limit, $orderBy, $filter), function ($carry, $item) {
+        return array_reduce($this->getList($select, $dto), function ($carry, $item) {
             $carry[$item->big_cd][] = (array)$item;
             return $carry;
         });
@@ -43,7 +32,9 @@ class Model_Sys_Code extends Model_Common
 
     public function getBigCodeList()
     {
-        $this->db->group_by('big_cd');
-        return $this->getList(['big_cd', 'cd_name'], [], [], [], ['big_cd' => 'desc']);
+        return $this->getList(['big_cd', 'cd_name'], [
+            'groupBy' => ['big_cd'],
+            'orderBy' => ['big_cd' => 'desc']
+        ]);
     }
 }

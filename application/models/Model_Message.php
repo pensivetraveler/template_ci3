@@ -15,11 +15,6 @@ class Model_Message extends Model_Common
 	public array   $intList = ['message_id','user_id','article_id','comment_id'];
 	public array   $fileList = [];
 
-	public bool    $isAutoincrement = true;
+	public bool    $isAutoIncrement = true;
 	public bool    $isCreatedDt = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }

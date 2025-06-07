@@ -15,11 +15,6 @@ class Model_User_Token extends Model_Common
 	public array   $intList = ['id','user_id'];
 	public array   $fileList = [];
 
-	public bool    $isAutoincrement = true;
+	public bool    $isAutoIncrement = true;
 	public bool    $isCreatedDt = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }

@@ -15,13 +15,8 @@ class Model_File extends Model_Common
 	public array   $intList = ['file_id','file_size','is_image','image_width','image_height','download_cnt'];
 	public array   $fileList = [];
 
-	public bool    $isAutoincrement = true;
+	public bool    $isAutoIncrement = true;
 	public bool    $isCreatedDt = true;
 	public bool    $isCreatedId = true;
 	public bool    $isUpdatedDt = false;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }

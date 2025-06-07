@@ -14,9 +14,4 @@ class Model_Article_Read extends Model_Common
 	public array   $strList = ['read_dt'];
 	public array   $intList = ['article_id','user_id'];
 	public array   $fileList = [];
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }

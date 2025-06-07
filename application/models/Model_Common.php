@@ -8,37 +8,41 @@ class Model_Common extends MY_Model
         parent::__construct();
     }
 
-    function getList($select = [], $where = [], $like = [], $limit = [], $orderBy = [], $filter = [])
+    function getList($select = [], $dto = [], $filter = [])
     {
-        $this->setFilter($filter);
-        $this->limit($limit);
-        $this->orderBy($orderBy);
-        $this->where($this->table, $where, $like);
         if(empty($select)) $this->db->select($this->getSelectList());
-        if($this->isDelYn) $this->db->where($this->table.".".DEL_YN_COLUMN_NAME, 'N');
-        if($this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $where)) $this->db->where($this->table.".".USE_YN_COLUMN_NAME, 'Y');
-
+        if(count($filter) > 0) $this->setFilter($this->table, $filter);
+        $this->setCondition($this->table, $dto);
         return parent::getListPDO($this->table, $select);
     }
 
-    function getData($select = [], $where = [])
+    function getListWhere($select = [], $where = [])
     {
-        $this->where($this->table, $where, []);
-        if(empty($select)) $this->db->select($this->getSelectList());
-        if($this->isDelYn) $this->db->where($this->table.".".DEL_YN_COLUMN_NAME, 'N');
-        if($this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $where)) $this->db->where($this->table.".".USE_YN_COLUMN_NAME, 'Y');
+        return $this->getList($select, ['where' => $where]);
+    }
 
+    function getData($select = [], $dto = [])
+    {
+        if(empty($select)) $this->db->select($this->getSelectList());
+        $this->setCondition($this->table, $dto, false);
         return parent::getDataPDO($this->table, $select);
     }
 
-    function getCnt($where = [], $like = [], $filter = [])
+    function getDataWhere($select = [], $where = [])
     {
-        $this->setFilter($filter);
-        $this->where($this->table, $where, $like);
-        if($this->isDelYn) $this->db->where($this->table.".".DEL_YN_COLUMN_NAME, 'N');
-        if($this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $where)) $this->db->where($this->table.".".USE_YN_COLUMN_NAME, 'Y');
+        return $this->getData($select, ['where' => $where]);
+    }
 
+    function getCnt($dto = [], $filter = [])
+    {
+        $this->setFilter($this->table, $filter);
+        $this->setCondition($this->table, $dto, false);
         return parent::getCntPDO($this->table);
+    }
+
+    function getCntWhere($where = [])
+    {
+        return $this->getCnt(['where' => $where]);
     }
 
     function addList($set)
@@ -51,7 +55,7 @@ class Model_Common extends MY_Model
     function addData($set, $bool = false)
     {
         $this->setCreatedId($set);
-        if(!$this->isAutoincrement) $bool = false;
+        if(!$this->isAutoIncrement) $bool = false;
 
         $set = $this->getValidSetData($set);
 
@@ -64,7 +68,7 @@ class Model_Common extends MY_Model
             $this->db->set(UPDATED_DT_COLUMN_NAME, 'now()', false);
             $this->setUpdatedId($set);
         }
-        if(!$this->isAutoincrement) $bool = false;
+        if(!$this->isAutoIncrement) $bool = false;
 
         $set = $this->getValidSetData($set);
 
@@ -121,7 +125,10 @@ class Model_Common extends MY_Model
         if($sortItem) {
             foreach ($sortItem as $key=>$val) $this->db->where("$key <> $val");
 
-            $list = $this->getList([], $where, [], [], [$sortField => 'ASC']);
+            $list = $this->getList([], [
+                'where' => $where,
+                'orderBy' => [$sortField => 'ASC'],
+            ]);
             $idx = 1;
             $matched = false;
             foreach ($list as $item) {
@@ -143,7 +150,10 @@ class Model_Common extends MY_Model
 
             $this->modData([$sortField => $newIndex], $sortItem);
         }else{
-            $list = $this->getList([], $where, [], [], [$sortField => 'ASC']);
+            $list = $this->getList([], [
+                'where' => $where,
+                'orderBy' => [$sortField => 'ASC'],
+            ]);
             foreach ($list as $i=>$item) {
                 $itemWhere = [];
                 if($this->identifier) {
@@ -223,34 +233,58 @@ class Model_Common extends MY_Model
             $this->db->set(UPDATED_ID_COLUMN_NAME, is_empty($set, UPDATED_ID_COLUMN_NAME) ? $userId : $set[UPDATED_ID_COLUMN_NAME]);
     }
 
+    public function determineDiffColumns(): array
+    {
+        $arr1 = $this->getColumnList();
+        $arr2 = [...$this->strList, ...$this->intList, ...$this->fileList];
+        $sym_diff = array_values(array_diff(array_merge($arr1, $arr2), array_intersect($arr1, $arr2)));
+    }
+
     public function validateTableColumns(): bool
     {
         return count($this->getColumnList()) === count([...$this->strList, ...$this->intList, ...$this->fileList]);
     }
 
-    public function setFilter($filter)
+    public function setCondition($table, $data, $list = true)
     {
-        if(empty($filter)) return null;
+        foreach ($data as $key => $val) {
+            if($key === 'select') continue;
+            if(!in_array($key, ['where','whereIn','whereNot','like','orLike','limit','orderBy','groupBy','filter','join'])) continue;
+            if(!$list && in_array($key, ['limit','orderBy','groupBy'])) continue;
 
-        $where = $filter['where'] ?? [];
-        foreach ($where as $key => $val) {
-            $this->db->where("{$this->table}.{$key}", $val);
-        }
-
-        $like = $filter['like'] ?? [];
-        if(!is_empty($like, 'value')) {
-            if(!is_empty($like, 'field')) {
-                $this->db->like("{$this->table}.{$like['field']}", $like['value'], 'both');
+            if(in_array($key, ['limit'])) {
+                $this->{$key}($val);
+            }else if($key === 'filter') {
+                $this->setFilter($table, $val);
             }else{
-                if(count($this->strList)) {
-                    foreach ($this->strList as $i=>$field) {
-                        if($i === 0){
-                            $this->db->like("{$this->table}.$field", $like['value'], 'both');
-                        }else{
-                            $this->db->or_like("{$this->table}.$field", $like['value'], 'both');
-                        }
-                    }
-                }
+                $this->{$key}($table, $val);
+            }
+        }
+        if(!array_key_exists('where', $data)) $this->where($table, []);
+        if($list && !array_key_exists('orderBy', $data)) $this->orderBy($table, []);
+    }
+
+    public function setFilter($table, $filter)
+    {
+        if(empty($filter)) return;
+
+        $this->setFilterWhere($table, $filter['where'] ?? []);
+
+        $this->setFilterLike($table, $filter['like'] ?? []);
+    }
+
+    public function setFilterWhere($table, $data)
+    {
+        $this->where($table, $data);
+    }
+
+    public function setFilterLike($table, $data)
+    {
+        if(!is_empty($data, 'value')) {
+            if(!is_empty($data, 'field')) {
+                $this->like($table, [$data['field'] => $data['value']]);
+            }else{
+                $this->orLike($table, $this->strList, $data['value']);
             }
         }
     }
@@ -317,5 +351,10 @@ SET FOREIGN_KEY_CHECKS = 1;
                 ->where(['user_cd' => 'USR000'])
                 ->from(USER_TABLE_NAME)
                 ->count_all_results() > 0;
+    }
+
+    public function truncate()
+    {
+        $this->db->truncate($this->table);
     }
 }

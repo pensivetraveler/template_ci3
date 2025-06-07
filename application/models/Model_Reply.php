@@ -15,11 +15,6 @@ class Model_Reply extends Model_Common
 	public array   $intList = ['reply_id','article_id','depth'];
 	public array   $fileList = [];
 
-	public bool    $isAutoincrement = true;
+	public bool    $isAutoIncrement = true;
 	public bool    $isCreatedDt = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }
