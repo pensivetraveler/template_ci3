@@ -1,10 +1,18 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+require_once APPPATH . 'traits/BuilderInitTrait.php';
+require_once APPPATH . 'traits/BuilderCommonTrait.php';
+
 class MY_Builder_API extends MY_Controller_API
 {
+    use BuilderInitTrait;
+    use BuilderCommonTrait;
+
     public string $flag;
     protected string $table = '';
+    protected array $idData = [];
+    protected bool $isAutoId = false;
     protected string $identifier = '';
     protected array $primaryKeyList = [];
     protected array $uniqueKeyList = [];
@@ -33,7 +41,6 @@ class MY_Builder_API extends MY_Controller_API
     {
         parent::__construct();
 
-        $this->identifier = '';
         if($this->listConfigName === '') $this->listConfigName = 'list_'.strtolower($this->router->class).'_config';
         if($this->formConfigName === '') $this->formConfigName = 'form_'.strtolower($this->router->class).'_config';
         if($this->viewConfigName === '') $this->viewConfigName = 'view_'.strtolower($this->router->class).'_config';
@@ -42,7 +49,14 @@ class MY_Builder_API extends MY_Controller_API
         $this->exceptValidateKeys = ['_mode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
         $this->transTargetKeys = [];
         $this->indexAPI = true;
-        $this->loadConfigs();
+
+        if($this->uri->segment(1) === 'api'){
+            $this->flag = 'web';
+        }else{
+            $this->flag = $this->flag??$this->uri->segment(1);
+        }
+
+        $this->loadConfigs(['builder_base_config', 'builder_form_config', 'builder_list_config', 'builder_view_config']);
     }
 
     public function index_get($key = 0)
@@ -75,147 +89,160 @@ class MY_Builder_API extends MY_Controller_API
         parent::index_delete($key);
     }
 
-    protected function loadConfigs()
+    protected function beforeGet($key = 0): array
     {
-        if($this->uri->segment(1) === 'api'){
-            $this->flag = 'web';
-        }else{
-            $this->flag = $this->flag??$this->uri->segment(1);
+        list($key, $data) = parent::beforeGet($key);
+
+        $return = [];
+        foreach ($data as $field=>$value) {
+            if(in_array($field, $this->exceptValidateKeys)) continue;
+            if(!$value) continue;
+            $return['where'][$field] = $this->input->get($field);
         }
 
-        foreach (['builder_base_config', 'builder_form_config'] as $config) {
-            $this->config->load('extra/builder/'.$config, false);
-        }
-
-        require_once APPPATH . 'config/extra/builder/builder_base_constants.php';
-        $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_form",]);
-        $this->lang->load("builder/base", $this->config->item('language'));
-
-        if(!$this->flag) show_error("Platform flag is not set.");
-
-        foreach (glob(APPPATH . "config/extra/{$this->flag}/*_config.php") as $file) {
-            $this->config->load("extra/{$this->flag}/" . substr(basename($file),0,strpos(basename($file),'.')));
-        }
-        foreach (glob(APPPATH . "config/extra/{$this->flag}/*_constants.php") as $file) {
-            require_once $file;
-        }
-        foreach (glob(APPPATH.'language'.DIRECTORY_SEPARATOR.$this->config->item('language').DIRECTORY_SEPARATOR.$this->flag.DIRECTORY_SEPARATOR.'*_lang.php') as $file) {
-            $this->lang->load($this->flag.DIRECTORY_SEPARATOR.str_replace('_lang.php', '', basename($file)), $this->config->item('language'));
-        }
-    }
-
-    protected function beforeGet()
-    {
-        $data = [];
-        foreach ($this->input->get() as $key=>$val) {
-            if(in_array($key, $this->exceptValidateKeys)) continue;
-            if(!$val) continue;
-            $data['where'][$key] = $this->input->get($key);
-        }
-
-        if($this->input->get('filters')) {
-            $filters = $this->input->get('filters');
+        if(array_key_exists('filters', $data)) {
+            $filters = $data['filters'];
             foreach ($filters as $type => $filter) {
                 switch ($type) {
                     case 'where' :
-                        foreach ($filter as $key=>$val) {
-                            if(!$val) continue;
-                            $data['filter']['where'][$key] = $val;
+                        foreach ($filter as $field=>$value) {
+                            if(!$value) continue;
+                            $return['filter']['where'][$field] = $value;
                         }
                         break;
                     case 'like' :
                         if($filter['value']) {
-                            $data['filter']['like'] = [
+                            $return['filter']['like'] = [
                                 'field' => $filter['field']??'',
                                 'value' => $filter['value'],
                             ];
                         }
                         break;
                     case 'date' :
-                        foreach ($filter as $key=>$val) {
-                            if(!$val) continue;
-                            $data['filter']['date'][$key] = $val;
+                        foreach ($filter as $field=>$value) {
+                            if(!$value) continue;
+                            $return['filter']['date'][$field] = $value;
                         }
                         break;
                 }
             }
         }else{
-            $data['filter'] = [];
+            $return['filter'] = [];
         }
 
-        if($this->input->get('format') === 'datatable') {
-            if($this->input->get('searchWord') && $this->input->get('searchCategory')) {
-                $data['filter']['like'][$this->input->get('searchCategory')] = $this->input->get('searchWord');
+        if(array_key_exists('format', $data)) {
+            if($data['format'] === 'datatable') {
+                if($data['searchWord'] && $data['searchCategory']) {
+                    $return['filter']['like'][$data['searchCategory']] = $data['searchWord'];
+                }
             }
         }
 
-        $data['select'] = $this->input->get('select');
+        $return['select'] = $data['select']??[];
+
+        $key = $this->checkIdentifierExist($key);
+
+        return [$key, $return];
+    }
+
+    protected function afterGet($key, $data = [])
+    {
+        if(count(array_keys($this->idData)) > 0 && count(array_keys($this->idData)) === count($this->primaryKeyList)) {
+            $this->view($key, $data);
+        }else{
+            $this->list($data);
+        }
+    }
+
+    protected function list($data = [], $isResponse = true)
+    {
+        $data = $this->beforeList($data);
+
+        $data = $this->executeList($data);
+
+        return $this->afterList($data, $isResponse);
+    }
+
+    protected function beforeList($data): array
+    {
         return $data;
     }
 
-    protected function afterGet($key, $data)
+    protected function executeList($data): array
     {
-        empty($key) ? $this->list($data) : $this->view($key);
-    }
-
-    protected function list($data = [])
-    {
-        $data = $this->listBefore($data);
-
         $list = $this->Model->getList(
             $data['select'] ?? [],
-            $data['where'] ?? [],
-            $data['like'] ?? [],
-            $data['limit'] ?? [],
-            $data['order_by'] ?? [],
-            $data['filter'] ?? [],
+            $data,
         );
 
-        $this->response([
-            'code' => DATA_RETRIEVED,
-            'data' => $this->listAfter($list),
-            'extra' => $data['extraFields'] ?? [],
-        ]);
-    }
+        $data['list'] = $this->transformList($list);
 
-    protected function listBefore($data)
-    {
         return $data;
     }
 
-    protected function listAfter($list)
+    protected function afterList($data, $isResponse = true): array
+    {
+        if($isResponse) {
+            $this->beforeResponse($data, true);
+
+            $this->response([
+                'code' => DATA_RETRIEVED,
+                'data' => $data['list'],
+                'extra' => $data['extraFields'] ?? [],
+            ]);
+        }else{
+            return $data;
+        }
+    }
+
+    protected function transformList($list): array
     {
         foreach ($list as $key=>$item) {
-            $list[$key] = $this->viewAfter($item);
+            $list[$key] = $this->transformView($item);
         }
         return $list;
     }
 
-    protected function view($key)
+    protected function view($key, $data = [], $isResponse = true)
     {
-        $this->viewBefore($key);
+        list($key, $data) = $this->beforeView($key, $data);
 
-        $data = $this->Model->getData([], [$this->identifier => $key]);
+        list($key, $data) = $this->executeView($key, $data);
 
-        if(!$data) {
+        return $this->afterView($key, $data, $isResponse);
+    }
+
+    protected function beforeView($key, $data): array
+    {
+        if(!$this->checkDataExist(['where' => $this->idData])) $this->response(['code' => DATA_NOT_EXIST]);
+
+        return [$key, $data];
+    }
+
+    protected function executeView($key, $data): array
+    {
+        $view = $this->Model->getDataWhere([], $this->idData);
+
+        $data['view'] = $this->transformView($view);
+
+        return [$key, $data];
+    }
+
+    protected function afterView($key, $data, $isResponse = true): array
+    {
+        if($isResponse) {
+            $this->beforeResponse($data, true);
+
             $this->response([
-                'code' => DATA_NOT_EXIST,
-                'data' => [],
-            ], RestController::HTTP_NOT_FOUND);
-        }else{
-            $this->response([
-                'code' => DATA_RETRIEVED,
-                'data' => $this->viewAfter($data),
+                'code' => $data['view']?DATA_RETRIEVED:DATA_NOT_EXIST,
+                'data' => $data['view']??[],
             ]);
+        }else{
+            return [$key, $data];
         }
     }
 
-    protected function viewBefore($key)
-    {
-        $this->checkIdentifierExist($key);
-    }
-
-    protected function viewAfter($data)
+    protected function transformView($data): object
     {
         if($this->input->get('_mode') && $this->input->get('_mode') !== 'form') {
             $transTargetKeys = [];
@@ -252,7 +279,7 @@ class MY_Builder_API extends MY_Controller_API
                 }
                 if($data->{$key}) {
                     $file_id = $data->{$key};
-                    $file_dto = $this->Model_File->getList([], ['file_id' => $file_id]);
+                    $file_dto = $this->Model_File->getListWhere([], ['file_id' => $file_id]);
                     if($file_dto) {
                         $data->{$key} = $file_dto;
                     }else{
@@ -265,163 +292,184 @@ class MY_Builder_API extends MY_Controller_API
         return $data;
     }
 
-    protected function beforePost($key, $model = null)
+    protected function beforePost($key = 0, $model = null): array
     {
-        if($key) $this->checkIdentifierExist($key);
+        list($key, $data) = parent::beforePost($key);
 
-        $dto = $this->validate($this->input->post(), $model);
+        $key = $this->checkIdentifierExist($key);
 
-        $this->checkUniqueExist($dto, $model, is_empty($key));
+        $data = $this->validate($data, $model);
 
-        if(count($this->fileList) > 0) $dto = $this->uploadFileInList($dto);
+        $this->checkUniqueExist($data, $model, is_empty($key));
 
-        return $dto;
+        if(count($this->fileList) > 0) $data = $this->uploadFileInList($data);
+
+        return [$key, $data];
     }
 
-    protected function afterPost($key, $dto)
+    protected function afterPost($key, $data = [])
     {
-        if($key) {
-            $this->modData($key, $dto, true);
+        if(count(array_keys($this->idData))) {
+            $this->modify($key, $data, true);
         }else{
-            $this->addData($dto, false);
+            $this->add($data, false);
         }
     }
 
-    protected function beforePut($key, $model = null)
+    protected function beforePut($key = 0, $model = null): array
     {
-        if($key) $this->checkIdentifierExist($key);
+        list($key, $data) = parent::beforePut($key);
 
-        $dto = $this->validate($this->put(), $model);
+        $key = $this->checkIdentifierExist($key);
 
-        if($key) $this->checkUniqueExist($dto, $model, false);
+        $data = $this->validate($data, $model);
 
-        return $dto;
+        if($key) $this->checkUniqueExist($data, $model, false);
+
+        return [$key, $data];
     }
 
-    protected function afterPut($key, $dto)
+    protected function afterPut($key, $data = [])
     {
-        if($key) {
-            $this->modData($key, $dto, true);
+        if(count(array_keys($this->idData))) {
+            $this->modify($key, $data, true);
         }else{
-            if($this->Model->primaryKeyList) {
-                $where = [];
-                foreach ($this->Model->primaryKeyList as $key) {
-                    if(array_key_exists($key, $dto)) {
-                        $where[$key] = $dto[$key];
-                    }
-                }
-                if($this->Model->getCnt($where)){
-                    $this->Model->modData($dto, $where, true);
-                    $this->response([
-                        'code' => DATA_EDITED,
-                    ]);
-                }else{
-                    $this->Model->addData($dto, true);
-                    $this->response([
-                        'code' => DATA_CREATED,
-                    ], RestController::HTTP_CREATED);
-                }
-            }else{
-                $this->Model->addData($dto, true);
-                $this->response([
-                    'code' => DATA_CREATED,
-                ], RestController::HTTP_CREATED);
-            }
+            $this->add($data, false);
         }
     }
 
 
-    protected function beforePatch($key, $model = null)
+    protected function beforePatch($key = 0, $model = null): array
     {
-        $this->checkIdentifierExist($key);
+        $key = $this->checkIdentifierExist($key);
 
-        return $this->validate($this->patch());
+        return parent::beforePatch($key);
     }
 
-    protected function afterPatch($key, $dto)
+    protected function afterPatch($key, $data = [])
     {
-        $this->modData($key, $dto, true);
+        $this->modify($key, $data, true);
     }
 
-    protected function beforeDelete($key)
+    protected function beforeDelete($key = 0): array
     {
-        $this->checkIdentifierExist($key);
+        $key = $this->checkIdentifierExist($key);
+
+        return parent::beforeDelete($key);
     }
 
-    protected function afterDelete($key)
+    protected function afterDelete($key, $data = [])
     {
-        $this->delData($key, true);
+        $this->remove($key, $data, true);
     }
 
 
     /* --------------------------------------------------------------- */
-    protected function addData($dto, $bool)
+    protected function add($dto, $bool)
     {
-        $dto = $this->beforeAddData($dto);
+        $dto = $this->beforeAdd($dto);
 
-        $dto[$this->identifier] = $this->Model->addData($dto, $bool);
+        $dto = $this->executeAdd($dto, $bool);
 
-        $dto = $this->afterAddData($dto);
+        $this->afterAdd($dto);
+    }
+
+    protected function beforeAdd($dto): array
+    {
+        if(!$this->isAutoId && count($this->primaryKeyList) > 0) {
+            $this->idData = array_reduce(array_merge($this->primaryKeyList, $this->uniqueKeyList), function ($carry, $item) {
+                if($this->input->post($item)) $carry[$item] = $this->input->post($item);
+                return $carry;
+            }, []);
+            if($this->checkDataExist(['where' => $this->idData])) $this->response(['code' => DATA_ALREADY_EXIST]);
+        }
+
+        return $dto;
+    }
+
+    protected function executeAdd($dto, $bool): array
+    {
+        $result = $this->Model->addData($dto, $bool);
+        if($this->isAutoId) {
+            $dto[$this->identifier] = $result;
+            $this->idData = [$this->identifier => $dto[$this->identifier]];
+        }
+
+        return $dto;
+    }
+
+    protected function afterAdd($dto)
+    {
+        $this->beforeResponse($dto);
 
         $this->response([
             'code' => DATA_CREATED,
-            'data' => [$this->identifier => $dto[$this->identifier]],
+            'data' => $this->idData,
         ], RestController::HTTP_CREATED);
     }
 
-    protected function beforeAddData($dto)
+    protected function modify($key, $dto, $bool)
+    {
+        $dto = $this->beforeModify($key, $dto);
+
+        $dto = $this->executeModify($key, $dto, $bool);
+
+        $this->afterModify($key, $dto);
+    }
+
+    protected function beforeModify($key, $dto): array
     {
         return $dto;
     }
 
-    protected function afterAddData($dto)
+    protected function executeModify($key, $dto, $bool): array
     {
+        $this->Model->modData($dto, $this->idData, $bool);
+
         return $dto;
     }
 
-    protected function modData($key, $dto, $bool)
+    protected function afterModify($key, $dto)
     {
-        $dto = $this->beforeModData($key, $dto);
-
-        $this->Model->modData($dto, [$this->identifier => $key], $bool);
-
-        $dto = $this->afterModData($key, $dto);
+        $this->beforeResponse($dto);
 
         $this->response([
             'code' => DATA_EDITED,
-            'data' => [$this->identifier => $key],
+            'data' => $this->idData,
         ]);
     }
 
-    protected function beforeModData($key, $dto)
+    protected function remove($key, $data, $bool)
     {
-        return $dto;
+        $data = $this->beforeRemove($key, $data);
+
+        $data = $this->executeRemove($key, $data, $bool);
+
+        $this->afterRemove($key, $data);
     }
 
-    protected function afterModData($key, $dto)
+    protected function beforeRemove($key, $data = []): array
     {
-        return $dto;
+        return $data;
     }
 
-    protected function delData($key, $bool)
+    protected function executeRemove($key, $data, $bool): array
     {
-        $this->beforeDelData($key);
+        $this->Model->delData($this->idData, $bool);
 
-        $this->Model->delData([$this->identifier => $key], $bool);
+        return $data;
+    }
 
-        $this->afterDelData($key);
+    protected function afterRemove($key, $data = [])
+    {
+        $this->beforeResponse($data);
 
         $this->response([
             'code' => DATA_DELETED,
         ]);
     }
 
-    protected function beforeDelData($key)
-    {
-
-    }
-
-    protected function afterDelData($key)
+    protected function beforeResponse($data, $isFetch = false)
     {
 
     }
@@ -430,31 +478,24 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function validate($data = [], $model = null, $validate = true, $configName = '')
     {
-        if($validate) $this->validateFormRules($configName);
+        if($validate) $data = $this->validateFormRules($configName, $data);
 
-        if($this->input->method() === 'post') {
-            if(!$model) $model = $this->Model;
+        if(is_null($model)) $model = $this->Model;
 
-            foreach ($this->defaultList as $field=>$default) {
-                if(!isset($data[$field])) $data[$field] = $default;
-            }
-
-            return $this->validateManually(
-                $data,
-                $model,
-                $this->validateMessages,
-                $this->validateCallback,
-            );
-        }else{
-            return $data;
-        }
+        return $this->validateManually(
+            $data,
+            $model,
+            $this->validateMessages,
+            $this->validateCallback,
+        );
     }
 
-    protected function validateFormRules($configName = '')
+    protected function validateFormRules($configName = '', $data = []): array
     {
         $method = __METHOD__;
         $errors = [];
-        $config = $configName?$this->config->get($configName):$this->formConfig;
+        $config = $this->config->get($configName, $this->formConfig, false);
+        if(empty($data)) $data = $this->input->post_put();
 
         // base rule validation
         $config = array_map(function ($item) {
@@ -475,7 +516,7 @@ class MY_Builder_API extends MY_Controller_API
 
             if($group === 'base') {
                 $targetData = [];
-                foreach ($this->input->post_put() as $field => $value) {
+                foreach ($data as $field => $value) {
                     if(in_array($field, array_column($groupConfig, 'field'))){
                         $targetData[$field] = $value;
                     }
@@ -491,9 +532,9 @@ class MY_Builder_API extends MY_Controller_API
                 $enveloped = $attr['envelope_name'];
                 $targetData = [];
                 if($enveloped) {
-                    $targetData = $this->input->post_put($group);
+                    $targetData = $data[$group];
                 }else{
-                    foreach ($this->input->post_put() as $field => $value) {
+                    foreach ($data as $field => $value) {
                         if(in_array($field, array_column($groupConfig, 'field'))){
                             $targetData[$field] = $value;
                         }
@@ -558,9 +599,7 @@ class MY_Builder_API extends MY_Controller_API
             if (isset($item['rules'])) {
                 // Use regex to check
                 foreach ($this->config->item('file_rules') as $rule=>$ruleData) {
-                    $exp = $ruleData['exp'];
-                    $flags = $ruleData['flags'];
-                    if (preg_match("/$exp/$flags", $item['rules'], $matches)) {
+                    if (preg_match("/{$ruleData['exp']}/{$ruleData['flags']}", $item['rules'], $matches)) {
                         $param = $matches[2]??null;
                         if($this->form_validation->{$rule}($item['field'], $matches[2]) === false){
                             $errors[] = [
@@ -582,6 +621,8 @@ class MY_Builder_API extends MY_Controller_API
                 'errors' => $errors,
             ], RestController::HTTP_UNPROCESSABLE_ENTITY);
         }
+
+        return $data;
     }
 
     protected function setValidateFormErrors($errors, $method, $group = 'base', $attr = [], $i = 0)
@@ -642,50 +683,56 @@ class MY_Builder_API extends MY_Controller_API
                 ]]
             ], RestController::HTTP_BAD_REQUEST);
 
-        foreach ($dto->notNullList as $key) {
-            if( $dto->identifier && $key === $dto->identifier ) continue;
-            if( in_array($key, $dto->primaryKeyList) ) continue;
+        if($this->input->method() === 'post') {
+            foreach ($this->defaultList as $field=>$default) {
+                if(!isset($data[$field])) $data[$field] = $default;
+            }
 
-            if(array_key_exists($key, $callbacks)){
-                $this->{$callbacks[$key]}();
-            }else{
-                $errorMsg = '';
-                $value = null;
+            foreach ($dto->notNullList as $key) {
+                if( $dto->identifier && $key === $dto->identifier ) continue;
+                if( in_array($key, $dto->primaryKeyList) ) continue;
 
-                if(array_key_exists($key, $msgList)) {
-                    $msg = $msgList[$key];
+                if(array_key_exists($key, $callbacks)){
+                    $this->{$callbacks[$key]}();
                 }else{
-                    $lang = $dto->table?lang($dto->table.'.'.$key):$key;
-                    if($this->request === 'post' && count($dto->fileList) > 0 && in_array($key, $dto->fileList)){
-                        if(!is_file_posted($key)) {
-                            $errorMsg = "File Data {$key} Is Missing.";
-                            $data = $_FILES;
-                            $msg = $this->josa->__conv("$lang{을} 업로드하세요.");
-                        }
-                    }else{
-                        if(!array_key_exists($key, $data)) {
-                            $errorMsg = 'Required';
-                        }else if(is_empty($data, $key)) {
-                            $value = $data[$key];
-                            $errorMsg = 'notEmpty';
-                        }
-                        if($errorMsg) $msg = $this->josa->__conv("$lang{은} 필수 입력값 입니다.");
-                    }
-                }
+                    $errorMsg = '';
+                    $value = null;
 
-                if($errorMsg) {
-                    $this->response([
-                        'code' => EMPTY_REQUIRED_DATA,
-                        'msg' => array_key_exists($key, $msgList)?$msgList[$key]:$msg,
-                        'data' => $data,
-                        'errors' => [[
-                            'location' => 'validateManually',
-                            'param' => $key,
-                            'value' => $value,
-                            'type' => 'required',
-                            'msg' => $errorMsg,
-                        ]]
-                    ], RestController::HTTP_BAD_REQUEST);
+                    if(array_key_exists($key, $msgList)) {
+                        $msg = $msgList[$key];
+                    }else{
+                        $lang = $dto->table?lang($dto->table.'.'.$key):$key;
+                        if($this->request === 'post' && count($dto->fileList) > 0 && in_array($key, $dto->fileList)){
+                            if(!is_file_posted($key)) {
+                                $errorMsg = "File Data {$key} Is Missing.";
+                                $data = $_FILES;
+                                $msg = $this->josa->__conv("$lang{을} 업로드하세요.");
+                            }
+                        }else{
+                            if(!array_key_exists($key, $data)) {
+                                $errorMsg = 'Required';
+                            }else if(is_empty($data, $key)) {
+                                $value = $data[$key];
+                                $errorMsg = 'empty';
+                            }
+                            if($errorMsg) $msg = $this->josa->__conv("$lang{은} 필수 입력값 입니다.");
+                        }
+                    }
+
+                    if($errorMsg) {
+                        $this->response([
+                            'code' => EMPTY_REQUIRED_DATA,
+                            'msg' => array_key_exists($key, $msgList)?$msgList[$key]:$msg,
+                            'data' => $data,
+                            'errors' => [[
+                                'location' => 'validateManually',
+                                'param' => $key,
+                                'value' => $value,
+                                'type' => 'required',
+                                'msg' => $errorMsg,
+                            ]]
+                        ], RestController::HTTP_BAD_REQUEST);
+                    }
                 }
             }
         }
@@ -722,7 +769,7 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function uploadFileInList($dto, $model = null)
     {
-        if(!$model) $model = $this->Model;
+        if(is_null($model)) $model = $this->Model;
         $key = null;
         try {
             $uploadPath = set_realpath('public/uploads/'.$this->router->class.'/'.date('Y').'/');
@@ -733,7 +780,7 @@ class MY_Builder_API extends MY_Controller_API
                 if(is_file_posted($key)) {
                     $config = $this->config->item($this->router->class . '_' . $key . '_upload_config')
                         ?: $this->config->item($key . '_upload_config')
-                            ?: $this->config->item('base_upload_config');
+                        ?: $this->config->item('base_upload_config');
 
                     if(!array_key_exists('allowed_types', $config))
                         throw new Exception('Upload config is not defined : '.$key, UPLOAD_FILE_FAIL);
@@ -786,6 +833,9 @@ class MY_Builder_API extends MY_Controller_API
     {
         $this->identifier = $model->identifier;
         $this->fileList = $model->fileList;
+        $this->isAutoId = $model->isAutoIncrement;
+        $this->primaryKeyList = $model->primaryKeyList;
+        $this->uniqueKeyList = $model->uniqueKeyList;
 
         // model check
         if(!$model->validateTableColumns()) {
@@ -799,6 +849,7 @@ class MY_Builder_API extends MY_Controller_API
                         'strList' => $model->strList,
                         'intList' => $model->intList,
                         'fileList' => $model->fileList,
+                        'diffList' => $model->determineDiffColumns(),
                     ]
                 ]
             ], RestController::HTTP_INTERNAL_SERVER_ERROR);
@@ -807,9 +858,15 @@ class MY_Builder_API extends MY_Controller_API
         if(!in_array($this->input->method(), ['get', 'post'])) return;
 
         if($this->setConfig) {
-            $this->listConfig = $this->config->get($this->listConfigName, [], false);
-            $this->formConfig = $this->config->get($this->formConfigName, [], false);
-            $this->viewConfig = $this->config->get($this->viewConfigName, [], false);
+            $this->listConfig = array_map(function ($item) {
+                return array_merge($this->config->get('builder_list_base'), $item);
+            }, $this->config->get($this->listConfigName, [], false));
+            $this->formConfig = array_map(function ($item) {
+                return array_merge($this->config->get('builder_form_base'), $item);
+            }, $this->config->get($this->formConfigName, [], false));
+            $this->viewConfig = array_map(function ($item) {
+                return array_merge($this->config->get('builder_view_base'), $item);
+            }, $this->config->get($this->viewConfigName, [], false));
 
             if($this->input->method === 'get') {
                 if(is_empty($this->listConfig)) {
@@ -820,7 +877,7 @@ class MY_Builder_API extends MY_Controller_API
                             if(sscanf($label, 'lang:%s', $line) === 1) $label = $line;
                             if($this->lang->line_exists($label.'_list')) $label = $label.'_list';
                             return array_merge(
-                                $this->config->get('builder_form_base_list_attributes', []),
+                                $this->config->get('builder_list_base', []),
                                 $attributes,
                                 [
                                     'field' => $item['field'],
@@ -855,16 +912,51 @@ class MY_Builder_API extends MY_Controller_API
         }
     }
 
-    protected function checkIdentifierExist($key, $model = null)
+    protected function checkIdentifierExist($key = 0, $model = null): string
     {
-        if(!$key) return;
-        if(!$model) $model = $this->Model;
-        $this->checkCnt([$model->identifier => $key], $model);
+        if(!$model && property_exists($this, 'Model')) $model = $this->Model;
+
+        if(is_null($model)) return $key;
+
+        if($key || $this->input->get($model->identifier)) {
+            if(!$key) $key = $this->input->get($model->identifier);
+            $this->idData = [$model->identifier => $key];
+        }else{
+            if(!count(array_merge($model->primaryKeyList, $model->uniqueKeyList))) {
+                show_error('There\'s No data for Identifying');
+            }
+
+            $this->idData = array_reduce(array_merge($model->primaryKeyList, $model->uniqueKeyList), function ($carry, $item) {
+                if($this->input->get($item)) $carry[$item] = $this->input->get($item);
+                return $carry;
+            }, []);
+
+//            if(count(array_keys($this->idData)) > 0 && count(array_keys($this->idData)) !== count($model->primaryKeyList)) {
+//                show_error('ID Field and Values is not equivalent counts');
+//            }
+        }
+        if(!count(array_keys($this->idData))) return $key;
+
+        return $key;
+    }
+
+    protected function checkDataExist($data, $model = null, $exit = false): bool
+    {
+        if(is_null($model)) $model = $this->Model;
+        $result = $this->checkCnt($data, $model);
+
+        if($exit && !$result) {
+            $this->response([
+                'code' => DATA_NOT_EXIST,
+            ], RestController::HTTP_NOT_FOUND);
+        }
+
+        return $result;
     }
 
     protected function checkUniqueExist($dto, $model = null, $add = true)
     {
-        if(!$model) $model = $this->Model;
+        if(is_null($model)) $model = $this->Model;
         if(count($model->uniqueKeyList) > 0){
             foreach ($model->uniqueKeyList as $key) {
                 if(!array_search($key, array_column($this->formConfig, 'field'))) continue;
@@ -872,7 +964,7 @@ class MY_Builder_API extends MY_Controller_API
 
                 $idx = array_search($key, array_column($this->formConfig, 'field'));
                 $config = $this->formConfig[$idx];
-                if(!$add && !$config['form_attributes']['editable']) continue;
+                if(!$add && (!array_key_exists('editable', $config['form_attributes']) || !$config['form_attributes']['editable'])) continue;
 
                 $isIncludeDeleted = false;
                 if(array_key_exists('form_attributes', $this->formConfig[$idx]) && !is_empty($this->formConfig[$idx]['form_attributes'], 'check_delete')) {
@@ -911,12 +1003,8 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function checkCnt($dto, $model = null)
     {
-        if(!$model) $model = $this->Model;
-        if($model->getCnt($dto) === 0){
-            $this->response([
-                'code' => DATA_NOT_EXIST,
-            ], RestController::HTTP_NOT_FOUND);
-        }
+        if(is_null($model)) $model = $this->Model;
+        return $model->getCnt($dto) > 0;
     }
 
     public function excelValidate_post()
@@ -975,7 +1063,7 @@ class MY_Builder_API extends MY_Controller_API
     /**
      * Common API
      */
-    function isMyData_get($key, $model = null)
+    function isMyData_get($key = 0, $model = null)
     {
         $tokenData = $this->validateToken();
 
@@ -989,9 +1077,7 @@ class MY_Builder_API extends MY_Controller_API
             $model = $this->Model;
         }
 
-        $data = $model->getData([], [
-            $model->identifier => $key,
-        ]);
+        $data = $model->getDataWhere([], $this->getIdentifierData($key, $model->primaryKeyList));
 
         if(!$data) $this->response(['code' => DATA_NOT_EXIST]);
         if(!$tokenData->is_admin && $data->{CREATED_ID_COLUMN_NAME} !== $tokenData->user_id){
@@ -1068,5 +1154,23 @@ class MY_Builder_API extends MY_Controller_API
         $this->response([
             'code' => DATA_DELETED,
         ]);
+    }
+
+    public function getMethodList_get()
+    {
+        if($this->flag !== 'admin') show_404();
+
+        if(empty($this->input->get('class'))) $this->response(['code' => EMPTY_REQUIRED_DATA]);
+
+        $list = $this->getMethodList($this->input->get('class'));
+        $result = [];
+        foreach ($list as $key=>$val) {
+            $result[] = [
+                'id' => $key,
+                'text' => $val,
+            ];
+        }
+
+        $this->response(['code' => DATA_RETRIEVED, 'data' => $result]);
     }
 }

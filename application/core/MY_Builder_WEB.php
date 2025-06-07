@@ -27,7 +27,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
     public array $formColumns = [];
     public array $viewColumns = [];
     public string $viewPath;
-    public array $navAuth;
+    public array $menuList = [];
+    public array $menuAuth = [];
     public bool $isLogin = false;
     public bool $isAdmin = false;
 
@@ -37,25 +38,9 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $this->config->load('extra/autologin_config', false);
 
-        foreach (['builder_base_config', 'builder_form_config', 'builder_nav_config', 'builder_page_config', 'builder_list_config', 'builder_view_config'] as $config) {
-            $this->config->load('extra/builder/'.$config, false);
-        }
-
-        require_once APPPATH . 'config/extra/builder/builder_base_constants.php';
-        $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_form"]);
-        $this->lang->load("builder/base", $this->config->item('language'));
-
         if(!$this->flag) show_error("Platform flag is not set.");
 
-        foreach (glob(APPPATH . "config/extra/{$this->flag}/*_config.php") as $file) {
-            $this->config->load("extra/{$this->flag}/" . substr(basename($file),0,strpos(basename($file),'.')));
-        }
-        foreach (glob(APPPATH . "config/extra/{$this->flag}/*_constants.php") as $file) {
-            require_once $file;
-        }
-        foreach (glob(APPPATH.'language'.DIRECTORY_SEPARATOR.$this->config->item('language').DIRECTORY_SEPARATOR.$this->flag.DIRECTORY_SEPARATOR.'*_lang.php') as $file) {
-            $this->lang->load($this->flag.DIRECTORY_SEPARATOR.str_replace('_lang.php', '', basename($file)), $this->config->item('language'));
-        }
+        $this->loadConfigs(['builder_base_config', 'builder_form_config', 'builder_nav_config', 'builder_page_config', 'builder_list_config', 'builder_filter_config', 'builder_view_config']);
 
         $this->baseViewPath = BUILDER_FLAGNAME."/layout/index";
         $this->baseUri = $this->flag === $this->router->routes['default_platform'] ? '' : $this->flag;
@@ -74,29 +59,29 @@ class MY_Builder_WEB extends MY_Controller_WEB
         ];
 
         $this->setRouteConfig();
-        $this->setProperties();
+        $this->setMethodConfig();
     }
 
     public function index()
     {
-        if($this->isBuilderAvailable()){
-            parent::index();
+        parent::index();
 
-            if(empty($this->routeConfig['methods'])) {
-                $data['subPage'] = '';
-                $data['backLink'] = WEB_HISTORY_BACK;
-                $this->viewApp($data);
-            }else{
-                if(!$this->routeConfig['properties']['allowNoLogin'] && !$this->isLogin){
-                    redirect($this->noLoginRedirect);
-                }
+        if($this->routeConfig['properties']['noIndex']) show_404();
 
-                if($this->router->class === 'common') {
-                    redirect("$this->baseUri/$this->defaultController");
-                }
-
-                $this->{"{$this->routeConfig['properties']['baseMethod']}"}();
+        if(empty($this->routeConfig['methods'])) {
+            $data['subPage'] = '';
+            $data['backLink'] = WEB_HISTORY_BACK;
+            $this->viewApp($data);
+        }else{
+            if(!$this->routeConfig['properties']['allowNoLogin'] && !$this->isLogin){
+                redirect($this->noLoginRedirect);
             }
+
+            if($this->router->class === 'common') {
+                redirect("$this->baseUri/$this->defaultController");
+            }
+
+            $this->{"{$this->routeConfig['properties']['baseMethod']}"}();
         }
     }
 
@@ -105,22 +90,91 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->titleList[] = 'List';
 
         $data['backLink'] = WEB_HISTORY_BACK;
+        $data = $this->prepareListData($data);
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-list.js'),
+        ];
+
+        $this->viewApp($data);
+    }
+
+    public function view($key = 0)
+    {
+        $this->checkIdentifierExist($key);
+
+        $this->titleList[] = 'View';
+
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data = $this->prepareViewData($data);
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-view.js'),
+        ];
+
+        $this->viewApp($data);
+    }
+
+    public function add()
+    {
+        if($this->listForm) show_404();
+
+        $this->titleList[] = 'Add';
+
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data = $this->prepareFormData($data);
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-add.js'),
+        ];
+
+        $this->viewApp($data);
+    }
+
+    public function edit($key = 0)
+    {
+        if($this->listForm) show_404();
+
+        $this->checkIdentifierExist($key);
+
+        $this->titleList[] = 'Edit';
+
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data = $this->prepareFormData($data);
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-edit.js'),
+        ];
+
+        $this->viewApp($data);
+    }
+
+    public function excel()
+    {
+        $this->addJS['head'][] = [
+            base_url('public/assets/builder/vendor/libs/jquery-tabledit/jquery.tabledit.js'),
+            base_url('public/assets/builder/js/app-page-excel.js'),
+            "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+        ];
+
+        $this->titleList[] = 'Excel';
+
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['excelHeaders'] = $this->getExcelHeaders();
+        $data['sampleFile'] = $this->getExcelSample($data['excelHeaders']);
+
+        if(!count($data['excelHeaders'])) show_error('Please Check The Excel Header List', 500);
+
+        $this->viewApp($data);
+    }
+
+    protected function prepareListData($data): array
+    {
+        $data['backLink'] = WEB_HISTORY_BACK;
         $data['filters'] = $this->jsVars['LIST_FILTERS']??[];
         $data['filterHelpBlock'] = $this->filterConfig['help_block'] ?? [];
         $data['columns'] = $this->jsVars['LIST_COLUMNS']??[];
         $data['isCheckbox'] = $this->methodConfig['properties']['isCheckbox'];
-
-        $this->addCSS[] = [
-            base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables.bootstrap5.css'),
-            base_url('public/assets/builder/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css'),
-            base_url('public/assets/builder/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css'),
-            base_url('public/assets/builder/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css'),
-        ];
-
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables-bootstrap5.js'),
-        ];
-
         $data['actions'] = reformat_bool_type_list($this->methodConfig['actions']);
         $data['buttons'] = $this->methodConfig['buttons']??[];
 
@@ -138,20 +192,16 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $data['actions'] = array_values($data['actions']);
         }
 
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/js/app-page-list.js'),
-        ];
+        if(!array_key_exists('subPage', $data))
+            $data['subPage'] = 'builder/layout/list';
 
-        $this->viewApp($data);
+        $this->addListScripts($this->methodConfig['subtype']);
+
+        return $data;
     }
 
-    public function view($key = 0)
+    protected function prepareViewData($data): array
     {
-        $this->checkIdentifierExist($key);
-
-        $this->titleList[] = 'View';
-
-        $data['backLink'] = WEB_HISTORY_BACK;
         $data['viewType'] = $this->methodConfig['subtype'];
         $data['viewData'] = reformat_form_data_by_type($this->jsVars['VIEW_COLUMNS'], $data['viewType']);
 
@@ -177,67 +227,14 @@ class MY_Builder_WEB extends MY_Controller_WEB
             ];
         }
 
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/js/app-page-view.js'),
-        ];
+        if(!array_key_exists('subPage', $data))
+            $data['subPage'] = 'builder/layout/view';
 
-        $this->viewApp($data);
+        return $data;
     }
 
-    public function add()
+    protected function prepareFormData($data): array
     {
-        if($this->listForm) show_404();
-
-        $this->titleList[] = 'Add';
-
-        $data = $this->prepareFormData();
-
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/js/app-page-add.js'),
-        ];
-
-        $this->viewApp($data);
-    }
-
-    public function edit($key = 0)
-    {
-        if($this->listForm) show_404();
-
-        $this->checkIdentifierExist($key);
-
-        $this->titleList[] = 'Edit';
-
-        $data = $this->prepareFormData();
-
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/js/app-page-edit.js'),
-        ];
-
-        $this->viewApp($data);
-    }
-
-    public function excel()
-    {
-        $this->addJS['head'][] = [
-            base_url('public/assets/builder/vendor/libs/jquery-tabledit/jquery.tabledit.js'),
-            base_url('public/assets/builder/js/app-page-excel.js'),
-            "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
-        ];
-
-        $this->titleList[] = 'Excel';
-
-        $data['excelHeaders'] = $this->getExcelHeaders();
-        $data['sampleFile'] = $this->getExcelSample($data['excelHeaders']);
-        $data['backLink'] = WEB_HISTORY_BACK;
-
-        if(!count($data['excelHeaders'])) show_error('Please Check The Excel Header List', 500);
-
-        $this->viewApp($data);
-    }
-
-    protected function prepareFormData(): array
-    {
-        $data['backLink'] = WEB_HISTORY_BACK;
         $data['formType'] = $this->methodConfig['subtype'];
         $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType']);
 
@@ -246,41 +243,35 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }));
         $data['buttons'] = $this->methodConfig['buttons']??[];
 
+        if(!array_key_exists('subPage', $data))
+            $data['subPage'] = 'builder/layout/form';
+
         $this->addFormScripts();
 
         return $data;
-
     }
 
-    protected function viewApp($data = [])
+    protected function beforeViewApp($data = []): array
     {
-        if(!array_key_exists('subPage', $data)) {
-            $view = null;
-            $method = $this->router->method === 'index'?$this->routeConfig['properties']['baseMethod']:$this->router->method;
-
-            foreach ([get_path(), BUILDER_FLAGNAME] as $firstPath) {
-                if(!file_exists(VIEWPATH.$firstPath)) continue;
-                foreach ([$this->router->class, 'layout'] as $secondPath) {
-                    $path = $firstPath.DIRECTORY_SEPARATOR.$secondPath.DIRECTORY_SEPARATOR;
-                    if(file_exists(VIEWPATH.$path.$method.'.php')) $view = $path.$method;
-                    if($view) break;
-                }
-            }
-
-            if(is_null($view) || !file_exists(VIEWPATH.$view.'.php')){
-                trigger_error("viewApp : View file for {$this->router->class}:{$method} does not exist.", E_USER_ERROR);
-            }else{
-                $data['subPage'] = $view;
-            }
-        }
-
-        if($this->baseViewPath===$data['subPage']) trigger_error('view file is not set.', E_USER_ERROR);
-
-        $data['hideBack'] = element('hideBack', $data);
+        // common
         $data['userData'] = $this->userData;
         $data['headerData'] = $this->headerData;
         $data['includes'] = $this->routeConfig['properties']['includes'];
+        $data['platformName'] = PLATFORM_NAME??'builder';
+        $data['hideBack'] = element('hideBack', $data);
 
+        // builder attributes
+        $data['htmlAttrs'] = get_builder_html_attributes($this->flag);
+        $data['bodyAttrs'] = get_builder_body_attributes(ENVIRONMENT !== 'production');
+
+        // menu
+        $data['menus'] = $this->menuList;
+
+        return $data;
+    }
+
+    protected function afterViewApp($data = []): array
+    {
         if(!file_exists(PLATFORM_ASSET_CSS_PATH.'style.css')){
             $file = fopen(PLATFORM_ASSET_CSS_PATH.'style.css',"w");
             if(!$file) trigger_error("viewApp : Unable to open file!", E_USER_ERROR);
@@ -313,16 +304,63 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url(PLATFORM_ASSET_JS_URI.strtolower($this->router->class).'_onload.js'),
         ];
 
-        $data['platformName'] = PLATFORM_NAME??'builder';
+        return $data;
+    }
 
-        // builder attributes
-        $data['htmlAttrs'] = get_builder_html_attributes($this->flag);
-        $data['bodyAttrs'] = get_builder_body_attributes(ENVIRONMENT !== 'production');
+    protected function viewApp($data = [])
+    {
+        $data = $this->beforeViewApp($data);
 
-        // menu
-        $data['menus'] = $this->setMenuData();
+        if(!array_key_exists('subPage', $data)) {
+            $view = null;
+            $method = $this->router->method === 'index'?$this->routeConfig['properties']['baseMethod']:$this->router->method;
+
+            foreach ([get_path(), BUILDER_FLAGNAME] as $firstPath) {
+                if(!file_exists(VIEWPATH.$firstPath)) continue;
+                foreach ([$this->router->class, 'layout'] as $secondPath) {
+                    $path = $firstPath.DIRECTORY_SEPARATOR.$secondPath.DIRECTORY_SEPARATOR;
+                    if(file_exists(VIEWPATH.$path.$method.'.php')) $view = $path.$method;
+                    if($view) break;
+                }
+            }
+
+            if(is_null($view) || !file_exists(VIEWPATH.$view.'.php')){
+                trigger_error("viewApp : View file for {$this->router->class}:{$method} does not exist.", E_USER_ERROR);
+            }else{
+                $data['subPage'] = $view;
+            }
+        }
+
+        if($this->baseViewPath===$data['subPage']) trigger_error('view file is not set.', E_USER_ERROR);
+
+        $data = $this->afterViewApp($data);
 
         parent::viewApp($data);
+    }
+
+    protected function fillRouteConfigProperties($config = []): array
+    {
+        foreach ($this->config->get("page_base_config", []) as $key=>$val) {
+            if(!array_key_exists($key, $config)) {
+                $config[$key] = $val;
+            }else{
+                if(is_array($val)) {
+                    foreach ($val as $subKey=>$subVal) {
+                        if(!array_key_exists($subKey, $config[$key])) {
+                            $config[$key][$subKey] = $subVal;
+                            continue;
+                        }
+                        if(is_array($subVal)) {
+                            $config[$key][$subKey] = array_merge($subVal, $config[$key][$subKey]);
+                        }
+                    }
+                }else{
+                    $config[$key] = $config[$key]??$val;
+                }
+            }
+        }
+        $config['properties']['allows'] = array_keys($config['methods']);
+        return $config;
     }
 
     protected function setRouteConfig(): void
@@ -339,31 +377,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
             if(empty($routeConfig['properties']['allows'])) $routeConfig['properties']['allows'][] = $routeConfig['properties']['baseMethod'];
         }
 
-        foreach ($this->config->get("page_base_config", []) as $key=>$val) {
-            if(!array_key_exists($key, $routeConfig)) {
-                $routeConfig[$key] = $val;
-            }else{
-                if(is_array($val)) {
-                    foreach ($val as $subKey=>$subVal) {
-                        if(!array_key_exists($subKey, $routeConfig[$key])) {
-                            $routeConfig[$key][$subKey] = $subVal;
-                            continue;
-                        }
-                        if(is_array($subVal)) {
-                            $routeConfig[$key][$subKey] = array_merge($subVal, $routeConfig[$key][$subKey]);
-                        }
-                    }
-                }else{
-                    $routeConfig[$key] = $routeConfig[$key]??$val;
-                }
-            }
-        }
-        $routeConfig['properties']['allows'] = array_keys($routeConfig['methods']);
-
-        $this->routeConfig = $routeConfig;
+        $this->routeConfig = $this->fillRouteConfigProperties($routeConfig);
     }
 
-    protected function setProperties($data = []): void
+    protected function setMethodConfig($data = []): void
     {
         if(empty($this->routeConfig['methods'])) return;
 
@@ -401,8 +418,6 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->methodConfig = $methodConfig;
 
         // method 별.
-        $formType = 'base';
-        $viewType = 'base';
         switch ($methodConfig['type']) {
             case 'list' :
                 $this->addJsVars([
@@ -414,6 +429,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                     'LIST_OPTIONS' => $methodConfig['properties'],
                     'LIST_EXPORTS' => reformat_bool_type_list($methodConfig['properties']['exports']),
                     'LIST_CHEKBOX' => $methodConfig['properties']['isCheckbox'],
+                    'LIST_PAGING' => true,
                 ]);
 
                 if($methodConfig['properties']['formExist']) {
@@ -533,7 +549,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         // list attributes
         $item['list_attributes'] = array_merge(
-            $this->config->get("builder_form_base_list_attributes", []),
+            $this->config->get("builder_list_base", []),
             $item['list_attributes']
         );
 
@@ -556,7 +572,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
          * 예외 처리
          */
         // textarea 가 wysiwyg quill 인 경우
-        if($this->listForm && $item['category'] === 'base' && $item['type'] === 'textarea' && $item['subtype'] === 'quill'){
+        if($this->listForm && $item['type'] === 'textarea' && $item['subtype'] === 'quill'){
             $item['subtype'] = 'autosize';
         }
 
@@ -643,7 +659,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                     $item['default'] = end($this->uri->segments);
             }
 
-            if ($item['category'] === 'group' && $item['group']) {
+            if ($item['group'] !== 'base') {
                 if(!in_array($item['group'], $groups)) {
                     $groups[] = $item['group'];
                     $attr = array_merge($this->config->get("builder_form_base_group_attributes", []), $item['group_attributes']);
@@ -675,16 +691,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 );
             }else{
                 // group category 예외처리
-                $item['group'] = '';
-                if($item['category'] === 'group') $item['category'] = 'base';
                 $item['group_attributes'] = [];
-
-                // view type
-                $item['view'] = $item['subtype'];
-
                 $item['id'] = ($this->listForm?$this->config->item('form_side_prefix'):$this->config->item('form_page_prefix')).$item['field'];
                 $item['name'] = $item['field'];
             }
+
+            // view type
+            $item['view'] = $item['subtype'];
 
             $result[] = $item;
         }
@@ -698,14 +711,15 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if(isset($name)) {
             $config = $this->config->get($name, []);
         }else{
-            $config = $this->config->get2('list_'.$this->methodConfig['config'].'_config'
+            $name = 'list_'.$this->methodConfig['config'].'_config';
+            $config = $this->config->get2($name
                 , 'list_'.snakeize($this->router->class).'_config'
                 , [], false);
         }
-        if(empty($config)) show_error("getListColumns: List Config '$config' is Empty");
+        if(empty($config)) show_error("getListColumns: List Config '$name' is Empty");
 
         $this->listColumns = array_reduce($config, function($carry, $item) {
-            $item = array_merge($this->config->get("builder_form_base_list_attributes", []), $item);
+            $item = array_merge($this->config->get("builder_list_base", []), $item);
 
             if(!is_empty($item, 'option_attributes'))
                 $item['options'] = $this->getOptions($item['field'], $item['option_attributes']);
@@ -733,7 +747,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $item = $this->listColumns[$idx];
 
             $attributes = array_merge(
-                $this->config->get("builder_form_base_list_attributes", []),
+                $this->config->get("builder_list_base", []),
                 $item['list_attributes'] ?? []
             );
 
@@ -755,7 +769,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         array_unshift($list,
             array_merge(
-                $this->config->get("builder_form_base_list_attributes", []),
+                $this->config->get("builder_list_base", []),
                 [
                     'label' => 'common.row_num',
                     'type' => 'row_num',
@@ -767,7 +781,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             return $value === true;
         }))) {
             $list[] = array_merge(
-                $this->config->get('builder_form_base_list_attributes', []),
+                $this->config->get('builder_list_base', []),
                 [
                     'label' => 'common.actions',
                     'type' => 'actions',
@@ -889,7 +903,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                         $item = $this->setFormColumn($item);
                         $item['attributes'] = get_admin_form_attributes($item, 'page');
                     }
-                    $item = array_merge($this->config->get('builder_view_field_config'), $item);
+                    $item = array_merge($this->config->get('builder_view_base'), $item);
                 }
 
                 return $item;
@@ -937,7 +951,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }
     }
 
-    protected function getExcelSample($data)
+    protected function getExcelSample($data): string
     {
         $sampleUri = '';
         $filename = $this->router->class.'_upload_sample.xlsx';
@@ -1009,6 +1023,24 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }
     }
 
+    protected function addListScripts($type)
+    {
+        switch ($type) {
+            default :
+                $this->addCSS[] = [
+                    base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables.bootstrap5.css'),
+                    base_url('public/assets/builder/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css'),
+                    base_url('public/assets/builder/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css'),
+                    base_url('public/assets/builder/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css'),
+                ];
+
+                $this->addJS['tail'][] = [
+                    base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables-bootstrap5.js'),
+                ];
+                break;
+        }
+    }
+
     protected function addFormScripts()
     {
         $this->addCSS[] = [
@@ -1044,30 +1076,33 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     public function _remap($method, $params = [])
     {
-        $this->isLogin = $this->checkLogin();
+        if($this->isBuilderAvailable()){
+            $this->isLogin = $this->checkLogin();
+            $this->setMenuList();
 
-        if(!method_exists($this, $method)) {
-            // 1) perform 메소드 실행
-            if(!is_empty($this->methodConfig['properties'], 'perform')) {
-                if (method_exists($this, $this->methodConfig['properties']['perform'])) {
-                    $this->{$this->methodConfig['properties']['perform']}();
-                }else{
-                    show_error('Performing Method is not defined : '.$this->methodConfig['properties']['perform']);
+            if(!method_exists($this, $method)) {
+                // 1) perform 메소드 실행
+                if(!is_empty($this->methodConfig['properties'], 'perform')) {
+                    if (method_exists($this, $this->methodConfig['properties']['perform'])) {
+                        $this->{$this->methodConfig['properties']['perform']}();
+                    }else{
+                        show_error('Performing Method is not defined : '.$this->methodConfig['properties']['perform']);
+                    }
+                }
+
+                // 2) redirect
+                if(!is_empty($this->methodConfig['properties'], 'redirectUri')) {
+                    redirect(base_url($this->methodConfig['properties']['redirectUri']));
                 }
             }
 
-            // 2) redirect
-            if(!is_empty($this->methodConfig['properties'], 'redirectUri')) {
-                redirect(base_url($this->methodConfig['properties']['redirectUri']));
+            // 3) 본래 메소드 실행
+            if (method_exists($this, $method)) {
+                return call_user_func_array([$this, $method], $params);
             }
-        }
 
-        // 3) 본래 메소드 실행
-        if (method_exists($this, $method)) {
-            return call_user_func_array([$this, $method], $params);
+            show_404();
         }
-
-        show_404();
     }
 
     protected function checkIdentifierExist($key = 0)
@@ -1079,27 +1114,5 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
             $this->addJsVars(['KEY' => count($idData)===1?array_values($idData)[0]:$idData]);
         }
-    }
-
-    protected function setMenuData()
-    {
-        $menuConfig = $this->config->get("{$this->flag}_nav_side", $this->config->get('builder_nav_side_sample', []), false);
-        return array_combine(
-            array_keys($menuConfig),
-            array_map(function($item) {
-                $item = array_merge(
-                    $this->config->get('builder_nav_side_base', []),
-                    $item
-                );
-                if(is_admin_active_page($item)) $item['className'][] = 'active';
-                $item['subMenuExist'] = count($item['subMenu']) > 0;
-                $item['href'] = $item['route'] ? $item['route'] . '?' . http_build_query($item['params']) : '';
-                $item['target'] = $item['target'] ?? '_self';
-
-                if($item['router'] === $this->router->class) $item['className'][] = 'active';
-                if($item['subMenuExist'] && is_admin_active_page($item)) $item['className'][] = 'open';
-                return $item;
-            }, $menuConfig)
-        );
     }
 }
