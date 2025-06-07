@@ -23,12 +23,13 @@ $lang['Complete'] = '완료';
 $lang['Search'] = '검색';
 $lang['Check'] = '확인';
 $lang['Confirm'] = '확인';
-$lang['Submit'] = '전송';
+$lang['Submit'] = '저장';
 $lang['Enter The Extra Address'] = '상세주소를 입력하세요.';
 $lang['Data Not Exist'] = '데이터가 존재하지 않습니다.';
 $lang['An Error Occurred'] = '에러가 발생했습니다.';
 $lang['Registered Successfully'] = '데이터가 등록되었습니다.';
 $lang['Your Data Is Updated'] = '데이터가 수정되었습니다.';
+$lang['Your Data Is Refreshed'] = '데이터가 갱신되었습니다.';
 $lang['Delete Completed'] = '데이터가 삭제되었습니다.';
 $lang['Enter The 6-digit Code With Numbers'] = '숫자로 된 6자리 코드를 입력해주세요.';
 $lang['out of'] = '/';
@@ -66,6 +67,21 @@ $lang['Verify Admin Account'] = '관리자 계정을 입력해주세요.';
 $lang['Settings'] = '설정';
 $lang['Add Record'] = '등록';
 $lang['Edit Record'] = '수정';
+
+/**
+ * system
+ */
+$lang['Add New Menu'] = '메뉴 추가';
+$lang['Add New SubMenu'] = '하위메뉴 추가';
+$lang['Add Menu Code'] = '코드 생성';
+$lang['Show Config'] = 'Config 보기';
+$lang['Hide Config'] = 'Config 숨김';
+$lang['Refresh Menu'] = '메뉴 갱신';
+$lang['Caching'] = '캐싱';
+$lang['MenuList'] = '메뉴 목록';
+$lang['MenuConf'] = '메뉴 설정값';
+$lang['MenuCode'] = '코드';
+$lang['Unregistered'] = '미지정';
 
 /**
  * add system user

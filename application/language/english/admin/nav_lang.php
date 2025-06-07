@@ -19,4 +19,14 @@ $lang['nav']['SysCfg Management'] = $lang['nav']['SysCfg'];
 $lang['nav']['SysCode'] = 'System Codes';
 $lang['nav']['SysCode Management'] = $lang['nav']['SysCode'];
 
+$lang['nav']['MenuList'] = 'Menu List';
+$lang['nav']['MenuList Management'] = $lang['nav']['MenuList'];
+
+$lang['nav']['MenuAuth'] = 'Menu Auth';
+$lang['nav']['MenuAuth Management'] = $lang['nav']['MenuAuth'];
+
 $lang['nav']['MyInfo'] = 'MyInfo';
+$lang['nav']['Statistics'] = 'Statistics';
+$lang['nav']['Logs'] = 'Logs';
+$lang['nav']['EmailLogs'] = 'Email Logs';
+$lang['nav']['Help'] = 'Help';

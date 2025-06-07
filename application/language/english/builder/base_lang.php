@@ -29,6 +29,7 @@ $lang['Data Not Exist'] = 'Data Not Exist';
 $lang['An Error Occurred'] = 'An Error Occurred';
 $lang['Registered Successfully'] = 'Registered Successfully';
 $lang['Your Data Is Updated'] = 'Your Data Is Updated';
+$lang['Your Data Is Refreshed'] = 'Your Data Is Refreshed';
 $lang['Delete Completed'] = 'Delete Completed';
 $lang['Enter The 6-digit Code With Numbers'] = 'Enter The 6-digit Code With Numbers';
 $lang['out of'] = 'Out of';
@@ -66,6 +67,21 @@ $lang['Verify Admin Account'] = 'Verify Your Admin Username And Password';
 $lang['Settings'] = 'Settings';
 $lang['Add Record'] = 'New Record';
 $lang['Edit Record'] = 'Edit Record';
+
+/**
+ * system
+ */
+$lang['Add New Menu'] = 'Add New Menu';
+$lang['Add New SubMenu'] = 'Add New SubMenu';
+$lang['Add Menu Code'] = 'Add Menu Code';
+$lang['Show Config'] = 'Show Config';
+$lang['Hide Config'] = 'Hide Config';
+$lang['Refresh Menu'] = 'Refresh Menu';
+$lang['Caching'] = 'Caching Menu';
+$lang['MenuList'] = 'Menu List';
+$lang['MenuConf'] = 'Menu Config';
+$lang['MenuCode'] = 'Code';
+$lang['Unregistered'] = 'Unregistered';
 
 /**
  * add system user

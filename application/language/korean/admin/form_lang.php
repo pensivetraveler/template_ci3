@@ -2,20 +2,25 @@
 $lang['common'] = [
     'row_num' => '순번',
     'actions' => '관리',
-    'created_dt' => '최초 등록일자',
+    'created_dt' => '등록일자',
     'created_id' => '작성자',
-    'updated_dt' => '최근 수정일자',
+    'updated_dt' => '수정일자',
     'updated_id' => '수정자',
     'recent_dt' => '최근 업데이트',
     'recent_dt_list' => '일자',
+    'lang_code' => '접속 언어',
+    'del_yn' => '삭제 여부',
+    'use_yn' => '사용 여부',
 ];
 
 $lang['auth'] = [
-	'autologin' => '자동 로그인',
+    'autologin' => '자동 로그인',
 ];
 
 $lang['user'] = [
     'id' => '아이디',
+    'password' => '비밀번호',
+    'password_confirm' => '비밀번호 확인',
     'name' => '이름',
     'birth' => '생년월일',
     'email' => '이메일',
@@ -25,9 +30,8 @@ $lang['user'] = [
     'addr1' => '주소',
     'addr2' => '상세주소',
     'memo' => '메모',
-    'password' => '비밀번호',
-    'password_confirm' => '비밀번호 확인',
-	'withdraw_dt' => '탈퇴일자',
+    'withdraw_dt' => '탈퇴일자',
+    'user_cd' => '사용자 구분',
 ];
 
 $lang['board'] = [
@@ -49,18 +53,6 @@ $lang['article'] = [
     'open_yn' => '공유여부',
 ];
 
-$lang['company'] = [
-    'comp_code' => '코드',
-    'comp_name' => '회사명',
-    'comp_ceo' => '대표자명',
-    'comp_tel' => '연락처',
-    'comp_addr' => '주소',
-    'comp_zipcode' => '우편번호',
-    'comp_addr1' => '주소',
-    'comp_addr2' => '상세주소',
-    'comp_memo' => '비고',
-];
-
 $lang['system'] = [
     'cmb_cfg' => '환경설정 Key',
     'big_cfg' => '대구분',
@@ -77,4 +69,37 @@ $lang['system'] = [
     'cd_desc' => '코드 설명',
     'cd_nick' => '코드 별명',
     'cd_srt' => '코드 순서',
+];
+
+$lang['menu'] = [
+    'code' => '메뉴 코드',
+    'parent_id' => '상위 메뉴',
+    'title' => '메뉴 명',
+    'icon' => '아이콘',
+    'class' => 'Routing Class',
+    'method' => 'Routing Method',
+    'href' => 'Link href',
+    'target' => 'Link target',
+    'className' => 'Link className',
+    'is_login' => '로그인 확인 여부',
+    'is_auth' => '권한확인 여부',
+    'is_super' => '최고관리자 전용',
+    'is_use' => '사용 여부',
+    'create' => '생성',
+    'read' => '조회',
+    'update' => '수정',
+    'delete' => '삭제',
+    'user_cd' => '사용자 구분',
+];
+
+$lang['company'] = [
+    'comp_code' => '코드',
+    'comp_name' => '회사명',
+    'comp_ceo' => '대표자명',
+    'comp_tel' => '연락처',
+    'comp_addr' => '주소',
+    'comp_zipcode' => '우편번호',
+    'comp_addr1' => '주소',
+    'comp_addr2' => '상세주소',
+    'comp_memo' => '비고',
 ];

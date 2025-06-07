@@ -10,16 +10,23 @@ $lang['nav']['Excel'] = '일괄 등록';
 $lang['nav']['Administrators'] = '관리자';
 $lang['nav']['Administrators Management'] = '관리자 관리';
 
-$lang['nav']['Students'] = '사용자';
-$lang['nav']['Students Management'] = '사용자 관리';
+$lang['nav']['System'] = '시스템 설정';
+$lang['nav']['System Management'] = '시스템 설정';
 
-$lang['nav']['Works'] = '작업물';
-$lang['nav']['Works Management'] = '작업물 관리';
+$lang['nav']['SysCfg'] = '환경값 설정';
+$lang['nav']['SysCfg Management'] = $lang['nav']['SysCfg'];
 
-$lang['nav']['Notices'] = '공지사항';
-$lang['nav']['Notices Management'] = '공지사항 관리';
+$lang['nav']['SysCode'] = '시스템 코드';
+$lang['nav']['SysCode Management'] = $lang['nav']['SysCode'];
 
-$lang['nav']['Inquiries'] = 'Q&A';
-$lang['nav']['Inquiries Management'] = 'Q&A 관리';
+$lang['nav']['MenuList'] = '메뉴 관리';
+$lang['nav']['MenuList Management'] = $lang['nav']['MenuList'];
+
+$lang['nav']['MenuAuth'] = '메뉴 권한';
+$lang['nav']['MenuAuth Management'] = $lang['nav']['MenuAuth'];
 
 $lang['nav']['MyInfo'] = '내 정보';
+$lang['nav']['Statistics'] = '접속 통계';
+$lang['nav']['Logs'] = '로그';
+$lang['nav']['EmailLogs'] = '이메일 로그';
+$lang['nav']['Help'] = '유지관리 요청';
