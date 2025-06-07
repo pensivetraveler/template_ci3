@@ -21,7 +21,7 @@ function maxLengthCheck(object){
 	}
 }
 
-function getNodeIndexInParent(node) {
+function getIndexInParent(node) {
 	if(node === null) return -1;
 	var children = node.parentNode.childNodes;
 	var num = 0;
@@ -459,3 +459,91 @@ async function getExtensionsForMimeType(mimeType) {
 function nl2br(str) {
 	return str.replace(/\n/g, '<br>');
 }
+
+function copyObject(obj) {
+	if(typeof obj !== "object" || obj === null){
+		return obj;
+	}
+
+	const deepCopyObj = {};
+
+	for(let key in obj){
+		deepCopyObj[key] = copyObject(obj[key]);
+	}
+
+	return deepCopyObj;
+}
+
+function normalizeHTML(html) {
+	return html
+		.replace(/\s*(<[^>]+>)\s*/g, '$1')  // 태그 주변 공백 제거
+		.replace(/[\r]+/g, '')           // 개행 제거
+		.replace(/[\n]+/g, '')           // 개행 제거
+		.replace(/[\t]+/g, '')           // 개행 제거
+		.replace(/\s{2,}/g, ' ');          // 연속 공백 → 단일 공백
+}
+
+function areHTMLStructuresEqual(el1, el2) {
+	const n1 = normalizeHTML(el1.innerHTML);
+	const n2 = normalizeHTML(el2.innerHTML);
+	return n1 === n2;
+}
+
+function deepEqual(a, b) {
+	if (a === b) return true;
+
+	if (typeof a !== typeof b) return false;
+	if (typeof a !== 'object' || a === null || b === null) return false;
+
+	if (Array.isArray(a) !== Array.isArray(b)) return false;
+
+	if (Array.isArray(a)) {
+		if (a.length !== b.length) return false;
+		for (let i = 0; i < a.length; i++) {
+			if (!deepEqual(a[i], b[i])) return false;
+		}
+		return true;
+	}
+
+	// 일반 객체 비교
+	const keysA = Object.keys(a).sort();
+	const keysB = Object.keys(b).sort();
+	if (!deepEqual(keysA, keysB)) return false;
+
+	for (let key of keysA) {
+		if (!deepEqual(a[key], b[key])) return false;
+	}
+	return true;
+}
+
+// 리스너를 추적하는 코드
+(function() {
+	var eventListeners = [];
+
+	/**
+	 * [Violation] Added non-passive event listener to a scroll-blocking <some> event. Consider marking event handler as 'passive' to make the page more responsive. See <URL>
+	 * TODO 위 Violation 관련, scroll event에 따라 passive:true 를 적용하거나 아니거나를 분기처리 해야 함.
+	 * @type {(type: string, callback: (EventListenerOrEventListenerObject | null), options?: (AddEventListenerOptions | boolean)) => void}
+	 */
+	var origAddEventListener = EventTarget.prototype.addEventListener;
+	EventTarget.prototype.addEventListener = function(type, listener, options) {
+		if(['DOMNodeInserted'].includes(type)) return;
+		eventListeners.push({target: this, type: type, listener: listener, options: options});
+		origAddEventListener.call(this, type, listener, {
+			...options,
+			// passive: ['touchstart', 'touchend', 'touchmove', 'scroll', 'mousedown', 'mousemove', 'mouseup', 'pointerdown', 'pointermove', 'pointerup'].includes(type)?true:false,
+		});
+	};
+
+	var origRemoveEventListener = EventTarget.prototype.removeEventListener;
+	EventTarget.prototype.removeEventListener = function(type, listener, options) {
+		eventListeners = eventListeners.filter(
+			event => event.target !== this || event.type !== type || event.listener !== listener || event.options !== options
+		);
+		origRemoveEventListener.call(this, type, listener, options);
+	};
+
+	window.getEventListeners = function(element) {
+		return eventListeners.filter(event => event.target === element);
+	};
+})();
