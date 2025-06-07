@@ -1,14 +1,14 @@
 <?php
 function is_admin_active_page($menu, $current_uri = ''): bool
 {
-    if(isset($menu['subMenu'])){
+    if($menu['isSubMenu']){
         $activated = false;
         foreach ($menu['subMenu'] as $submenu) {
-            if(is_active_page($submenu['route'], $submenu['params'], $current_uri)) $activated = true;
+            if(is_active_page($submenu['attr']['href'], $submenu['params'], $current_uri)) $activated = true;
         }
         return $activated;
     }else{
-        return is_active_page($menu['route'], $menu['params'], $current_uri);
+        return is_active_page($menu['attr']['href'], $menu['params'], $current_uri);
     }
 }
 
