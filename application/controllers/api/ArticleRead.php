@@ -1,4 +1,5 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed');
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
 
 require_once __DIR__.'/Common.php';
 
@@ -15,7 +16,7 @@ class ArticleRead extends Common
 		$this->setProperties($this->Model);
 	}
 
-	protected function beforePut($key, $model = null)
+	protected function beforePut($key = 0, $model = null): array
 	{
 		$tokenData = $this->validateToken();
 
@@ -24,7 +25,9 @@ class ArticleRead extends Common
 		$dto['user_id'] = $tokenData->user_id;
 		$dto['read_dt'] = date('Y-m-d H:i:s');
 
-		$readData = $this->Model->getData([], $dto);
+		$readData = $this->Model->getData([], [
+            'where' => $dto,
+        ]);
 		if($readData) {
 			$read_dt = $readData->read_dt;
 			if(time() >= strtotime($read_dt) + 60*60){
@@ -32,7 +35,7 @@ class ArticleRead extends Common
 					'article_id' => $dto['article_id'],
 				]);
 
-				return $dto;
+				return [$key, $dto];
 			}else{
 				$this->response([
 					'code' => DATA_PROCESSED,
@@ -43,7 +46,7 @@ class ArticleRead extends Common
 				'article_id' => $dto['article_id'],
 			]);
 
-			return $dto;
+            return [$key, $dto];
 		}
 	}
 
