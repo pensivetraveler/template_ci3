@@ -341,7 +341,6 @@ function getUrlWithIdentifiers(url, identifierData = {}, addParams = {}) {
     if(Object.keys(addParams).length)
         url += (url.indexOf('?') === -1 ? '?' : '&') + new URLSearchParams(addParams).toString();
 
-    console.log(url)
     return url;
 }
 
