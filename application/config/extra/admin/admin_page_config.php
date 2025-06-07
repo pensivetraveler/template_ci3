@@ -86,6 +86,29 @@ $config['page_config'] = [
             ],
         ],
     ],
+    'emailLogs' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subType' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'type' => 'list',
+                'subtype' => 'datatable',
+                'actions' => [
+                    'edit' => false,
+                    'view' => false,
+                    'delete' => false,
+                ],
+                'buttons' => [
+                    'add' => false,
+                    'excel' => false,
+                ],
+            ],
+        ],
+    ],
     'myinfo' => [
         'category' => 'page',
         'type' => 'page',
@@ -106,6 +129,7 @@ $config['page_config'] = [
         'type' => 'page',
         'subType' => 'base',
         'properties' => [
+            'noIndex' => true,
             'noIdentifier' => true,
             'baseMethod' => 'sysCfg',
         ],
@@ -113,12 +137,12 @@ $config['page_config'] = [
             'sysCfg' => [
                 'type' => 'form',
                 'subType' => 'side',
-                'config' => 'system_config',
+                'config' => 'syscfg',
             ],
             'sysCode' => [
                 'type' => 'list',
                 'subtype' => 'datatable',
-                'config' => 'system_code',
+                'config' => 'syscode',
                 'actions' => [
                     'edit' => true,
                 ],
@@ -136,7 +160,29 @@ $config['page_config'] = [
                 ],
                 'properties' => [
                     'formExist' => true,
-                    'formConfig' => 'system_code'
+                    'formConfig' => 'syscode'
+                ],
+            ],
+            'menuList' => [
+                'type' => 'form',
+                'subtype' => 'menuList',
+                'config' => 'menu_list',
+            ],
+            'menuAuth' => [
+                'type' => 'list',
+                'subtype' => 'datatable',
+                'config' => 'menu_auth',
+                'actions' => [
+                    'view' => false,
+                    'edit' => false,
+                    'delete' => false,
+                ],
+                'buttons' => [
+                    'add' => false,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'filterConfig' => 'menu_auth'
                 ],
             ],
         ],
