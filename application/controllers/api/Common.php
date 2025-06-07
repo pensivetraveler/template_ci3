@@ -1,4 +1,5 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed');
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Common extends MY_Builder_API
 {
@@ -12,33 +13,30 @@ class Common extends MY_Builder_API
 
 	}
 
-	protected function listBefore($data)
+	protected function beforeList($data): array
 	{
-		$data = parent::listBefore($data);
+		$data = parent::beforeList($data);
 
 		$extraFields = [];
 
 		if($this->input->get('format') === 'datatable') {
 			$extraFields['draw'] = (int)$this->input->get('draw');
 			// 전체 레코드 수
-			$extraFields['recordsTotal'] = $this->Model->getCnt(
-				$data['where'] ?? [],
-				$data['like'] ?? [],
-			);
+			$extraFields['recordsTotal'] = $this->Model->getCnt($data);
 			// 검색필터가 적용된 레코드 수
 			if( isset($data['filter']) ) {
-				$extraFields['recordsFiltered'] = $this->Model->getCnt(
-					$data['where'] ?? [],
-					$data['like'] ?? [],
-					$data['filter'] ?? [],
-				);
+				$extraFields['recordsFiltered'] = $this->Model->getCnt($data);
 			}else{
 				$extraFields['recordsFiltered'] = $extraFields['recordsTotal'];
 			}
 
-			$limit = (int)$this->input->get('limit')?:10;
-			$offset = (int)$this->input->get('pageNo')*$limit;
-			$this->db->limit($limit, $offset);
+            if((int)$this->input->get('limit') !== -1) {
+                $limit = (int)$this->input->get('limit')?:10;
+                $data['limit'] = [
+                    'limit' => $limit,
+                    'offset' => (int)$this->input->get('pageNo')*$limit,
+                ];
+            }
 		}
 
 		$data['extraFields'] = $extraFields;
@@ -46,9 +44,9 @@ class Common extends MY_Builder_API
 		return $data;
 	}
 
-	protected function viewAfter($data)
+	protected function transformView($data): object
 	{
-		$data = parent::viewAfter($data);
+		$data = parent::transformView($data);
 
 		if(property_exists($data, 'created_dt') && !empty($data->created_dt)) {
 			$data->recent_dt = $data->created_dt;
@@ -58,11 +56,11 @@ class Common extends MY_Builder_API
 		}
 
 		if(property_exists($data, 'created_id') && !empty($data->created_id)) {
-			$data->created_id = $this->Model_User->getData([], ['user_id' => $data->created_id])->id;
+			$data->created_id = $this->Model_User->getDataWhere([], ['user_id' => $data->created_id])->id;
 		}
 
 		if(property_exists($data, 'updated_id') && !empty($data->updated_id)) {
-			$data->updated_id = $this->Model_User->getData([], ['user_id' => $data->updated_id])->id;
+			$data->updated_id = $this->Model_User->getDataWhere([], ['user_id' => $data->updated_id])->id;
 		}
 
 		return $data;
@@ -84,4 +82,37 @@ class Common extends MY_Builder_API
 			'code' => DATA_PROCESSED,
 		]);
 	}
+
+    protected function sendEmail($dto = [])
+    {
+        $this->email->initialize([
+            'protocol'  => 'smtp',
+            'smtp_host' => getenv('MAIL_HOST'),
+            'smtp_port' => getenv('MAIL_PORT'),
+            'smtp_user' => getenv('MAIL_USERNAME'),
+            'smtp_pass' => getenv('MAIL_PASSWORD'),
+            'mailtype'  => 'html',
+            'charset'   => 'utf-8',
+            'newline'   => "\r\n",
+        ]);
+        $this->email->from(getenv('MAIL_USERNAME'), '이광우');
+        $this->email->to($dto['to']);
+        $this->email->bcc('pensive_lee@naver.com');
+
+        $this->email->subject($dto['subject']);
+        $this->email->message($this->load->view("email/{$dto['template']}", $dto, true));
+
+        $this->load->model('Model_Log_Email');
+
+        $debug_message = '';
+        if (!$this->email->send()) $debug_message = $this->email->print_debugger();
+
+        $this->Model_Log_Email->addData([
+            'email_type' => $dto['template'],
+            'doc_id' => $dto['doc_id'],
+            'email_address' => $dto['to'],
+            'success_yn' => strlen($debug_message)>0?'N':'Y',
+            'debug_message' => $debug_message,
+        ]);
+    }
 }
