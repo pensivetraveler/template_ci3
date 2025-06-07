@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $config['builder_list_config_loaded'] = true;
 
-$config['builder_list_base_attributes'] = [
+$config['builder_list_base'] = [
     'list' => true,
     'type' => 'text',
     'subtype' => 'base',
@@ -19,10 +19,7 @@ $config['builder_list_base_attributes'] = [
     'options' => [],
 ];
 
-/***
- * sample configs
- */
-$config['list_system_code_config'] = [
+$config['list_syscode_config'] = [
     [
         'field' => 'cmb_cd',
         'label' => 'lang:system.cmb_cd',
@@ -51,5 +48,52 @@ $config['list_system_code_config'] = [
     [
         'field' => 'use_yn',
         'label' => 'lang:common.use_yn',
+    ],
+];
+
+$config['list_menu_auth_config'] = [
+    [
+        'field' => 'menu_id',
+        'label' => 'lang:system.menu_id',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:system.user_cd',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'title',
+        'label' => 'lang:menu.title',
+    ],
+    [
+        'field' => 'code',
+        'label' => 'lang:menu.code',
+    ],
+    [
+        'field' => 'create',
+        'label' => 'lang:menu.create',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+    ],
+    [
+        'field' => 'read',
+        'label' => 'lang:menu.read',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+    ],
+    [
+        'field' => 'update',
+        'label' => 'lang:menu.update',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+    ],
+    [
+        'field' => 'delete',
+        'label' => 'lang:menu.delete',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
     ],
 ];
