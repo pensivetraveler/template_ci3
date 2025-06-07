@@ -30,15 +30,22 @@ if ( ! function_exists('is_empty'))
             }
             return false;
         }else{
-            switch (gettype($data)) {
-                case 'object' :
+            if(gettype($data) === 'object' || gettype($data) === 'array') {
+                if(gettype($data) === 'object') {
                     if(!property_exists($data, $key)) return true;
-                    return empty($data->{$key});
-                case 'array' :
+                    $data = get_object_vars($data);
+                }else{
                     if(!array_key_exists($key, $data)) return true;
+                }
+
+                if(gettype($data[$key]) === 'array' || gettype($data[$key]) === 'object') {
+                    if(gettype($data[$key]) === 'object') $data[$key] = get_object_vars($data[$key]);
                     return empty($data[$key]);
-                default :
-                    return true;
+                }else{
+                    return empty($data[$key])&&!strlen($data[$key]);
+                }
+            }else{
+                return true;
             }
         }
     }
@@ -116,5 +123,93 @@ if ( ! function_exists( 'str_ends_with' ) )
         $len = strlen( $needle );
 
         return mb_substr( $haystack, -$len, $len ) === $needle;
+    }
+}
+
+if ( ! function_exists('is_serialized_string'))
+{
+    function is_serialized_string( $data ) {
+        // 문자열이 아니면 바로 false
+        if ( ! is_string( $data ) ) {
+            return false;
+        }
+        $data = trim( $data );
+
+        // serialize 포맷의 최소 길이 (예: b:0;)
+        if ( strlen( $data ) < 4 ) {
+            return false;
+        }
+
+        // 시작 문자 및 마지막 세미콜론/중괄호 검사
+        if ( ! preg_match( '/^(?:s|a|O|b|i|d):/', $data ) ) {
+            return false;
+        }
+        $last = substr( $data, -1 );
+        if ( $last !== ';' && $last !== '}' ) {
+            return false;
+        }
+
+        // 실제로 unserialize 해보고 에러 없이 값이 돌아오면 true
+        try {
+            $unserialized = @unserialize( $data );
+            return $unserialized !== false || $data === 'b:0;';
+        } catch ( Exception $e ) {
+            return false;
+        }
+    }
+}
+
+if ( ! function_exists('get_time_text'))
+{
+    function get_time_text($datetime) {
+        if(strtotime($datetime) + 60 > time()) {
+            // 1분 내
+            return lang('just now');
+        }else {
+            $div = strtotime($datetime) - time();
+            if(strtotime($datetime) + 60*60 > time()) {
+                // 1시간 내
+                $div = floor(abs($div)/60);
+                return $div.lang('m ago');
+            }else if(strtotime($datetime) + 60*60*24 > time()) {
+                // 1일 내
+                $div = floor(abs($div) / (60 * 60));
+                return $div . lang('h ago');
+            }else{
+                // 수일
+                $div = floor(abs($div)/(60*60*24));
+                if($div > 1) {
+                    return $div.lang('days ago');
+                }else{
+                    return $div.lang('day ago');
+                }
+            }
+        }
+    }
+}
+
+if ( ! function_exists('get_starred_id'))
+{
+    function get_starred_id($id) {
+        $len = strlen($id);
+        $res = substr($id, 0, 2);
+        $res .= substr($id, 2, min($len-2,3));
+        if(strlen($id) > 5) {
+            $res .= substr($id, 5);
+        }
+        return $res;
+    }
+}
+
+if ( ! function_exists('get_starred_password'))
+{
+    function get_starred_password($password) {
+        $len = strlen($password);
+        $res = substr($password, 0, 2);
+        $res .= substr($password, 2, min($len-2,5));
+        if(strlen($password) > 7) {
+            $res .= substr($password, 7);
+        }
+        return $res;
     }
 }
