@@ -1,4 +1,5 @@
-<?php defined('BASEPATH') or exit('No Direct script access allowed');
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
 
 require_once __DIR__ . '/Common.php';
 
