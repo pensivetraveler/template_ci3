@@ -17,51 +17,47 @@ class MY_Controller_API extends RestController
 
     public function index_get($key = 0)
     {
-        $data = $this->beforeGet();
+        list($key, $data) = $this->beforeGet($key);
 
         $this->afterGet($key, $data);
     }
 
     public function index_post($key = 0)
     {
-        $dto = $this->beforePost($key);
+        list($key, $data) = $this->beforePost($key);
 
-        $this->afterPost($key, $dto);
+        $this->afterPost($key, $data);
     }
 
     public function index_put($key = 0)
     {
-		$data = $this->beforePut($key);
+		list($key, $data) = $this->beforePut($key);
 
 		$this->afterPut($key, $data);
     }
 
     public function index_patch($key = 0)
     {
-        if($key === 0) {
-            $this->keyNotExist();
-        }else{
-            $data = $this->beforePatch($key);
+        list($key, $data) = $this->beforePatch($key);
 
-            $this->afterPatch($key, $data);
-        }
+        $this->afterPatch($key, $data);
     }
 
     public function index_delete($key = 0)
     {
-		$this->beforeDelete($key);
+		list($key, $data) = $this->beforeDelete($key);
 
-		$this->afterDelete($key);
+		$this->afterDelete($key, $data);
     }
 
     /* --------------------------------------------------------------- */
 
-    protected function beforeGet()
+    protected function beforeGet($key = 0)
     {
-		return $this->input->get();
+		return [$key, $this->input->get()];
     }
 
-    protected function afterGet($key, $data)
+    protected function afterGet($key, $data = [])
     {
 		$this->response([
 			'code' => DATA_RETRIEVED,
@@ -70,58 +66,59 @@ class MY_Controller_API extends RestController
 		]);
     }
 
-    protected function beforePost($key, $model = null)
+    protected function beforePost($key = 0, $model = null)
     {
-		return $this->input->post();
+		return [$key, $this->input->post()??$this->input->json()];
     }
 
-    protected function afterPost($key, $dto)
+    protected function afterPost($key, $data = [])
     {
 		$this->response([
 			'code' => DATA_RETRIEVED,
 			'key' => $key,
-			'data' => $dto,
+			'data' => $data,
 		]);
     }
 
-    protected function beforePut($key, $model = null)
+    protected function beforePut($key = 0, $model = null)
     {
-        return $this->put()??$this->input->json();
+		return [$key, $this->put()??$this->input->json()];
     }
 
-    protected function afterPut($key, $dto)
+    protected function afterPut($key, $data = [])
     {
 		$this->response([
 			'code' => DATA_RETRIEVED,
 			'key' => $key,
-			'data' => $dto,
+			'data' => $data,
 		]);
     }
 
-    protected function beforePatch($key, $model = null)
+    protected function beforePatch($key = 0, $model = null)
     {
-        return $this->patch()??$this->input->json();
+		return [$key, $this->patch()??$this->input->json()];
     }
 
-    protected function afterPatch($key, $dto)
+    protected function afterPatch($key, $data = [])
     {
 		$this->response([
 			'code' => DATA_RETRIEVED,
 			'key' => $key,
-			'data' => $dto,
+			'data' => $data,
 		]);
     }
 
-    protected function beforeDelete($key)
+    protected function beforeDelete($key = 0)
     {
-        return $key;
+        return [$key, $this->put()??$this->input->json()];
     }
 
-    protected function afterDelete($key)
+    protected function afterDelete($key, $data = [])
     {
 		$this->response([
 			'code' => DATA_RETRIEVED,
 			'key' => $key,
+            'data' => $data,
 		]);
     }
 
