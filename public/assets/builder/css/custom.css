@@ -170,10 +170,16 @@ html[data-style="dark"] .border-input {
 .auto-linebreak {
 	white-space: pre-line;
 }
-.input-group.input-group-merge:has(textarea:read-only) {
-	background-color: var(--bs-light);
+.input-group.input-group-merge:has(textarea:read-only)>* {
+	background-color: #eee !important;
 }
+/*body.aa-Detached nav#layout-navbar {*/
+/*	right: var(--bs-scrollbar-width);*/
+/*}*/
 
+.menu-item.active:not(.open) > .menu-link:not(.menu-toggle) > div[class*="text-"] {
+	color: #fff !important;
+}
 
 /*********************************************
     .form-type-* common
@@ -197,7 +203,7 @@ form[class*="form-type-"] .form-control.d-none~label {
 
 /* flatpickr */
 form[class*="form-type-"] .input-group:has(.form-control:not([type="file"]):not(.flatpickr-input):read-only) .input-group-text,
-form[class*="form-type-"] .input-group .form-control:not([type="file"]):not(.flatpickr-input):read-only {
+form[class*="form-type-"] .input-group .form-control:not([type="file"]):not(.flatpickr-input):not(.tagify):read-only {
 	background-color: #eee !important;
 }
 html[data-style="dark"] form[class*="form-type-"] .input-group:has(.form-control:not([type="file"]):not(.flatpickr-input):read-only) .input-group-text,
@@ -375,6 +381,14 @@ form[class*="form-type-"] .choice-wrapper.single-checkbox ~ label {
 	display: none;
 }
 
+
+/*********************************************
+    .form-type-* .form-input_custom
+ *********************************************/
+/* unique */
+form[class*="form-type-"] .input-group .form-control.form-input_custom.form-input_custom-unique {
+	padding-left: calc(-1px + 1rem) !important;
+}
 
 /*********************************************
     .form-type-page
@@ -746,4 +760,171 @@ html[data-style="dark"] .form-type-side .input-group .form-floating > div:has(.s
 	top: 5px;
 	right: 5px;
 	border-radius: 50%;
+}
+
+/*********************************************
+    body[data-class="system"][data-method="menuList"]
+ *********************************************/
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item {
+	margin: 8px 0;
+	padding: 12px;
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	transition: all 0.2s ease;
+}
+
+body[data-class="system"][data-method="menuList"] #menuContainer.menu-container .menu-item .menu-header,
+body[data-class="system"][data-method="menuList"] #menuContainer.menu-container .menu-item .menu-actions {
+	opacity: .75;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item:hover {
+	background: #f8f9fa;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+body[data-class="system"][data-method="menuList"] #menuContainer.menu-container .menu-item:hover .menu-header,
+body[data-class="system"][data-method="menuList"] #menuContainer.menu-container .menu-item:hover .menu-actions {
+	opacity: 1;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item[data-is-use="0"] {
+	background: #cbcbcb !important;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .submenu-container {
+	margin: 12px 0 0 24px;
+	padding: 8px 0 8px 16px;
+	border-left: 2px solid #e0e0e0;
+	position: relative;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .submenu-container:not(:has(>.menu-item)) {
+	display: none;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .submenu-container::before {
+	content: '';
+	position: absolute;
+	left: -2px;
+	top: 0;
+	height: 100%;
+	width: 2px;
+	background: linear-gradient(to bottom, #e0e0e0 0%, #e0e0e0 50%, transparent 50%, transparent 100%);
+	background-size: 2px 16px;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-header {
+	display: flex;
+	padding: 4px 0;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-title {
+	font-weight: 500;
+	font-size: 1rem;
+	color: #2c3e50;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: move;
+	flex-grow: 1;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-actions {
+	display: flex;
+	gap: 8px;
+	transition: opacity 0.2s ease;
+	cursor: initial;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-actions .btn {
+	padding: 4px 8px;
+	font-size: 0.875rem;
+	cursor: pointer;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .badge {
+	font-weight: normal;
+	padding: 4px 8px;
+	font-size: 0.75rem;
+	line-height: 20px;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .ghost {
+	opacity: 0.5;
+	background: #e3f2fd;
+	border: 1px dashed #2196f3;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .chosen {
+	background: #e3f2fd;
+	border-color: #2196f3;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .drag {
+	background: #bbdefb;
+	border-color: #1976d2;
+	box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* 깊이별 스타일 차별화 */
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item[data-depth="1"] {
+	background: #eee;
+	border-left: 4px solid #2196f3;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item:hover[data-depth="1"] {
+	background: #f8f9fa;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item[data-depth="2"] {
+	background: #fff;
+	border-left: 4px solid #4caf50;
+}
+
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item[data-depth="3"] {
+	background: #fff;
+	border-left: 4px solid #ff9800;
+}
+
+/* 아이콘 스타일 */
+body[data-class="system"][data-method="menuList"] .menu-container .icon-base {
+	font-size: 1.1rem;
+	color: #666;
+}
+
+/* 드래그 중인 아이템의 하위메뉴 표시 */
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item.dragging .submenu-container {
+	border-left-color: #2196f3;
+}
+
+/* 메뉴 아이템 간격 조정 */
+body[data-class="system"][data-method="menuList"] .menu-container .menu-item + .menu-item {
+	margin-top: 12px;
+}
+
+/* 하위메뉴 컨테이너 내부 아이템 간격 */
+body[data-class="system"][data-method="menuList"] .menu-container .submenu-container .menu-item {
+	margin: 8px 0;
+}
+
+@media (min-width: 992px) {
+	body[data-class="system"][data-method="menuList"] .menu-container .menu-header {
+		align-items: center;
+		flex-direction: row;
+	}
+}
+
+/*********************************************
+    body[data-class="system"]
+ *********************************************/
+body[data-class="system"] .form-input_text-base:read-only {
+	background-color: #eee;
+	margin-right: 3px;
 }
