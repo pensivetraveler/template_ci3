@@ -1,4 +1,5 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
 
 require_once __DIR__.'/Common.php';
 
@@ -18,9 +19,6 @@ class Dashboard extends Common
 
 	public function view($key = 0)
 	{
-		$data['subPage'] = $this->viewPath.'/index';
-		$data['backLink'] = WEB_HISTORY_BACK;
-
-		$this->viewApp($data);
+		$this->viewApp();
 	}
 }
