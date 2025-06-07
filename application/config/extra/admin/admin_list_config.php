@@ -3,6 +3,30 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $config['admin_list_config_loaded'] = true;
 
+$config['list_administrators_config'] = [
+    [
+        'field' => 'user_id',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+    ],
+    [
+        'field' => 'name',
+        'label' => 'lang:user.name',
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+    ],
+];
+
 $config['list_company_config'] = [
     [
         'field' => 'comp_code',
