@@ -7,80 +7,148 @@ $config['admin_nav_top'] = [
 ];
 
 $config['admin_nav_side'] = [
-    'Dashboard' => [
+    [
         'icon' => 'ri-home-smile-line',
         'title' => 'Home',
-        'route' => '/admin/dashboard',
-        'method' => 'dashboard',
-        'router' => 'index',
+        'class' => 'dashboard',
         'params' => [
             'layout' => 'side-menu',
         ],
-        'className' => [],
-        'subMenu' => [],
     ],
-    'Company' => [
+    [
+        'icon' => 'ri-team-line',
+        'title' => 'Administrators Management',
+        'class' => 'administrators',
+        'params' => [
+            'layout' => 'side-menu',
+        ],
+    ],
+    [
         'icon' => 'ri-home-smile-line',
-        'title' => 'Company',
-        'route' => '/admin/company',
-        'router' => 'company',
+        'title' => 'Company Management',
+        'class' => 'company',
         'params' => [
             'layout' => 'side-menu',
         ],
-        'className' => [],
-        'subMenu' => [],
     ],
-    'Project' => [
+    [
         'icon' => 'ri-home-smile-line',
-        'title' => 'Project',
-        'route' => '/admin/project',
-        'router' => 'project',
+        'title' => 'Project Management',
+        'class' => 'project',
         'params' => [
             'layout' => 'side-menu',
         ],
-        'className' => [],
-        'subMenu' => [],
     ],
-    'MyInfo' => [
+    [
         'icon' => 'ri-user-line',
         'title' => 'MyInfo',
-        'route' => '/admin/myInfo',
+        'class' => 'myInfo',
         'params' => [
             'layout' => 'side-menu',
         ],
-        'className' => [],
-        'subMenu' => [],
     ],
-    'System' => [
+    [
+        'icon' => 'ri-settings-4-line',
+        'title' => 'Settings',
+    ],
+    [
+        'icon' => 'ri-folder-history-line',
+        'title' => 'Logs',
+        'route' => '',
+        'params' => [
+            'layout' => 'side-menu',
+        ],
+        'subMenu' => [
+
+        ],
+    ],
+    [
         'icon' => 'ri-function-line',
         'title' => 'System',
         'route' => '',
         'params' => [
             'layout' => 'side-menu',
         ],
-        'className' => [],
-        'authCheck' => true,
         'subMenu' => [
-            'SysCfg' => [
+            [
                 'icon' => '',
                 'title' => 'SysCfg Management',
-                'route' => '/admin/system/sysCfg',
+                'class' => 'system',
+                'method' => 'sysCfg',
                 'params' => [
                     'layout' => 'side-menu',
-                    'isSuper' => 0,
                 ],
-                'className' => [],
             ],
-            'SysCode' => [
+            [
                 'icon' => '',
                 'title' => 'SysCode Management',
-                'route' => '/admin/system/sysCode',
+                'class' => 'system',
+                'method' => 'sysCode',
                 'params' => [
                     'layout' => 'side-menu',
-                    'isSuper' => 0,
                 ],
-                'className' => [],
             ],
+            [
+                'icon' => '',
+                'title' => 'MenuList Management',
+                'class' => 'system',
+                'method' => 'menuList',
+                'params' => [
+                    'layout' => 'side-menu',
+                ],
+            ],
+            [
+                'icon' => '',
+                'title' => 'MenuAuth Management',
+                'class' => 'system',
+                'method' => 'menuAuth',
+                'params' => [
+                    'layout' => 'side-menu',
+                ],
+            ],
+        ],
+    ],
+    [
+        'icon' => 'ri-bar-chart-2-fill',
+        'title' => 'Statistics',
+        'route' => '',
+        'params' => [
+            'layout' => 'side-menu',
+        ],
+        'subMenu' => [
+            [
+                'icon' => '',
+                'title' => 'Report',
+                'attr' => [
+                    'className' => ['text-primary', 'fw-bolder'],
+                ],
+            ],
+            [
+                'icon' => '',
+                'title' => 'Visitor',
+            ],
+            [
+                'icon' => '',
+                'title' => 'Domain',
+            ],
+            [
+                'icon' => '',
+                'title' => 'Browser',
+            ],
+            [
+                'icon' => '',
+                'title' => 'OS',
+            ],
+        ]
+    ],
+    [
+        'icon' => 'ri-questionnaire-fill',
+        'title' => 'Help',
+        'route' => '',
+        'attr' => [
+            'href' => 'https://naver.com',
+            'className' => ['text-danger', 'fw-bolder'],
+            'target' => '_popup'
         ],
     ],
 ];
