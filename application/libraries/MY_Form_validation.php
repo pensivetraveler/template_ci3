@@ -216,6 +216,21 @@ class MY_Form_validation extends CI_Form_validation
 		}
 	}
 
+    public function required_if_value($value, $params)
+    {
+        $exploded = explode('|', $params);
+        $targetField = $exploded[0];
+        $targetValue = $exploded[1];
+
+        if(!array_key_exists($targetField, $this->_field_data)) return true;
+
+        if($this->_field_data[$targetField]['postdata'] != $targetValue) {
+            return true;
+        }
+
+        return !empty($value);
+    }
+
 	public function required_if_empty_data($value, $params)
 	{
 		list($table, $field, $identifier) = explode(".", $params);
