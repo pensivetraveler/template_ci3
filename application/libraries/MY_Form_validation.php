@@ -232,26 +232,33 @@ class MY_Form_validation extends CI_Form_validation
 
 	public function required_if_empty_file($value, $params, $data = null)
 	{
-		$CI =& get_instance();
-		$exploded = explode('|', $params);
-		$name = $exploded[0];
-		list($table, $field, $identifier) = explode(".", $exploded[1]);
+        $CI =& get_instance();
+        $exploded = explode('|', $params);
+        $name = $exploded[0];
+        list($table, $field, $identifier) = explode(".", $exploded[1]);
 
-		if($this->CI->input->get_post('_mode') === 'add') {
-			return is_file_posted($name);
-		}else{
-			if(empty($this->_field_data)) {
-				$field_data = $data ?? $CI->input->post();
-				$id = $field_data[$identifier];
-			}else{
-				$field_data =$this->_field_data;
-				$id = $field_data[$identifier]['postdata'];
-			}
-			$query = $this->CI->db
-				->where($identifier, $id)
-				->get($table)->row();
-			return (is_null($query) || is_empty($query, $field)) && is_file_posted($field);
-		}
+        if($this->CI->input->get_post('_mode') === 'add') {
+            return is_file_posted($name);
+        }else{
+            if(empty($this->_field_data)) {
+                $field_data = $data ?? $CI->input->post();
+                $id = $field_data[$identifier];
+            }else{
+                $field_data =$this->_field_data;
+                $id = $field_data[$identifier]['postdata'];
+            }
+
+            $query = $this->CI->db
+                ->select($field)
+                ->where($identifier, $id)
+                ->get($table)->row();
+
+            if(is_null($query) || is_null($query->{$field}) || is_empty($query->{$field})) {
+                return is_file_posted($field);
+            }else{
+                return true;
+            }
+        }
 	}
 
 	public function is_numeric($value, $params): bool
