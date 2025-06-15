@@ -505,10 +505,10 @@ class MY_Builder_API extends MY_Controller_API
         }, $config);
         $groups = array_flip(array_unique(array_column($config, 'group')));
 
-        foreach ($groups as $group=>$idx) {
-            if($group !== 'base') $groups[$group] = array_merge($this->config->get('builder_form_base_group_attributes'), $config[$idx]['group_attributes']);
-        }
-        foreach ($groups as $group => $attr) {
+        foreach ($groups as $group => $idx) {
+            $attr = $group === 'base' ? []
+                : array_merge($this->config->get('builder_form_base_group_attributes'), $config[$idx]['group_attributes']);
+
             $groupConfig = array_filter($config, function($item) use ($group) {
                 return $item['group'] === $group;
             });
