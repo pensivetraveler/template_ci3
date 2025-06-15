@@ -194,15 +194,16 @@ const customValidatorsPreset = {
 		requiredIfValue : function() {
 			return {
 				validate: function(input) {
-					let valid = true;
+					let valid = false;
 					const node = input.element;
 					const form = node.closest('form');
 
 					const field = input.options.field;
 					const value = input.options.value;
 
+					valid = true;
 					if(form.querySelector(`[name=${field}]`)) {
-						if(form.querySelector(`[name=${field}]`).value === value) valid = isEmpty(node.value);
+						if(form.querySelector(`[name=${field}]`).value == value) valid = !isEmpty(node.value);
 					}
 
 					return {
