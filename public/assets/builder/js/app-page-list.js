@@ -363,6 +363,10 @@ $(function () {
 			resetFrmInputs(document.querySelector(formSelector), common.FORM_DATA);
 			fv.resetForm(true);
 
+			document.querySelector(formSelector).querySelectorAll('input[type="file"]').forEach(function (v, i){
+				v.value = '';
+			})
+
 			if ($('[data-repeater-item]').length) {
 				$('[data-repeater-item]').each(function (i, v) {
 					if(i > 0) $(v).remove();
