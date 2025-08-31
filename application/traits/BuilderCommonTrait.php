@@ -70,7 +70,7 @@ trait BuilderCommonTrait
     protected function getMenuList($configName = ''): array
     {
         if(!$configName) {
-            $configs = $this->config->get("{$this->flag}_nav_menu", $this->config->get('builder_nav_menu_sample', []), false);
+            $configs = $this->config->get("{$this->flag}_nav_menu", $this->config->get('builder_nav_side_sample', []), false);
         }else{
             $configs = $this->config->get($configName, [], false);
         }

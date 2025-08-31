@@ -35,7 +35,7 @@ $config['builder_nav_top_sample'] = [
 /***
  * sample nav configs
  */
-$config['builder_nav_menu_sample'] = [
+$config['builder_nav_side_sample'] = [
     [
         'icon' => 'ri-home-smile-line',
         'title' => 'Home',
