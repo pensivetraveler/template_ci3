@@ -25,3 +25,4 @@ user_guide export-ignore
 * text eol=auto
 *.html linguist-detectable=false
 *.css linguist-detectable=false
+* text=auto eol=lf
