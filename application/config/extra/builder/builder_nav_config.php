@@ -36,54 +36,47 @@ $config['builder_nav_top_sample'] = [
  * sample nav configs
  */
 $config['builder_nav_menu_sample'] = [
-    'dashboard' => [
+    [
         'icon' => 'ri-home-smile-line',
         'title' => 'Home',
-        'route' => '/admin/dashboard',
-        'method' => 'dashboard',
+        'class' => 'dashboard',
         'params' => [
             'layout' => 'side-menu',
         ],
     ],
-    'welcome' => [
+    [
         'icon' => 'ri-user-line',
         'title' => 'Welcome',
-        'route' => '',
-        'method' => 'dashboard',
+        'class' => 'dashboard',
         'params' => [
             'layout' => 'side-menu',
         ],
+        'isSubMenu' => true,
         'subMenu' => [
-            'Welcome Sub 1' => [
+            [
                 'icon' => '',
                 'title' => 'Welcome Sub 1',
-                'route' => '/admin/',
+                'class' => 'dashboard',
                 'params' => [
-                    'welcome' => 1,
+                    'layout' => 'side-menu',
                 ],
-                'className' => [],
             ],
-            'Welcome Sub 2' => [
+            [
                 'icon' => '',
                 'title' => 'Welcome Sub 2',
-                'route' => '/admin/',
+                'class' => 'dashboard',
                 'params' => [
-                    'welcome' => 2,
+                    'layout' => 'side-menu',
                 ],
-                'className' => [],
             ],
-
         ],
     ],
-    'user' => [
+    [
         'icon' => 'ri-user-line',
         'title' => 'User',
-        'route' => '/admin/users',
-        'method' => 'dashboard',
+        'class' => 'users',
         'params' => [
             'layout' => 'side-menu',
         ],
     ],
-
 ];
-
