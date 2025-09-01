@@ -1,5 +1,6 @@
 'use strict';
 
+$.fn.dataTable.ext.errMode = 'throw';
 let fv, offCanvasEl;
 
 // Datatable (jquery)
