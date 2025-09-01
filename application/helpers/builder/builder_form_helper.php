@@ -276,6 +276,10 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
 			case 'readonly' :
 				$attributes['readonly'] = 'readonly';
 				break;
+            case 'cleave-bizno' :
+                $classList[] = 'cleave cleave-bizno';
+                $attributes['placeholder'] = '123-45-67890';
+                break;
 		}
 	}
 
