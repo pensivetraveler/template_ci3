@@ -34,6 +34,10 @@ function getAjaxOptions(obj = {}) {
 			method: method,
 			data: data,
 			dataType: dataType,
+			error: function (xhr, status, error) {
+				// 기본 에러 메시지 대신 커스텀 처리
+				console.log(xhr.responseJSON)
+			},
 		};
 
 		for(const key of ['headers', 'complete', 'contentType', 'processData']){
