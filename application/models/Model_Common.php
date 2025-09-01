@@ -236,13 +236,13 @@ class Model_Common extends MY_Model
     public function determineDiffColumns(): array
     {
         $arr1 = $this->getColumnList();
-        $arr2 = [...$this->strList, ...$this->intList, ...$this->fileList];
-        $sym_diff = array_values(array_diff(array_merge($arr1, $arr2), array_intersect($arr1, $arr2)));
+        $arr2 = array_unique([...$this->strList, ...$this->intList, ...$this->fileList]);
+        return array_values(array_diff(array_merge($arr1, $arr2), array_intersect($arr1, $arr2)));
     }
 
     public function validateTableColumns(): bool
     {
-        return count($this->getColumnList()) === count([...$this->strList, ...$this->intList, ...$this->fileList]);
+        return count($this->getColumnList()) === count(array_unique([...$this->strList, ...$this->intList, ...$this->fileList]));
     }
 
     public function setCondition($table, $data, $list = true)
