@@ -21,7 +21,7 @@ class System extends Common
         $data = $this->prepareFormData($data);
 
         $this->load->model('Model_Sys_Cfg');
-        $data['data'] = $this->Model_Sys_Cfg->getListByBig();
+        $data['data'] = $this->Model_Sys_Cfg->getListByBig()??[];
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-system-config.js'),
@@ -48,7 +48,7 @@ class System extends Common
 
         $this->load->model('Model_Sys_Code');
         $data['category'] = $this->Model_Sys_Code->getBigCodeList();
-        $data['data'] = $this->Model_Sys_Code->getListByBig();
+        $data['data'] = $this->Model_Sys_Code->getListByBig()??[];
         $data['bigCdFormData'] = restructure_form_data_by_type($bigCdFormData);
 
         $this->addCSS[] = [
@@ -81,7 +81,7 @@ class System extends Common
         ];
 
         $this->addJsVars([
-            'API_PARAMS' => ['big_cd' => $data['category'][0]->big_cd],
+            'API_PARAMS' => count($data['category'])>0?['big_cd' => $data['category'][0]->big_cd]:'',
             'API_URI' => $this->apiUri.'sysCode',
             'FORM_REGEXP' => $this->config->item('regexp'),
             'EXTRA_FORMDATA' => $bigCdFormData,
