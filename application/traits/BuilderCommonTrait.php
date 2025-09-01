@@ -169,7 +169,7 @@ trait BuilderCommonTrait
             }
         }
 
-        if(env('MENU_CACHED')) $this->cache->file->save('menu_done', $menuList, 0);
+        if(env('CACHING_MENU')) $this->cache->file->save('menu_done', $menuList, 0);
     }
 
     protected function deformMenuList($menuList)
