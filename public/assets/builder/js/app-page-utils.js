@@ -525,5 +525,12 @@ function setCleave(node) {
 			uppercase: false,
 			numericOnly: true
 		});
+	}else if(node.classList.contains('cleave-bizno')) {
+		new Cleave(node, {
+			delimiter: '-',
+			blocks: [3, 2, 5],
+			uppercase: false,
+			numericOnly: true
+		});
 	}
 }
