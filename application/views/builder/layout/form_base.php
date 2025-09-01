@@ -9,24 +9,27 @@
         '_event' => '',
     ]);
 
-	foreach ($formData['hiddens'] as $item) :
-		echo form_input(
-			[
-				'type' => $item['type'],
-				'name' => $item['field'],
-				'id' => $item['id'],
-			],
-			set_admin_form_value($item['field'], $item['default'], null),
-			$item['attributes'],
-		);
-	endforeach;
+	if(!is_empty($formData, 'hiddens') && count($formData['hiddens']) > 0) {
+		foreach ($formData['hiddens'] as $item) :
+			echo form_input(
+					[
+							'type' => $item['type'],
+							'name' => $item['field'],
+							'id' => $item['id'],
+					],
+					set_admin_form_value($item['field'], $item['default'], null),
+					$item['attributes'],
+			);
+		endforeach;
+	}
 
-    foreach ($formData['fields'] as $item):
-        if($item['group'] !== 'base'):
-            builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
-        elseif($item['type'] === 'custom'):
-            builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
-        else:
+	if(!is_empty($formData, 'fields') && count($formData['fields']) > 0) {
+		foreach ($formData['fields'] as $item):
+			if($item['group'] !== 'base'):
+				builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
+			elseif($item['type'] === 'custom'):
+				builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
+			else:
 ?>
 <div class="row mb-3 form-validation-unit">
 	<?=get_builder_form_label($item, ['class' => 'col-sm-2 col-form-label text-primary fw-bolder'])?>
@@ -42,8 +45,9 @@
     </div>
 </div>
 <?php
-        endif;
-    endforeach;
+			endif;
+		endforeach;
+	}
 ?>
 <div class="row">
 	<div class="col-sm-6 text-start">
