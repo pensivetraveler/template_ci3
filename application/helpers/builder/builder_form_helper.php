@@ -460,7 +460,7 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
 	}
 
     // default value
-    if($item['default']) $attributes['data-dafault-value'] = $item['default'];
+    if($item['default']) $attributes['data-default-value'] = $item['default'];
 
 	// class
 	$attributes['class'] = implode(' ', $classList);
