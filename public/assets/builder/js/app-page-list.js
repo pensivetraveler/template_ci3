@@ -507,6 +507,7 @@ $(function () {
 					updateFormLifeCycle('transFrmValues', formRecord);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
+					console.warn(jqXHR.responseJSON)
 					if(jqXHR.status === 422) {
 						jqXHR.responseJSON.errors.forEach((error) => {
 							const field = error.param;

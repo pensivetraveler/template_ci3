@@ -135,11 +135,25 @@ $(function () {
             error: function(jqXHR, textStatus, errorThrown) {
                 console.warn(jqXHR.responseJSON)
                 if(jqXHR.status === 422) {
-                    jqXHR.responseJSON.errors.forEach(error => {
-                        if(Object.hasOwn(fv.fields, error.param)) {
-							fv.updateFieldStatus(error.param, 'Invalid', customValidatorsPreset.inflector(error.type));
-                        }
-                    });
+					jqXHR.responseJSON.errors.forEach((error) => {
+						const field = error.param;
+						if (!fv.fields[field]) return;
+						// 서버 메시지 i18n(선택)
+						const msg = getLocale ? getLocale(error.msg, common.LOCALE) : error.msg;
+						// 서버 type → FV validator 매핑 (있으면 사용)
+						const map = { password_matches: 'identical', required: 'notEmpty' /* ... */ };
+						const vKey = map[error.type];
+						const hasValidator = vKey && fv.fields[field].validators && fv.fields[field].validators[vKey];
+						if (hasValidator) {
+							fv.updateValidatorOption(field, vKey, 'message', msg);
+							fv.updateFieldStatus(field, 'Invalid', vKey);
+						} else {
+							// 항상 존재하는 server validator로 폴백
+							fv.updateValidatorOption(field, 'server', 'message', msg);
+							fv.enableValidator(field, 'server');
+							fv.updateFieldStatus(field, 'Invalid', 'server');
+						}
+					});
                 }else{
                     showAlert({
                         type: 'warning',
