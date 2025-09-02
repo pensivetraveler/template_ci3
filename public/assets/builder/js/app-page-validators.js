@@ -69,7 +69,7 @@ const customValidatorsPreset = {
 			validatorName : 'identical',
 		},
 		password_matches : {
-			regex : '^password_matches$',
+			regex : '^password_matches\\[(.*?)\\]$',
 			options : function(form, item, matches) {
 				return {
 					compare: function() {
