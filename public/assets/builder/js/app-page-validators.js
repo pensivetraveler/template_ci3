@@ -44,18 +44,26 @@ const customValidatorsPreset = {
 			options : function(form, item, matches) {
 				return {
 					min: parseInt(matches[1]),
+					message: replaceValidationMessage(getLocale('form_validation_greater_than_equal_to'), {
+						field: form.querySelector(item.selector).name,
+						param: matches[1],
+					}),
 				};
 			},
-			validatorName : 'options',
+			validatorName : 'greaterThan',
 		},
 		max : {
 			regex : '^max\\[(\\d+)\\]$',
 			options : function(form, item, matches) {
 				return {
 					max: parseInt(matches[1]),
+					message: replaceValidationMessage(getLocale('form_validation_less_than_equal_to'), {
+						field: form.querySelector(item.selector).name,
+						param: matches[1],
+					}),
 				};
 			},
-			validatorName : 'options',
+			validatorName : 'lessThan',
 		},
 		matches : {
 			regex : '^matches\\[(.*?)\\]$',

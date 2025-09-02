@@ -534,3 +534,10 @@ function setCleave(node) {
 		});
 	}
 }
+
+function replaceValidationMessage(message, obj = null) {
+	for(const key of Object.keys(obj)) {
+		message = message.replaceAll(`{${key}}`, obj[key]);
+	}
+	return window.Josa.s(message);
+}
