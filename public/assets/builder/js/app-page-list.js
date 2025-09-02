@@ -364,6 +364,10 @@ $(function () {
 			resetFrmInputs(document.querySelector(formSelector), common.FORM_DATA);
 			fv.resetForm(true);
 
+			document.querySelector(formSelector).querySelectorAll('[data-default-value]').forEach(function (v, i){
+				v.value = v.getAttribute('data-default-value');
+			})
+
 			document.querySelector(formSelector).querySelectorAll('input[type="file"]').forEach(function (v, i){
 				v.value = '';
 			})
