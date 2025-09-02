@@ -25,7 +25,7 @@
 
 	if(!is_empty($formData, 'fields') && count($formData['fields']) > 0) {
 		foreach ($formData['fields'] as $item):
-			if($item['group'] !== 'base'):
+			if(!is_empty($item, 'group') && $item['group'] !== 'base'):
 				builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
 			elseif($item['type'] === 'custom'):
 				builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);

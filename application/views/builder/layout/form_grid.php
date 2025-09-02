@@ -29,7 +29,7 @@
 <div class="row">
 	<?php
 		foreach ($row as $item):
-			if($item['group'] !== 'base'):
+			if(!is_empty($item, 'group') && $item['group'] !== 'base'):
 				builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
 			elseif($item['type'] === 'common'):
 				echo "<div class='col-md-{$item['colspan']} d-sm-block d-none'></div>";
