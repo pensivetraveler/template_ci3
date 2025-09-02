@@ -368,20 +368,15 @@ class MY_Controller extends CI_Controller
 							$options = $this->getOptionsFromDBList($list, $render);
 							break;
 						case 'model' :
-							if (!property_exists($this, $data['model'])) $this->load->model($data['model']);
+                            if (!property_exists($this, $data['model'])) $this->load->model($data['model']);
 
-							if (!method_exists($this->{$data['model']}, $data['method']))
-								trigger_error("getOptions : Method {$data['method']} not exist.", E_USER_ERROR);
+                            if (!method_exists($this->{$data['model']}, $data['method']))
+                                trigger_error("getOptions : Method {$data['method']} not exist.", E_USER_ERROR);
 
-                            $params = array_merge([
-                                'select' => [],
-                                'where' => [],
-                                'like' => [],
-                                'limit' => [],
-                                'orderBy' => [],
-                            ], array_intersect_key($data['params'] ?? [], array_flip(['select', 'where', 'like', 'limit', 'orderBy'])));
-
-                            $list = call_user_func_array([$this->{$data['model']}, $data['method']], $params);
+                            $list = call_user_func_array([$this->{$data['model']}, $data['method']], [
+                                'select' => array_values($render),
+                                'data' => $data['params'] ?? [],
+                            ]);
                             $options = $this->getOptionsFromDBList($list, $render);
 							break;
 						case 'custom' :
