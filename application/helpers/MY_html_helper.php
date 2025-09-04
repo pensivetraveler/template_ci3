@@ -10,7 +10,7 @@ function get_site_title($site_name, $title_list = [])
 
 function is_active_page($nav_link, $params = [], $current_uri = '')
 {
-    if(!$current_uri) $current_uri = $_SERVER['PATH_INFO'];
+    if(!$current_uri) $current_uri = $_SERVER['PATH_INFO'] ?? '/';
     if(count($params) > 0) {
         $queries = array_reduce(explode('&', $_SERVER['QUERY_STRING']),
             function($carry, $item) {
