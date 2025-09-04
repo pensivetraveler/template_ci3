@@ -1057,6 +1057,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
             base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
             base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater.js'),
+            base_url('public/assets/builder/vendor/libs/jquery-repeater/jquery-repeater-plugins.js'),
             base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
         ];
 
