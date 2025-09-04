@@ -2,6 +2,7 @@ let record;
 let editors = {};
 
 const FORM_LIFECYCLE = {
+	onLoadedLayout : false,
 	preparePlugins : false,
 	resetFrmInputs : false,
 	readyFrmInputs : false,
@@ -29,6 +30,7 @@ function updateFormLifeCycle(state, form = null, detail = {}) {
 			formSelector: form.getAttribute('id'),
 		}, detail);
 	}
+
 	target.dispatchEvent(
 		new CustomEvent(state, {
 			bubbles : false,
@@ -37,6 +39,10 @@ function updateFormLifeCycle(state, form = null, detail = {}) {
 			detail : detail,
 		}),
 	);
+}
+
+function onLoadedLayout(form) {
+	updateFormLifeCycle('onLoadedLayout', form)
 }
 
 function preparePlugins(form) {
@@ -472,8 +478,10 @@ function applyFrmValues(form, data, fields = []) {
 			if(groupAttrs[groupName].repeater_type === 'jquery' && $('[data-repeater-type="jquery"]').length) {
 				const repeater = document.querySelector(`[data-repeater-type="jquery"][data-group-name="${groupName}"]`);
 				const rowCount = parseInt(repeater.getAttribute('data-repeater-count'));
-				for(let i = rowCount+1; i <= data[groupName].length; i++) repeater.querySelector('[data-repeater-create]').click();
-				repeater.setAttribute('data-repeater-count', data[groupName].length === 0 ? 1 : data[groupName].length);
+				if(data.hasOwnProperty(groupName)) {
+					for(let i = rowCount+1; i <= data[groupName].length; i++) repeater.querySelector('[data-repeater-create]').click();
+					repeater.setAttribute('data-repeater-count', data[groupName].length === 0 ? 1 : data[groupName].length);
+				}
 			}
 		}
 
