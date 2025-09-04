@@ -43,4 +43,4 @@
 					<!-- Content wrapper -->
 					<main class="content-wrapper">
 						<!-- Content -->
-						<div class="flex-grow-1 container-p-y container-<?=$containerFluid?'fluid':'xxl'?>">
+						<div class="flex-grow-1 container-p-y container-<?=!isset($containerFluid)||$containerFluid?'fluid':'xxl'?>">
