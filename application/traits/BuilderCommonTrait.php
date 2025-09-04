@@ -62,7 +62,7 @@ trait BuilderCommonTrait
             $menuList = $this->cache->file->get('menu_done');
         }else{
             $menuList = $this->getMenuList();
-            $this->saveMenuList($menuList);
+            if(env('CACHING_MENU')) $this->saveMenuList($menuList);
         }
         return $this->menuList = $this->setMenuData($menuList);
     }
