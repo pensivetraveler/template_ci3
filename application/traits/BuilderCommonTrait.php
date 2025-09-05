@@ -7,17 +7,7 @@ trait BuilderCommonTrait
     {
         delete_cookie('autologin');
 
-        if(count($this->session->userdata())) {
-            foreach ($this->session->userdata() as $key=>$val) {
-                $this->session->unset_userdata($key);
-            }
-            $this->session->sess_destroy();
-        }
-
-        // 세션 쿠키 삭제
-        if (isset($_COOKIE[$this->config->item('sess_cookie_name')])) {
-            setcookie($this->config->item('sess_cookie_name'), '', time() - 3600, '/');
-        }
+        parent::destroyUserData();
     }
 
     protected function getIdentifierData($key, $identifiers): array
