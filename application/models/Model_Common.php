@@ -280,11 +280,13 @@ class Model_Common extends MY_Model
 
     public function setFilterLike($table, $data)
     {
-        if(!is_empty($data, 'value')) {
-            if(!is_empty($data, 'field')) {
-                $this->like($table, [$data['field'] => $data['value']]);
-            }else{
-                $this->orLike($table, $this->strList, $data['value']);
+        foreach ($data as $item) {
+            if(!is_empty($item, 'value')) {
+                if(!is_empty($item, 'field')) {
+                    $this->like($table, [$item['field'] => $item['value']]);
+                }else{
+                    $this->orLike($table, $this->strList, $item['value']);
+                }
             }
         }
     }
