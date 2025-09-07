@@ -8,5 +8,9 @@ class Cli extends Common
     public function __construct()
     {
         parent::__construct();
+
+        if (php_sapi_name() !== 'cli') {
+            show_error('Direct access is not allowed');
+        }
     }
 }
