@@ -135,7 +135,7 @@ $(function () {
 						}
 					},
 				]
-			: []),
+				: []),
 			// ...fields,
 			...common.LIST_COLUMNS.map(function (column, index) {
 				switch (column.type) {
@@ -362,21 +362,7 @@ $(function () {
 
 		offCanvasElement.addEventListener('hidden.bs.offcanvas', function(e) {
 			resetFrmInputs(document.querySelector(formSelector), common.FORM_DATA);
-			fv.resetForm(true);
-
-			document.querySelector(formSelector).querySelectorAll('[data-default-value]').forEach(function (v, i){
-				v.value = v.getAttribute('data-default-value');
-			})
-
-			document.querySelector(formSelector).querySelectorAll('input[type="file"]').forEach(function (v, i){
-				v.value = '';
-			})
-
-			if ($('[data-repeater-item]').length) {
-				$('[data-repeater-item]').each(function (i, v) {
-					if(i > 0) $(v).remove();
-				});
-			}
+			safeReset(fv);
 		});
 
 		$('.dataTables_wrapper').on('click', '.edit-record', function() {
