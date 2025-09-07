@@ -15,13 +15,14 @@ const FORM_LIFECYCLE = {
 
 common.FORM_LIFECYCLE = [];
 common.FORM_REPEATER = [];
+common.DYNAMIC_FIELDS = [];
 
 function updateFormLifeCycle(state, form = null, detail = {}) {
-	if(common.FORM_LIFECYCLE[form.name] === undefined) {
-		common.FORM_LIFECYCLE[form.name] = FORM_LIFECYCLE;
+	if(common.FORM_LIFECYCLE[form.getAttribute('name')] === undefined) {
+		common.FORM_LIFECYCLE[form.getAttribute('name')] = FORM_LIFECYCLE;
 	}
 
-	common.FORM_LIFECYCLE[form.name][state] = true;
+	common.FORM_LIFECYCLE[form.getAttribute('name')][state] = true;
 
 	// Event trigger
 	const target = form ?? window;
@@ -270,12 +271,7 @@ function preparePlugins(form) {
  * @param fields
  */
 function resetFrmInputs(form, fields = []) {
-	record = null;
-	Object.keys(common.FORM_LIFECYCLE[form.name]).forEach((v, k) => {
-		if(!k) return;
-		common.FORM_LIFECYCLE[form.name][v] = false;
-	});
-
+	// value resets
 	form.querySelectorAll('input, textarea, select').forEach(function(node) {
 		if(!isAttributeValueTrue(node, 'data-reset-value')) return;
 
@@ -312,14 +308,21 @@ function resetFrmInputs(form, fields = []) {
 				break;
 		}
 
+		// input change attr 초기화
 		if(node.type !== 'hidden' && !isAttributeValueTrue(node, 'data-detect-changed')){
 			node.setAttribute('data-input-changed', 'false');
 		}
 
+		// original value attr 초기화
 		if(node.hasAttribute('data-original-value')){
 			node.removeAttribute('data-original-value');
 		}
 	});
+
+	// file type 초기화
+	form.querySelectorAll('input[type="file"]').forEach(function (v, i){
+		v.value = '';
+	})
 
 	// list 초기화
 	fields.map(function(item) {
@@ -333,6 +336,26 @@ function resetFrmInputs(form, fields = []) {
 	if($('[data-repeater-type="jquery"]').length) {
 		$('[data-repeater-type="jquery"]').attr('data-repeater-count', 1);
 	}
+
+	if ($('[data-repeater-item]').length) {
+		$('[data-repeater-item]').each(function (i, v) {
+			if(i > 0) $(v).remove();
+		});
+	}
+
+	// life cycle 초기화
+	Object.keys(common.FORM_LIFECYCLE[form.getAttribute('name')]).forEach((v, k) => {
+		if(!k) return;
+		common.FORM_LIFECYCLE[form.getAttribute('name')][v] = false;
+	});
+
+	// 마지막에 폼 전체 및 레코드 리셋
+	record = null;
+
+	// default value set
+	form.querySelectorAll('[data-default-value]').forEach(function (v, i){
+		v.value = v.getAttribute('data-default-value');
+	})
 
 	// Event trigger
 	updateFormLifeCycle('resetFrmInputs', form);
@@ -983,4 +1006,46 @@ function setDynamicSelect2Options(node, params) {
 		.fail(function() {
 			console.error(`${params.target} 리스트 로드 실패`);
 		});
+}
+
+/*
+ * Dynamif Fields 관련 methods
+ */
+function addDynamicField(fvInstance, name, options) {
+	const form = fvInstance.form; // 또는 document.querySelector('form');
+	const formName = form.getAttribute('name');
+
+	if(common.DYNAMIC_FIELDS[formName] === undefined) {
+		common.DYNAMIC_FIELDS[formName] = new Set();
+	}
+
+	// 이미 등록되어 있으면 중복 추가 방지
+	if (!Object.hasOwn(fvInstance.getFields(), name)) {
+		fvInstance.addField(name, options);
+		common.DYNAMIC_FIELDS[formName].add(name);
+	}
+}
+
+// 2) 안전 리셋: 동적 필드 먼저 정리 후 전체 resetForm
+function safeReset(fvInstance) {
+	const form = fvInstance.form; // 또는 document.querySelector('form');
+	const formName = form.getAttribute('name');
+
+	if(common.DYNAMIC_FIELDS[formName] !== undefined) {
+		for (const name of common.DYNAMIC_FIELDS[formName]) {
+			const el = form.querySelector(`[name="${name}"]`);
+			if (!el || common.DYNAMIC_FIELDS[formName]) {
+				// DOM에 없거나 완전히 제거하고 싶다면 FV에서 먼저 제거
+				fvInstance.removeField(name);
+			} else {
+				// DOM에는 남겨두고 값만 초기화하고 싶다면 필드 단위 리셋
+				// true = 값까지 초기화
+				fvInstance.resetField(name, true);
+			}
+		}
+		common.DYNAMIC_FIELDS[formName].clear();
+	}
+
+	// 마지막에 폼 전체 리셋
+	fvInstance.resetForm(true); // 값/상태/메시지 초기화
 }
