@@ -47,49 +47,49 @@
 			<!--/ Error -->
 
 			<?php if(isset($headerData)): ?>
-			<!-- User -->
-			<li class="nav-item navbar-dropdown dropdown-user dropdown">
-				<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-					<div class="avatar avatar-online bg-primary rounded-circle d-flex justify-content-center align-items-center">
-						<span class="text-white"><?=mb_substr($headerData['name'],0,1)?></span>
-					</div>
-				</a>
-				<ul class="dropdown-menu dropdown-menu-end">
-					<li>
-						<a class="dropdown-item" href="<?=base_url('/admin/myInfo')?>">
-							<div class="d-flex justify-content-between">
-								<span class="fw-medium d-block small"><?=$headerData['name']?></span>
-								<small class="text-muted"><?=$headerData['id']?></small>
-							</div>
-						</a>
-					</li>
-					<li>
-						<div class="dropdown-divider"></div>
-					</li>
-					<li>
-						<a class="dropdown-item" href="<?=base_url("/{$this->flag}/myInfo")?>">
-							<i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle"><?=lang('My Info')?></span>
-						</a>
-					</li>
-					<li>
-						<a class="dropdown-item" href="<?=base_url("/{$this->flag}/system")?>">
-							<i class="ri-settings-4-line ri-22px me-3"></i><span class="align-middle"><?=lang('Settings')?></span>
-						</a>
-					</li>
-					<li>
-						<div class="dropdown-divider"></div>
-					</li>
-					<li>
-						<div class="d-grid px-4 pt-2 pb-1">
-							<a class="btn btn-sm btn-danger d-flex" href="javascript:logout();" target="_self">
-								<small class="align-middle"><?=lang('Logout')?></small>
-								<i class="ri-logout-box-r-line ms-2 ri-16px"></i>
-							</a>
+				<!-- User -->
+				<li class="nav-item navbar-dropdown dropdown-user dropdown">
+					<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+						<div class="avatar avatar-online bg-primary rounded-circle d-flex justify-content-center align-items-center">
+							<span class="text-white"><?=mb_substr($headerData['name'],0,1)?></span>
 						</div>
-					</li>
-				</ul>
-			</li>
-			<!--/ User -->
+					</a>
+					<ul class="dropdown-menu dropdown-menu-end">
+						<li>
+							<a class="dropdown-item" href="<?=base_url('/admin/myInfo')?>">
+								<div class="d-flex justify-content-between">
+									<span class="fw-medium d-block small"><?=$headerData['name']?></span>
+									<small class="text-muted"><?=$headerData['id']?></small>
+								</div>
+							</a>
+						</li>
+						<li>
+							<div class="dropdown-divider"></div>
+						</li>
+						<li>
+							<a class="dropdown-item" href="<?=base_url("/{$this->flag}/myInfo")?>">
+								<i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle"><?=lang('My Info')?></span>
+							</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="<?=base_url("/{$this->flag}/system")?>">
+								<i class="ri-settings-4-line ri-22px me-3"></i><span class="align-middle"><?=lang('Settings')?></span>
+							</a>
+						</li>
+						<li>
+							<div class="dropdown-divider"></div>
+						</li>
+						<li>
+							<div class="d-grid px-4 pt-2 pb-1">
+								<a class="btn btn-sm btn-danger d-flex" href="javascript:logout();" target="_self">
+									<small class="align-middle"><?=lang('Logout')?></small>
+									<i class="ri-logout-box-r-line ms-2 ri-16px"></i>
+								</a>
+							</div>
+						</li>
+					</ul>
+				</li>
+				<!--/ User -->
 			<?php endif; ?>
 		</ul>
 	</div>
