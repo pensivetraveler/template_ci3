@@ -280,6 +280,11 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
     // type & subtype
     $classList[] = 'form-input_'.$item['type'].'-'.$item['subtype'];
 
+    // autocomplete false
+    if(in_array($item['name'], ['name','email','tel'])) {
+        $attributes['autocomplete'] = 'false';
+    }
+
     // add attr by subtype and type
     if($item['type'] === 'text') {
         switch ($item['subtype']) {
@@ -289,6 +294,14 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
             case 'cleave-bizno' :
                 $classList[] = 'cleave cleave-bizno';
                 $attributes['placeholder'] = '123-45-67890';
+                break;
+        }
+    }
+
+    if($item['type'] === 'number') {
+        switch ($item['subtype']) {
+            case 'readonly' :
+                $attributes['readonly'] = 'readonly';
                 break;
         }
     }
