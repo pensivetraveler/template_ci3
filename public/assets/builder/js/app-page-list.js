@@ -59,23 +59,45 @@ $(function () {
 				if($('#formFilter').length) {
 					const filters = {
 						where : {},
-						like : {
-							field : null,
-							value : null,
-						},
+						like : [],
 						date : {
 							start_date : null,
 							end_date : null,
 							on_date : null,
-						}
+						},
+						text : {},
 					};
 
 					if($('#formFilter').find('[name="_onloaded"]').val() === '1') {
-						filters.like.field = $('#formFilter').find('[name="like[field]"]').val() ?? null;
-						filters.like.value = $('#formFilter').find('[name="like[value]"]').val() ?? null;
-						filters.like.start_date = $('#formFilter').find('[name="date[start_date]"]').val() ?? null;
-						filters.like.end_date = $('#formFilter').find('[name="date[end_date]"]').val() ?? null;
-						filters.like.on_date = $('#formFilter').find('[name="date[on_date]"]').val() ?? null;
+						filters.date.start_date = $('#formFilter').find('[name="date[start_date]"]').val() ?? null;
+						filters.date.end_date = $('#formFilter').find('[name="date[end_date]"]').val() ?? null;
+						filters.date.on_date = $('#formFilter').find('[name="date[on_date]"]').val() ?? null;
+
+						$('#formFilter').find('[name^="like"]').each(function() {
+							const match = this.name.match(/\[(.*?)\]/);
+							if(match) {
+								const key = match[1];
+								if(key === 'value') {
+									filters.like.push({
+										field: $('#formFilter').find('[name="like[field]"]').val() ?? null,
+										value: $('#formFilter').find('[name="like[value]"]').val() ?? null,
+									})
+								}else if(key !== 'field'){
+									filters.like.push({
+										field: key,
+										value: this.value,
+									})
+								}
+							}
+						});
+
+						$('#formFilter').find('[name^="where"]').each(function() {
+							const match = this.name.match(/\[(.*?)\]/);
+							if (match) {
+								const key = match[1];
+								filters.where[key] = this.value;
+							}
+						});
 
 						$('#formFilter').find('[name^="where"]').each(function() {
 							const match = this.name.match(/\[(.*?)\]/);
