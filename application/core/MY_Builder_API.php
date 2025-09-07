@@ -1149,7 +1149,7 @@ class MY_Builder_API extends MY_Controller_API
         $class = $this->input->patch('class') ?? null;
         if(!$class) $this->response(['code' => EMPTY_REQUIRED_DATA]);
 
-        $filename = $class.'_upload_sample.xlsx';;
+        $filename = $class.'_upload_sample.xlsx';
         $filepath = 'public'.DIRECTORY_SEPARATOR.'sample'.DIRECTORY_SEPARATOR;
         if(!unlink(FCPATH.$filepath.$filename)) $this->response(['code' => INTERNAL_SERVER_ERROR]);
 
