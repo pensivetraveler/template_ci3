@@ -111,11 +111,13 @@ class MY_Builder_API extends MY_Controller_API
                         }
                         break;
                     case 'like' :
-                        if($filter['value']) {
-                            $return['filter']['like'] = [
-                                'field' => $filter['field']??'',
-                                'value' => $filter['value'],
-                            ];
+                        foreach ($filter as $item) {
+                            if(!is_empty($item, 'value')) {
+                                $return['filter']['like'][] = [
+                                    'field' => $item['field']??'',
+                                    'value' => $item['value'],
+                                ];
+                            }
                         }
                         break;
                     case 'date' :
@@ -780,7 +782,7 @@ class MY_Builder_API extends MY_Controller_API
                 if(is_file_posted($key)) {
                     $config = $this->config->item($this->router->class . '_' . $key . '_upload_config')
                         ?: $this->config->item($key . '_upload_config')
-                        ?: $this->config->item('base_upload_config');
+                            ?: $this->config->item('base_upload_config');
 
                     if(!array_key_exists('allowed_types', $config))
                         throw new Exception('Upload config is not defined : '.$key, UPLOAD_FILE_FAIL);
