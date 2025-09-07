@@ -32,14 +32,13 @@ class MY_Controller extends CI_Controller
         $this->load->view("includes/View_footer");
     }
 
-    function response($data = NULL, $http_code = NULL)
+    function setResponseData($data = NULL, $http_code = NULL): object
     {
-        header('Content-Type: application/json; charset=utf-8');
+        header('Content-Type: application/json;charset=utf-8');
 
         if(is_empty($data, 'code') && $http_code === null)
             show_error('Insufficient response data provided');
 
-        if($http_code === null) $http_code = floor((int)$data['code']/10);
         $http_big_code = floor($http_code/100);
 
         $response = new StdClass();
@@ -69,6 +68,14 @@ class MY_Controller extends CI_Controller
         }
 
         if(!is_empty($data, 'extra')) foreach ($data['extra'] as $k=>$v) $response->{$k} = $v;
+
+        return $response;
+    }
+
+    function response($data = NULL, $http_code = NULL)
+    {
+        if($http_code === null) $http_code = floor((int)$data['code']/10);
+        $response = $this->setResponseData($data, $http_code);
 
         $this->output
             ->set_status_header($http_code)
