@@ -3,32 +3,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Common extends MY_Builder_API
 {
-	function __construct()
-	{
-		parent::__construct();
-	}
+    function __construct()
+    {
+        parent::__construct();
+    }
 
-	protected function auth()
-	{
+    protected function auth()
+    {
 
-	}
+    }
 
-	protected function beforeList($data): array
-	{
-		$data = parent::beforeList($data);
+    protected function beforeList($data): array
+    {
+        $data = parent::beforeList($data);
 
-		$extraFields = [];
+        $extraFields = [];
 
-		if($this->input->get('format') === 'datatable') {
-			$extraFields['draw'] = (int)$this->input->get('draw');
-			// 전체 레코드 수
-			$extraFields['recordsTotal'] = $this->Model->getCnt($data);
-			// 검색필터가 적용된 레코드 수
-			if( isset($data['filter']) ) {
-				$extraFields['recordsFiltered'] = $this->Model->getCnt($data);
-			}else{
-				$extraFields['recordsFiltered'] = $extraFields['recordsTotal'];
-			}
+        if($this->input->get('format') === 'datatable') {
+            $extraFields['draw'] = (int)$this->input->get('draw');
+            // 전체 레코드 수
+            $extraFields['recordsTotal'] = $this->Model->getCnt($data);
+            // 검색필터가 적용된 레코드 수
+            if( isset($data['filter']) ) {
+                $extraFields['recordsFiltered'] = $this->Model->getCnt($data);
+            }else{
+                $extraFields['recordsFiltered'] = $extraFields['recordsTotal'];
+            }
 
             if((int)$this->input->get('limit') !== -1) {
                 $limit = (int)$this->input->get('limit')?:10;
@@ -37,51 +37,54 @@ class Common extends MY_Builder_API
                     'offset' => (int)$this->input->get('pageNo')*$limit,
                 ];
             }
-		}
+        }
 
-		$data['extraFields'] = $extraFields;
+        $data['extraFields'] = $extraFields;
 
-		return $data;
-	}
+        return $data;
+    }
 
-	protected function transformView($data): object
-	{
-		$data = parent::transformView($data);
+    protected function transformView($data): object
+    {
+        $data = parent::transformView($data);
 
-		if(property_exists($data, 'created_dt') && !empty($data->created_dt)) {
-			$data->recent_dt = $data->created_dt;
-			if(property_exists($data, 'updated_dt') && !empty($data->updated_dt)) {
-				$data->recent_dt = $data->updated_dt;
-			}
-		}
+        // date 기본값 초기화
+        foreach ($data as $k=>$v) if($v === '0000-00-00') $data->{$k} = '';
 
-		if(property_exists($data, 'created_id') && !empty($data->created_id)) {
-			$data->created_id = $this->Model_User->getDataWhere([], ['user_id' => $data->created_id])->id;
-		}
+        if(property_exists($data, 'created_dt') && !empty($data->created_dt)) {
+            $data->recent_dt = $data->created_dt;
+            if(property_exists($data, 'updated_dt') && !empty($data->updated_dt)) {
+                $data->recent_dt = $data->updated_dt;
+            }
+        }
 
-		if(property_exists($data, 'updated_id') && !empty($data->updated_id)) {
-			$data->updated_id = $this->Model_User->getDataWhere([], ['user_id' => $data->updated_id])->id;
-		}
+        if(property_exists($data, 'created_id') && !empty($data->created_id)) {
+            $data->created_id = $this->Model_User->getDataWhere([], ['user_id' => $data->created_id])->id;
+        }
 
-		return $data;
-	}
+        if(property_exists($data, 'updated_id') && !empty($data->updated_id)) {
+            $data->updated_id = $this->Model_User->getDataWhere([], ['user_id' => $data->updated_id])->id;
+        }
 
-	public function message_read_patch($key)
-	{
-		$tokenData = $this->validateToken();
+        return $data;
+    }
 
-		$this->load->model('Model_Message');
-		$this->Model_Message->modData([
-			'read_yn' => 'Y'
-		], [
-			'message_id' => $key,
-			'user_id' => $tokenData->user_id,
-		]);
+    public function message_read_patch($key)
+    {
+        $tokenData = $this->validateToken();
 
-		$this->response([
-			'code' => DATA_PROCESSED,
-		]);
-	}
+        $this->load->model('Model_Message');
+        $this->Model_Message->modData([
+            'read_yn' => 'Y'
+        ], [
+            'message_id' => $key,
+            'user_id' => $tokenData->user_id,
+        ]);
+
+        $this->response([
+            'code' => DATA_PROCESSED,
+        ]);
+    }
 
     protected function sendEmail($dto = [])
     {
