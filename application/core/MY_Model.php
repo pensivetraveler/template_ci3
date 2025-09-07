@@ -14,14 +14,14 @@ class MY_Model extends CI_Model
     public array $fileList = [];
     public array $defaultOrderBy = [];
 
-	public bool    $isAutoIncrement = false;
-	public bool    $isDelYn = false;
-	public bool    $isUseYn = false;
-	public bool    $isCreatedDt = false;
-	public bool    $isCreatedId = false;
-	public bool    $isUpdatedDt = false;
+    public bool    $isAutoIncrement = false;
+    public bool    $isDelYn = false;
+    public bool    $isUseYn = false;
+    public bool    $isCreatedDt = false;
+    public bool    $isCreatedId = false;
+    public bool    $isUpdatedDt = false;
 
-	function __construct()
+    function __construct()
     {
         log_message('info', 'Model Class Initialized');
         $this->load->database();
@@ -117,15 +117,15 @@ class MY_Model extends CI_Model
         $this->db->where($where);
         if(count($select) > 0) $this->db->select($select);
 
-		$result = $this->db->get($table)->result();
+        $result = $this->db->get($table)->result();
 
-		if(count($select) === 1) {
-			return array_map(function ($curr) use ($select) {
-				return $curr->{$select[0]};
-			}, $result);
-		}else{
-			return $result;
-		}
+        if(count($select) === 1) {
+            return array_map(function ($curr) use ($select) {
+                return $curr->{$select[0]};
+            }, $result);
+        }else{
+            return $result;
+        }
     }
 
     public function getCntPDO($table, $where = [])
@@ -212,7 +212,7 @@ class MY_Model extends CI_Model
     */
     public function where($table, $data)
     {
-		if(!empty($data)) {
+        if(!empty($data)) {
             if(is_list_type($data)) {
                 foreach ($data as $item) {
                     $this->where($table, $item);
@@ -251,7 +251,7 @@ class MY_Model extends CI_Model
                         }
                         $this->db->group_end();
                     }else{
-                        $this->db->where($table.'.'.$key, $val);
+                        $this->db->like($table.'.'.$key, $val, 'both');
                     }
                 }
             }
@@ -335,37 +335,41 @@ class MY_Model extends CI_Model
         }
     }
 
-    public function join($table, $data = [])
+    public function join($table, $data = [], $alias = null)
     {
         if(!empty($data)) {
             if(is_list_type($data)){
                 foreach ($data as $item) $this->join($table, $item);
             }else{
-                if(is_empty($data, 'select')) {
+                if(!qb_join_exists($this->db, $data['table'])) {
+                    if(is_empty($data, 'select')) {
+                        foreach ($data['matches'] as $key=>$val) {
+                            $this->db->select($data['table'].'.'.$key);
+                        }
+                    }else if(is_string($data['select'])){
+                        $this->db->select($data['table'].'.'.$data['select']);
+                    }else{
+                        foreach ($data['select'] as $select) {
+                            $this->db->select($data['table'].'.'.$select);
+                        }
+                    }
+
+                    $matchQuery = '';
+                    $i = 0;
                     foreach ($data['matches'] as $key=>$val) {
-                        $this->db->select($data['table'].'.'.$key);
+                        if($i > 0) $matchQuery .= " AND ";
+                        $matchQuery .= " {$data['table']}.{$key} = {$table}.{$val} ";
+                        $i++;
                     }
-                }else if(is_string($data['select'])){
-                    $this->db->select($data['table'].'.'.$data['select']);
-                }else{
-                    foreach ($data['select'] as $select) {
-                        $this->db->select($data['table'].'.'.$select);
+
+                    if(!qb_join_exists($this->db, $data['table'], $matchQuery, $data['direction']??'left')) {
+                        $this->db->join(
+                            $data['table'],
+                            $matchQuery,
+                            $data['direction']??'left'
+                        );
                     }
                 }
-
-                $matchQuery = '';
-                $i = 0;
-                foreach ($data['matches'] as $key=>$val) {
-                    if($i > 0) $matchQuery .= " AND ";
-                    $matchQuery .= " {$data['table']}.{$key} = {$table}.{$val} ";
-                    $i++;
-                }
-
-                $this->db->join(
-                    $data['table'],
-                    $matchQuery,
-                    $data['direction']??'left'
-                );
             }
         }
     }
@@ -415,8 +419,8 @@ class MY_Model extends CI_Model
     */
     public function getTableInfo($table = '')
     {
-		if(!$table) $table = $this->table;
-		return $this->getListQuery("
+        if(!$table) $table = $this->table;
+        return $this->getListQuery("
 			SELECT * 
 			FROM
 			    INFORMATION_SCHEMA.columns
@@ -425,23 +429,23 @@ class MY_Model extends CI_Model
 				AND table_schema = ?
 				AND table_name = ?
 		", [
-			$this->db->database,
-			$this->db->dbprefix.$table
-		]);
+            $this->db->database,
+            $this->db->dbprefix.$table
+        ]);
     }
 
     public function getTableColumns($table = ''): array
-	{
-		if(!$table) $table = $this->table;
+    {
+        if(!$table) $table = $this->table;
         $result = array_map(function($item) {
-			return (array)$item;
-		}, $this->getTableInfo($table));
+            return (array)$item;
+        }, $this->getTableInfo($table));
         return array_column($result, 'COLUMN_NAME');
     }
 
     public function getTableFields($table = '')
     {
-		if(!$table) $table = $this->table;
-		return $this->db->list_fields($table);
+        if(!$table) $table = $this->table;
+        return $this->db->list_fields($table);
     }
 }
