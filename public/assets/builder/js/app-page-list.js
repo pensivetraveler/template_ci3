@@ -98,14 +98,6 @@ $(function () {
 								filters.where[key] = this.value;
 							}
 						});
-
-						$('#formFilter').find('[name^="where"]').each(function() {
-							const match = this.name.match(/\[(.*?)\]/);
-							if (match) {
-								const key = match[1];
-								filters.where[key] = this.value;
-							}
-						});
 					}
 
 					req.filters = filters;
@@ -469,7 +461,7 @@ $(function () {
 			var element = event.elements[0];  // The field element
 			element.addEventListener('change', function() {
 				// Revalidate field when flatpickr
-				if(element.classList.contains('.form-input_date-flatpickr')) fv.revalidateField(field);
+				if(element.classList.contains('form-input_date-flatpickr')) fv.revalidateField(field);
 				// Revalidate field whenever input changes
 				// e.fv.revalidateField(field);
 			});
@@ -579,7 +571,7 @@ function renderColumn(data, type, full, meta, column) {
 
 	// class
 	if(column.classes.length)
-		for(const className of classed) wrap.classList.add(className);
+		for(const className of column.classes) wrap.classList.add(className);
 
 	// inner
 	let inner;
