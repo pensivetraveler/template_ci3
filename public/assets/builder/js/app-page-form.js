@@ -814,7 +814,6 @@ function setFormListItem(selector, data, field) {
 }
 
 function setFormListItemFile(field, item, identifier = '') {
-	const url = location.origin+location.pathname;
 	const fullItem = JSON.stringify(item).replace(/"/g, "'");
 	const articleId = item.article_id ?? '';
 	const fileId = item.file_id;
@@ -843,6 +842,7 @@ function setFormListItemFile(field, item, identifier = '') {
         `;
 		return output;
 	}else{
+		const url = common.BASE_URI+'/common';
 		return `
         <div class="form-list-item d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
             <div class="badge text-body text-truncate">
@@ -857,7 +857,7 @@ function setFormListItemFile(field, item, identifier = '') {
 }
 
 function setFormListItemThumbnail(field, item, identifier = '') {
-	const url = location.origin+location.pathname;
+	const url = common.BASE_URI+'/common';
 	const fullItem = JSON.stringify(item).replace(/"/g, "'");
 	return `
         <div class="form-list-item d-flex align-items-start flex-column justify-content-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
