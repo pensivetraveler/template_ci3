@@ -356,11 +356,21 @@ function elementToSelector(element) {
 	return selector;
 }
 
-function redirect(uri = null) {
+function redirect(uri = null, newTab = false) {
 	if(uri === null) {
 		back();
 	}else{
-		location.href = uri;
+		if(newTab) {
+			const a = document.createElement('a');
+			a.href = uri;
+			a.target = '_blank';
+			a.style.display = 'none';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+		}else{
+			location.href = uri;
+		}
 	}
 }
 
