@@ -774,7 +774,7 @@ class MY_Builder_API extends MY_Controller_API
         if(is_null($model)) $model = $this->Model;
         $key = null;
         try {
-            $uploadPath = set_realpath('public/uploads/'.$this->router->class.'/'.date('Y').'/');
+            $uploadPath = 'public/uploads/'.$this->router->class.'/'.date('Y').'/';
             if(!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
 
             $files = $_FILES;

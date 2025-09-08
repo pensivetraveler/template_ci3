@@ -119,7 +119,7 @@ class MY_Controller extends CI_Controller
         if (is_null($_files)) $_files = $_FILES;
 
         if (array_key_exists($name, $_files) && $_files[$name] && $_files[$name]['name']) {
-            $uploadPath = set_realpath('public/uploads/' . $this->router->class . '/' . date('Y') . '/');
+            $uploadPath = 'public/uploads/' . $this->router->class . '/' . date('Y') . '/';
             if (!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
 
             $this->upload->initialize(
