@@ -1,4 +1,13 @@
 <div class="col-md-<?=$item['colspan']?> mb-6 form-validation-unit" data-field-name="<?=$item['field']??''?>">
+	<?php
+		echo form_input(
+			[
+				'type' => 'hidden',
+				'name' => $item['field'].'_unique',
+				'id' => $item['id'].'_unique',
+			]
+		);
+	?>
 	<?=get_builder_form_label($item, ['class' => 'd-block col-form-label fs-6 text-primary py-0 mb-2 fw-bolder'])?>
 	<div class="input-group input-group-merge">
 		<?php
