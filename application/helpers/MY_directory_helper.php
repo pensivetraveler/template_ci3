@@ -13,7 +13,7 @@ function make_directory($path, $mode = 0755): bool
         if(is_dir($total_path)) {
             continue;
         }else{
-            $result = @mkdir($total_path, DIR_READ_MODE);
+            $result = @mkdir($total_path, $mode);
             @chmod($total_path, $mode);
             if(!$result) continue;
         }
