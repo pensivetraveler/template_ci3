@@ -1000,7 +1000,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 ]);
 
                 // 폴더가 없으면 생성
-                if (!file_exists($filepath)) mkdir($filepath, 0755, true);
+                if (!file_exists($filepath)) make_directory($filepath, 0755);
 
                 $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
                 $writer->save($filepath . $filename);
