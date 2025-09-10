@@ -46,7 +46,7 @@ class MY_Controller extends CI_Controller
         $response->msg = is_empty($data, 'msg')?$this->lang->status($response->code):$data['msg'];
         $response->data = [];
         if(!is_empty($data, 'data')) {
-            if(is_array($data['data'])) {
+            if(is_array($data['data']) && is_list_type($data['data'])) {
                 $response->data = $data['data'];
             }else{
                 $response->data[] = $data['data'];
