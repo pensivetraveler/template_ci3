@@ -180,6 +180,11 @@ $config['page_config'] = [
                 'buttons' => [
                     'add' => false,
                     'excel' => false,
+                    'resetDB' => [
+                        'text' => 'DB 초기화',
+                        'classes' => ['btn','btn-warning','waves-effect','waves-light','me-4','my-5'],
+                        'action' => 'resetMenuAuthDB',
+                    ],
                 ],
                 'properties' => [
                     'filterConfig' => 'menu_auth'
