@@ -1,3 +1,4 @@
+
 <?php
 /* status codes */
 $lang['status_code'][HTTP_CONTINUE] = 'HTTP_CONTINUE';
@@ -90,6 +91,7 @@ $lang['status_code'][USER_NOT_EXIST] = 'No matching account exists.';
 $lang['status_code'][PASSWORD_IS_NOT_MATCHED] = 'Password is not matched with ID.';
 $lang['status_code'][API_NOT_EXIST] = 'API is not registered.';
 $lang['status_code'][ERROR_DOWNLOAD_NOTFILE] = 'Download file is not available.';
+$lang['status_code'][NO_REMAIN_ADMINS] = 'One Administrator should be exist at least.';
 $lang['status_code'][DATA_ALREADY_EXIST] = 'The data already exists.';
 $lang['status_code'][ID_ALREADY_EXIST] = 'The ID already exists.';
 $lang['status_code'][EMAIL_ALREADY_EXIST] = 'The email already exists.';

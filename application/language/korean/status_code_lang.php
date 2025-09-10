@@ -27,6 +27,7 @@ $lang['status_code'][USER_NOT_EXIST] = '일치하는 계정이 존재하지 않�
 $lang['status_code'][PASSWORD_IS_NOT_MATCHED] = '비밀번호를 확인해주세요.';
 $lang['status_code'][API_NOT_EXIST] = '등록된 API 경로가 아닙니다.';
 $lang['status_code'][ERROR_DOWNLOAD_NOTFILE] = 'DOWNLOAD 파일이 조회되지 않습니다.';
+$lang['status_code'][NO_REMAIN_ADMINS] = '최소 1명의 관리자가 존재해야 합니다.';
 $lang['status_code'][DATA_ALREADY_EXIST] = '등록된 데이터가 존재합니다.';
 $lang['status_code'][ID_ALREADY_EXIST] = '등록된 아이디가 존재합니다.';
 $lang['status_code'][EMAIL_ALREADY_EXIST] = '등록된 이메일이 존재합니다.';
