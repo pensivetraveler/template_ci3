@@ -219,10 +219,11 @@ class MY_Model extends CI_Model
                 }
             }else{
                 foreach ($data as $key=>$val) {
+                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
                     if(is_array($val)) {
-                        $this->db->where_in($table.'.'.$key, $val);
+                        $this->db->where_in($column, $val);
                     }else{
-                        $this->db->where($table.'.'.$key, $val);
+                        $this->db->where($column, $val);
                     }
                 }
             }
@@ -240,18 +241,19 @@ class MY_Model extends CI_Model
                 }
             }else{
                 foreach ($data as $key=>$val) {
+                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
                     if(is_array($val)) {
                         $this->db->group_start();
                         foreach ($val as $i=>$subVal) {
                             if($i === 0) {
-                                $this->db->like($table.'.'.$key, $subVal, 'both');
+                                $this->db->like($column, $subVal, 'both');
                             }else{
-                                $this->db->or_like($table.'.'.$key, $subVal, 'both');
+                                $this->db->or_like($column, $subVal, 'both');
                             }
                         }
                         $this->db->group_end();
                     }else{
-                        $this->db->like($table.'.'.$key, $val, 'both');
+                        $this->db->like($column, $val, 'both');
                     }
                 }
             }
@@ -266,18 +268,20 @@ class MY_Model extends CI_Model
                 show_error('Only One among Keys and Vals can be array type.');
             }elseif (is_array($keys) && !is_array($vals)) {
                 foreach ($keys as $i=>$key) {
+                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
                     if($i === 0) {
-                        $this->db->like($table.'.'.$key, $vals, 'both');
+                        $this->db->like($column, $vals, 'both');
                     }else{
-                        $this->db->or_like($table.'.'.$key, $vals, 'both');
+                        $this->db->or_like($column, $vals, 'both');
                     }
                 }
             }elseif (!is_array($keys) && is_array($vals)) {
+                $column = str_contains($keys, '.') ? $keys : $table.'.'.$keys;
                 foreach ($vals as $i=>$val) {
                     if($i === 0) {
-                        $this->db->like($table.'.'.$keys, $val, 'both');
+                        $this->db->like($column, $val, 'both');
                     }else{
-                        $this->db->or_like($table.'.'.$keys, $val, 'both');
+                        $this->db->or_like($column, $val, 'both');
                     }
                 }
             }else{
@@ -296,10 +300,11 @@ class MY_Model extends CI_Model
                 }
             }else{
                 foreach ($data as $key=>$val) {
+                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
                     if(is_array($val)) {
-                        $this->db->where_in($table.'.'.$key, $val);
+                        $this->db->where_in($column, $val);
                     }else{
-                        $this->db->where_in($table.'.'.$key, [$val]);
+                        $this->db->where_in($column, [$val]);
                     }
                 }
             }
@@ -314,10 +319,11 @@ class MY_Model extends CI_Model
             }
         }else{
             foreach ($data as $key=>$val) {
+                $column = str_contains($key, '.') ? $key : $table.'.'.$key;
                 if(is_array($val)) {
-                    $this->db->where_not_in($table.'.'.$key, $val);
+                    $this->db->where_not_in($column, $val);
                 }else{
-                    $this->db->where_not_in($table.'.'.$key, [$val]);
+                    $this->db->where_not_in($column, [$val]);
                 }
             }
         }
@@ -380,12 +386,14 @@ class MY_Model extends CI_Model
             if(is_list_type($data)) {
                 foreach ($data as $item) {
                     foreach ($item as $key => $val) {
-                        $this->db->order_by($table.'.'.$key, $val);
+                        $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                        $this->db->order_by($column, $val);
                     }
                 }
             }else{
                 foreach ($data as $key => $val) {
-                    $this->db->order_by($table.'.'.$key, $val);
+                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                    $this->db->order_by($column, $val);
                 }
             }
         }else{
@@ -407,7 +415,8 @@ class MY_Model extends CI_Model
                     $this->groupBy($table, $item);
                 }
             }else{
-                $this->db->group_by($table.'.'.$data);
+                $column = str_contains($data, '.') ? $data : $table.'.'.$data;
+                $this->db->group_by($column);
             }
         }
     }
