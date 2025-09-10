@@ -10,10 +10,19 @@ class MenuList extends Common
         parent::__construct();
 
         $this->load->model('Model_Menu', 'Model');
+        $this->load->model('Model_Menu_Auth');
 
         $this->setProperties($this->Model);
 
         if($this->flag !== 'admin') show_404();
+    }
+
+    public function reset_get()
+    {
+        $this->Model->truncate();
+        $this->Model_Menu_Auth->truncate();
+        $this->cache->file->delete('menu_done');
+        $this->response(['code' => DATA_PROCESSED]);
     }
 
     public function caching_get()
@@ -178,5 +187,36 @@ class MenuList extends Common
         $menuList = $this->deformMenuList($this->list([], false)['list']);
 
         $this->cache->file->save('menu_done', $menuList, 0);
+    }
+
+    public function options_get()
+    {
+        $class = $this->input->get('class');
+
+        $pageConfig = $this->config->get('page_config');
+
+        $data = [];
+
+        $filtered = array_filter($pageConfig, function($v, $k) use ($class) {
+            return preg_match("/^" . preg_quote($class, "/") . "$/i", $k);
+        }, ARRAY_FILTER_USE_BOTH);
+
+        if($filtered) {
+            $data[] = [
+                'id' => 'index',
+                'text' => 'Index',
+            ];
+            $conf = array_values($filtered)[0];
+            $baseMethod = $conf['properties']['baseMethod'];
+            foreach (array_keys($conf['methods']) as $method) {
+                if($method === $baseMethod) continue;
+                $data[] = [
+                    'id' => $method,
+                    'text' => ucfirst($method),
+                ];
+            }
+        }
+
+        $this->response(['code' => DATA_PROCESSED, 'data' => $data]);
     }
 }
