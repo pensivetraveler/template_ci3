@@ -509,7 +509,7 @@ $config['form_menu_list_config'] = [
             'change_after' => [
                 'params' => [
                     'target' => '[name="method"]',
-                    'add_uri' => 'getMethodList',
+                    'add_uri' => 'options',
                 ],
                 'callback' => 'setDynamicSelect2Options',
             ]
