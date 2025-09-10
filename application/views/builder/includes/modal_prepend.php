@@ -26,15 +26,7 @@
 														</ul>
 														<div class="tab-content ps-8 pe-8">
 															<div class="tab-pane fade show active" id="navs-left-home" role="tabpanel">
-																<p>
-																	Donut dragée jelly pie halvah. Danish gingerbread bonbon cookie wafer candy oat cake ice
-																	cream. Gummies halvah tootsie roll muffin biscuit icing dessert gingerbread. Pastry ice
-																	cream cheesecake fruitcake.
-																</p>
-																<p class="mb-0">
-																	Jelly-o jelly beans icing pastry cake cake lemon drops. Muffin muffin pie tiramisu halvah
-																	cotton candy liquorice caramels.
-																</p>
+																<p class="mb-0">No Benchmark Data</p>
 															</div>
 														</div>
 													</div>
