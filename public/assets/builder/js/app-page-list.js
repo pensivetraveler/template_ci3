@@ -285,6 +285,7 @@ $(function () {
 				});
 
 				preparePlugins(document.querySelector('#formFilter'));
+				refreshPlugins(document.querySelector('#formFilter'));
 
 				$('.form-type-filter').find('.btn-search').on('click', function(e) {
 					dt.ajax.reload();
@@ -292,10 +293,11 @@ $(function () {
 
 				$('.form-type-filter').find('.btn-reset').on('click', function(e) {
 					e.preventDefault();
-					$('.form-type-filter')[0].reset();
+					resetFrmInputs(document.querySelector('#formFilter'));
 					if($('.form-type-filter').find('.form-select').length) {
 						$('.form-type-filter').find('.form-select').trigger('change')
 					}
+					preparePlugins(document.querySelector('#formFilter'));
 					dt.ajax.reload();
 				});
 			}
@@ -362,7 +364,7 @@ $(function () {
 
 		offCanvasElement.addEventListener('show.bs.offcanvas', function(e) {
 			console.log('offcanvas show');
-			refreshPlugins(formRecord);
+			refreshPlugins(formRecord, record);
 			document.getElementById('offcanvasLabel').textContent = getLocale(`${capitalize(this.querySelector(formSelector)['_mode'].value)} Record`, common.LOCALE);
 		});
 
@@ -379,10 +381,25 @@ $(function () {
 			safeReset(fv);
 		});
 
-		$('.dataTables_wrapper').on('click', '.edit-record', function() {
+		$('.dataTables_wrapper').on('click', '.edit-record', function(e) {
 			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 			readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
 			fetchFrmValues(document.querySelector(formSelector), getRedirectActionData(this, common.IDENTIFIER));
+		});
+
+		$('.dataTables_wrapper').on('click', '.duplicate-record', function(e) {
+			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
+			executeAjax({
+				url: getUrlWithIdentifiers(common.API_URI + '/' + 'duplicate', getRedirectActionData(this, common.IDENTIFIER)),
+				success: function(response) {
+					showAlert({
+						type: 'success',
+						title: 'Complete',
+						text: response.msg,
+						callback: reload,
+					});
+				},
+			});
 		});
 
 		formRecord.addEventListener('readyFrmInputs', (e) => {
@@ -392,7 +409,6 @@ $(function () {
 		formRecord.addEventListener("fetchFrmValues", (e) => {
 			readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
 			applyFrmValues(formRecord, record, common.FORM_DATA);
-			refreshPlugins(formRecord);
 			offCanvasEl.show();
 		});
 
@@ -610,12 +626,13 @@ function renderColumn(data, type, full, meta, column) {
 			case 'checkbox':
 				switch (column.subtype) {
 					case 'boolean' :
+						const idData = getIdentifiersData(full, common.IDENTIFIER, true).replace(/"/gi, "'");
 						inner = `
 							<input
 								type="checkbox"
 								value="1"
 								${data===1?'checked':''}
-								onchange="afterCheckboxColumnChange(${getIdentifiersData(full, common.IDENTIFIER, true)}, '${column.field}', this.value)"
+								onchange="afterCheckboxColumnChange(${idData}, '${column.field}', this.checked?1:0)"
 								class="form-check-input"
 							>
 						`;
@@ -1035,6 +1052,7 @@ function getListActions(btns, full, identifiers = []) {
 		edit : '<i class="ri-edit-box-line"></i>',
 		view : '<i class="ri-eye-line ri-20px"></i>',
 		delete : '<i class="ri-delete-bin-7-line ri-20px"></i>',
+		duplicate : '<i class="ri-file-copy-2-fill ri-20px"></i>',
 	};
 
 	let btnHtml = '<div class="d-flex align-items-center gap-50">';
