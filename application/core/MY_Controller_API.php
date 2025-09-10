@@ -122,14 +122,21 @@ class MY_Controller_API extends RestController
         ]);
     }
 
-    public function response($data = null, $http_code = null)
+    public function response($data = null, $http_code = null, $exit = true)
     {
         if($http_code === null) $http_code = floor((int)$data['code']/10);
         $response = $this->setResponseData($data, $http_code);
-
         RestController::response($response, $http_code);
-        $this->output->_display();
-        exit;
+
+        if ($exit) {
+            // 최종 헤더+본문을 즉시 전송
+            $this->output->_display();
+            // FPM 환경이면 클라이언트 요청 마무리(선응답)
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
+            exit; // 이후 코드 실행 방지
+        }
     }
 
     protected function keyNotExist()
