@@ -67,6 +67,7 @@ $lang['Verify Admin Account'] = 'Verify Your Admin Username And Password';
 $lang['Settings'] = 'Settings';
 $lang['Add Record'] = 'New Record';
 $lang['Edit Record'] = 'Edit Record';
+$lang['Data replication has been completed'] = 'Data replication has been completed.';
 
 /**
  * system

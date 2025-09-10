@@ -67,6 +67,7 @@ $lang['Verify Admin Account'] = '관리자 계정을 입력해주세요.';
 $lang['Settings'] = '설정';
 $lang['Add Record'] = '등록';
 $lang['Edit Record'] = '수정';
+$lang['Data replication has been completed'] = '데이터 복제가 완료되었습니다.';
 
 /**
  * system
