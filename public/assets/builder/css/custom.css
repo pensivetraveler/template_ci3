@@ -181,6 +181,16 @@ html[data-style="dark"] .border-input {
 	color: #fff !important;
 }
 
+select.readonly ~ .select2 {
+	pointer-events: none !important;
+	background-color: #eee !important;
+}
+
+div.dataTables_wrapper:not(:has(.dataTables_length)) .dt-buttons {
+	margin-top: 1.25rem;
+	margin-bottom: 1.25rem;
+}
+
 /*********************************************
     .form-type-* common
  *********************************************/
