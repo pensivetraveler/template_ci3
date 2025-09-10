@@ -97,6 +97,7 @@
 	<!-- Search Small Screens -->
 	<div class="navbar-search-wrapper search-input-wrapper d-none">
 		<input
+				id="nav-search-input"
 				type="text"
 				class="form-control search-input container-xxl border-0"
 				placeholder="Search..."
