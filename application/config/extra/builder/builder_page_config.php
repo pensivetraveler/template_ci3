@@ -63,6 +63,7 @@ $config['page_list_base_config'] = array_replace_recursive($config['page_method_
         'excel' => true,
     ],
     'actions' => [
+        'duplicate' => false,
         'edit' => true,
         'view' => false,
         'delete' => true,
