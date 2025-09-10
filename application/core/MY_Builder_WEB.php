@@ -1079,7 +1079,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
     {
         if($this->isBuilderAvailable()){
             $this->isLogin = $this->checkLogin();
-            $this->setMenuList();
+            $this->menuList = $this->setMenuList();
 
             if(!method_exists($this, $method)) {
                 // 1) perform 메소드 실행
