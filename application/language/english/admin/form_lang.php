@@ -89,6 +89,7 @@ $lang['menu'] = [
     'update' => 'Update',
     'delete' => 'Delete',
     'user_cd' => 'User Kind',
+    'is_show' => 'Show YN',
 ];
 
 $lang['company'] = [
@@ -101,4 +102,80 @@ $lang['company'] = [
     'comp_addr1' => 'Address',
     'comp_addr2' => 'Detail Address',
     'comp_memo' => 'Memo',
+];
+
+$lang['application'] = [
+    'family_name' => 'Family Name',
+    'first_name' => 'First Name',
+    'passport_number' => 'Passport Number',
+    'issuing_country' => 'Issuing Country',
+    'issuance_date' => 'Issuance Date',
+    'expiration_date' => 'Expiration Date',
+    'citizenship_country' => 'Citizenship Country',
+    'date_of_birth' => 'Date of Birth',
+    'birth_country' => 'Birth Country',
+    'other_citizenship_country' => 'Other Citizenship',
+    'email_address' => 'Email',
+    'address_line' => 'Address',
+    'address_line1' => 'State',
+    'address_line2' => 'Region',
+    'address_line3' => 'Extra Address',
+    'zipcode' => 'Zipcode',
+    'city' => 'City',
+    'contact_country' => 'State',
+    'country_code' => 'Country Tel Code',
+    'phone_number' => 'Phone Number',
+    'job_title' => 'Job Title',
+    'face_photo' => 'Face Photo',
+    'passport_photo' => 'Passport Photo',
+    'application_status' => 'App. Status',
+    'proxy_status' => 'Proxy Status',
+];
+
+$lang['order'] = [
+    'application_id' => 'Application',
+    'transaction_id' => 'Transaction ID',
+    'capture_id' => 'Capture ID',
+    'amount' => 'Amount',
+    'card_type' => 'Card Type',
+    'last_digits' => 'Last Digits',
+    'exp_date' => 'Expiration Date',
+    'exp_year' => 'Expiration Year',
+    'exp_month' => 'Expiration Month',
+    'family_name' => 'Family Name',
+    'first_name' => 'First Name',
+    'order_status' => 'Order State',
+    'error_message' => 'Error Message',
+    'refund_yn' => 'Refund YN',
+    'refund_dt' => 'Refund Date',
+];
+
+$lang['inquiry'] = [
+    'inquiry_type' => 'Inquiry Type',
+    'family_name' => 'Family Name',
+    'first_name' => 'First Name',
+    'passport_number' => 'Passport Number',
+    'emergency_email' => 'Email',
+    'message' => 'Message',
+    'reply_yn' => 'Reply YN',
+    'inquiry_status' => 'Inquiry Status',
+    'reply_message' => 'Replied',
+    'reply' => 'Reply',
+    'reply_dt' => 'Reply Date',
+];
+
+$lang['country'] = [
+    'code' => 'Country ISO Code',
+    'code3' => 'Country ISO Code 3',
+    'country_name' => 'Country Name',
+    'use_yn' => 'Use YN',
+    'lang_code' => 'Language Code',
+];
+
+$lang['log'] = [
+    'email_type' => 'Email Type',
+    'doc_id' => 'Doc. ID',
+    'email_address' => 'Email',
+    'success_yn' => 'Send Success',
+    'debug_message' => 'Debug Message',
 ];

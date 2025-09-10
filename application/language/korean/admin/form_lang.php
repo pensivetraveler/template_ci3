@@ -90,6 +90,7 @@ $lang['menu'] = [
     'update' => '수정',
     'delete' => '삭제',
     'user_cd' => '사용자 구분',
+    'is_show' => '노출 여부',
 ];
 
 $lang['company'] = [
