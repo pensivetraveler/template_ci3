@@ -162,23 +162,11 @@ function preparePlugins(form) {
 							}
 						}
 
-						Swal.fire({
-							title: getLocale('Do you really want to delete?', common.LOCALE),
-							text: getLocale('You can\'t undo this action', common.LOCALE),
-							icon: 'warning',
-							showCancelButton: true,
-							confirmButtonText: getLocale('Delete', common.LOCALE),
-							cancelButtonText: getLocale('Cancel', common.LOCALE),
-							customClass: {
-								confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
-								cancelButton: 'btn btn-outline-secondary waves-effect'
-							},
-							buttonsStyling: false
-						}).then(function (result) {
-							if (result.isConfirmed) {
-								deleteRepeater(repeater, deleteElement)
-							}
-						});
+						showSwalAlert({
+							type: 'delete',
+							callback: deleteRepeater,
+							params: {repeater, deleteElement},
+						})
 					}
 				},
 				ready: function(setIndexes) {
@@ -548,7 +536,9 @@ function applyFrmValues(form, data, fields = []) {
 		}
 	});
 
-	updateFormLifeCycle('applyFrmValues', form);
+	updateFormLifeCycle('applyFrmValues', form, {
+		record : data,
+	});
 }
 
 function getFrmInputDto(groupAttrs, field, dataIndex = 0) {
@@ -726,7 +716,7 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
 	}
 }
 
-function refreshPlugins(form) {
+function refreshPlugins(form, data = null) {
 	// Select Picker
 	if($(form).find('.selectpicker').length){
 		$(form).find('.selectpicker').selectpicker('refresh');
@@ -774,7 +764,40 @@ function refreshPlugins(form) {
 		if(!this.children.length) this.classList.add('d-none');
 	});
 
-	updateFormLifeCycle('refreshPlugins', form);
+	// selectpicker 빈 option 처리
+	$(form).find('select.selectpicker').each(function () {
+		const $sel = $(this);
+		$sel.find('option').filter(function () {
+			var $opt = $(this);
+
+			// value 존재 여부/내용 체크
+			var hasValueAttr = $opt.is('[value]');
+			var val = $opt.attr('value');
+			var isValueEmpty = !hasValueAttr || (String(val).trim() === '');
+
+			// 텍스트도 완전 공백만 있는 경우까지 걸러주기 (value조차 없고 text도 공백)
+			var isTextEmpty = !hasValueAttr && ($opt.text().trim() === '');
+
+			// placeholder/타이틀/디바이더 등은 유지
+			var isPlaceholder =
+				$opt.hasClass('bs-title-option') ||           // selectpicker가 만드는 타이틀 option
+				$opt.data('placeholder') === true ||
+				$opt.is(':disabled') && $opt.is(':selected') && $opt.index() === 0 ||
+				$opt.data('hidden') === true || $opt.prop('hidden') === true;
+
+			var isDivider = $opt.data('divider') === true;
+
+			// 진짜로 지울 대상만 true
+			return (isValueEmpty || isTextEmpty) && !isPlaceholder && !isDivider;
+		}).remove();
+
+		// UI 재렌더
+		$sel.selectpicker('refresh');
+	});
+
+	updateFormLifeCycle('refreshPlugins', form, {
+		record : data,
+	});
 }
 
 function setFormListItem(selector, data, field) {
@@ -966,9 +989,12 @@ function prepareSelect2(node, addOption = {}) {
 	}
 
 	$this.wrap('<div class="position-relative w-100"></div>').select2(option).on(option.onHandler);
+
+	if(node.id) resetSelect2(`#${node.id}`);
 }
 
-function setDynamicSelect2Options(node, params) {
+function setDynamicSelect2Options(selector, params) {
+	const node = document.querySelector(selector);
 	if(!node.value) return;
 
 	const $select2 = $(params.target);
@@ -1008,8 +1034,48 @@ function setDynamicSelect2Options(node, params) {
 		});
 }
 
-/*
- * Dynamif Fields 관련 methods
+// select2 option selected 유동적 부여
+function reloadSelect2(selector, url, preselectedIds = [], template = {id:'id',text:'text'}) {
+	// 비워주기
+	const $sel = $(selector);
+	$sel.val(null).trigger('change');
+	$sel.empty(); // 옵션 싹 비움
+
+	$.getJSON(url).done(function (json) {
+		const rows = json.data || [];
+		rows.forEach(function (row) {
+			const id   = row[template.id];
+			const text = row[template.text];
+			const isSelected = Array.isArray(preselectedIds)
+				? preselectedIds.includes(id)
+				: preselectedIds === id;
+
+			// new Option(text, value, defaultSelected, selected)
+			const opt = new Option(text, id, isSelected, isSelected);
+			$sel.append(opt);
+		});
+
+		// 다 채운 후 Select2 갱신
+		$sel.trigger('change');
+	});
+}
+
+function resetSelect2(selector, removeOptions = false) {
+	const defaultValue = $(selector).attr('data-default-value')??null;
+	$(selector).val(defaultValue).trigger('change')
+	if(removeOptions) $(selector).empty();
+}
+
+function setSelect2Readonly(selector, reverse = false) {
+	if(reverse) {
+		document.querySelector(selector).classList.remove('readonly');
+	}else{
+		document.querySelector(selector).classList.add('readonly');
+	}
+}
+
+/**
+ * Dynamic Fields 관련 methods
  */
 function addDynamicField(fvInstance, name, options) {
 	const form = fvInstance.form; // 또는 document.querySelector('form');
