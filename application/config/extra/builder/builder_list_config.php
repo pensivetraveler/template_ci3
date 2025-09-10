@@ -73,6 +73,12 @@ $config['list_menu_auth_config'] = [
         'label' => 'lang:menu.code',
     ],
     [
+        'field' => 'is_show',
+        'label' => 'lang:menu.is_show',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+    ],
+    [
         'field' => 'create',
         'label' => 'lang:menu.create',
         'type' => 'checkbox',
