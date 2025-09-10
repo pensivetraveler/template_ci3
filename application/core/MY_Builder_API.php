@@ -182,7 +182,7 @@ class MY_Builder_API extends MY_Controller_API
         return $data;
     }
 
-    protected function afterList($data, $isResponse = true): array
+    protected function afterList($data, $isResponse = true)
     {
         if($isResponse) {
             $this->beforeResponse($data, true);
@@ -230,7 +230,7 @@ class MY_Builder_API extends MY_Controller_API
         return [$key, $data];
     }
 
-    protected function afterView($key, $data, $isResponse = true): array
+    protected function afterView($key, $data, $isResponse = true)
     {
         if($isResponse) {
             $this->beforeResponse($data, true);
@@ -1174,5 +1174,28 @@ class MY_Builder_API extends MY_Controller_API
         }
 
         $this->response(['code' => DATA_RETRIEVED, 'data' => $result]);
+    }
+
+    public function duplicate_get($key = 0)
+    {
+        $data = $this->Model->getData([], [
+            $this->identifier => $key,
+        ]);
+
+        if(!$data) {
+            $this->response([
+                'code' => DATA_NOT_EXIST,
+            ]);
+        }else{
+            foreach ([$this->identifier, CREATED_ID_COLUMN_NAME, CREATED_DT_COLUMN_NAME, UPDATED_ID_COLUMN_NAME, UPDATED_DT_COLUMN_NAME, DEL_YN_COLUMN_NAME, USE_YN_COLUMN_NAME] as $field) {
+                if(property_exists($data, $field)) unset($data->{$field});
+            }
+            $this->Model->addData((array)$data);
+
+            $this->response([
+                'code' => DATA_PROCESSED,
+                'msg' => lang('Data replication has been completed')
+            ]);
+        }
     }
 }
