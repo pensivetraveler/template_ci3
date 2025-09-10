@@ -54,7 +54,7 @@ trait BuilderCommonTrait
             $menuList = $this->getMenuList();
             if(env('CACHING_MENU')) $this->saveMenuList($menuList);
         }
-        return $this->menuList = $this->setMenuData($menuList);
+        return $this->setMenuData($menuList);
     }
 
     protected function getMenuList($configName = ''): array
@@ -198,7 +198,7 @@ trait BuilderCommonTrait
             $className = basename($filePath, '.php');
             if($className === 'Common') continue;
             // 파일명에서 .php 제거
-            $classes[strtolower($className)] = $className;
+            $classes[lcfirst($className)] = $className;
         }
 
         return $classes;
