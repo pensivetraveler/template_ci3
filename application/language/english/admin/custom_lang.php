@@ -21,6 +21,10 @@ $lang['filter'] = [
     'search_word' => 'Search Word',
     'Enter The Search Word' => 'Enter The Search Word.',
     'Select The User Kind' => 'Select The User Kind',
+    'Select The Cate 1' => '대분류를 선택하세요.',
+    'Select The Cate 2' => '중분류를 선택하세요.',
+    'Select The Cate 3' => '소분류를 선택하세요.',
+    'Select The Product' => '상품을 선택하세요.',
 ];
 
 $lang['form_text'] = [
