@@ -9,9 +9,9 @@ class Model_Menu_Auth extends Model_Common
     public string  $identifier = '';
     public array   $primaryKeyList = ['user_cd', 'menu_id'];
     public array   $uniqueKeyList = [];
-    public array   $notNullList = ['user_cd','menu_id','menu_auth','scope_cd',];
+    public array   $notNullList = ['user_cd','menu_id','is_show','menu_auth','scope_cd',];
     public array   $nullList = [];
-    public array   $strList = ['user_cd','menu_auth','scope_cd',];
+    public array   $strList = ['user_cd','is_show','menu_auth','scope_cd',];
     public array   $intList = ['menu_id',];
     public array   $fileList = [];
 
