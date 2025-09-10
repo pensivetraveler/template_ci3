@@ -1,10 +1,10 @@
 <div class="row g-6 mb-6">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb"><?=get_admin_breadcrumbs($titleList)?></ol>
-    </nav>
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb"><?=get_admin_breadcrumbs($titleList)?></ol>
+	</nav>
 </div>
 <div class="row g-6 mb-6">
-    <div class="card mb-6">
+	<div class="card mb-6">
 		<div class="card-header">
 			<div class="nav-align-top system-code-nav">
 				<ul class="nav nav-tabs nav-fill" role="tablist">
@@ -43,6 +43,7 @@
 						<div class="col-12 mb-6 text-end">
 							<button class="btn btn-outline-danger" id="addMenuCodeBtn"><?=lang('Add Menu Code')?></button>
 							<button class="btn btn-outline-primary" id="addMenuBtn"><?=lang('Add New Menu')?></button>
+							<button class="btn btn-warning" id="resetMenuBtn"><?=lang('Reset Menu')?></button>
 							<button class="btn btn-primary" id="saveMenuBtn"><?=lang('Submit')?></button>
 						</div>
 						<div class="col-12">
