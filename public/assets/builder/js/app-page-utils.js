@@ -121,30 +121,6 @@ function callUserFunc(callback = undefined, params = undefined) {
 
 function showAlert(obj = {}) {
 	try {
-		var title, text;
-		if(obj.type === undefined) obj.type = 'success';
-		if(!['success', 'warning', 'error'].includes(obj.type)) throw new Error(`showAlert : Type is not allowed. ${obj.type}`);
-		if(obj.title !== undefined) title = getLocale(obj.title, common.LOCALE);
-		if(obj.text !== undefined || obj.html !== undefined) text = getLocale(obj.text, common.LOCALE);
-
-		switch (obj.type) {
-			case 'success' :
-				if(title === undefined) title = 'Success!';
-				if(text === undefined) text = getLocale('You clicked the button!', common.LOCALE);
-				break;
-			case 'warning' :
-				if(title === undefined) title = 'Warning!';
-				if(text === undefined) text = getLocale('Are you sure you want to do this?', common.LOCALE);
-				break;
-			case 'error' :
-				if(title === undefined) title = 'Error!';
-				if(text === undefined) text = getLocale('An Error Occurred', common.LOCALE);
-				break;
-		}
-
-		obj.title = title;
-		if(obj.html === undefined) obj.text = text;
-
 		showSwalAlert(obj);
 	} catch (error) {
 		customErrorHandler(error);
@@ -161,11 +137,57 @@ function swalKeydownHandler(event) {
 	}
 }
 
-function showSwalAlert(obj) {
-	Swal.fire({
+function getSwalOption(obj) {
+	let title, text;
+	if(obj.type === undefined) obj.type = 'success';
+	if(!['success', 'warning', 'error', 'delete'].includes(obj.type)) throw new Error(`showAlert : Type is not allowed. ${obj.type}`);
+	if(obj.title !== undefined) title = getLocale(obj.title, common.LOCALE);
+	if(obj.text !== undefined || obj.html !== undefined) text = getLocale(obj.text, common.LOCALE);
+
+	switch (obj.type) {
+		case 'delete' :
+			if(title === undefined) title = getLocale('Do you really want to delete?', common.LOCALE);
+			if(text === undefined) text = getLocale('You can\'t undo this action', common.LOCALE);
+			obj = Object.assign(obj, {
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonText: getLocale('Delete', common.LOCALE),
+				cancelButtonText: getLocale('Cancel', common.LOCALE),
+				customClass: {
+					confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+					cancelButton: 'btn btn-outline-secondary waves-effect'
+				},
+				buttonsStyling: false
+			});
+			break;
+		case 'confirm' :
+			if(title === undefined) title = 'Warning!';
+			if(text === undefined) text = getLocale('Are you sure you want to do this?', common.LOCALE);
+			break;
+		case 'success' :
+			if(title === undefined) title = 'Success!';
+			if(text === undefined) text = getLocale('You clicked the button!', common.LOCALE);
+			break;
+		case 'warning' :
+			if(title === undefined) title = 'Warning!';
+			if(text === undefined) text = getLocale('Are you sure you want to do this?', common.LOCALE);
+			break;
+		case 'error' :
+			if(title === undefined) title = 'Error!';
+			if(text === undefined) text = getLocale('An Error Occurred', common.LOCALE);
+			break;
+	}
+
+	obj.title = title;
+	if(obj.html === undefined) obj.text = text;
+
+	let html = null;
+	if(obj.text || obj.html) html = nl2br(obj.text??obj.html);
+
+	return Object.assign({
 		title: obj.title,
-		html: nl2br(obj.text??obj.html??null),
-		icon: obj.type,
+		html: html,
+		icon: obj.icon??obj.type,
 		customClass: {
 			confirmButton: 'btn btn-primary waves-effect waves-light'
 		},
@@ -185,15 +207,22 @@ function showSwalAlert(obj) {
 			// console.log('4 willClose')
 			document.removeEventListener('keydown', swalKeydownHandler);
 		},
-	}).then(function (result) {
-		if(obj.callback !== undefined) {
-			if(Object.hasOwn(obj, 'params') && obj.params !== null){
-				callUserFunc(obj.callback, obj.params);
+	}, obj);}
+
+function showSwalAlert(obj = {}) {
+	const option = getSwalOption(obj);
+	Swal.fire(option).then(function (result) {
+		if(result.isConfirmed) {
+			if(option.callback !== undefined) {
+				if(Object.hasOwn(option, 'params') && option.params !== null){
+					option.params.result = result;
+					callUserFunc(option.callback, option.params);
+				}else{
+					option.callback(result);
+				}
 			}else{
-				obj.callback();
+				// if(obj.type === 'error') location.reload();
 			}
-		}else{
-			// if(obj.type === 'error') location.reload();
 		}
 	});
 }
