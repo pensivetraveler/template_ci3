@@ -1623,7 +1623,8 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
                 //        max 2048 bytes will probably throw a wobbly.
                 $row = self::getInt2d($recordData, 0);
                 $extension = true;
-                $cellAddress = array_pop(array_keys($this->phpSheet->getComments()));
+                $array = array_keys($this->phpSheet->getComments());
+                $cellAddress = array_pop($array);
             }
 //            echo 'Note Address=', $cellAddress,'<br />';
 
