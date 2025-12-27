@@ -6,6 +6,7 @@ extract(trans_formdata_dit_type($formData));
 		<div class="authentication-inner py-6">
 			<!-- Login -->
 			<div class="card p-md-7 p-1">
+				<?php if(isset($hideLogoAtLogin)&&$hideLogoAtLogin === false): ?>
 				<!-- Logo -->
 				<div class="app-brand justify-content-center mt-5">
 					<a href="/admin" class="app-brand-link gap-2">
@@ -19,6 +20,7 @@ extract(trans_formdata_dit_type($formData));
 					</a>
 				</div>
 				<!-- /Logo -->
+				<?php endif; ?>
 
 				<div class="card-body mt-1">
 					<p class="mb-5 text-center"><?=lang('Verify Admin Account')?></p>
