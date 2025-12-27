@@ -491,6 +491,7 @@ function setFlatpickr(node) {
 			enableTime: false,
 			dateFormat: 'Y-m-d',
 		})
+		node.flatpickr(option);
 	}else if(node.classList.contains('flatpickr-time')) {
 		Object.assign(option, {
 			enableTime: true,
@@ -508,9 +509,19 @@ function setFlatpickr(node) {
 				timeContainer.insertBefore(amPm, timeContainer.firstChild);
 			},
 		})
+		node.flatpickr(option);
+	}else if(node.classList.contains('flatpickr-year-month')) {
+		node.flatpickr({
+			locale: 'ko',
+			plugins: [
+				new monthSelectPlugin({
+					shorthand: true,    // 기본값 false
+					dateFormat: "Y.m",  // 기본값 "F Y"
+					altFormat: "Y년 m월",   // 기본값 "F Y"
+				})
+			],
+		});
 	}
-
-	node.flatpickr(option);
 }
 
 function setCleave(node) {
