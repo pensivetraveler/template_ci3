@@ -30,7 +30,7 @@ trait BuilderCommonTrait
         foreach ($builderConfigs as $config) $this->config->load('extra/builder/'.$config, false);
 
         require_once APPPATH . 'config/extra/builder/builder_base_constants.php';
-        $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_form",]);
+        $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_form","builder/builder_api",]);
         $this->lang->load("builder/base", $this->config->item('language'));
 
         if(!$this->flag) show_error("Platform flag is not set.");
