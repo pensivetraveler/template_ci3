@@ -708,8 +708,13 @@ class MY_Builder_API extends MY_Controller_API
 
             if(!is_object($val) && !is_array($val)) $data[$key] = trim(preg_replace('/\s\s+/', ' ', $val));
             if(in_array($key, $dto->strList) && empty($val)) $data[$key] = '';
-            if(in_array($key, $dto->intList) && empty($val)) $data[$key] = 0;
-            if(in_array($key, $dto->intList) && $data[$key]) $data[$key] = (int)$data[$key];
+            if(in_array($key, $dto->intList)) {
+                if(array_key_exists($key, $data)) {
+                    $data[$key] = (int)$data[$key];
+                }else{
+                    $data[$key] = in_array($key, $dto->notNullList) ? 0 : null;
+                }
+            }
 
             switch ($key) {
                 case 'gender' :
