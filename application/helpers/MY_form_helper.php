@@ -42,7 +42,8 @@ if ( ! function_exists('form_options_by_field'))
     function form_options_by_field(string $field = 'default'): array
     {
         $CI =& get_instance();
-        return $CI->config->get(implode('.', ['options', $field]), [], false);
+        $options = $CI->config->get(implode('.', ['options', $field]), [], false);
+        return is_empty($options) ? form_options_by_field() : $options;
     }
 }
 
