@@ -88,8 +88,8 @@ function get_admin_form_choice($item, $formType = '')
 
             if($direction === 'vertical' && $count === count($item['options']) - 1) $labelClassList[] = 'mb-0';
 
-            $input = $item['type'] === 'radio'?get_admin_form_radio($item, $value, $text):get_admin_form_checkbox($item, $value, $text);
-            $inner .= convert_selector_to_html("label.".implode('.', $labelClassList)."[for='$id']", true, $input);
+            $input = $item['type'] === 'radio'?get_admin_form_radio($item, $value, $text, $id):get_admin_form_checkbox($item, $value, $text, $id);
+            $inner .= convert_selector_to_html("label.".implode('.', $labelClassList)."[for=\"$id\"]", true, $input);
 
             $count++;
         }
@@ -104,9 +104,9 @@ function get_admin_form_choice($item, $formType = '')
     return convert_selector_to_html('div.'.implode('.', $wrapClassList), true, $inner);
 }
 
-function get_admin_form_checkbox($item, $value, $text = '')
+function get_admin_form_checkbox($item, $value, $text, $id = null)
 {
-    $id = $item['field'];
+    if($id === null) $id = $item['field'];
     $name = $item['name'].($item['subtype'] === 'single'?'':'[]');
 
     $output = form_checkbox([
@@ -124,9 +124,9 @@ function get_admin_form_checkbox($item, $value, $text = '')
     return $output;
 }
 
-function get_admin_form_radio($item, $value, $text)
+function get_admin_form_radio($item, $value, $text, $id = null)
 {
-    $id = $item['field'];
+    if($id === null) $id = $item['field'];
     $name = $item['name'];
 
     $output = form_radio([
@@ -396,6 +396,14 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
                 $attributes['placeholder'] = 'mm';
                 break;
             default :
+                break;
+        }
+    }
+
+    if($item['type'] === 'year_month') {
+        switch ($item['subtype']) {
+            case 'flatpickr' :
+                $classList[] = 'flatpickr flatpickr-year-month';
                 break;
         }
     }
