@@ -496,8 +496,17 @@ function setFlatpickr(node) {
 			enableTime: true,
 			noCalendar: true,
 			// See https://flatpickr.js.org/formatting/
-			dateFormat: 'h:i K',
-			// time_24hr: false,
+			dateFormat: "K h:i",  // am/pm 표시
+			time_24hr: false,     // 12시간제 사용
+			onReady: function (selectedDates, dateStr, instance) {
+				// time 영역 컨테이너
+				const timeContainer = instance.timeContainer;
+				if (!timeContainer || !instance.amPM) return;
+
+				const amPm = instance.amPM; // AM/PM 셀렉터
+				// 제일 앞(시 앞)에 넣기
+				timeContainer.insertBefore(amPm, timeContainer.firstChild);
+			},
 		})
 	}
 
