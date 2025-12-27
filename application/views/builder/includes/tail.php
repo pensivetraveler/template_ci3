@@ -28,6 +28,8 @@
 		<?php if(isset($addJS['tail'])) add_javascript($addJS['tail']); ?>
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-onload.js');?>"></script>
 
+		<iframe id="downloadFrame" name="downloadFrame" style="display:none;"></iframe>
+
 		<?php if($this->config->config['life_cycle'] === 'post_controller'): ?>
 		<script>
 			$(function() {
