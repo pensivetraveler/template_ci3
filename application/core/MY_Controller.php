@@ -353,26 +353,19 @@ class MY_Controller extends CI_Controller
     {
         if (empty($attr)) $attr['option_type'] = 'field';
 
-        $type = $attr['option_type'];
+        $type = $attr['option_type'] ?? '';
         $data = $attr['option_data'] ?? [];
         $render = $attr['render'] ?? [];
 
         $options = [];
-        if(in_array($type, ['yn', 'target', 'bool', 'field', 'static', 'none'])){
-            switch ($type) {
-                case 'none' :
-                    return $options;
-                case 'yn' :
-                case 'bool' :
-                    $options = form_options_by_field($type);
-                    break;
-                case 'static' :
-                    $options = $data;
-                    break;
-                default :
-                    $options = form_options_by_field($field ?? 'default');
-            }
-            return is_empty($options) ? form_options_by_field() : $options;
+        if($type === 'none' || empty($type)) {
+            return form_options_by_field();
+        }else if($type === 'static') {
+            return empty($data) ? form_options_by_field() : $data;
+        }else if($type === 'field') {
+            return form_options_by_field($field ?? 'default');
+        }else if(in_array($type, array_keys(config_item('options')))) {
+            return form_options_by_field($type);
         }else{
             switch ($type) {
                 case 'method' :
