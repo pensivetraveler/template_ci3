@@ -35,7 +35,7 @@ class Model_Common extends MY_Model
 
     function getCnt($dto = [], $filter = [])
     {
-        $this->setFilter($this->table, $filter);
+        if(count($filter) > 0) $this->setFilter($this->table, $filter);
         $this->setCondition($this->table, $dto, false);
         return parent::getCntPDO($this->table);
     }
@@ -271,6 +271,8 @@ class Model_Common extends MY_Model
         $this->setFilterWhere($table, $filter['where'] ?? []);
 
         $this->setFilterLike($table, $filter['like'] ?? []);
+
+        $this->setFilterDate($table, $filter['date'] ?? []);
     }
 
     public function setFilterWhere($table, $data)
@@ -286,6 +288,23 @@ class Model_Common extends MY_Model
                     $this->like($table, [$item['field'] => $item['value']]);
                 }else{
                     $this->orLike($table, $this->strList, $item['value']);
+                }
+            }
+        }
+    }
+
+    public function setFilterDate($table, $data)
+    {
+        if($this->isCreatedDt) {
+            $columnName = 'DATE_FORMAT('.CREATED_DT_COLUMN_NAME.',"%Y-%m-%d")';
+            if(array_key_exists('on_date', $data) && !empty($data['on_date'])) {
+                $this->db->where($columnName, $data['on_date']);
+            }else{
+                if(array_key_exists('start_date', $data) && !empty($data['start_date'])) {
+                    $this->db->where($columnName.' >=', $data['start_date']);
+                }
+                if(array_key_exists('end_date', $data) && !empty($data['end_date'])) {
+                    $this->db->where($columnName.' <=', $data['end_date']);
                 }
             }
         }
