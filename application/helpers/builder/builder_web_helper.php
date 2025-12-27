@@ -1,27 +1,33 @@
 <?php
-function is_admin_active_page($menu, $current_uri = ''): bool
+if ( ! function_exists('is_active_page'))
 {
-    if($menu['isSubMenu']){
-        $activated = false;
-        foreach ($menu['subMenu'] as $submenu) {
-            if(is_active_page($submenu['attr']['href'], $submenu['params'], $current_uri)) $activated = true;
+    function is_active_page($menu, $current_uri = ''): bool
+    {
+        if($menu['isSubMenu']){
+            $activated = false;
+            foreach ($menu['subMenu'] as $submenu) {
+                if(is_current_uri($submenu['attr']['href'], $submenu['params'], $current_uri)) $activated = true;
+            }
+            return $activated;
+        }else{
+            return is_current_uri($menu['attr']['href'], $menu['params'], $current_uri);
         }
-        return $activated;
-    }else{
-        return is_active_page($menu['attr']['href'], $menu['params'], $current_uri);
     }
 }
 
-function get_admin_breadcrumbs($title_list): string
+if ( ! function_exists('get_breadcrumbs'))
 {
-    $CI =& get_instance();
+    function get_breadcrumbs($title_list): string
+    {
+        $CI =& get_instance();
 
-    $html = '';
-    foreach ($title_list as $title) {
-        $title = $CI->lang->line('nav.'.$title);
-        $html .= "<li class='breadcrumb-item'><a href='javascript:void(0);'>{$title}</a></li>";
+        $html = '';
+        foreach ($title_list as $title) {
+            $title = $CI->lang->line('nav.'.$title);
+            $html .= "<li class='breadcrumb-item'><a href='javascript:void(0);'>{$title}</a></li>";
+        }
+        return $html;
     }
-    return $html;
 }
 
 if ( ! function_exists('get_icon'))
