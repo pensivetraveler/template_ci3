@@ -11,6 +11,7 @@ $lang['common'] = [
     'lang_code' => '접속 언어',
     'del_yn' => '삭제 여부',
     'use_yn' => '사용 여부',
+    'year_month' => '연월',
 ];
 
 $lang['auth'] = [
