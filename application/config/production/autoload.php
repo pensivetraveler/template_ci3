@@ -119,7 +119,7 @@ foreach (glob(APPPATH . 'config/extra/*_config.php') as $file) {
 | "codeigniter_lang.php" would be referenced as array('codeigniter');
 |
 */
-$autoload['language'] = array();
+$autoload['language'] = array('common');
 
 /*
 | -------------------------------------------------------------------
