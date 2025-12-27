@@ -12,9 +12,9 @@ $lang['placeholder'] = [
 ];
 
 $lang['filter'] = [
-    'start_dt' => 'Start Date',
+    'start_date' => 'Start Date',
     'Enter The Start Date' => 'Enter The Start Date.',
-    'end_dt' => 'End Date',
+    'end_date' => 'End Date',
     'Enter The End Date' => 'Enter The End Date.',
     'search_category' => 'Search Category',
     'Select The Search Category' => 'Select The Search Category.',
