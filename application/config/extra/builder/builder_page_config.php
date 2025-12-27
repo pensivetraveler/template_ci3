@@ -68,6 +68,13 @@ $config['page_list_base_config'] = array_replace_recursive($config['page_method_
         'view' => false,
         'delete' => true,
     ],
+    'exports' => [
+        'print' => false,
+        'csv' => false,
+        'excel' => false,
+        'pdf' => false,
+        'copy' => false,
+    ],
     'properties' => [
         'plugin' => '',
         'isCheckbox' => false,
