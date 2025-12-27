@@ -44,6 +44,7 @@
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/animate-css/animate.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/sweetalert2/sweetalert2.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/flatpickr/flatpickr.css');?>" />
+	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/flatpickr-month-select/style.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/select2/select2.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/bootstrap-select/bootstrap-select.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/quill/editor.css');?>" />

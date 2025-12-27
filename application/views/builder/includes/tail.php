@@ -9,6 +9,7 @@
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/cleavejs/cleave-phone.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/cleavejs/cleave-phone.kr.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/flatpickr/flatpickr.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/vendor/libs/flatpickr-month-select/index.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/bootstrap-select/bootstrap-select.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/select2/select2.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/moment/moment.js');?>"></script>
