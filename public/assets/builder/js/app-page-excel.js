@@ -76,7 +76,7 @@ async function validateData(dataArray, chunkSize = 50) {
 
 		try {
 			const response = await $.ajax({
-				url: common.API_URI + '/excelValidate',
+				url: common.API_URI + '/validateExcel',
 				type: "POST",
 				data: JSON.stringify(chunk),
 				contentType: "application/json",
@@ -115,7 +115,7 @@ async function submitData(dataArray, chunkSize = 50) {
 
 		try {
 			const response = await $.ajax({
-				url: common.API_URI + '/excelUpload',
+				url: common.API_URI + '/uploadExcel',
 				type: 'POST',
 				dataType: 'json',
 				contentType: 'application/json', // content-type 지정
