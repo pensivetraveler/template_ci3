@@ -113,7 +113,7 @@ trait BuilderCommonTrait
             }
 
             $item['listClassName'] = [];
-            if(is_admin_active_page($item)) {
+            if(is_active_page($item)) {
                 if($item['isSubMenu']) $item['listClassName'][] = 'open';
                 $item['listClassName'][] = 'active';
             }
