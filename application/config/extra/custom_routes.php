@@ -5,6 +5,7 @@ $route['default_platform'] = 'web';
 $route['default_controller'] = 'common';
 $route['except_folders'] = ['app', 'adm', 'admin', 'module', 'web', 'api'];
 $route['api_folders'] = ['api'];
+$route['except_routes'] = '';
 
 $route['default_controller_filename'] = preg_replace('/' . preg_quote(substr($route['default_controller'],0,1), '/') . '/', strtoupper(substr($route['default_controller'],0,1)), $route['default_controller'], 1).'.php';
 foreach ($route['except_folders'] as $name) {
@@ -56,12 +57,21 @@ if (($key = array_search($route['default_platform'], $route['except_folders'])) 
 |--------------------------------------------------------------------------
  */
 if($route['default_platform']) {
-    $except_routes = join('|', array_merge($route['except_folders']));
+    $route['except_routes'] = $except_routes = join('|', array_merge($route['except_folders']));
     // 숫자와 매칭되는 웹 경로
-    $route["(?!{$except_routes})([^/]+)/(:num)"] = 'web/$1/index/$2';
-    $route["(?!{$except_routes})([^/]+)/(:any)/(:any)"] = 'web/$1/$2/$3';
-    // 포괄적인 웹 경로 (마지막에 선언)
-    $route["(?!{$except_routes}).*"] = 'web/$0';
+    $route["^(?!{$except_routes})([^/]+)/(:num)$"]         = $route['default_platform'].'/$1/index/$2';
+    // 3세그먼트 (문자)
+    $route["^(?!{$except_routes})([^/]+)/(:any)/(:any)$"]  = $route['default_platform'].'/$1/$2/$3';
+    // 🔧 추가: 2세그먼트 (문자) — /apply/submit 같은 케이스
+    $route["^(?!{$except_routes})([^/]+)/(:any)$"]         = $route['default_platform'].'/$1/$2';
+    // 🔧 수정: 포괄(캐치올) — $0 → $1
+    $route["^(?!{$except_routes})(.+)$"]                   = $route['default_platform'].'/$1';
+
+//    // 숫자와 매칭되는 웹 경로
+//    $route["(?!{$except_routes})([^/]+)/(:num)"] = $route['default_platform'].'/$1/index/$2';
+//    $route["(?!{$except_routes})([^/]+)/(:any)/(:any)"] = $route['default_platform'].'/$1/$2/$3';
+//    // 포괄적인 웹 경로 (마지막에 선언)
+//    $route["(?!{$except_routes}).*"] = $route['default_platform'].'/$0';
     $route['default_controller'] = $route['default_platform'].DIRECTORY_SEPARATOR.$route['default_controller'];
 }
 

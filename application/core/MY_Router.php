@@ -3,6 +3,105 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class MY_Router extends CI_Router
 {
+    /**
+     * CI3 core를 기반으로 하되,
+     * 1) 기본 디렉토리 탐색
+     * 2) 컨트롤러 파일 존재 확인 실패 시 'web/' 폴더를 자동 프리펜드(예외 폴더 제외)
+     */
+    protected function _validate_request($segments)
+    {
+        // 0. 세그먼트가 없으면 그대로 (default_controller 로 처리됨)
+        if (empty($segments))
+        {
+            return $segments;
+        }
+
+        $orig_segments = $segments;
+        $base_path     = APPPATH.'controllers/';
+
+        // 1) 하위 디렉토리 탐색 (CI 기본 로직)
+        $path = $base_path;
+        while (count($segments) > 0 && is_dir($path.$segments[0]))
+        {
+            $this->set_directory($segments[0]);
+            $path .= $segments[0].'/';
+            array_shift($segments);
+        }
+
+        // 2) 현재 디렉토리에서 컨트롤러 파일 존재하면 OK
+        if (!empty($segments))
+        {
+            // 대소문자 파일명 모두 대응
+            if (file_exists($path.ucfirst($segments[0]).'.php') || file_exists($path.$segments[0].'.php'))
+            {
+                return $segments;
+            }
+        }
+        else
+        {
+            // 디렉토리까지만 주어졌고 기본 컨트롤러가 디렉토리에 있다면
+            if (file_exists($path.ucfirst($this->default_controller).'.php') || file_exists($path.$this->default_controller.'.php'))
+            {
+                return array($this->default_controller);
+            }
+        }
+
+        // 3) Fallback: 최상위가 예외 폴더가 아니면 web/ 아래를 시도
+        //    예: /apply/submit  -> controllers/web/Apply.php@submit
+        $excepts = array('web', 'api', 'admin', 'auth', 'cli', 'cron'); // 필요시 추가
+        $first   = strtolower($orig_segments[0]);
+
+        if ( ! in_array($first, $excepts, true))
+        {
+            $web_path = $base_path.'web/';
+
+            if (is_dir($web_path))
+            {
+                // 컨트롤러 파일이 web/ 밑에 있으면 web 디렉토리로 고정
+                if (file_exists($web_path.ucfirst($orig_segments[0]).'.php') || file_exists($web_path.$orig_segments[0].'.php'))
+                {
+                    $this->set_directory('web');
+                    // 세그먼트는 원본 그대로 반환 (CI는 set_directory 된 경로에서 이 세그먼트를 컨트롤러로 찾음)
+                    return $orig_segments;
+                }
+
+                // 혹시 /foo/bar 가 web/foo/ (하위 디렉토리) 인 경우도 처리
+                if (is_dir($web_path.$orig_segments[0]))
+                {
+                    $this->set_directory('web/'.$orig_segments[0]);
+                    $rest = array_slice($orig_segments, 1);
+
+                    // 디렉토리만 있고 컨트롤러명이 빠진 경우 -> default_controller 시도
+                    if (empty($rest))
+                    {
+                        if (file_exists($web_path.$orig_segments[0].'/'.ucfirst($this->default_controller).'.php')
+                            || file_exists($web_path.$orig_segments[0].'/'.$this->default_controller.'.php'))
+                        {
+                            return array($this->default_controller);
+                        }
+                    }
+                    else
+                    {
+                        $try_path = $web_path.$orig_segments[0].'/';
+                        if (file_exists($try_path.ucfirst($rest[0]).'.php') || file_exists($try_path.$rest[0].'.php'))
+                        {
+                            return $rest;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4) 마지막으로 현재 디렉토리에서 default_controller 시도
+        if (file_exists($path.ucfirst($this->default_controller).'.php') || file_exists($path.$this->default_controller.'.php'))
+        {
+            return array($this->default_controller);
+        }
+
+        // 5) 모두 실패 → 404
+        show_404($this->directory.implode('/', $orig_segments));
+    }
+
     protected function _set_default_controller()
     {
         if (empty($this->default_controller)) {
