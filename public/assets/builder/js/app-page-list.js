@@ -54,54 +54,10 @@ $(function () {
 						searchWord: data.search.value || '',
 						searchCategory: data.search.category || '',
 					},
+					filters : {},
 				};
 
-				if($('#formFilter').length) {
-					const filters = {
-						where : {},
-						like : [],
-						date : {
-							start_date : null,
-							end_date : null,
-							on_date : null,
-						},
-						text : {},
-					};
-
-					if($('#formFilter').find('[name="_onloaded"]').val() === '1') {
-						filters.date.start_date = $('#formFilter').find('[name="date[start_date]"]').val() ?? null;
-						filters.date.end_date = $('#formFilter').find('[name="date[end_date]"]').val() ?? null;
-						filters.date.on_date = $('#formFilter').find('[name="date[on_date]"]').val() ?? null;
-
-						$('#formFilter').find('[name^="like"]').each(function() {
-							const match = this.name.match(/\[(.*?)\]/);
-							if(match) {
-								const key = match[1];
-								if(key === 'value') {
-									filters.like.push({
-										field: $('#formFilter').find('[name="like[field]"]').val() ?? null,
-										value: $('#formFilter').find('[name="like[value]"]').val() ?? null,
-									})
-								}else if(key !== 'field'){
-									filters.like.push({
-										field: key,
-										value: this.value,
-									})
-								}
-							}
-						});
-
-						$('#formFilter').find('[name^="where"]').each(function() {
-							const match = this.name.match(/\[(.*?)\]/);
-							if (match) {
-								const key = match[1];
-								filters.where[key] = this.value;
-							}
-						});
-					}
-
-					req.filters = filters;
-				}
+				if($('#formFilter').length) req.filters = getFilterData('#formFilter');
 
 				return req;
 			},
@@ -159,7 +115,11 @@ $(function () {
 							searchable: false,
 							orderable: false,
 							render: function (data, type, full, meta) {
-								return meta.row + meta.settings._iDisplayStart + 1;
+								// 전체 행 개수
+								var totalRows = meta.settings._iRecordsDisplay;
+								// 내림차순 번호 계산
+								return totalRows - (meta.row + meta.settings._iDisplayStart);
+								// return meta.row + meta.settings._iDisplayStart + 1;
 							}
 						};
 					case 'actions' : // Actions
@@ -288,6 +248,17 @@ $(function () {
 				refreshPlugins(document.querySelector('#formFilter'));
 
 				$('.form-type-filter').find('.btn-search').on('click', function(e) {
+					const start_date = $('#formFilter').find('[name="date[start_date]"]').val() ?? null;
+					const end_date = $('#formFilter').find('[name="date[end_date]"]').val() ?? null;
+					if(start_date !== null && end_date !== null) {
+						if(new Date(start_date) > new Date(end_date)) {
+							showAlert({
+								type: 'warning',
+								text: getLocale('End Date must be on or after Start Date', common.LOCALE),
+							});
+							return;
+						}
+					}
 					dt.ajax.reload();
 				});
 
@@ -885,7 +856,9 @@ function getListButtons() {
 
 function getListExports() {
 	const btns = [];
-	for(const kind of common.LIST_EXPORTS) {
+	for(const kind in common.LIST_EXPORTS) {
+		if(common.LIST_EXPORTS[kind] === false) continue;
+
 		switch (kind) {
 			case 'print' :
 				btns.push({
@@ -927,56 +900,32 @@ function getListExports() {
 				});
 				break;
 			case 'csv' :
-				btns.push({
-					extend: 'csv',
-					text: `<i class="ri-file-text-line me-1" ></i>${getLocale('Csv', common.LOCALE)}`,
-					className: 'dropdown-item',
-					exportOptions: {
-						columns: [1, 2, 3, 4, 5],
-						// prevent avatar to be display
-						format: {
-							body: function (inner, coldex, rowdex) {
-								if (inner.length <= 0) return inner;
-								var el = $.parseHTML(inner);
-								var result = '';
-								$.each(el, function (index, item) {
-									if (item.classList !== undefined && item.classList.contains('user-name')) {
-										result = result + item.lastChild.firstChild.textContent;
-									} else if (item.innerText === undefined) {
-										result = result + item.textContent;
-									} else result = result + item.innerText;
-								});
-								return result;
-							}
-						}
-					}
-				})
-				break;
 			case 'excel' :
 				btns.push({
-					extend: 'excel',
-					text: `<i class="ri-file-excel-line me-1"></i>${getLocale('Excel', common.LOCALE)}`,
+					extend: kind,
+					text: kind === 'csv'
+						? `<i class="ri-file-text-line me-1" ></i>${getLocale('Csv', common.LOCALE)}`
+						: `<i class="ri-file-excel-line me-1"></i>${getLocale('Excel', common.LOCALE)}`,
 					className: 'dropdown-item',
-					exportOptions: {
-						columns: [3, 4, 5, 6, 7],
-						// prevent avatar to be display
-						format: {
-							body: function (inner, coldex, rowdex) {
-								if (inner.length <= 0) return inner;
-								var el = $.parseHTML(inner);
-								var result = '';
-								$.each(el, function (index, item) {
-									if (item.classList !== undefined && item.classList.contains('user-name')) {
-										result = result + item.lastChild.firstChild.textContent;
-									} else if (item.innerText === undefined) {
-										result = result + item.textContent;
-									} else result = result + item.innerText;
-								});
-								return result;
-							}
-						}
-					}
-				});
+					action: function (e, dt, node, config) {
+						executeAjax({
+							async: false,
+							data : {
+								exportType: kind !== 'csv' ? 'xlsx' : kind,
+								filters: getFilterData('#formFilter')
+							},
+							url : getUrlWithIdentifiers(common.API_URI+'/prepareExports', {}, common.API_PARAMS),
+							headers: {
+								'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+							},
+							success: function(response, textStatus, jqXHR) {
+								const token = encodeURIComponent(response.data[0].filename);
+								const iframe = document.getElementById('downloadFrame');
+								iframe.src = common.API_URI+'/downloadExports?filename='+response.data[0].filename;
+							},
+						});
+					},
+				})
 				break;
 			case 'pdf' :
 				btns.push({
@@ -1136,4 +1085,51 @@ function afterCheckboxColumnChange(idData, field, value) {
 			});
 		}
 	});
+}
+
+function getFilterData(selector) {
+	const filters = {
+		where : {},
+		like : [],
+		date : {
+			start_date : null,
+			end_date : null,
+			on_date : null,
+		},
+		text : {},
+	};
+
+	if($(selector).find('[name="_onloaded"]').val() === '1') {
+		filters.date.start_date = $(selector).find('[name="date[start_date]"]').val() ?? null;
+		filters.date.end_date = $(selector).find('[name="date[end_date]"]').val() ?? null;
+		filters.date.on_date = $(selector).find('[name="date[on_date]"]').val() ?? null;
+
+		$(selector).find('[name^="like"]').each(function() {
+			const match = this.name.match(/\[(.*?)\]/);
+			if(match) {
+				const key = match[1];
+				if(key === 'value') {
+					filters.like.push({
+						field: $(selector).find('[name="like[field]"]').val() ?? null,
+						value: $(selector).find('[name="like[value]"]').val() ?? null,
+					})
+				}else if(key !== 'field'){
+					filters.like.push({
+						field: key,
+						value: this.value,
+					})
+				}
+			}
+		});
+
+		$(selector).find('[name^="where"]').each(function() {
+			const match = this.name.match(/\[(.*?)\]/);
+			if (match) {
+				const key = match[1];
+				filters.where[key] = this.value;
+			}
+		});
+	}
+
+	return filters;
 }

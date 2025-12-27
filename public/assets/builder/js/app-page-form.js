@@ -413,6 +413,20 @@ function fetchFrmValues(form = null, key = {}, params = {}) {
 				});
 			}
 		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.warn(jqXHR.responseJSON)
+
+			const opt = {
+				type: 'warning',
+				text: jqXHR.responseJSON.msg,
+			};
+
+			if(['view','edit'].includes(form._mode.value)) {
+				opt.callback = back;
+			}
+
+			showAlert(opt);
+		}
 	});
 
 	return data;
