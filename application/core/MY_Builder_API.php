@@ -3,11 +3,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 require_once APPPATH . 'traits/BuilderInitTrait.php';
 require_once APPPATH . 'traits/BuilderCommonTrait.php';
+require_once APPPATH . 'traits/BuilderColumnsTrait.php';
 
 class MY_Builder_API extends MY_Controller_API
 {
     use BuilderInitTrait;
     use BuilderCommonTrait;
+    use BuilderColumnsTrait;
 
     public string $flag;
     protected string $table = '';
@@ -93,58 +95,10 @@ class MY_Builder_API extends MY_Controller_API
     {
         list($key, $data) = parent::beforeGet($key);
 
-        $return = [];
-        foreach ($data as $field=>$value) {
-            if(in_array($field, $this->exceptValidateKeys)) continue;
-            if(!$value) continue;
-            $return['where'][$field] = $this->input->get($field);
-        }
-
-        if(array_key_exists('filters', $data)) {
-            $filters = $data['filters'];
-            foreach ($filters as $type => $filter) {
-                switch ($type) {
-                    case 'where' :
-                        foreach ($filter as $field=>$value) {
-                            if(!$value) continue;
-                            $return['filter']['where'][$field] = $value;
-                        }
-                        break;
-                    case 'like' :
-                        foreach ($filter as $item) {
-                            if(!is_empty($item, 'value')) {
-                                $return['filter']['like'][] = [
-                                    'field' => $item['field']??'',
-                                    'value' => $item['value'],
-                                ];
-                            }
-                        }
-                        break;
-                    case 'date' :
-                        foreach ($filter as $field=>$value) {
-                            if(!$value) continue;
-                            $return['filter']['date'][$field] = $value;
-                        }
-                        break;
-                }
-            }
-        }else{
-            $return['filter'] = [];
-        }
-
-        if(array_key_exists('format', $data)) {
-            if($data['format'] === 'datatable') {
-                if($data['searchWord'] && $data['searchCategory']) {
-                    $return['filter']['like'][$data['searchCategory']] = $data['searchWord'];
-                }
-            }
-        }
-
-        $return['select'] = $data['select']??[];
-
-        $key = $this->checkIdentifierExist($key);
-
-        return [$key, $return];
+        return [
+            $this->checkIdentifierExist($key),
+            reformat_get_data($data, $this->exceptValidateKeys)
+        ];
     }
 
     protected function afterGet($key, $data = [])
@@ -504,7 +458,9 @@ class MY_Builder_API extends MY_Controller_API
             if(!array_key_exists('rules', $item) || !$item['rules']) $item['rules'] = 'do_nothing';
             if(is_empty($item, 'group')) $item['group'] = 'base';
             return $item;
-        }, $config);
+        }, array_filter($config, function ($item) {
+            return $item['type'] !== 'common';
+        }));
         $groups = array_flip(array_unique(array_column($config, 'group')));
 
         foreach ($groups as $group=>$idx) {
@@ -739,9 +695,12 @@ class MY_Builder_API extends MY_Controller_API
             }
         }
 
-        foreach ($data as $key => $val) {
-            $columnList = array_unique(array_merge($dto->notNullList, $dto->nullList));
+        $checkboxes = array_values(array_filter($this->formConfig, function ($item) {
+            return $item['type'] === 'checkbox';
+        }));
 
+        $columnList = array_unique(array_merge($dto->notNullList, $dto->nullList));
+        foreach ($data as $key => $val) {
             if(!in_array($key, $columnList)){
                 unset($data[$key]);
                 continue;
@@ -763,6 +722,11 @@ class MY_Builder_API extends MY_Controller_API
                         unset($data[$key]);
                     }
                     break;
+            }
+
+            if(in_array($key, array_column($checkboxes, 'field'))) {
+                $seperator = $checkboxes['option_attributes']['seperator'] ?? ',';
+                $data[$key] = join($seperator, $data[$key]);
             }
         }
 
@@ -1009,7 +973,7 @@ class MY_Builder_API extends MY_Controller_API
         return $model->getCnt($dto) > 0;
     }
 
-    public function excelValidate_post()
+    public function validateExcel_post()
     {
         $this->beforeExcelUpload();
 
@@ -1018,11 +982,282 @@ class MY_Builder_API extends MY_Controller_API
         ]);
     }
 
-    public function excelUpload_post()
+    public function uploadExcel_post()
     {
         $data = $this->beforeExcelUpload();
 
         $this->afterExcelUpload($data);
+    }
+
+    public function prepareExports_get()
+    {
+        /**
+         * 1.Model check
+         */
+        if(is_null($this->Model)) {
+            $this->response([
+                'code' => MODEL_IS_NOT_DEFINED,
+            ]);
+        }
+
+        /**
+         * 2.Count check
+         */
+        $data = $this->input->get();
+        $exportType = $data['exportType'];
+        if(!in_array($exportType, ['csv', 'xlsx'])) {
+            $this->response([
+                'code' => BAD_REQUEST,
+            ]);
+        }
+        unset($data['exportType']);
+
+        $data = reformat_get_data($data, $this->exceptValidateKeys);
+        if($this->Model->getCnt($data) === 0) {
+            $this->response([
+                'code' => EMPTY_CONTENT,
+            ]);
+        }
+
+        /**
+         * 3.Prepare Data
+         */
+        $config = array_values(array_filter($this->setFormColumns(snakeize($this->router->class)), function ($item) {
+            return !(
+                $item['type'] === 'common' ||
+                $item['type'] === 'file' ||
+                $item['subtype'] === 'identifier'
+            );
+        }));
+
+        // heads
+        $heads['num'] = 'No.';
+        foreach ($config as $item) $heads[$item['field']] = lang($item['label']);
+
+        // dateFormats
+        $dateFormats = array_values(array_map(function ($item) {
+            return $item['field'];
+        }, array_filter($config, function ($item) {
+            return $item['type'] === 'date';
+        })));
+
+        // optionFormats
+        $optionFiltered = array_filter($config, function ($item) {
+            return !empty($item['option_attributes']);
+        });
+        $optionConfigs = array_combine(
+            array_column($optionFiltered, 'field'),
+            array_column($optionFiltered, 'option_attributes'),
+        );
+        $optionFields = array_keys($optionConfigs);
+
+        $chkboxFormats = array_column(array_filter($optionFiltered, function ($item) {
+            return $item['type'] === 'checkbox';
+        }), 'field');
+
+        // data
+        $list = $this->transformList($this->Model->getList(
+            $data['select'] ?? [],
+            $data,
+        ));
+
+        // dataset
+        $i = 0;
+        $dataset = array_reduce($list, function ($carry, $item) use ($heads, $optionFields, $optionConfigs, $chkboxFormats, &$i) {
+            $result['num'] = ++$i;
+
+            foreach(array_keys($heads) as $field) {
+                if($field === 'num') continue;
+
+                $value = $item->{$field};
+                if(in_array($field, $optionFields)) {
+                    $optionConfig = $optionConfigs[$field];
+                    $options = $this->getOptions($field, $optionConfig);
+                    if(in_array($field, $chkboxFormats)) {
+                        $seperator = $optionConfig['seperator'] ?? ',';
+                        $exploded = explode($seperator, $value);
+                        $value = '';
+                        foreach ($exploded as $i=>$v) {
+                            if(!isset($options[$v])) continue;
+                            $value .= $options[$v];
+                            if($i !== count($exploded) -1) $value .= $seperator.' ';
+                        }
+                    }else{
+                        $value = $options[$value] ?? '';
+                    }
+                }
+
+                $result[$field] = $value;
+            }
+
+            $carry[] = $result;
+            return $carry;
+        }, array());
+
+        /**
+         * 4.Prepare Folder
+         */
+        // 저장할 폴더 경로 설정
+        $uploadPath = 'public/temps/';
+        if (!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
+        $filename = APP_NAME.'_'.strtolower($this->router->class).'_'.date('YmdHis').'.'.$exportType;
+        $encrypted = strtr($this->encryption->encrypt($filename), [
+            '+' => '-',
+            '/' => '_',
+        ]);
+        $fullPath = FCPATH . $uploadPath . $encrypted;
+
+        if(in_array($exportType, ['xls', 'xlsx'])) {
+            $this->prepareExcel($heads, $dataset, $fullPath, $dateFormats);
+        }else {
+            $this->prepareCSV($heads, $dataset, $fullPath);
+        }
+
+        $this->response([
+            'code' => FILE_CREATED,
+            'data' => [
+                'filename' => $encrypted,
+            ]
+        ]);
+    }
+
+    protected function prepareExcel($heads, $dataset, $filepath, $dateFormats = []): void
+    {
+        $this->load->library('excel_lib');
+        $this->load->helper('excel');
+        $objPHPExcel = $this->excel_lib->load();
+
+        // sheet
+        $sheet = $objPHPExcel->getActiveSheet();
+        $sheet->setTitle(date('Y-m-d'));
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        // head
+        $maxAlphabet = number_to_alphabet(count(array_keys($heads))-1);
+        foreach (array_keys($heads) as $i=>$key) {
+            $coord = number_to_alphabet($i);
+            $value = $heads[$key];
+            $sheet
+                ->setCellValue($coord.'1',$value);
+        }
+
+        $sheet->getStyle("A1:{$maxAlphabet}1")
+            ->getFont()->setBold(true);
+        $sheet->getStyle("A1:{$maxAlphabet}1")
+            ->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $sheet->getStyle("A1:{$maxAlphabet}1")
+            ->getFill()->getStartColor()->setRGB('EEEEEE');
+        $sheet->getStyle("A1:{$maxAlphabet}1")
+            ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        // body
+        foreach ($dataset as $i=>$item) {
+            $j = 0;
+            foreach ($item as $field=>$value) {
+                $coord = number_to_alphabet($j);
+                if(in_array($field, $dateFormats)){
+                    $diffInSeconds = strtotime($value) - strtotime('1899-12-30');
+                    $diffInDays = floor($diffInSeconds / (60 * 60 * 24))+1;
+                    $sheet->setCellValue($coord.($i+2), $diffInDays);
+                    $sheet->getStyle($coord.($i+2))
+                        ->getNumberFormat()
+                        ->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_YYYYMMDD2);
+                }else{
+                    $sheet->setCellValueExplicit($coord.($i+2), $value, PHPExcel_Cell_DataType::TYPE_STRING);
+                }
+                $j++;
+            }
+        }
+
+        $rowMax = strval(count($dataset)+1);
+
+        $range = get_alphabet_range('B', $maxAlphabet);
+        foreach ($range as $columnID) {
+            $sheet->getColumnDimension($columnID)->setWidth(20);
+        }
+        $sheet->getStyle('A1:'.$maxAlphabet.$rowMax)->applyFromArray(
+            array(
+                'width' => 10,
+                'alignment' => array(
+                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                ),
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                ),
+            )
+        );
+
+        // 엑셀 Writer 생성 (XLSX 형식)
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+
+        // 파일 저장
+        error_clear_last(); // 이전 에러 초기화
+
+        try {
+            $objWriter->save($filepath);
+        } catch (Exception $e) {
+            $this->response([
+                'code' => INTERNAL_SERVER_ERROR,
+                'msg' => $e->getMessage()
+            ]);
+        }
+
+        $last_error = error_get_last();
+        if ($last_error) {
+            $this->response([
+                'code' => INTERNAL_SERVER_ERROR,
+                'msg' => $last_error['message']
+            ]);
+        }
+    }
+
+    protected function prepareCSV($heads, $dataset, $filepath): void
+    {
+        // 예시 데이터 (보통은 DB에서 가져오겠지)
+        array_unshift($dataset, $heads);
+
+        // 파일 열기
+        $fp = fopen($filepath, 'w');
+        if ($fp === false) {
+            $this->response([
+                'code' => PERMISSION_OR_DISK_ERROR,
+            ]);
+        }
+
+        // fputcsv 로 한 줄씩 쓰기
+        foreach ($dataset as $row) {
+            $row = array_values($row);
+            fputcsv($fp, $row);  // 기본 구분자: 콤마 (,)
+        }
+
+        fclose($fp);
+    }
+
+    public function downloadExports_get()
+    {
+        $message = '';
+
+        $encrypted = $this->input->get('filename');
+        if(empty($encrypted)) $message = $this->lang->status(EMPTY_REQUIRED_DATA);
+
+        $fullPath = FCPATH . 'public/temps/' . $encrypted;
+        if(!file_exists($fullPath)) $message = $this->lang->status(FILE_NOT_EXIST);
+
+        $encrypted = strtr($encrypted, [
+            '-' => '+',
+            '_' => '/',
+        ]);
+        $filename = $this->encryption->decrypt($encrypted);
+        if($filename === false) $message = $this->lang->status(WRONG_TOKEN);
+
+        if($message) show_alert('error', $message, true);
+
+        $fileContents = file_get_contents($fullPath);
+        @unlink($fullPath);
+
+        force_download($filename, $fileContents, true);
     }
 
     protected function validateExcelData($data): array
