@@ -1,3 +1,19 @@
+function scrollToSelector(selector, offset = 0) {
+	const element = document.querySelector(selector);
+	if (!element) {
+		console.warn(`Element not found: ${selector}`);
+		return;
+	}
+
+	const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+	const targetPosition = elementPosition - offset;
+
+	window.scrollTo({
+		top: targetPosition,
+		behavior: 'smooth' // 부드럽게 이동
+	});
+}
+
 function makeEllipsis(input, length) {
 	if (input.length > length) {
 		return input.substring(0, length) + '...';
