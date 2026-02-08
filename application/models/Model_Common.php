@@ -54,8 +54,11 @@ class Model_Common extends MY_Model
 
     function addData($set, $bool = false)
     {
+        $this->setCreatedDt($set);
+
         $this->setCreatedId($set);
-        if(!$this->isAutoIncrement) $bool = false;
+
+        if(!$this->isAutoincrement) $bool = false;
 
         $set = $this->getValidSetData($set);
 
@@ -64,11 +67,11 @@ class Model_Common extends MY_Model
 
     function modData($set, $where, $bool = false)
     {
-        if($this->isUpdatedDt) {
-            $this->db->set(UPDATED_DT_COLUMN_NAME, 'now()', false);
-            $this->setUpdatedId($set);
-        }
-        if(!$this->isAutoIncrement) $bool = false;
+        $this->setUpdatedDt($set);
+
+        $this->setUpdatedId($set);
+
+        if(!$this->isAutoincrement) $bool = false;
 
         $set = $this->getValidSetData($set);
 
@@ -77,6 +80,10 @@ class Model_Common extends MY_Model
 
     function modNumb($field, $count, $where, $bool = false)
     {
+        $this->setUpdatedDt();
+
+        $this->setUpdatedId();
+
         if ($count > 0) {
             $this->db->set($field, $field . '+' . $count, false);
         } else {
@@ -188,6 +195,10 @@ class Model_Common extends MY_Model
     {
         return array_map(function($item) {
             if(!is_array($item)) $item = (array)$item;
+
+            $this->setCreatedDt($item);
+            $this->setCreatedId($item);
+
             return $this->getValidSetData($item);
         }, $set);
     }
@@ -195,14 +206,9 @@ class Model_Common extends MY_Model
     protected function getValidSetData($set): array
     {
         $columnList = $this->getColumnList();
-        $set = array_filter($set, function($key) use ($columnList) {
+        return array_filter($set, function($key) use ($columnList) {
             return in_array($key, $columnList);
         }, ARRAY_FILTER_USE_KEY);
-
-        if($this->isCreatedId && is_empty($set, CREATED_ID_COLUMN_NAME)) {
-            $set[CREATED_ID_COLUMN_NAME] = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
-        }
-        return $set;
     }
 
     public function getColumnList(): array
@@ -219,18 +225,42 @@ class Model_Common extends MY_Model
         ));
     }
 
-    protected function setCreatedId($set)
+    protected function setCreatedDt($set = array())
     {
-        $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
-        if($this->isCreatedId)
-            $this->db->set(CREATED_ID_COLUMN_NAME, is_empty($set, CREATED_ID_COLUMN_NAME) ? $userId : $set[CREATED_ID_COLUMN_NAME]);
+        if($this->isCreatedDt) {
+            if(is_empty($set, CREATED_DT_COLUMN_NAME)) {
+                $this->db->set(CREATED_DT_COLUMN_NAME, 'now()', false);
+            }else{
+                $this->db->set(CREATED_DT_COLUMN_NAME, $set[CREATED_DT_COLUMN_NAME]);
+            }
+        }
     }
 
-    protected function setUpdatedId($set)
+    protected function setCreatedId($set = array())
     {
-        $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
-        if($this->isCreatedId)
+        if($this->isCreatedId) {
+            $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
+            $this->db->set(CREATED_ID_COLUMN_NAME, is_empty($set, CREATED_ID_COLUMN_NAME) ? $userId : $set[CREATED_ID_COLUMN_NAME]);
+        }
+    }
+
+    protected function setUpdatedDt($set = array())
+    {
+        if($this->isUpdatedDt) {
+            if(is_empty($set, UPDATED_DT_COLUMN_NAME)) {
+                $this->db->set(UPDATED_DT_COLUMN_NAME, 'now()', false);
+            }else{
+                $this->db->set(UPDATED_DT_COLUMN_NAME, $set[UPDATED_DT_COLUMN_NAME]);
+            }
+        }
+    }
+
+    protected function setUpdatedId($set = array())
+    {
+        if($this->isCreatedId) {
+            $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
             $this->db->set(UPDATED_ID_COLUMN_NAME, is_empty($set, UPDATED_ID_COLUMN_NAME) ? $userId : $set[UPDATED_ID_COLUMN_NAME]);
+        }
     }
 
     public function determineDiffColumns(): array
