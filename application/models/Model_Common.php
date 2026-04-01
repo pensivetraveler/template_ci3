@@ -58,7 +58,7 @@ class Model_Common extends MY_Model
 
         $this->setCreatedId($set);
 
-        if(!$this->isAutoincrement) $bool = false;
+        if(!$this->isAutoIncrement) $bool = false;
 
         $set = $this->getValidSetData($set);
 
@@ -71,7 +71,7 @@ class Model_Common extends MY_Model
 
         $this->setUpdatedId($set);
 
-        if(!$this->isAutoincrement) $bool = false;
+        if(!$this->isAutoIncrement) $bool = false;
 
         $set = $this->getValidSetData($set);
 
