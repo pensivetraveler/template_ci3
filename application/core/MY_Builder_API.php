@@ -1334,7 +1334,9 @@ class MY_Builder_API extends MY_Controller_API
     public function checkDuplicate_get()
     {
         $dto = $this->input->get();
-        if($this->checkDuplicate([$dto['field'] => $dto['value']], $this->Model??null, $dto)){
+        $unique = [$dto['field'] => $dto['value']];
+        unset($dto['field'], $dto['value']);
+        if($this->checkDuplicate($unique, $this->Model??null, $dto)){
             $this->response([
                 'code' => DATA_ALREADY_EXIST,
                 'dto' => $dto,
