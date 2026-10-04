@@ -23,6 +23,7 @@ $config['builder_form_base'] = [
     'group_attributes' => [],
     'list' => false,
     'list_attributes' => [],
+    'tab_index' => 0,
 ];
 
 $config['builder_form_base_form_attributes'] = [
@@ -34,6 +35,7 @@ $config['builder_form_base_form_attributes'] = [
     'list_sorter' => false,
     'list_onclick' => 'download',
     'list_delete' => false,
+    'form_validation' => true,
 ];
 
 $config['builder_form_base_option_attributes'] = [
@@ -86,6 +88,7 @@ $config['form_sample_config'] = [
             'placeholder' => 'Enter The User ID',
         ],
         'form_attributes' => [
+            'writable' => true,
             'editable' => true,
             'view_mod' => '',
             'with_btn' => true,
@@ -202,6 +205,290 @@ $config['form_first_registration_config'] = [
     ],
 ];
 
+$config['form_login_config'] = [
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:user.user_cd',
+        'form' => true,
+        'rules' => 'trim',
+        'category' => 'base',
+        'type' => 'hidden',
+        'default' => 'USR001',
+        'list' => false,
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => 'ri-user-line',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User ID',
+        ],
+    ],
+    [
+        'field' => 'password',
+        'label' => 'lang:user.password',
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'password',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+    ],
+    [
+        'field' => 'autologin',
+        'label' => 'lang:auth.autologin',
+        'rules' => '',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'checkbox',
+        'subtype' => 'single',
+        'attributes' => [],
+        'form_attributes' => [],
+    ],
+];
+
+$config['form_find_id_config'] = [
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:user.user_cd',
+        'form' => true,
+        'rules' => 'trim',
+        'category' => 'base',
+        'type' => 'hidden',
+        'default' => 'USR001',
+        'list' => false,
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+        'rules' => 'trim|required|is_unique[user.email.user_id]',
+        'category' => 'base',
+        'type' => 'email',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User Email',
+        ],
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'tel',
+        'subtype' => 'cleave-hp',
+        'icon' => null,
+        'form_text' => '',
+        'attributes' => [],
+        'default' => '',
+        'list_attributes' => [],
+    ],
+];
+
+$config['form_find_password_config'] = [
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:user.user_cd',
+        'form' => true,
+        'rules' => 'trim',
+        'category' => 'base',
+        'type' => 'hidden',
+        'default' => 'USR001',
+        'list' => false,
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+        'rules' => 'trim|required',
+        'category' => 'base',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User ID',
+        ],
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+        'rules' => 'trim|required',
+        'category' => 'base',
+        'type' => 'email',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User Email',
+        ],
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'tel',
+        'subtype' => 'cleave-hp',
+        'icon' => null,
+        'form_text' => '',
+        'attributes' => [],
+        'default' => '',
+        'list_attributes' => [],
+    ],
+];
+
+$config['form_myinfo_config'] = [
+    [
+        'field' => 'user_id',
+        'label' => 'lang:user.user_id',
+        'form' => true,
+        'rules' => 'trim|required_mod[edit]',
+        'errors' => [],
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:user.user_cd',
+        'form' => true,
+        'rules' => 'trim',
+        'type' => 'hidden',
+    ],
+    [
+        'field' => 'del_yn',
+        'label' => 'lang:user.del_yn',
+        'form' => true,
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => 'N',
+    ],
+    [
+        'field' => 'withdraw_yn',
+        'label' => 'lang:user.withdraw_yn',
+        'form' => true,
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => 'N',
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+        'rules' => 'trim|required|min_length[4]|is_unique[user.id.user_id]',
+        'form' => true,
+        'errors' => [],
+        'type' => 'text',
+        'subtype' => 'readonly',
+        'icon' => 'ri-user-line',
+        'form_text' => 'Please enter at least 4 characters',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User ID',
+        ],
+        'form_attributes' => [
+            'editable' => false,
+            'with_btn' => false,
+        ],
+    ],
+    [
+        'field' => 'password',
+        'label' => 'lang:user.password',
+        'rules' => 'trim|required_mod[add]|min_length[4]|max_length[15]',
+        'form' => true,
+        'errors' => [],
+        'category' => 'group',
+        'type' => 'password',
+        'icon' => 'svg:ri-lock-password-line',
+        'form_text' => 'Please enter 4 to 15 characters, including letters and numbers',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+        'form_attributes' => [
+            'detect_changed' => true,
+        ],
+        'group' => 'user_password',
+        'group_attributes' => [
+            'envelope_name' => false,
+            'label' => 'lang:user.password',
+            'form_text' => '',
+            'type' => 'new_password',
+            'key' => 'password',
+        ],
+    ],
+    [
+        'field' => 'password_confirm',
+        'label' => 'lang:user.password_confirm',
+        'rules' => 'trim|required_mod[add]|password_matches[password]',
+        'form' => true,
+        'errors' => [],
+        'category' => 'group',
+        'type' => 'password',
+        'subtype' => 'password_confirm',
+        'icon' => 'svg:ri-lock-password-fill',
+        'form_text' => 'Please Repeat The Password',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+        'form_attributes' => [
+            'detect_changed' => true,
+        ],
+        'group' => 'user_password',
+        'group_attributes' => [
+            'key' => 'password_confirm',
+        ],
+    ],
+    [
+        'field' => 'name',
+        'label' => 'lang:user.name',
+        'rules' => 'trim|required',
+        'form' => true,
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+        'rules' => 'trim|required|is_unique[user.email.user_id]',
+        'form' => true,
+        'type' => 'text',
+        'subtype' => 'readonly',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'placeholder' => 'Enter The User Email',
+        ],
+        'form_attributes' => [
+            'editable' => false,
+            'with_btn' => false,
+        ],
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'type' => 'tel',
+        'subtype' => 'cleave-hp',
+        'icon' => null,
+        'form_text' => '',
+        'attributes' => [],
+        'default' => '',
+        'list_attributes' => [],
+    ],
+];
+
 $config['form_syscfg_config'] = [
     [
         'field' => 'cmb_cfg',
@@ -303,7 +590,7 @@ $config['form_big_code_config'] = [
     ],
     [
         'field' => 'use_yn',
-        'label' => 'lang:system.use_yn',
+        'label' => 'lang:common.use_yn',
         'rules' => 'trim|required',
         'type' => 'hidden',
         'default' => 'N',
@@ -507,11 +794,10 @@ $config['form_menu_list_config'] = [
         'form_attributes' => [
             'detect_changed' => false,
             'change_after' => [
+                'callback' => 'onChangeTriggerSelect',
                 'params' => [
-                    'target' => '[name="method"]',
-                    'add_uri' => 'options',
-                ],
-                'callback' => 'setDynamicSelect2Options',
+                    'target' => 'method',
+                ]
             ]
         ],
     ],
