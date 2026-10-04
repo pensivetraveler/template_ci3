@@ -9,6 +9,8 @@ class SysCfg extends Common
     {
         parent::__construct();
 
+        $this->routeTitle = '환경값 설정';
+
         $this->load->model('Model_Sys_Cfg', 'Model');
 
         $this->setProperties($this->Model);

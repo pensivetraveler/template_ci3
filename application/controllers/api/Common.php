@@ -6,6 +6,8 @@ class Common extends MY_Builder_API
     function __construct()
     {
         parent::__construct();
+
+        $this->apiRoute = 'api';
     }
 
     protected function auth()
@@ -19,7 +21,7 @@ class Common extends MY_Builder_API
 
         $extraFields = [];
 
-        if($this->input->get('format') === 'datatable') {
+        if($this->input->get('format') === 'datatable' || $this->input->get('format') === 'log') {
             $extraFields['draw'] = (int)$this->input->get('draw');
             // 전체 레코드 수
             $extraFields['recordsTotal'] = $this->Model->getCnt($data);
@@ -66,19 +68,37 @@ class Common extends MY_Builder_API
             $data->updated_id = $this->Model_User->getDataWhere([], ['user_id' => $data->updated_id])->id;
         }
 
-        return $data;
+        return $this->transformViewByMode($data);
+    }
+
+    protected function transformViewByMode($data): object
+    {
+        // type/subtype 별 처리
+        switch ($this->mode) {
+            case 'form' :
+                $selectMultiples = array_filter($this->formConfig, function ($item) {
+                    return $item['type'] === 'select' && $item['subtype'] === 'select2' && isset($item['attributes']['multiple']);
+                });
+                foreach ($selectMultiples as $k=>$v) {
+                    $field = $v['field'];
+                    if(!empty($data->{$field})) $data->{$field} = explode(',', $data->{$field});
+                }
+                return $data;
+            case 'list' :
+            case 'view' :
+            default :
+                return $data;
+        }
     }
 
     public function message_read_patch($key)
     {
-        $tokenData = $this->validateToken();
-
         $this->load->model('Model_Message');
         $this->Model_Message->modData([
             'read_yn' => 'Y'
         ], [
             'message_id' => $key,
-            'user_id' => $tokenData->user_id,
+            'user_id' => $this->session->userdata('user_id'),
         ]);
 
         $this->response([
@@ -105,12 +125,12 @@ class Common extends MY_Builder_API
         $this->email->subject($dto['subject']);
         $this->email->message($this->load->view("email/{$dto['template']}", $dto, true));
 
-        $this->load->model('Model_Log_Email');
+        $this->load->model('Model_Email_Log');
 
         $debug_message = '';
         if (!$this->email->send()) $debug_message = $this->email->print_debugger();
 
-        $this->Model_Log_Email->addData([
+        $this->Model_Email_Log->addData([
             'email_type' => $dto['template'],
             'doc_id' => $dto['doc_id'],
             'email_address' => $dto['to'],

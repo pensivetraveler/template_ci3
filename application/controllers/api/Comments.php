@@ -9,6 +9,8 @@ class Comments extends Common
 	{
 		parent::__construct();
 
+        $this->routeTitle = '댓글';
+
 		$this->load->model('Model_Comment', 'Model');
 		$this->load->model('Model_Message');
 		$this->load->model('Model_Article');

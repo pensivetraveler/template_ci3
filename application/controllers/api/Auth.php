@@ -11,14 +11,54 @@ class Auth extends Common
 
 		$this->load->model('Model_User', 'Model');
 
-		$this->setConfig = false;
+		$this->setProperties($this->Model, false);
 
-		$this->setProperties($this->Model);
+		$this->noIndexMethod = true;
 
-		$this->indexAPI = false;
-	}
+        // 공개 API: key 필요 없음, 로그도 생략
+        $this->methods['dupCheck_get'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['idCheck_get'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['emailCheck_get'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['login_post'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['signup_post'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['findId_post'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['findPassword_post'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['withdraw_post'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['passwordCheck_post'] = [
+            'key' => false,
+            'log' => false,
+        ];
+        $this->methods['logout_post'] = [
+            'key' => false,
+            'log' => false,
+        ];
+    }
 
-	public function dupCheck_get()
+    public function dupCheck_get()
 	{
 		$key = $this->input->get('key');
 		$value = $this->input->get('value');
@@ -36,11 +76,9 @@ class Auth extends Common
 			}else{
 				$this->response([
 					'code' => DATA_AVAILABLE,
-					'msg' => ID_IS_AVAILABLE,
 				]);
 			}
 		}
-
 	}
 
 	public function idCheck_get()
@@ -58,8 +96,7 @@ class Auth extends Common
 				]);
 			}else{
 				$this->response([
-					'code' => DATA_AVAILABLE,
-					'msg' => ID_IS_AVAILABLE,
+					'code' => ID_IS_AVAILABLE,
 				]);
 			}
 		}
@@ -80,8 +117,7 @@ class Auth extends Common
 				]);
 			}else{
 				$this->response([
-					'code' => DATA_AVAILABLE,
-					'msg' => EMAIL_IS_AVAILABLE,
+					'code' => EMAIL_IS_AVAILABLE,
 				]);
 			}
 		}
@@ -108,37 +144,44 @@ class Auth extends Common
 
 		if ($this->input->post('autologin')) {
 			$vericode = array('$', '/', '.');
-			$hash = str_replace(
-				$vericode,
-				'',
-				password_hash(random_string('alnum', 10) . element('user_id', (array)$userData) . ctimestamp() . element('id', (array)$userData), PASSWORD_BCRYPT)
-			);
 
-			$this->Model_User_Autologin->addData([
-				'user_id' => element('user_id', (array)$userData),
-				'aul_key' => $hash,
-				'aul_ip' => $this->input->ip_address(),
-				'aul_datetime' => cdate('Y-m-d H:i:s'),
-			]);
+            $hash = str_replace(
+                $vericode,
+                '',
+                password_hash(
+                    random_string('alnum', 10)
+                    . element('user_id', (array) $userData)
+                    . ctimestamp()
+                    . element('id', (array) $userData),
+                    PASSWORD_BCRYPT
+                )
+            );
 
-			$cookie_name = 'autologin';
-			$cookie_value = $hash;
-			$cookie_expire = 2592000; // 30일간 저장
-			set_cookie($cookie_name, $cookie_value, $cookie_expire);
+            $this->Model_User_Autologin->addData([
+                'user_id'      => element('user_id', (array) $userData),
+                'aul_key'      => $hash,
+                'aul_ip'       => $this->input->ip_address(),
+                'aul_datetime' => cdate('Y-m-d H:i:s'),
+            ]);
+
+            $cookie_value = $hash;
+
+            set_cookie('autologin', $cookie_value, 2592000); // 30일간 저장
 		}
 
-		$this->session->set_userdata([
+        $this->session->set_userdata([
+            'name' => $userData->name,
+            'id' => $userData->id,
 			'user_id' => $userData->user_id,
-			'token' => $this->setToken([
-				'user_id' => $userData->user_id,
-				'user_cd' => $userData->user_cd,
-				'id' => $userData->id,
-				'name' => $userData->name,
-				'is_admin' => in_array($userData->user_cd, ['USR000', 'USR001']),
-			]),
-			'is_admin' => in_array($userData->user_cd, ['USR000', 'USR001']),
-			'approve_yn' => in_array($userData->user_cd, ['USR000', 'USR001'])?'Y':$userData->approve_yn,
+            'user_cd' => $userData->user_cd,
+			'is_sys_admin' => in_array($userData->user_cd, ['USR000']),
+			'is_admin' => in_array($userData->user_cd, ['USR000', 'USR001', 'USR002']),
+            'token' => $this->setToken([
+                'user_id' => $userData->user_id,
+            ]),
 		]);
+
+        $this->loggingUserlog();
 
 		$this->response([
 			'code' => DATA_AVAILABLE,
@@ -165,6 +208,8 @@ class Auth extends Common
 		$dtoChild[$this->Model->identifier] = $this->Model->addData($dto, false);
 		$dtoChild[$this->Model_Child->identifier] = $this->Model_Child->addData($dtoChild, false);
 		$dto = array_merge($dto, $dtoChild);
+
+        $this->loggingUserlog();
 
 		$this->response([
 			'code' => DATA_CREATED,
@@ -234,13 +279,11 @@ class Auth extends Common
 
 	public function withdraw_post()
 	{
-		$tokenData = $this->validateToken();
-
 		$this->Model->modData([
 			'withdraw_yn' => 'Y',
 			'withdraw_dt' => date('Y-m-d'),
 		], [
-			'user_id' => $tokenData->user_id,
+			'user_id' => $this->session->userdata('user_id'),
 		]);
 
 		$this->Model_User_Autologin->delData([
@@ -256,17 +299,19 @@ class Auth extends Common
 
 	public function passwordCheck_post()
 	{
-		$tokenData = $this->validateToken();
-
 		$params = [
 			'password' => $this->input->post('password'),
 		];
 
 		$userData = $this->Model->getData([], [
-			'where' => ['user_id' => $tokenData->user_id,]
+			'where' => ['user_id' => $this->session->userdata('user_id'),]
 		]);
 
-		if(!custom_password_verify($userData->password, $params['password'], true)) $this->response(['code' => PASSWORD_IS_NOT_MATCHED, 'data' => []]);
+		if(!custom_password_verify($userData->password, $params['password'], true)){
+            $this->response([
+                'code' => PASSWORD_IS_NOT_MATCHED,
+            ]);
+        }
 
 		$this->response([
 			'code' => DATA_PROCESSED,
@@ -275,6 +320,8 @@ class Auth extends Common
 
     public function logout_post()
     {
+        $this->loggingUserlog();
+
         $this->destroyUserData();
 
         $this->response([

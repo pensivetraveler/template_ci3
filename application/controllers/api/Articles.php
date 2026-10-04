@@ -9,6 +9,8 @@ class Articles extends Common
 	{
 		parent::__construct();
 
+        $this->routeTitle = '아티클';
+
 		$this->load->model('Model_Article', 'Model');
 		$this->load->model('Model_Comment');
 		$this->load->model('Model_User');

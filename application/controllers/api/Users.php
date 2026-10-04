@@ -9,6 +9,8 @@ class Users extends Common
 	{
 		parent::__construct();
 
+        $this->routeTitle = '사용자';
+
 		$this->load->model('Model_User', 'Model');
 
 		$this->setProperties($this->Model);
