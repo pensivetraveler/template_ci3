@@ -20,7 +20,8 @@ class MY_Controller extends CI_Controller
 
         $this->devMode = ENVIRONMENT !== 'production';
 
-        $this->load->library('Authorization_token', ['config' => 'extra/jwt_config']);
+        $this->load->library('opaque_token');
+        $this->load->library('file_system');
     }
 
     function _view($view, $array = [])
@@ -39,9 +40,10 @@ class MY_Controller extends CI_Controller
         if(is_empty($data, 'code') && $http_code === null)
             show_error('Insufficient response data provided');
 
-        $http_big_code = floor($http_code/100);
+        $http_big_code = (int)floor($http_code/100);
 
         $response = new StdClass();
+        $response->status = $http_big_code === 2;
         $response->code = is_empty($data, 'code')?(int)$http_code*10:$data['code'];
         $response->msg = is_empty($data, 'msg')?$this->lang->status($response->code):$data['msg'];
         $response->data = [];
@@ -219,7 +221,7 @@ class MY_Controller extends CI_Controller
             $this->Model_File->modNumb('download_cnt', 1, ['file_id' => $key]);
             force_download($data->client_name, file_get_contents($data->full_path));
         } catch (Exception $e) {
-            log_message('error', 'downloadr : modNumb error ' . $this->db->last_query());
+            log_message('error', 'downloader : modNumb error ' . $this->db->last_query());
             return [
                 'result' => false,
                 'data' => [],
@@ -259,32 +261,9 @@ class MY_Controller extends CI_Controller
 
     protected function getCodeList($dto)
     {
+        $this->db->where_not_in('sml_cd', ['000']);
         $dto = array_merge($dto, ['use_yn' => 'Y']);
         return $this->Model_Sys_Code->getListWhere([], $dto);
-    }
-
-    protected function reorderCodeList($big_cd, $add = [], $list = [])
-    {
-        $where = ['big_cd' => $big_cd];
-
-        if(empty($list)) {
-            $list = $this->Model_Sys_Code->getList([], [
-                'where' => $where,
-                'whereNot' => ['sml_cd' => ['000']],
-            ]);
-        }
-
-        if(array_search('000', array_column($list, 'sml_cd')) !== false) {
-            unset($list[array_search('000', array_column($list, 'sml_cd'))]);
-            $list = array_values($list);
-        }
-
-        $list = reorder($list, $add, 'cd_srt', true);
-
-        $this->db->where_in('cmb_cd', array_column($list, 'cmb_cd'));
-        $this->Model_Sys_Code->delData($where);
-
-        $this->Model_Sys_Code->addList($list);
     }
 
     protected function getArticleFileLink($dto)
@@ -360,6 +339,8 @@ class MY_Controller extends CI_Controller
         $options = [];
         if($type === 'none' || empty($type)) {
             return form_options_by_field();
+        }else if($type === 'blank') {
+            return [];
         }else if($type === 'static') {
             return empty($data) ? form_options_by_field() : $data;
         }else if($type === 'field') {
@@ -379,8 +360,8 @@ class MY_Controller extends CI_Controller
                     $options = $this->getOptionsFromDBList($list, $render);
                     break;
                 default :
-                    if (empty($data)) $this->logger("getOptions : {$field} have no option data.");
-                    if (empty($render)) $this->logger("getOptions : {$field} attributes has no render data.");
+                    if (empty($data)) $this->logging(__METHOD__." : {$field} have no option data.");
+                    if (empty($render)) $this->logging(__METHOD__." : {$field} attributes has no render data.");
 
                     switch ($type) {
                         case 'db' :
@@ -390,10 +371,16 @@ class MY_Controller extends CI_Controller
                             $options = $this->getOptionsFromDBList($list, $render);
                             break;
                         case 'model' :
-                            if (!property_exists($this, $data['model'])) $this->load->model($data['model']);
+                            if (!property_exists($this, $data['model'])) {
+                                try {
+                                    $this->load->model($data['model']);
+                                }catch (Exception $e) {
+                                    show_error("(".__FUNCTION__.") ".$e->getMessage());
+                                }
+                            }
 
                             if (!method_exists($this->{$data['model']}, $data['method']))
-                                trigger_error("getOptions : Method {$data['method']} not exist.", E_USER_ERROR);
+                                show_error("getOptions : Method {$data['method']} not exist.", E_USER_ERROR);
 
                             $list = call_user_func_array([$this->{$data['model']}, $data['method']], [
                                 'select' => array_values($render),
@@ -417,6 +404,12 @@ class MY_Controller extends CI_Controller
             return array_reduce($list, function ($carry, $item) use ($render) {
                 $item = (array)$item;
                 $id = $item[$render['id']] ?? '';
+
+                if (strpos($render['text'], '.') !== false) {
+                    $exploded = explode('.', $render['text']);
+                    $render['text'] = $exploded[1];
+                }
+
                 $text = $item[$render['text']] ?? '';
                 $carry[$id] = $text;
                 if(!is_empty($render, 'add')) {
@@ -430,7 +423,36 @@ class MY_Controller extends CI_Controller
         }
     }
 
-    public function logger($message, $errorLevel = E_USER_ERROR, $triggerError = true)
+    protected function setFrontendOptionList($list, $render)
+    {
+        if(count($list) === 0) return [];
+        if(is_object($list[0]) || is_array($list[0])) {
+            return array_map(function ($item) use ($render) {
+                $item = (array)$item;
+                $id = $item[$render['id']] ?? '';
+
+                if (strpos($render['text'], '.') !== false) {
+                    $exploded = explode('.', $render['text']);
+                    $render['text'] = $exploded[1];
+                }
+
+                $text = $item[$render['text']] ?? '';
+                if(!is_empty($render, 'add')) {
+                    $add = $item[$render['add']] ?? '';
+                    if($add) $text .= " ($add)";
+                }
+
+                return [
+                    'id' => $id,
+                    'text' => $text,
+                ];
+            }, $list);
+        }else{
+            return array_combine(array_values($list),array_values($list));
+        }
+    }
+
+    public function logging($message, $errorLevel = E_USER_ERROR, $triggerError = true): void
     {
         switch ($errorLevel) {
             case E_USER_ERROR:
@@ -446,28 +468,53 @@ class MY_Controller extends CI_Controller
         log_message($type ?? 'ERROR', $message);
 
         if($triggerError && $errorLevel === E_USER_ERROR) {
-            if($this->devMode) trigger_error($message, $errorLevel);
+            if($this->devMode) show_error($message);
         }
     }
 
     protected function setToken($data)
     {
-        $token = $this->authorization_token->generateToken($data);
-        if($this->Model_User_Token->getDataWhere([], ['user_id' => $data['user_id']])){
+        if (empty($data['user_id'])) {
+            return false;
+        }
+
+        $userId = $data['user_id'];
+        $now = date('Y-m-d H:i:s');
+
+        $length = $this->config->item('rest_key_length') ?: 40;
+
+        do {
+            $token = $this->opaque_token->generate($length);
+
+            $exists = $this->Model_User_Token->getDataWhere([], [
+                'token' => $token,
+            ]);
+        } while ($exists);
+
+        $row = $this->Model_User_Token->getDataWhere([], [
+            'user_id' => $userId,
+        ]);
+
+        if ($row) {
             $this->Model_User_Token->modData([
-                'token' => $token,
-                'created_dt' => date('Y-m-d H:i:s'),
-            ], ['user_id' => $data['user_id']], true);
-        }else{
-            $this->Model_User_Token->addData([
-                'user_id' => $data['user_id'],
-                'token' => $token,
-                'level' => 1,
-                'ignore_limits' => 1,
-                'is_private_key' => 1,
+                'token'        => $token,
+                'created_dt'   => $now,
                 'ip_addresses' => $this->input->ip_address(),
+            ], [
+                'user_id' => $userId,
+            ], true);
+        } else {
+            $this->Model_User_Token->addData([
+                'user_id'        => $userId,
+                'token'          => $token,
+                'level'          => 1,
+                'ignore_limits'  => 1,
+                'is_private_key' => 0,
+                'ip_addresses'   => $this->input->ip_address(),
+                'created_dt'     => $now,
             ], true);
         }
+
         return $token;
     }
 
