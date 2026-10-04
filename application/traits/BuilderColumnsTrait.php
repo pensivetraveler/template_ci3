@@ -1,8 +1,24 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access 1wed');
 
 trait BuilderColumnsTrait
 {
+    protected function setConfigList($flag, $add = null)
+    {
+        $class = snakeize($this->router->class);
+        $method = snakeize($this->router->method);
+        if($method === 'index' && $flag !== 'filter') $method = $flag;
+
+        $configs = [];
+        if(!empty($add)) $configs[] = "{$flag}_{$add}_config";
+
+        return array_merge($configs, [
+            "{$flag}_{$class}_{$method}_config",
+            "{$flag}_{$class}_config",
+            "{$flag}_{$method}_config",
+        ]);
+    }
+
     protected function setFormColumns($configData = null): array
     {
         $config = [];
@@ -17,13 +33,12 @@ trait BuilderColumnsTrait
             if($this->router->method === 'index' && $this->routeConfig['properties']['baseMethod']) {
                 $method = $this->routeConfig['properties']['baseMethod'];
             }
-            $config = $this->config->get2(
-                'form_'.snakeize($this->router->class).'_config'
-                , 'form_'.$method.'_config'
-                , [], false);
+            $config = $this->config->get($this->setConfigList(
+                'form', $method ?? null
+            ), [], false);
 
             if(empty($config)) {
-                $this->logger("setFormColumns : config does not exist.", E_USER_WARNING, false);
+                $this->logging(__METHOD__." : config does not exist.", E_USER_WARNING, false);
                 return $config;
             }
         }
@@ -51,6 +66,8 @@ trait BuilderColumnsTrait
 
         $item = $this->setColumnErrors($item);
 
+        if($item['type'] === $item['subtype']) $item['subtype'] = 'base';
+
         // list attributes
         $item['list_attributes'] = array_merge(
             $this->config->get("builder_list_base", []),
@@ -72,7 +89,19 @@ trait BuilderColumnsTrait
             $item['form_attributes']
         );
 
-        if($item['type'] === $item['subtype']) $item['subtype'] = 'base';
+        // file
+        if($item['type'] === 'file') {
+            $upload_config = $this->config->item($this->router->class . '_' . $item['field'] . '_upload_config')
+                ?: $this->config->item($item['field'] . '_upload_config')
+                    ?: $this->config->item('base_upload_config');
+
+            if(!isset($upload_config['allowed_types'])) $upload_config['allowed_types'] = '';
+
+            $item['attributes'] = array_merge([
+                'max_size' => get_file_size_to_kb($upload_config['max_size']),
+                'accept' => convert_allowed_types_to_accept($upload_config['allowed_types']),
+            ], $item['attributes']);
+        }
 
         return $item;
     }

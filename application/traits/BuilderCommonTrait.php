@@ -30,7 +30,7 @@ trait BuilderCommonTrait
         foreach ($builderConfigs as $config) $this->config->load('extra/builder/'.$config, false);
 
         require_once APPPATH . 'config/extra/builder/builder_base_constants.php';
-        $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_form","builder/builder_api",]);
+        $this->load->helper(["builder/builder_web","builder/builder_base","builder/builder_menu","builder/builder_route","builder/builder_form","builder/builder_api","builder/builder_auth"]);
         $this->lang->load("builder/base", $this->config->item('language'));
 
         if(!$this->flag) show_error("Platform flag is not set.");
@@ -46,15 +46,73 @@ trait BuilderCommonTrait
         }
     }
 
+    protected function fillRouteConfigProperties($className, $config = [], $base = []): array
+    {
+        if(empty($base)) {
+            $type = array_key_exists('type', $config)?$config['type']:'base';
+            $subtype = array_key_exists('subtype', $config)?$config['subtype']:'base';
+
+            $base = $this->config->item("route_base_config");
+            if($this->config->item("route_{$type}_base_config")) {
+                $base = fill_config_properties($this->config->item("route_{$type}_base_config"), $base);
+            }
+            if($this->config->item("route_{$type}_{$subtype}_config")) {
+                $base = fill_config_properties($this->config->item("route_{$type}_{$subtype}_config"), $base);
+            }
+        }
+
+        $config = fill_config_properties($config, $base);
+
+        if(!isset($config['methods']) || !count($config['methods'])){
+            trigger_error(__METHOD__.' : method is registered for the '.ucfirst($className), E_USER_ERROR);
+        }
+
+        if(empty($config['properties']['baseMethod'])) {
+            $config['properties']['baseMethod'] = array_key_first($config['methods']);
+        }else{
+            if(!in_array($config['properties']['baseMethod'], array_keys($config['methods']))) {
+                trigger_error(__METHOD__.' : baseMethod is not in method list', E_USER_ERROR);
+            }
+        }
+
+        $this->allowedMethods = $config['properties']['allows'] = array_keys($config['methods']);
+
+        return $config;
+    }
+
+    protected function fillMethodConfigProperties($config = []): array
+    {
+        $category = array_key_exists('category', $config)?$config['category']:'base';
+        $type = array_key_exists('type', $config)?$config['type']:'base';
+        $subtype = array_key_exists('subtype', $config)?$config['subtype']:'base';
+
+        $base = $this->config->item("method_base_config");
+        if($this->config->item("method_{$category}_base_config")) {
+            $base = fill_config_properties($this->config->item("method_{$category}_base_config"), $base);
+        }
+        if($this->config->item("method_{$category}_{$type}_config")) {
+            $base = fill_config_properties($this->config->item("method_{$category}_{$type}_config"), $base);
+        }
+        if($this->config->item("method_{$category}_{$type}_{$subtype}_config")) {
+            $base = fill_config_properties($this->config->item("method_{$category}_{$type}_{$subtype}_config"), $base);
+        }
+
+        return fill_config_properties($config, $base);
+    }
+
     protected function setMenuList(): array
     {
         if($this->cache->file->get('menu_done')){
             $menuList = $this->cache->file->get('menu_done');
         }else{
             $menuList = $this->getMenuList();
-            if(env('CACHING_MENU')) $this->saveMenuList($menuList);
+            if(env('CACHING_MENU')) {
+                $this->saveMenuList($menuList);
+                $menuList = $this->cache->file->get('menu_done');
+            }
         }
-        return $this->setMenuData($menuList);
+
+        return $this->setMenuAttributes($menuList);
     }
 
     protected function getMenuList($configName = ''): array
@@ -71,29 +129,20 @@ trait BuilderCommonTrait
     protected function fillMenuConf($configData = [], $depth = 1): array
     {
         $conf = $this->config->get('builder_nav_menu_base', []);
+        if(!is_list_type($configData)) show_error('Menu Config is written wrong way.');
+
         return array_map(function ($item) use ($conf, $depth) {
-            foreach ($conf as $key=>$val) {
-                if(is_array($val)) {
-                    if(array_key_exists($key, $item)) {
-                        if(is_bool($item[$key]) || is_null($item[$key])) $item[$key] = [];
-                        $item[$key] = array_merge($val, $item[$key]);
-                    }else{
-                        $item[$key] = $val;
-                    }
-                }else{
-                    if(!array_key_exists($key, $item)) $item[$key] = $val;
-                }
-            }
+            $item = fill_config_properties($item, $conf);
+            $item['params'] = array_merge($item['params'], $this->config->get('platform_config.navDefaultParams', [], false));
             $item['depth'] = $depth;
             $item['method'] = !$item['method']&&$item['class']?'index':$item['method'];
-            $item['isSubMenu'] = count($item['subMenu']) > 0;
+            $item['isSubMenu'] = count($item['subMenu']) > 0 ? 1 : 0;
             if($item['isSubMenu']) $item['subMenu'] = $this->fillMenuConf($item['subMenu'], 2);
-
             return $item;
         }, $configData);
     }
 
-    protected function setMenuData($menuList = []): array
+    protected function setMenuAttributes($menuList = []): array
     {
         return array_map(function ($item) {
             $item = (array)$item;
@@ -103,7 +152,7 @@ trait BuilderCommonTrait
                 $item['attr']['className'] = array_merge($item['attr']['className'], [
                     'menu-toggle', 'waves-effect'
                 ]);
-                $item['subMenu'] = $this->setMenuData($item['subMenu']);
+                $item['subMenu'] = $this->setMenuAttributes($item['subMenu']);
             }else{
                 if($item['class'] && $item['method']) {
                     $flags = [$this->flag, $item['class']];
@@ -131,38 +180,76 @@ trait BuilderCommonTrait
     {
         $this->load->model('Model_Menu');
 
-        $this->Model_Menu->truncate();
-
-        function transformMenuData($data, $srt = 1, $parentId = 0)
-        {
-            $result = [];
-            foreach ($data as $key=>$val) {
-                if(is_array($val)) {
-                    $val = serialize($val);
-                }elseif (is_bool($val)) {
-                    $val = !$val?'0':'1';
+        $routeConfigs = $this->config->item("route_config");
+        $config = array_combine(
+            array_keys($routeConfigs),
+            array_map(function ($className, $item) {
+                foreach ($item['methods'] as $method=>$config) {
+                    $item['methods'][$method] = $this->fillMethodConfigProperties($config);
                 }
-                $result[snakeize($key)] = $val;
-            }
-            $result['parent_id'] = $parentId;
-            $result['srt'] = $srt;
-            return $result;
-        }
+                return $this->fillRouteConfigProperties($className, $item);
+            },
+                array_keys($routeConfigs),
+                $routeConfigs
+            )
+        );
 
         foreach ($menuList as $i=>$item) {
-            $menuId = $this->Model_Menu->addData(transformMenuData($item, $i+1));
-            if(count($item['subMenu'])) {
-                foreach ($item['subMenu'] as $j=>$subitem) {
-                    $subitem = transformMenuData($subitem, $j+1, $menuId);
-                    $this->Model_Menu->addData($subitem);
+            $item = $this->setMenuData($item, $config, $i+1);
+            $item['menuId'] = $this->Model_Menu->addData($this->transformMenuData($item));
+
+            if($item['isSubMenu']) {
+                foreach ($item['subMenu'] as $j=>$subItem) {
+                    $subItem = $this->setMenuData($subItem, $config, $j+1, $item['menuId']);
+                    $subItem['menuId'] = $this->Model_Menu->addData($this->transformMenuData($subItem));
+                    $item['subMenu'][$j] = $subItem;
                 }
             }
+
+            $menuList[$i] = $item;
         }
 
-        if(env('CACHING_MENU')) $this->cache->file->save('menu_done', $menuList, 0);
+        $this->cache->file->save('menu_done', $menuList, 0);
     }
 
-    protected function deformMenuList($menuList)
+    protected function setMenuData($data, $config, $srt = 1, $parentId = 0)
+    {
+        $data = array_map(function ($value) {
+            if(is_bool($value)) $value = !$value?0:1;
+            return $value;
+        }, $data);
+
+        $data['baseAuth'] = $this->getMenuBaseAuth($data, $config);
+        $data['srt'] = $srt;
+        $data['parentId'] = $parentId;
+        return $data;
+    }
+
+    function getMenuBaseAuth($item, $config): string
+    {
+        if(!$item['isSubMenu'] && array_key_exists($item['class'], $config)) {
+            $routeConfig = $config[$item['class']];
+            $method = $item['method'] === 'index' ? $routeConfig['properties']['baseMethod'] : $item['method'];
+
+            $methodConfig = $routeConfig['methods'][$method];
+
+            return make_base_auth_from_method($methodConfig);
+        }else{
+            return BASE_AUTH_CHAR;
+        }
+    }
+
+    function transformMenuData($data): array
+    {
+        $set = [];
+        foreach ($data as $key=>$val) {
+            if(is_array($val)) $val = serialize($val);
+            $set[snakeize($key)] = $val;
+        }
+        return $set;
+    }
+
+    protected function deformMenuList($menuList): array
     {
         $list = [];
         foreach ($menuList as $i => $item) {
@@ -177,7 +264,7 @@ trait BuilderCommonTrait
         return $list;
     }
 
-    protected function deformMenuData($menuData)
+    protected function deformMenuData($menuData): array
     {
         $data = [];
         foreach ($menuData as $key=>$val) {
@@ -206,7 +293,7 @@ trait BuilderCommonTrait
 
     public function getMethodList($className): array
     {
-        $config = $this->config->get("page_config")[$className]??$this->config->get("page_config")[strtolower($className)];
+        $config = $this->config->get("route_config")[$className]??$this->config->get("route_config")[strtolower($className)];
 
         if(is_empty($config, 'properties')) $config['properties'] = [];
         if(is_empty($config['properties'], 'noIndex')) $config['properties']['noIndex'] = false;
@@ -228,4 +315,35 @@ trait BuilderCommonTrait
 
         return $methodList;
     }
-}
+
+    public function reorderList($sortColumn, $idColumn, $cateColumn, $addCondition = [], $target = [], $model = null): void
+    {
+        if(is_null($model)) $model = $this->Model;
+
+        $condition = [
+            'where' => is_empty($target, $cateColumn) ? [] : [$cateColumn => $target[$cateColumn]],
+            'whereNot' => is_empty($target, $idColumn) ? [] : [$idColumn => $target[$idColumn]],
+            'orderBy' => [$sortColumn => 'ASC'],
+        ];
+
+        foreach (array_keys($condition) as $key) {
+            if(array_key_exists($key, $addCondition) && !empty($addCondition[$key])) {
+                $condition[$key] = array_merge($condition[$key], $addCondition[$key]);
+            }
+        }
+
+        if($model->getCnt($condition)) {
+            $list = $model->getList([], $condition);
+
+            $list = reorder($list, $target, $sortColumn);
+
+            foreach ($list as $item) {
+                if(!empty($target) && $item[$idColumn] === $target[$idColumn]) continue;
+                $model->modData([
+                    $sortColumn => $item[$sortColumn],
+                ], [
+                    $idColumn => $item[$idColumn],
+                ]);
+            }
+        }
+    }}
