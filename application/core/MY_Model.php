@@ -3,16 +3,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Model extends CI_Model
 {
-    public string $table = '';
-    public string $identifier = '';
-    public array $primaryKeyList = [];
-    public array $uniqueKeyList = [];
-    public array $notNullList = [];
-    public array $nullList = [];
-    public array $strList = [];
-    public array $intList = [];
-    public array $fileList = [];
-    public array $defaultOrderBy = [];
+    public string  $dbprefix = '';
+    public string  $table = '';
+    public string  $identifier = '';
+    public string  $filteringDateColumn = '';
+    public array   $primaryKeyList = [];
+    public array   $uniqueKeyList = [];
+    public array   $foreignKeyList = [];
+    public array   $notNullList = [];
+    public array   $nullList = [];
+    public array   $strList = [];
+    public array   $intList = [];
+    public array   $fileList = [];
+    public array   $defaultOrderBy = [];
 
     public bool    $isAutoIncrement = false;
     public bool    $isDelYn = false;
@@ -21,10 +24,26 @@ class MY_Model extends CI_Model
     public bool    $isCreatedId = false;
     public bool    $isUpdatedDt = false;
 
+    public bool    $useDelYnAsBase = true;
+    public bool    $useUseYnAsBase = true;
+
     function __construct()
     {
         log_message('info', 'Model Class Initialized');
         $this->load->database();
+
+        if($this->isAutoIncrement && !$this->identifier) {
+            if(!count($this->primaryKeyList))
+                show_error('Primary key list is empty.');
+
+            $this->identifier = $this->primaryKeyList[0];
+        }
+
+        if($this->isCreatedDt && !$this->filteringDateColumn) {
+            $this->filteringDateColumn = CREATED_DT_COLUMN_NAME;
+        }
+
+        $this->dbprefix = $this->db->dbprefix;
     }
 
     /*
@@ -97,7 +116,7 @@ class MY_Model extends CI_Model
     public function getDataPDO($table, $select = [], $where = [])
     {
         $this->db->where($where);
-        if(count($select) > 0) $this->db->select($select);
+        if(count($select) > 0) $this->select($table, $select);
 
         $result = $this->db->get($table)->row();
 
@@ -115,7 +134,7 @@ class MY_Model extends CI_Model
     public function getListPDO($table, $select = [], $where = [])
     {
         $this->db->where($where);
-        if(count($select) > 0) $this->db->select($select);
+        if(count($select) > 0) $this->select($table, $select);
 
         $result = $this->db->get($table)->result();
 
@@ -210,6 +229,44 @@ class MY_Model extends CI_Model
     | 사용 공통 함수
     |--------------------------------------------------------------------------
     */
+    protected function getColumnName($table, $column)
+    {
+        list($table, $column) = resolve_select_column_table($table, $column);
+        return $table.'.'.$column;
+    }
+
+    public function select($table, $data)
+    {
+        if(empty($data) || $data === '*') {
+            $this->db->select("$table.*");
+        }else{
+            if(is_array($data)){
+                if(!is_list_type($data)) {
+                    trigger_error(__METHOD__.' : Select Array Data must be list type', E_USER_ERROR);
+                }
+                $fields = $data;
+            }else{
+                $fields = explode(',', $data);
+            }
+
+            foreach ($fields as $field){
+                $parsed = parse_select_column($field);
+                if($parsed['type'] === 'invalid') {
+                    trigger_error(__METHOD__.' : Please Check The Column Name - '.$parsed['raw'], E_USER_ERROR);
+                }else if($parsed['type'] === 'plain'){
+                    list($table, $column) = resolve_select_column_table($table, $parsed['column']);
+                    $this->db->select($table.'.'.$column);
+                }else if($parsed['type'] === 'alias' || $parsed['type'] === 'alias_backtick'){
+                    list($table, $column) = resolve_select_column_table($table, $parsed['column']);
+                    $this->db->select("$table.$column as {$parsed['alias']}", false);
+                }else{
+                    // $parsed['type'] === 'alias_expr'
+                    $this->db->select("{$parsed['column']} as {$parsed['alias']}", false);
+                }
+            }
+        }
+    }
+
     public function where($table, $data)
     {
         if(!empty($data)) {
@@ -219,7 +276,7 @@ class MY_Model extends CI_Model
                 }
             }else{
                 foreach ($data as $key=>$val) {
-                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                    $column = $this->getColumnName($table, $key);
                     if(is_array($val)) {
                         $this->db->where_in($column, $val);
                     }else{
@@ -228,8 +285,8 @@ class MY_Model extends CI_Model
                 }
             }
         }
-        if($this->isDelYn) $this->db->where($table.".".DEL_YN_COLUMN_NAME, 'N');
-        if($this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $data)) $this->db->where($table.".".USE_YN_COLUMN_NAME, 'Y');
+        if($this->useDelYnAsBase && $this->isDelYn) $this->db->where($table.".".DEL_YN_COLUMN_NAME, 'N');
+        if($this->useUseYnAsBase && $this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $data)) $this->db->where($table.".".USE_YN_COLUMN_NAME, 'Y');
     }
 
     public function like($table, $data = [])
@@ -241,7 +298,7 @@ class MY_Model extends CI_Model
                 }
             }else{
                 foreach ($data as $key=>$val) {
-                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                    $column = $this->getColumnName($table, $key);
                     if(is_array($val)) {
                         $this->db->group_start();
                         foreach ($val as $i=>$subVal) {
@@ -268,7 +325,7 @@ class MY_Model extends CI_Model
                 show_error('Only One among Keys and Vals can be array type.');
             }elseif (is_array($keys) && !is_array($vals)) {
                 foreach ($keys as $i=>$key) {
-                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                    $column = $this->getColumnName($table, $key);
                     if($i === 0) {
                         $this->db->like($column, $vals, 'both');
                     }else{
@@ -276,7 +333,7 @@ class MY_Model extends CI_Model
                     }
                 }
             }elseif (!is_array($keys) && is_array($vals)) {
-                $column = str_contains($keys, '.') ? $keys : $table.'.'.$keys;
+                $column = $this->getColumnName($table, $keys);
                 foreach ($vals as $i=>$val) {
                     if($i === 0) {
                         $this->db->like($column, $val, 'both');
@@ -300,7 +357,7 @@ class MY_Model extends CI_Model
                 }
             }else{
                 foreach ($data as $key=>$val) {
-                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                    $column = $this->getColumnName($table, $key);
                     if(is_array($val)) {
                         $this->db->where_in($column, $val);
                     }else{
@@ -319,7 +376,7 @@ class MY_Model extends CI_Model
             }
         }else{
             foreach ($data as $key=>$val) {
-                $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                $column = $this->getColumnName($table, $key);
                 if(is_array($val)) {
                     $this->db->where_not_in($column, $val);
                 }else{
@@ -350,13 +407,13 @@ class MY_Model extends CI_Model
                 if(!qb_join_exists($this->db, $data['table'])) {
                     if(is_empty($data, 'select')) {
                         foreach ($data['matches'] as $key=>$val) {
-                            $this->db->select($data['table'].'.'.$key);
+                            $this->select($data['table'], $key);
                         }
                     }else if(is_string($data['select'])){
-                        $this->db->select($data['table'].'.'.$data['select']);
+                        $this->select($data['table'], $data['select']);
                     }else{
                         foreach ($data['select'] as $select) {
-                            $this->db->select($data['table'].'.'.$select);
+                            $this->select($data['table'], $select);
                         }
                     }
 
@@ -386,13 +443,13 @@ class MY_Model extends CI_Model
             if(is_list_type($data)) {
                 foreach ($data as $item) {
                     foreach ($item as $key => $val) {
-                        $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                        $column = $this->getColumnName($table, $key);
                         $this->db->order_by($column, $val);
                     }
                 }
             }else{
                 foreach ($data as $key => $val) {
-                    $column = str_contains($key, '.') ? $key : $table.'.'.$key;
+                    $column = $this->getColumnName($table, $key);
                     $this->db->order_by($column, $val);
                 }
             }
@@ -415,7 +472,7 @@ class MY_Model extends CI_Model
                     $this->groupBy($table, $item);
                 }
             }else{
-                $column = str_contains($data, '.') ? $data : $table.'.'.$data;
+                $column = $this->getColumnName($table, $data);
                 $this->db->group_by($column);
             }
         }

@@ -12,36 +12,24 @@ class MY_Config extends CI_Config
     {
 		$CI =& get_instance();
 
-		if(is_null($this->item($item))) $CI->logger("MY_Config-get : $item does not exist.", E_USER_ERROR, $triggerError);
-
-        if($this->item($item) === null) {
-            return $default;
-        }else{
-            if(empty($this->item($item))) {
-                return $default === null ? $this->item($item) : $default;
-            }else{
-                return $this->item($item);
-            }
-        }
-    }
-
-    public function get2($item1, $item2, $default = null, $triggerError = true)
-    {
-        $CI =& get_instance();
-
-        if($this->item($item1) === null || empty($this->item($item1))) {
-            $CI->logger("MY_Config-get : $item1 does not exist.", E_USER_ERROR, false);
-
-            if($this->item($item2) === null || empty($this->item($item2))) {
-                $CI->logger("MY_Config-get : $item1 and $item2 does not exist.", E_USER_ERROR, $triggerError);
-
-                return $default;
-            }else{
-                return $this->item($item2);
+        $result = null;
+        if(is_array($item)) {
+            if(!is_list_type($item)) show_error(__METHOD__.' : Please Check Config Item');
+            foreach ($item as $value) {
+                if(!is_null($this->item($value))) {
+                    $result = $this->item($value);
+                    break;
+                }
             }
         }else{
-            return $this->item($item1);
+            $result = $this->item($item);
         }
+
+        if(is_null($result) && $triggerError) {
+            $CI->logging("MY_Config-get : $item does not exist.", E_USER_ERROR, $triggerError);
+        }
+
+        return $result ?? $default;
     }
 
     // . 으로 구성된 Config 처리

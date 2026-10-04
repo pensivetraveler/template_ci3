@@ -241,7 +241,7 @@ class MY_Lang extends CI_Lang {
 		// Because killer robots like unicorns!
 		if ($value === false && $log_errors === true)
 		{
-			log_message('error', "Could not find the language line '$line' in {$this->base_language}");
+			log_message('debug', "Could not find the language line '$line' in {$this->base_language}");
 		}
 
 		return $value;

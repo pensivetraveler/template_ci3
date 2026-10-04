@@ -3,6 +3,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class MY_Router extends CI_Router
 {
+    public $location;
+
+    public function __construct($routes = NULL)
+    {
+        parent::__construct();
+
+        $this->location = $this->class.'/'.$this->method;
+    }
+
+
     /**
      * CI3 core를 기반으로 하되,
      * 1) 기본 디렉토리 탐색

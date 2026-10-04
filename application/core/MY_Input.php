@@ -48,7 +48,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @author        EllisLab Dev Team
  * @link        http://codeigniter.com/user_guide/libraries/input.html
  */
-class MY_Input extends CI_Input
+class
+MY_Input extends CI_Input
 {
 //    /**
 //     * chrome 80 cookie issue를 해결하기 위함.
@@ -323,5 +324,14 @@ class MY_Input extends CI_Input
     public function json()
     {
         return json_decode($this->raw_input_stream, true);
+    }
+
+    public function file($index = NULL)
+    {
+        if(is_null($index)) {
+            return $_FILES;
+        }else{
+            return $_FILES[$index] ?? [];
+        }
     }
 }

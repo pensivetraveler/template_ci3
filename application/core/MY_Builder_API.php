@@ -11,10 +11,16 @@ class MY_Builder_API extends MY_Controller_API
     use BuilderCommonTrait;
     use BuilderColumnsTrait;
 
-    public string $flag;
+    public string $flag = '';
+    public string $routeTitle = '';
+    public string $mode = '';
+    public string $submode = '';
+    public string $apiRoute;
+    public string $apiBaseUri;
+    public string $apiUri;
+
     protected string $table = '';
     protected array $idData = [];
-    protected bool $isAutoId = false;
     protected string $identifier = '';
     protected array $primaryKeyList = [];
     protected array $uniqueKeyList = [];
@@ -37,11 +43,13 @@ class MY_Builder_API extends MY_Controller_API
     protected array $validateCallback = [];
     protected array $exceptValidateKeys = [];
     protected array $transTargetKeys = [];
-    protected bool $indexAPI = false;
+    protected bool $noIndexMethod = false;
 
     public function __construct()
     {
         parent::__construct();
+
+        $this->validateModel('Model_User_Logs');
 
         if($this->listConfigName === '') $this->listConfigName = 'list_'.strtolower($this->router->class).'_config';
         if($this->formConfigName === '') $this->formConfigName = 'form_'.strtolower($this->router->class).'_config';
@@ -50,60 +58,43 @@ class MY_Builder_API extends MY_Controller_API
         $this->validateCallback = [];
         $this->exceptValidateKeys = ['_mode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
         $this->transTargetKeys = [];
-        $this->indexAPI = true;
 
         if($this->uri->segment(1) === 'api'){
             $this->flag = 'web';
         }else{
-            $this->flag = $this->flag??$this->uri->segment(1);
+            $this->flag = $this->uri->segment(1);
         }
 
-        $this->loadConfigs(['builder_base_config', 'builder_form_config', 'builder_list_config', 'builder_view_config']);
+        $this->loadConfigs(['builder_base_config', 'builder_route_config', 'builder_form_config', 'builder_list_config', 'builder_view_config']);
+
+        if($this->router->method === 'index') {
+            if($this->noIndexMethod) show_404();
+        }
     }
 
-    public function index_get($key = 0)
-    {
-        if(!$this->indexAPI) show_404();
-        parent::index_get($key);
-    }
-
-    public function index_post($key = 0)
-    {
-        if(!$this->indexAPI) show_404();
-        parent::index_post($key);
-    }
-
-    public function index_put($key = 0)
-    {
-        if(!$this->indexAPI) show_404();
-        parent::index_put($key);
-    }
-
-    public function index_patch($key = 0)
-    {
-        if(!$this->indexAPI) show_404();
-        parent::index_patch($key);
-    }
-
-    public function index_delete($key = 0)
-    {
-        if(!$this->indexAPI) show_404();
-        parent::index_delete($key);
-    }
-
-    protected function beforeGet($key = 0): array
+    protected function beforeGet($key = 0, $strict = false): array
     {
         list($key, $data) = parent::beforeGet($key);
 
         return [
-            $this->checkIdentifierExist($key),
+            $this->checkIdentifierExist($key, $strict),
             reformat_get_data($data, $this->exceptValidateKeys)
         ];
     }
 
     protected function afterGet($key, $data = [])
     {
-        if(count(array_keys($this->idData)) > 0 && count(array_keys($this->idData)) === count($this->primaryKeyList)) {
+        if(!property_exists($this, 'Model')) {
+            $this->responseError([
+                'location' => __METHOD__,
+                'param' => [
+                    'class' => $this->router->class,
+                ],
+                'msg' => "Model is not defined",
+            ]);
+        }
+
+        if(count(array_keys($this->idData))) {
             $this->view($key, $data);
         }else{
             $this->list($data);
@@ -124,9 +115,16 @@ class MY_Builder_API extends MY_Controller_API
         return $data;
     }
 
-    protected function executeList($data): array
+    protected function executeList($data, $model = null): array
     {
-        $list = $this->Model->getList(
+        if($model === null) {
+            if(!property_exists($this, 'Model')) {
+                trigger_error(__METHOD__." : Model Property is not defined.", E_CORE_ERROR);
+            }
+            $model = $this->Model;
+        }
+
+        $list = $model->getList(
             $data['select'] ?? [],
             $data,
         );
@@ -136,10 +134,10 @@ class MY_Builder_API extends MY_Controller_API
         return $data;
     }
 
-    protected function afterList($data, $isResponse = true)
+    protected function afterList($data, $isResponse = true): array
     {
         if($isResponse) {
-            $this->beforeResponse($data, true);
+            $data = $this->beforeResponse($data, true);
 
             $this->response([
                 'code' => DATA_RETRIEVED,
@@ -187,7 +185,7 @@ class MY_Builder_API extends MY_Controller_API
     protected function afterView($key, $data, $isResponse = true)
     {
         if($isResponse) {
-            $this->beforeResponse($data, true);
+            $data = $this->beforeResponse($data, true);
 
             $this->response([
                 'code' => $data['view']?DATA_RETRIEVED:DATA_NOT_EXIST,
@@ -252,11 +250,20 @@ class MY_Builder_API extends MY_Controller_API
     {
         list($key, $data) = parent::beforePost($key);
 
-        $key = $this->checkIdentifierExist($key);
+        $this->checkIdentifierExist($key);
 
-        $data = $this->validate($data, $model);
+        foreach ($this->defaultList as $field=>$default) {
+            if(!isset($data[$field])) $data[$field] = $default;
+        }
 
-        $this->checkUniqueExist($data, $model, is_empty($key));
+        foreach ($this->getModelPipeline() as $modelName) {
+            if (property_exists($this, $modelName)) {
+                $exceptRequiredKeys = $this->getGeneratedForeignKeyFields($this->{$modelName}, $modelName);
+
+                $this->validate($data, $this->{$modelName}, true, '', $exceptRequiredKeys);
+                $this->checkUniqueExist($data, $this->{$modelName});
+            }
+        }
 
         if(count($this->fileList) > 0) $data = $this->uploadFileInList($data);
 
@@ -276,11 +283,20 @@ class MY_Builder_API extends MY_Controller_API
     {
         list($key, $data) = parent::beforePut($key);
 
-        $key = $this->checkIdentifierExist($key);
+        $this->checkIdentifierExist($key);
 
-        $data = $this->validate($data, $model);
+        foreach ($this->defaultList as $field=>$default) {
+            if(!isset($data[$field])) $data[$field] = $default;
+        }
 
-        if($key) $this->checkUniqueExist($data, $model, false);
+        foreach ($this->getModelPipeline() as $modelName) {
+            if (property_exists($this, $modelName)) {
+                $exceptRequiredKeys = $this->getGeneratedForeignKeyFields($this->{$modelName}, $modelName);
+
+                $this->validate($data, $this->{$modelName}, true, '', $exceptRequiredKeys);
+                $this->checkUniqueExist($data, $this->{$modelName});
+            }
+        }
 
         return [$key, $data];
     }
@@ -297,7 +313,7 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function beforePatch($key = 0, $model = null): array
     {
-        $key = $this->checkIdentifierExist($key);
+        $this->checkIdentifierExist($key);
 
         return parent::beforePatch($key);
     }
@@ -309,7 +325,7 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function beforeDelete($key = 0): array
     {
-        $key = $this->checkIdentifierExist($key);
+        $this->checkIdentifierExist($key);
 
         return parent::beforeDelete($key);
     }
@@ -321,6 +337,95 @@ class MY_Builder_API extends MY_Controller_API
 
 
     /* --------------------------------------------------------------- */
+    protected function setData($data = [], $model = null)
+    {
+        if(is_null($model)) $model = $this->Model;
+
+        $checkboxes = array_values(array_filter($this->formConfig, function ($item) {
+            return $item['type'] === 'checkbox';
+        }));
+
+        $onoff = array_values(array_filter($checkboxes, function ($item) {
+            return $item['subtype'] === 'onoff';
+        }));
+
+        $columnList = array_unique(array_merge($model->notNullList, $model->nullList));
+        if($model->isDelYn) $columnList[] = DEL_YN_COLUMN_NAME;
+        if($model->isUseYn) $columnList[] = USE_YN_COLUMN_NAME;
+
+        foreach ($data as $field => $value) {
+            if(!in_array($field, $columnList)){
+                unset($data[$field]);
+                continue;
+            }
+
+            if(!is_object($value) && !is_array($value)) $data[$field] = trim(preg_replace('/\s\s+/', ' ', $value));
+            if(in_array($field, $model->strList) && empty($value)) $data[$field] = '';
+            if(in_array($field, $model->intList)) {
+                if(array_key_exists($field, $data)) {
+                    $data[$field] = (int)$data[$field];
+                }else{
+                    $data[$field] = in_array($field, $model->notNullList) ? 0 : null;
+                }
+            }
+
+            switch ($field) {
+                case 'gender' :
+                    $data[$field] = strtoupper($data[$field]);
+                    break;
+                case 'password' :
+                    if($value) {
+                        $data[$field] = $this->encryption->encrypt($value);
+                    }else{
+                        unset($data[$field]);
+                    }
+                    break;
+            }
+
+            if(in_array($field, array_column($checkboxes, 'field'))) {
+                $index = array_search($field, array_column($checkboxes, 'field'));
+                $config = $checkboxes[$index];
+                if($config['subtype'] === 'onoff') {
+                    $data[$field] = $value;
+                }else{
+                    $seperator = $checkboxes['option_attributes']['seperator'] ?? ',';
+                    $data[$field] = join($seperator, $value);
+                }
+            }
+        }
+
+        foreach ($onoff as $config) {
+            $field = $config['field'];
+            if(!array_key_exists($field, $data)) $data[$field] = 'N';
+        }
+
+        return $data;
+    }
+
+    protected function setModData($data = [], $model = null)
+    {
+        if(is_null($model)) $model = $this->Model;
+
+        $data = $this->setData($data, $model);
+
+        $idData = [];
+        if($model->isAutoIncrement) {
+            $idData[$model->identifier] = $data[$model->identifier];
+        }else if(count($model->primaryKeyList) > 0){
+            $idData = array_reduce(array_merge($model->primaryKeyList, $model->uniqueKeyList), function ($carry, $item) use ($data) {
+                if(isset($data[$item])) {
+                    $carry[$item] = $data[$item];
+                    unset($data[$item]);
+                }
+                return $carry;
+            }, []);
+        }
+
+        return [$data, $idData];
+    }
+
+    /* --------------------------------------------------------------- */
+
     protected function add($dto, $bool)
     {
         $dto = $this->beforeAdd($dto);
@@ -330,25 +435,44 @@ class MY_Builder_API extends MY_Controller_API
         $this->afterAdd($dto);
     }
 
-    protected function beforeAdd($dto): array
+    protected function beforeAdd($dto, $model = null): array
     {
-        if(!$this->isAutoId && count($this->primaryKeyList) > 0) {
-            $this->idData = array_reduce(array_merge($this->primaryKeyList, $this->uniqueKeyList), function ($carry, $item) {
-                if($this->input->post($item)) $carry[$item] = $this->input->post($item);
-                return $carry;
-            }, []);
-            if($this->checkDataExist(['where' => $this->idData])) $this->response(['code' => DATA_ALREADY_EXIST]);
+        if(is_null($model)) $model = $this->Model;
+
+        if(!$model->isAutoIncrement && count($model->primaryKeyList) > 0) {
+            $this->idData = array_reduce(
+                array_merge($model->primaryKeyList, $model->uniqueKeyList)
+                , function ($carry, $item) use ($dto) {
+                    if(isset($dto[$item])) $carry[$item] = $dto[$item];
+                    return $carry;
+                }
+                , []
+            );
+            if($this->checkDataExist(['where' => $this->idData], $model)) $this->response(['code' => DATA_ALREADY_EXIST]);
         }
 
         return $dto;
     }
 
-    protected function executeAdd($dto, $bool): array
+    protected function executeAdd($dto, $bool, $model = null): array
     {
-        $result = $this->Model->addData($dto, $bool);
-        if($this->isAutoId) {
-            $dto[$this->identifier] = $result;
-            $this->idData = [$this->identifier => $dto[$this->identifier]];
+        if(is_null($model)) {
+            foreach (['Model_Parent', 'Model', 'Model_Child'] as $modelName) {
+                if (property_exists($this, $modelName)) {
+                    $targetModel = $this->{$modelName};
+
+                    $dto = $this->applyForeignKeyValues($dto, $targetModel);
+
+                    $params = $this->setData($dto, $targetModel);
+                    $params = $this->addData($params, $bool, $targetModel);
+
+                    $dto = array_merge($dto, $params);
+                }
+            }
+        }else{
+            $dto = $this->applyForeignKeyValues($dto, $model);
+            $dto = $this->setData($dto, $model);
+            $dto = $this->addData($dto, $bool, $model);
         }
 
         return $dto;
@@ -356,7 +480,7 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function afterAdd($dto)
     {
-        $this->beforeResponse($dto);
+        $data = $this->beforeResponse($dto);
 
         $this->response([
             'code' => DATA_CREATED,
@@ -378,16 +502,26 @@ class MY_Builder_API extends MY_Controller_API
         return $dto;
     }
 
-    protected function executeModify($key, $dto, $bool): array
+    protected function executeModify($key, $dto, $bool, $model = null): array
     {
-        $this->Model->modData($dto, $this->idData, $bool);
+        if(is_null($model)) {
+            foreach (['Model_Parent', 'Model', 'Model_Child'] as $modelName) {
+                if(property_exists($this, $modelName)) {
+                    list($params, $idData) = $this->setModData($dto, $this->{$modelName});
+                    $this->modData($params, $idData, $bool, $this->{$modelName});
+                }
+            }
+        }else{
+            $dto = $this->setData($dto, $model);
+            $this->modData($dto, $this->idData, $bool, $model);
+        }
 
         return $dto;
     }
 
     protected function afterModify($key, $dto)
     {
-        $this->beforeResponse($dto);
+        $data = $this->beforeResponse($dto);
 
         $this->response([
             'code' => DATA_EDITED,
@@ -411,38 +545,181 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function executeRemove($key, $data, $bool): array
     {
-        $this->Model->delData($this->idData, $bool);
+        $baseRow = $this->getDeleteBaseRow();
+
+        $pipeline = array_reverse($this->getModelPipeline());
+
+        foreach ($pipeline as $modelName) {
+            if (!property_exists($this, $modelName)) {
+                continue;
+            }
+
+            $model = $this->{$modelName};
+
+            $idData = $this->makeDeleteIdData($model, $baseRow);
+
+            if (!count($idData)) {
+                continue;
+            }
+
+            $model->delData($idData, $bool);
+        }
 
         return $data;
     }
 
     protected function afterRemove($key, $data = [])
     {
-        $this->beforeResponse($data);
+        $data = $this->beforeResponse($data);
 
         $this->response([
             'code' => DATA_DELETED,
         ]);
     }
 
+    protected function loggingUserlog()
+    {
+        $class = $this->router->class;
+        $method = $this->router->method;
+        $restMethod = $this->input->method();
+        $idExist = !empty($this->idData);
+        $userKind = '시스템';
+        if($this->session->userdata('user_cd') !== 'USR000') {
+            $userKind = $this->getCodeName([
+                'cmb_cd' => $this->session->userdata('user_cd')
+            ]);
+        }
+
+        if(!$this->devMode && $this->session->userdata('is_sys_admin')) return;
+
+        $name = $this->session->userdata('name');
+        $pp = $this->josa->__replace($name, '이');
+        $subject = "{$name}($userKind){$pp}";
+        $object = '';
+        $verb = '';
+        $message = '';
+
+        switch ($class) {
+            case 'auth' :
+                $type = 'auth';
+                if($method === 'login') {
+                    $title = '로그인';
+                    $verb = "로그인했습니다";
+                }else if($method === 'logout') {
+                    $title = '로그아웃';
+                    $verb = "로그아웃했습니다";
+                }
+                break;
+            default :
+                switch ($restMethod) {
+                    case 'get' :
+                        $type = 'read';
+                        $title = '조회';
+                        $verb = "조회했습니다";
+                        if($idExist) {
+                            $object = "데이터를";
+                        }else{
+                            $object = "목록을";
+                        }
+                        break;
+                    case 'post' :
+                    case 'put' :
+                    case 'patch' :
+                        $object = "데이터를";
+                        if($idExist) {
+                            $title = '수정';
+                            $type = 'update';
+                            $verb = "수정했습니다";
+                        }else{
+                            $title = '등록';
+                            $type = 'create';
+                            $verb = "등록했습니다";
+                        }
+                        break;
+                    case 'delete' :
+                        $title = '삭제';
+                        $type = 'delete';
+                        $object = "데이터를";
+                        $verb = "삭제했습니다";
+                        break;
+                }
+                break;
+        }
+
+        if($object) {
+            if($this->routeTitle) {
+                $object = $this->routeTitle . ' ' . $object;
+            }
+        }
+
+        foreach ([$subject, $object, $verb] as $i=>$item) {
+            if($item !== '') $message .= $item;
+            if($i === 2) {
+                $message .= '.';
+            }else{
+                if($item !== '') $message .= ' ';
+            }
+        }
+
+        $this->Model_User_Logs->addData([
+            'user_id' => $this->session->userdata("user_id"),
+            'class' => $this->router->class,
+            'method' => $this->router->method,
+            'title' => $title ?? '',
+            'message' => $message ?? '',
+            'log_id' => $this->_insert_id,
+            'type' => $type ?? '',
+        ]);
+    }
+
     protected function beforeResponse($data, $isFetch = false)
     {
+        if($this->mode === 'option') {
+            $data['list'] = $this->getOptionsFromDBList($data['list'], $data['render']);
+        }else{
+            $this->loggingUserlog();
+        }
 
+        return $data;
     }
 
     /* --------------------------------------------------------------- */
 
-    protected function validate($data = [], $model = null, $validate = true, $configName = '')
+    protected function addData($dto, $bool, $model = null)
     {
-        if($validate) $data = $this->validateFormRules($configName, $data);
-
         if(is_null($model)) $model = $this->Model;
 
-        return $this->validateManually(
+        $result = $model->addData($dto, $bool);
+
+        if ($model->isAutoIncrement && $model->identifier) {
+            $dto[$model->identifier] = $result;
+            $this->idData[$model->identifier] = $result;
+        }
+
+        return $dto;
+    }
+
+    protected function modData($dto, $idData, $bool, $model = null)
+    {
+        if(is_null($model)) $model = $this->Model;
+
+        $model->modData($dto, $idData, $bool);
+
+        return $dto;
+    }
+
+    /* --------------------------------------------------------------- */
+
+    protected function validate($data = [], $model = null, $validate = true, $configName = '', $exceptRequiredKeys = [])
+    {
+        if($validate) $this->validateFormRules($configName, $data);
+
+        $this->validateManually(
             $data,
-            $model,
+            $model ?? $this->Model,
             $this->validateMessages,
             $this->validateCallback,
+            $exceptRequiredKeys,
         );
     }
 
@@ -490,6 +767,7 @@ class MY_Builder_API extends MY_Controller_API
                 $enveloped = $attr['envelope_name'];
                 $targetData = [];
                 if($enveloped) {
+                    if(!array_key_exists($group, $data)) continue;
                     $targetData = $data[$group];
                 }else{
                     foreach ($data as $field => $value) {
@@ -574,9 +852,8 @@ class MY_Builder_API extends MY_Controller_API
         }
 
         if(count($errors)) {
-            $this->response([
+            $this->responseError($errors, [
                 'data' => $this->input->post(),
-                'errors' => $errors,
             ], RestController::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -622,116 +899,82 @@ class MY_Builder_API extends MY_Controller_API
         $dto->intList = $intList;
         $dto->fileList = [];
 
-        return $this->validateManually($parsed_data, $dto, $msgList, $callbacks);
+        $this->validateManually($parsed_data, $dto, $msgList, $callbacks);
+
+        return $parsed_data;
     }
 
-    protected function validateManually($data = [], $dto = null, $msgList = [], $callbacks = [])
+    protected function validateManually($data = [], $model = null, $msgList = [], $callbacks = [], $exceptRequiredKeys = [])
     {
-        if($dto === null || !isset($dto->notNullList))
-            $this->response([
+        if($model === null || !isset($model->notNullList))
+            $this->responseError([
+                'location' => __METHOD__,
+                'type' => 'required',
+            ], [
                 'code' => EMPTY_REQUIRED_DATA,
-                'msg' => lang('status_code.'.EMPTY_REQUIRED_DATA),
                 'data' => $data,
-                'errors' => [[
-                    'location' => 'validateManually',
-                    'param' => null,
-                    'value' => null,
-                    'type' => 'required',
-                    'msg' => lang('status_code.'.EMPTY_REQUIRED_DATA),
-                ]]
-            ], RestController::HTTP_BAD_REQUEST);
+            ]);
 
         if($this->input->method() === 'post') {
-            foreach ($this->defaultList as $field=>$default) {
-                if(!isset($data[$field])) $data[$field] = $default;
-            }
+            foreach ($model->notNullList as $key) {
+                if ($model->identifier && $key === $model->identifier) {
+                    continue;
+                }
 
-            foreach ($dto->notNullList as $key) {
-                if( $dto->identifier && $key === $dto->identifier ) continue;
-                if( in_array($key, $dto->primaryKeyList) ) continue;
+                if (in_array($key, $model->primaryKeyList, true)) {
+                    continue;
+                }
 
-                if(array_key_exists($key, $callbacks)){
+                if (in_array($key, $exceptRequiredKeys, true)) {
+                    continue;
+                }
+
+                if (array_key_exists($key, $callbacks)) {
                     $this->{$callbacks[$key]}();
-                }else{
-                    $errorMsg = '';
-                    $value = null;
+                    continue;
+                }
 
-                    if(array_key_exists($key, $msgList)) {
-                        $msg = $msgList[$key];
-                    }else{
-                        $lang = $dto->table?lang($dto->table.'.'.$key):$key;
-                        if($this->request === 'post' && count($dto->fileList) > 0 && in_array($key, $dto->fileList)){
-                            if(!is_file_posted($key)) {
-                                $errorMsg = "File Data {$key} Is Missing.";
-                                $data = $_FILES;
-                                $msg = $this->josa->__conv("$lang{을} 업로드하세요.");
-                            }
-                        }else{
-                            if(!array_key_exists($key, $data)) {
-                                $errorMsg = 'Required';
-                            }else if(is_empty($data, $key)) {
-                                $value = $data[$key];
-                                $errorMsg = 'empty';
-                            }
-                            if($errorMsg) $msg = $this->josa->__conv("$lang{은} 필수 입력값 입니다.");
+                $errorMsg = '';
+                $value = null;
+                $msg = '';
+
+                if(array_key_exists($key, $msgList)) {
+                    $msg = $msgList[$key];
+                }else{
+                    $lang = $model->table ? lang($model->table.'.'.$key) : $key;
+
+                    if($this->request === 'post' && count($model->fileList) > 0 && in_array($key, $model->fileList)){
+                        if(!is_file_posted($key)) {
+                            $errorMsg = "File Data {$key} Is Missing.";
+                            $data = $_FILES;
+                            $msg = $this->josa->__conv("$lang{을} 업로드하세요.");
                         }
-                    }
-
-                    if($errorMsg) {
-                        $this->response([
-                            'code' => EMPTY_REQUIRED_DATA,
-                            'msg' => array_key_exists($key, $msgList)?$msgList[$key]:$msg,
-                            'data' => $data,
-                            'errors' => [[
-                                'location' => 'validateManually',
-                                'param' => $key,
-                                'value' => $value,
-                                'type' => 'required',
-                                'msg' => $errorMsg,
-                            ]]
-                        ], RestController::HTTP_BAD_REQUEST);
-                    }
-                }
-            }
-        }
-
-        $checkboxes = array_values(array_filter($this->formConfig, function ($item) {
-            return $item['type'] === 'checkbox';
-        }));
-
-        $columnList = array_unique(array_merge($dto->notNullList, $dto->nullList));
-        foreach ($data as $key => $val) {
-            if(!in_array($key, $columnList)){
-                unset($data[$key]);
-                continue;
-            }
-
-            if(!is_object($val) && !is_array($val)) $data[$key] = trim(preg_replace('/\s\s+/', ' ', $val));
-            if(in_array($key, $dto->strList) && empty($val)) $data[$key] = '';
-            if(in_array($key, $dto->intList)) {
-                if(array_key_exists($key, $data)) {
-                    $data[$key] = (int)$data[$key];
-                }else{
-                    $data[$key] = in_array($key, $dto->notNullList) ? 0 : null;
-                }
-            }
-
-            switch ($key) {
-                case 'gender' :
-                    $data[$key] = strtoupper($data[$key]);
-                    break;
-                case 'password' :
-                    if($val) {
-                        $data[$key] = $this->encryption->encrypt($val);
                     }else{
-                        unset($data[$key]);
-                    }
-                    break;
-            }
+                        if(!array_key_exists($key, $data)) {
+                            $errorMsg = 'Required';
+                        }else if(is_empty($data, $key)) {
+                            $value = $data[$key];
+                            $errorMsg = 'empty';
+                        }
 
-            if(in_array($key, array_column($checkboxes, 'field'))) {
-                $seperator = $checkboxes['option_attributes']['seperator'] ?? ',';
-                $data[$key] = join($seperator, $data[$key]);
+                        if($errorMsg)
+                            $msg = $this->josa->__conv("$lang{은} 필수 입력값 입니다.");
+                    }
+                }
+
+                if($errorMsg) {
+                    $this->responseError([
+                        'location' => __METHOD__,
+                        'param' => $key,
+                        'value' => $value,
+                        'type' => 'required',
+                        'msg' => $errorMsg,
+                    ], [
+                        'code' => EMPTY_REQUIRED_DATA,
+                        'msg' => array_key_exists($key, $msgList) ? $msgList[$key] : $msg,
+                        'data' => $data,
+                    ]);
+                }
             }
         }
 
@@ -785,50 +1028,32 @@ class MY_Builder_API extends MY_Controller_API
                 }
             }
         } catch (Exception $e) {
-            $this->response([
+            $this->responseError([
+                'location' => __METHOD__,
+                'param' => $key,
+                'type' => 'upload error',
+            ], [
                 'code' => $e->getCode(),
                 'msg' => strip_tags($e->getMessage()),
                 'data' => $_FILES,
-                'errors' => [
-                    'location' => 'uploadFileInList',
-                    'param' => $key,
-                    'type' => 'upload error',
-                ]
-            ], RestController::HTTP_INTERNAL_SERVER_ERROR);
+            ]);
         }
 
         return $dto;
     }
 
-    protected function setProperties($model, $model_parent = null)
+    protected function setProperties($model, $setConfig = null)
     {
         $this->identifier = $model->identifier;
         $this->fileList = $model->fileList;
-        $this->isAutoId = $model->isAutoIncrement;
         $this->primaryKeyList = $model->primaryKeyList;
         $this->uniqueKeyList = $model->uniqueKeyList;
 
-        // model check
-        if(!$model->validateTableColumns()) {
-            $this->response([
-                'code' => MODEL_DATA_NOT_COINCIDENCE,
-                'errors' => [
-                    'location' => 'model',
-                    'type' => 'model error',
-                    'value' => [
-                        'columnList' => $model->getColumnList(),
-                        'strList' => $model->strList,
-                        'intList' => $model->intList,
-                        'fileList' => $model->fileList,
-                        'diffList' => $model->determineDiffColumns(),
-                    ]
-                ]
-            ], RestController::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
         if(!in_array($this->input->method(), ['get', 'post'])) return;
 
-        if($this->setConfig) {
+        if(is_null($setConfig)) $setConfig = $this->setConfig;
+
+        if($setConfig) {
             $this->listConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_list_base'), $item);
             }, $this->config->get($this->listConfigName, [], false));
@@ -866,49 +1091,111 @@ class MY_Builder_API extends MY_Controller_API
 
             if($this->input->method === 'post') {
                 if(is_empty($this->formConfig)) {
-                    $this->response([
+                    $this->responseError([
+                        'location' => __METHOD__,
+                        'msg' => "Validation Rules Config For $this->formConfigName Is Empty",
+                    ], [
                         'data' => $this->input->request(),
-                        'errors' => [
-                            [
-                                'location' => __METHOD__,
-                                'param' => '',
-                                'value' => '',
-                                'type' => '',
-                                'msg' => "Validation Rules Config For $this->formConfigName Is Empty",
-                            ]
-                        ],
-                    ], RestController::HTTP_BAD_REQUEST);
+                    ]);
                 }
             }
         }
     }
 
-    protected function checkIdentifierExist($key = 0, $model = null): string
+    protected function checkIdentifierExist($key = 0, $strict = false, $model = null): array
     {
-        if(!$model && property_exists($this, 'Model')) $model = $this->Model;
+        if (!$model && property_exists($this, 'Model')) {
+            $model = $this->Model;
+        }
 
-        if(is_null($model)) return $key;
+        if (is_null($model)) {
+            if ($strict) {
+                $this->responseError([
+                    'location' => __METHOD__,
+                    'param' => [
+                        'class' => $this->router->class,
+                    ],
+                    'msg' => "Model is not defined",
+                ]);
+            }else{
+                return $this->idData;
+            }
+        }
 
-        if($key || $this->input->get($model->identifier)) {
-            if(!$key) $key = $this->input->get($model->identifier);
-            $this->idData = [$model->identifier => $key];
-        }else{
-            if(!count(array_merge($model->primaryKeyList, $model->uniqueKeyList))) {
-                show_error('There\'s No data for Identifying');
+        $this->idData = [];
+
+        if ($model->isAutoIncrement) {
+            if (!$model->identifier) {
+                if ($strict) {
+                    $this->responseError([
+                        'location' => __METHOD__,
+                        'param' => [
+                            'class' => $this->router->class,
+                        ],
+                        'msg' => "Identifier is not defined",
+                    ]);
+                }
             }
 
-            $this->idData = array_reduce(array_merge($model->primaryKeyList, $model->uniqueKeyList), function ($carry, $item) {
-                if($this->input->get($item)) $carry[$item] = $this->input->get($item);
-                return $carry;
-            }, []);
+            $value = $key ?: $this->input->get($model->identifier);
 
-//            if(count(array_keys($this->idData)) > 0 && count(array_keys($this->idData)) !== count($model->primaryKeyList)) {
-//                show_error('ID Field and Values is not equivalent counts');
-//            }
+            if ($value !== null && $value !== '') {
+                $this->idData[$model->identifier] = $value;
+            }
+
+            if ($strict && !count($this->idData)) {
+                $this->responseError([
+                    'location' => __METHOD__,
+                    'param' => [
+                        'class' => $this->router->class,
+                    ],
+                    'msg' => "Identifier value is missing",
+                ]);
+            }
+
+            return $this->idData;
         }
-        if(!count(array_keys($this->idData))) return $key;
 
-        return $key;
+        if (count($model->primaryKeyList) > 0) {
+            $found = [];
+
+            foreach ($model->primaryKeyList as $field) {
+                $value = $this->input->get($field);
+
+                if ($value !== null && $value !== '') {
+                    $found[$field] = $value;
+                }
+            }
+
+            if (count($found) === count($model->primaryKeyList)) {
+                $this->idData = $found;
+                return $this->idData;
+            }
+
+            if (count($found) > 0 && $strict) {
+                $this->responseError([
+                    'location' => __METHOD__,
+                    'param' => [
+                        'table' => $model->table,
+                    ],
+                    'msg' => "ID Field and Values is not equivalent counts",
+                ]);
+            }
+
+            return [];
+        }
+
+        if ($strict) {
+            $this->responseError([
+                'location' => __METHOD__,
+                'param' => [
+                    'table' => $model->table,
+                ],
+                'msg' => "There\'s No Columns for Identifying",
+            ]);
+        }
+
+        return [];
     }
 
     protected function checkDataExist($data, $model = null, $exit = false): bool
@@ -925,24 +1212,26 @@ class MY_Builder_API extends MY_Controller_API
         return $result;
     }
 
-    protected function checkUniqueExist($dto, $model = null, $add = true)
+    protected function checkUniqueExist($dto, $model = null)
     {
+        $modeAdd = $this->mode === 'add';
+
         if(is_null($model)) $model = $this->Model;
         if(count($model->uniqueKeyList) > 0){
             foreach ($model->uniqueKeyList as $key) {
                 if(!array_search($key, array_column($this->formConfig, 'field'))) continue;
-                if(!$add && !array_key_exists($key, $dto)) continue;
+                if(!$modeAdd && !array_key_exists($key, $dto)) continue;
 
                 $idx = array_search($key, array_column($this->formConfig, 'field'));
                 $config = $this->formConfig[$idx];
-                if(!$add && (!array_key_exists('editable', $config['form_attributes']) || !$config['form_attributes']['editable'])) continue;
+                if(!$modeAdd && (!array_key_exists('editable', $config['form_attributes']) || !$config['form_attributes']['editable'])) continue;
 
                 $isIncludeDeleted = false;
                 if(array_key_exists('form_attributes', $this->formConfig[$idx]) && !is_empty($this->formConfig[$idx]['form_attributes'], 'check_delete')) {
                     $isIncludeDeleted = $config['form_attributes']['check_delete'];
                 }
 
-                if($this->checkDuplicate([$key => $dto[$key]], $model, !$add?$dto:[], $isIncludeDeleted)){
+                if($this->checkDuplicate([$key => $dto[$key]], $model, !$modeAdd?$dto:[], $isIncludeDeleted)){
                     $lang = $model?lang($model->table.'.'.$key):$key;
                     $this->response([
                         'code' => DATA_ALREADY_EXIST,
@@ -978,7 +1267,7 @@ class MY_Builder_API extends MY_Controller_API
         return $model->getCnt($dto) > 0;
     }
 
-    public function validateExcel_post()
+    public function validateExcel_post(): void
     {
         $this->beforeExcelUpload();
 
@@ -987,14 +1276,162 @@ class MY_Builder_API extends MY_Controller_API
         ]);
     }
 
-    public function uploadExcel_post()
+    public function uploadExcel_post(): void
     {
         $data = $this->beforeExcelUpload();
 
         $this->afterExcelUpload($data);
     }
 
-    public function prepareExports_get()
+    protected function getExportsConfig(): array
+    {
+        $className = snakeize($this->router->class);
+        if($this->config->get('form_'.$className.'_config', [], false)) {
+            $columns = $this->setFormColumns(snakeize($this->router->class));
+        }else{
+            $config = $this->config->get('list_'.$className.'_config', [], false);
+            $columns = array_reduce($config, function($carry, $item) {
+                if(isset($item['field']) || $item['type'] === 'common') {
+                    $carry[] = $this->setFormColumn($item);
+                }
+                return $carry;
+            }, []);
+        }
+
+        if(empty($columns)) {
+            return [];
+        }
+
+        return array_values(array_filter($columns, function ($item) {
+            return !(
+                $item['type'] === 'common' ||
+                $item['type'] === 'file' ||
+                $item['subtype'] === 'identifier'
+            );
+        }));
+    }
+
+    protected function getExportsHeader($config): array
+    {
+        $header['num'] = 'No.';
+        foreach ($config as $item) $header[$item['field']] = lang($item['label']);
+        return $header;
+    }
+
+    protected function getExportsDataTypes($config): array
+    {
+        // num formats
+        $numFormats = array_values(array_map(function ($item) {
+            return $item['field'];
+        }, array_filter($config, function ($item) {
+            return $item['type'] === 'int';
+        })));
+
+        // num formats
+        $floatFormats = array_values(array_map(function ($item) {
+            return $item['field'];
+        }, array_filter($config, function ($item) {
+            return $item['type'] === 'float';
+        })));
+
+        // dateFormats
+        $dateFormats = array_values(array_map(function ($item) {
+            return $item['field'];
+        }, array_filter($config, function ($item) {
+            return $item['type'] === 'date';
+        })));
+
+        // optionFormats
+        $optionFiltered = array_filter($config, function ($item) {
+            return !empty($item['option_attributes']);
+        });
+        $optionConfigs = array_combine(
+            array_column($optionFiltered, 'field'),
+            array_column($optionFiltered, 'option_attributes'),
+        );
+        $optionFields = array_keys($optionConfigs);
+
+        $checkboxFormats = array_column(array_filter($optionFiltered, function ($item) {
+            return $item['type'] === 'checkbox';
+        }), 'field');
+
+        return [
+            'int' => $numFormats,
+            'float' => $floatFormats,
+            'date' => $dateFormats,
+            'option' => [
+                'fields' => $optionFields,
+                'config' => $optionConfigs,
+            ],
+            'checkbox' => $checkboxFormats,
+        ];
+    }
+
+    protected function getExportsDataSource($params): array
+    {
+        return $this->transformList($this->Model->getList(
+            $params['select'] ?? [],
+            $params,
+        ));
+    }
+
+    protected function getExportsDataset($data, $header, $formats): array
+    {
+        // data
+        $source = $this->getExportsDataSource($data);
+
+        // dataset
+        $i = 0;
+        return array_reduce($source, function ($carry, $item) use ($header, $formats, &$i) {
+            $result['num'] = ++$i;
+
+            foreach(array_keys($header) as $field) {
+                if($field === 'num') continue;
+
+                $value = $item->{$field};
+                if(in_array($field, $formats['option']['fields'])) {
+                    $optionConfig = $formats['option']['config'][$field];
+                    $options = $this->getOptions($field, $optionConfig);
+                    if(in_array($field, $formats['checkbox'])) {
+                        $seperator = $optionConfig['seperator'] ?? ',';
+                        $exploded = explode($seperator, $value);
+                        $value = '';
+                        foreach ($exploded as $i=>$v) {
+                            if(!isset($options[$v])) continue;
+                            $value .= $options[$v];
+                            if($i !== count($exploded) -1) $value .= $seperator.' ';
+                        }
+                    }else{
+                        $value = $options[$value] ?? '';
+                    }
+                }
+
+                $result[$field] = $value;
+            }
+
+            $carry[] = $result;
+            return $carry;
+        }, array());
+    }
+
+    protected function addExtraDataset($dataset): array
+    {
+        return $dataset;
+    }
+
+    protected function prepareExportsPath($exportType): string
+    {
+        $uploadPath = 'public/temps/';
+        if (!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
+        $filename = APP_NAME.'_'.strtolower($this->router->class).'_'.date('YmdHis').'.'.$exportType;
+        $encrypted = strtr($this->encryption->encrypt($filename), [
+            '+' => '-',
+            '/' => '_',
+        ]);
+        return FCPATH . $uploadPath . $encrypted;
+    }
+
+    public function prepareExports_get(): void
     {
         /**
          * 1.Model check
@@ -1018,115 +1455,76 @@ class MY_Builder_API extends MY_Controller_API
         unset($data['exportType']);
 
         $data = reformat_get_data($data, $this->exceptValidateKeys);
-        if($this->Model->getCnt($data) === 0) {
-            $this->response([
-                'code' => EMPTY_CONTENT,
-            ]);
-        }
+//        if($this->Model->getCnt($data) === 0) {
+//            $this->response([
+//                'code' => EMPTY_CONTENT,
+//            ]);
+//        }
 
         /**
          * 3.Prepare Data
          */
-        $config = array_values(array_filter($this->setFormColumns(snakeize($this->router->class)), function ($item) {
-            return !(
-                $item['type'] === 'common' ||
-                $item['type'] === 'file' ||
-                $item['subtype'] === 'identifier'
-            );
-        }));
+        $config = $this->getExportsConfig();
 
         // heads
-        $heads['num'] = 'No.';
-        foreach ($config as $item) $heads[$item['field']] = lang($item['label']);
+        $header = $this->getExportsHeader($config);
 
-        // dateFormats
-        $dateFormats = array_values(array_map(function ($item) {
-            return $item['field'];
-        }, array_filter($config, function ($item) {
-            return $item['type'] === 'date';
-        })));
-
-        // optionFormats
-        $optionFiltered = array_filter($config, function ($item) {
-            return !empty($item['option_attributes']);
-        });
-        $optionConfigs = array_combine(
-            array_column($optionFiltered, 'field'),
-            array_column($optionFiltered, 'option_attributes'),
-        );
-        $optionFields = array_keys($optionConfigs);
-
-        $chkboxFormats = array_column(array_filter($optionFiltered, function ($item) {
-            return $item['type'] === 'checkbox';
-        }), 'field');
-
-        // data
-        $list = $this->transformList($this->Model->getList(
-            $data['select'] ?? [],
-            $data,
-        ));
+        // types
+        $formats = $this->getExportsDataTypes($config);
 
         // dataset
-        $i = 0;
-        $dataset = array_reduce($list, function ($carry, $item) use ($heads, $optionFields, $optionConfigs, $chkboxFormats, &$i) {
-            $result['num'] = ++$i;
+        $dataset = $this->getExportsDataset($data, $header, $formats);
 
-            foreach(array_keys($heads) as $field) {
-                if($field === 'num') continue;
-
-                $value = $item->{$field};
-                if(in_array($field, $optionFields)) {
-                    $optionConfig = $optionConfigs[$field];
-                    $options = $this->getOptions($field, $optionConfig);
-                    if(in_array($field, $chkboxFormats)) {
-                        $seperator = $optionConfig['seperator'] ?? ',';
-                        $exploded = explode($seperator, $value);
-                        $value = '';
-                        foreach ($exploded as $i=>$v) {
-                            if(!isset($options[$v])) continue;
-                            $value .= $options[$v];
-                            if($i !== count($exploded) -1) $value .= $seperator.' ';
-                        }
-                    }else{
-                        $value = $options[$value] ?? '';
-                    }
-                }
-
-                $result[$field] = $value;
-            }
-
-            $carry[] = $result;
-            return $carry;
-        }, array());
+        // extra
+        $dataset = $this->addExtraDataset($dataset);
 
         /**
          * 4.Prepare Folder
          */
-        // 저장할 폴더 경로 설정
-        $uploadPath = 'public/temps/';
-        if (!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
-        $filename = APP_NAME.'_'.strtolower($this->router->class).'_'.date('YmdHis').'.'.$exportType;
-        $encrypted = strtr($this->encryption->encrypt($filename), [
-            '+' => '-',
-            '/' => '_',
-        ]);
-        $fullPath = FCPATH . $uploadPath . $encrypted;
+        try {
+            // 저장할 폴더 경로 설정
+            $filePath = $this->prepareExportsPath($exportType);
 
-        if(in_array($exportType, ['xls', 'xlsx'])) {
-            $this->prepareExcel($heads, $dataset, $fullPath, $dateFormats);
-        }else {
-            $this->prepareCSV($heads, $dataset, $fullPath);
+            if(in_array($exportType, ['xls', 'xlsx'])) {
+                $this->prepareExcel($header, $dataset, $filePath, $formats);
+            }else {
+                $this->prepareCSV($header, $dataset, $filePath);
+            }
+
+            $this->response([
+                'code' => FILE_CREATED,
+                'data' => [
+                    'filename' => basename($filePath),
+                ]
+            ]);
+        } catch (Exception $e) {
+            $this->response([
+                'code' => INTERNAL_SERVER_ERROR,
+            ]);
         }
-
-        $this->response([
-            'code' => FILE_CREATED,
-            'data' => [
-                'filename' => $encrypted,
-            ]
-        ]);
     }
 
-    protected function prepareExcel($heads, $dataset, $filepath, $dateFormats = []): void
+    protected function setExcelSheetStyle($sheet, $maxAlphabet, $rowMax): void
+    {
+        $range = get_alphabet_range('B', $maxAlphabet);
+        foreach ($range as $columnID) {
+            $sheet->getColumnDimension($columnID)->setWidth(20);
+        }
+        $sheet->getStyle('A1:'.$maxAlphabet.$rowMax)->applyFromArray(
+            array(
+                'alignment' => array(
+                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                ),
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                ),
+            )
+        );
+    }
+
+    protected function prepareExcel($header, $dataset, $filepath, $formats = []): void
     {
         $this->load->library('excel_lib');
         $this->load->helper('excel');
@@ -1138,10 +1536,10 @@ class MY_Builder_API extends MY_Controller_API
         $objPHPExcel->setActiveSheetIndex(0);
 
         // head
-        $maxAlphabet = number_to_alphabet(count(array_keys($heads))-1);
-        foreach (array_keys($heads) as $i=>$key) {
+        $maxAlphabet = number_to_alphabet(count(array_keys($header))-1);
+        foreach (array_keys($header) as $i=>$key) {
             $coord = number_to_alphabet($i);
-            $value = $heads[$key];
+            $value = $header[$key];
             $sheet
                 ->setCellValue($coord.'1',$value);
         }
@@ -1160,39 +1558,14 @@ class MY_Builder_API extends MY_Controller_API
             $j = 0;
             foreach ($item as $field=>$value) {
                 $coord = number_to_alphabet($j);
-                if(in_array($field, $dateFormats)){
-                    $diffInSeconds = strtotime($value) - strtotime('1899-12-30');
-                    $diffInDays = floor($diffInSeconds / (60 * 60 * 24))+1;
-                    $sheet->setCellValue($coord.($i+2), $diffInDays);
-                    $sheet->getStyle($coord.($i+2))
-                        ->getNumberFormat()
-                        ->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_YYYYMMDD2);
-                }else{
-                    $sheet->setCellValueExplicit($coord.($i+2), $value, PHPExcel_Cell_DataType::TYPE_STRING);
-                }
+                $this->setExcelValue($sheet, $coord.($i+2), $field, $value, $formats);
                 $j++;
             }
         }
 
         $rowMax = strval(count($dataset)+1);
 
-        $range = get_alphabet_range('B', $maxAlphabet);
-        foreach ($range as $columnID) {
-            $sheet->getColumnDimension($columnID)->setWidth(20);
-        }
-        $sheet->getStyle('A1:'.$maxAlphabet.$rowMax)->applyFromArray(
-            array(
-                'width' => 10,
-                'alignment' => array(
-                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-                ),
-                'borders' => array(
-                    'allborders' => array(
-                        'style' => PHPExcel_Style_Border::BORDER_THIN,
-                    ),
-                ),
-            )
-        );
+        $this->setExcelSheetStyle($sheet, $maxAlphabet, $rowMax);
 
         // 엑셀 Writer 생성 (XLSX 형식)
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
@@ -1218,10 +1591,48 @@ class MY_Builder_API extends MY_Controller_API
         }
     }
 
-    protected function prepareCSV($heads, $dataset, $filepath): void
+    protected function setExcelValue($sheet, $location, $field, $value, $formats)
+    {
+        if(in_array($field, $formats['date'])){
+            if(!$value) {
+                $sheet->setCellValue($location, '');
+            }else{
+                $diffInSeconds = strtotime($value) - strtotime('1899-12-30');
+                $diffInDays = floor($diffInSeconds / (60 * 60 * 24))+1;
+                $sheet->setCellValue($location, $diffInDays);
+                $sheet->getStyle($location)
+                    ->getNumberFormat()
+                    ->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_YYYYMMDD2);
+            }
+        }elseif(
+            in_array($field, $formats['int'])
+            ||
+            in_array($field, $formats['float'])
+        ) {
+            if(!$value) $value = 0;
+
+            $sheet->setCellValueExplicit(
+                $location,
+                $value,
+                PHPExcel_Cell_DataType::TYPE_NUMERIC
+            );
+
+            if(in_array($field, $formats['float'])) {
+                $sheet->getStyle($location)
+                    ->getNumberFormat()
+                    ->setFormatCode('0.00');
+            }
+        }else {
+            if(!$value) $value = '';
+
+            $sheet->setCellValueExplicit($location, $value, PHPExcel_Cell_DataType::TYPE_STRING);
+        }
+    }
+
+    protected function prepareCSV($header, $dataset, $filepath): void
     {
         // 예시 데이터 (보통은 DB에서 가져오겠지)
-        array_unshift($dataset, $heads);
+        array_unshift($dataset, $header);
 
         // 파일 열기
         $fp = fopen($filepath, 'w');
@@ -1240,7 +1651,7 @@ class MY_Builder_API extends MY_Controller_API
         fclose($fp);
     }
 
-    public function downloadExports_get()
+    public function downloadExports_get(): void
     {
         $message = '';
 
@@ -1270,7 +1681,7 @@ class MY_Builder_API extends MY_Controller_API
         return $data;
     }
 
-    protected function beforeExcelUpload()
+    protected function beforeExcelUpload(): array
     {
         $json_data = $this->input->raw_input_stream;
         $data = json_decode($json_data, true);
@@ -1278,7 +1689,7 @@ class MY_Builder_API extends MY_Controller_API
         return $this->validateExcelData($data);
     }
 
-    protected function afterExcelUpload($data)
+    protected function afterExcelUpload($data): void
     {
         if(!property_exists($this, 'Model')) {
             $this->response([
@@ -1307,8 +1718,6 @@ class MY_Builder_API extends MY_Controller_API
      */
     function isMyData_get($key = 0, $model = null)
     {
-        $tokenData = $this->validateToken();
-
         if(!property_exists($this, 'Model')) {
             if(is_null($model)) {
                 $this->response([
@@ -1322,7 +1731,7 @@ class MY_Builder_API extends MY_Controller_API
         $data = $model->getDataWhere([], $this->getIdentifierData($key, $model->primaryKeyList));
 
         if(!$data) $this->response(['code' => DATA_NOT_EXIST]);
-        if(!$tokenData->is_admin && $data->{CREATED_ID_COLUMN_NAME} !== $tokenData->user_id){
+        if(!$this->session->userdata('is_admin') && $data->{CREATED_ID_COLUMN_NAME} !== $this->session->userdata('user_id')){
             $this->response(['code' => NO_PERMISSION]);
         }
 
@@ -1336,7 +1745,7 @@ class MY_Builder_API extends MY_Controller_API
         $dto = $this->input->get();
         $unique = [$dto['field'] => $dto['value']];
         unset($dto['field'], $dto['value']);
-        if($this->checkDuplicate($unique, $this->Model??null, $dto)){
+        if($this->checkDuplicate($unique, null, $dto)){
             $this->response([
                 'code' => DATA_ALREADY_EXIST,
                 'dto' => $dto,
@@ -1351,7 +1760,8 @@ class MY_Builder_API extends MY_Controller_API
 
     public function options_get()
     {
-        show_404();
+        list($key, $data) = $this->beforeGet();
+        $this->afterGet($key, $data);
     }
 
     public function reorder_patch()
@@ -1376,7 +1786,7 @@ class MY_Builder_API extends MY_Controller_API
     public function deleteFile_patch($key = 0)
     {
         $type = $this->input->get('type') ?? null;
-        $file_id = $this->patch('file_id') ?? null;
+        $file_id = $this->input->patch('file_id') ?? null;
         if(!$type || !$file_id) $this->response(['code' => EMPTY_REQUIRED_DATA]);
 
         $this->delFileData(['file_id' => $file_id]);
@@ -1439,5 +1849,143 @@ class MY_Builder_API extends MY_Controller_API
                 'msg' => lang('Data replication has been completed')
             ]);
         }
+    }
+
+    protected function getModelPipeline(): array
+    {
+        return ['Model_Parent', 'Model', 'Model_Child'];
+    }
+
+    protected function getGeneratedForeignKeyFields(object $model, string $currentModelName): array
+    {
+        if (!property_exists($model, 'foreignKeyList')) {
+            return [];
+        }
+
+        $fields = [];
+
+        foreach ($model->foreignKeyList as $field => $config) {
+            if ($this->isForeignKeyGeneratedByPreviousModel($field, $model, $currentModelName)) {
+                $fields[] = $field;
+            }
+        }
+
+        return $fields;
+    }
+
+    protected function isForeignKeyGeneratedByPreviousModel(string $field, object $model, string $currentModelName): bool
+    {
+        if (
+            !property_exists($model, 'foreignKeyList') ||
+            !isset($model->foreignKeyList[$field])
+        ) {
+            return false;
+        }
+
+        $fk = $model->foreignKeyList[$field];
+
+        $pipeline = $this->getModelPipeline();
+        $currentIndex = array_search($currentModelName, $pipeline, true);
+
+        if ($currentIndex === false || $currentIndex === 0) {
+            return false;
+        }
+
+        $previousModelNames = array_slice($pipeline, 0, $currentIndex);
+
+        foreach ($previousModelNames as $previousModelName) {
+            if (!property_exists($this, $previousModelName)) {
+                continue;
+            }
+
+            $previousModel = $this->{$previousModelName};
+
+            $fkModelMatches = isset($fk['model']) && $fk['model'] === get_class($previousModel);
+            $fkTableMatches = isset($fk['table']) && $fk['table'] === $previousModel->table;
+            $fkColumnMatches = isset($fk['column']) && $fk['column'] === $previousModel->identifier;
+
+            if (
+                $previousModel->isAutoIncrement &&
+                ($fkModelMatches || $fkTableMatches) &&
+                $fkColumnMatches
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function applyForeignKeyValues(array $dto, object $model): array
+    {
+        if (!property_exists($model, 'foreignKeyList')) {
+            return $dto;
+        }
+
+        foreach ($model->foreignKeyList as $field => $fk) {
+            if (array_key_exists($field, $dto) && $dto[$field]) {
+                continue;
+            }
+
+            $refColumn = $fk['column'] ?? null;
+
+            if ($refColumn && array_key_exists($refColumn, $dto)) {
+                $dto[$field] = $dto[$refColumn];
+            }
+        }
+
+        return $dto;
+    }
+
+    protected function getDeleteBaseRow()
+    {
+        if (!count($this->idData)) {
+            show_error('getDeleteBaseRow : idData is empty');
+        }
+
+        $row = $this->Model->getDataWhere([], $this->idData);
+
+        if (!$row) {
+            $this->response([
+                'code' => DATA_NOT_EXIST,
+            ]);
+        }
+
+        return $row;
+    }
+
+    protected function makeDeleteIdData(object $model, $baseRow): array
+    {
+        $idData = [];
+
+        if ($model->isAutoIncrement) {
+            if (!$model->identifier) {
+                return [];
+            }
+
+            if (property_exists($baseRow, $model->identifier)) {
+                $idData[$model->identifier] = $baseRow->{$model->identifier};
+            }
+
+            return $idData;
+        }
+
+        foreach ($model->primaryKeyList as $field) {
+            if (property_exists($baseRow, $field)) {
+                $idData[$field] = $baseRow->{$field};
+            }
+        }
+
+        return $idData;
+    }
+
+    public function _remap($object_called, $arguments = [])
+    {
+        $this->mode = $this->input->get('_mode') ?? '';
+        $this->submode = $this->input->get('_submode') ?? '';
+        $this->apiBaseUri = base_url($this->flag . '/' . $this->apiRoute);
+        $this->apiUri = $this->apiBaseUri . '/' . $this->router->class;
+
+        parent::_remap($object_called, $arguments);
     }
 }

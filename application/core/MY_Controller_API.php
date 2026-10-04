@@ -12,38 +12,73 @@ class MY_Controller_API extends RestController
         if($this->router->class === 'common') redirect('/welcome');
 
         $this->lang->load('status_code', $this->config->item('language'));
+
         $this->config->set_item('compress_output', FALSE);
     }
 
+    public function __destruct()
+    {
+        parent::__destruct();
+    }
+
+    /* --------------------------------------------------------------- */
+
     public function index_get($key = 0)
+    {
+        $this->handleGet($key);
+    }
+
+    public function index_post($key = 0)
+    {
+        $this->handlePost($key);
+    }
+
+    public function index_put($key = 0)
+    {
+        $this->handlePut($key);
+    }
+
+    public function index_patch($key = 0)
+    {
+        $this->handlePatch($key);
+    }
+
+    public function index_delete($key = 0)
+    {
+        $this->handleDelete($key);
+    }
+
+    /* --------------------------------------------------------------- */
+
+    protected function handleGet($key = 0)
     {
         list($key, $data) = $this->beforeGet($key);
 
         $this->afterGet($key, $data);
     }
 
-    public function index_post($key = 0)
+    protected function handlePost($key = 0)
     {
         list($key, $data) = $this->beforePost($key);
 
         $this->afterPost($key, $data);
     }
 
-    public function index_put($key = 0)
+    protected function handlePut($key = 0)
     {
         list($key, $data) = $this->beforePut($key);
 
         $this->afterPut($key, $data);
     }
 
-    public function index_patch($key = 0)
+    protected function handlePatch($key = 0)
     {
         list($key, $data) = $this->beforePatch($key);
 
         $this->afterPatch($key, $data);
     }
 
-    public function index_delete($key = 0)
+    protected function handleDelete($key = 0)
     {
         list($key, $data) = $this->beforeDelete($key);
 
@@ -82,7 +117,7 @@ class MY_Controller_API extends RestController
 
     protected function beforePut($key = 0, $model = null)
     {
-        return [$key, $this->put()??$this->input->json()];
+        return [$key, $this->input->put()??$this->input->json()];
     }
 
     protected function afterPut($key, $data = [])
@@ -96,7 +131,7 @@ class MY_Controller_API extends RestController
 
     protected function beforePatch($key = 0, $model = null)
     {
-        return [$key, $this->patch()??$this->input->json()];
+        return [$key, $this->input->patch()??$this->input->json()];
     }
 
     protected function afterPatch($key, $data = [])
@@ -110,7 +145,7 @@ class MY_Controller_API extends RestController
 
     protected function beforeDelete($key = 0)
     {
-        return [$key, $this->put()??$this->input->json()];
+        return [$key, $this->input->put()??$this->input->json()];
     }
 
     protected function afterDelete($key, $data = [])
@@ -139,52 +174,41 @@ class MY_Controller_API extends RestController
         }
     }
 
+    public function responseError($error = [], $response = [], $http_code = RestController::HTTP_INTERNAL_SERVER_ERROR)
+    {
+        if(is_list_type($error)) {
+            $errors = $error;
+        }else{
+            $errors = [array_merge([
+                'location' => null,
+                'param' => null,
+                'value' => null,
+                'type' => null,
+                'msg' => null,
+            ], $error)];
+        }
+
+        if(!is_empty($response, 'code')) $http_code = null;
+        $this->response([
+            'code' => $response['code'] ?? null,
+            'msg' => $response['msg'] ?? null,
+            'data' => $response['data'] ?? [],
+            'errors' => $errors,
+        ], $http_code);
+    }
+
     protected function keyNotExist()
     {
         $this->response([
             'code' => EMPTY_REQUIRED_KEY,
-            'errors' => [
-                'location' => 'keyNotExist',
+            'errors' => [[
+                'location' => __METHOD__,
                 'param' => 'key',
                 'value' => '',
                 'type' => 'missing data',
                 'msg' => 'required',
-            ]
+            ]]
         ], RestController::HTTP_BAD_REQUEST);
-    }
-
-    protected function auth()
-    {
-        $this->validateToken();
-    }
-
-    protected function validateToken()
-    {
-        $headers = array_change_key_case($this->input->request_headers(), CASE_LOWER);
-
-        if (isset($headers['authorization'])) {
-            $decodedToken = $this->authorization_token->validateToken();
-            if($decodedToken['status'] === FALSE){
-                switch ($decodedToken['message']) {
-                    case 'Token Time Expire.':
-                        $this->response([
-                            'code' => TOKEN_EXPIRED,
-                            'data' => ['token' => $headers['authorization']],
-                        ], RestController::HTTP_UNAUTHORIZED);
-                    default:
-                        $this->response([
-                            'code' => WRONG_TOKEN,
-                            'data' => ['token' => $headers['authorization']],
-                        ], RestController::HTTP_UNAUTHORIZED);
-                }
-            }else{
-                return $decodedToken['data'];
-            }
-        }else{
-            $this->response([
-                'code' => EMPTY_TOKEN,
-            ], RestController::HTTP_UNAUTHORIZED);
-        }
     }
 
     protected function uploader($name, $fileDto = null)
@@ -201,13 +225,44 @@ class MY_Controller_API extends RestController
                     'code' => $response['code'],
                     'msg' => strip_tags($response['message']),
                     'data' => $_FILES,
-                    'errors' => [
-                        'location' => 'uploader',
+                    'errors' => [[
+                        'location' => __METHOD__,
                         'param' => $name,
                         'type' => 'upload error',
-                    ]
+                    ]]
                 ], RestController::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
+    }
+
+    public function validateModel($model, $name = '', $db_conn = FALSE): object
+    {
+        $obj = $this->load->model($model, $name, $db_conn);
+
+        $targetModel = $this->{$name?:$model};
+
+        // model check
+        if(!$targetModel->validateModelDefinition()) {
+            $this->response([
+                'code' => MODEL_DATA_NOT_COINCIDENCE,
+                'errors' => [[
+                    'location' => __METHOD__,
+                    'type' => 'model error',
+                    'value' => [
+                        'table' => $targetModel->table,
+                        'identifier' => $targetModel->identifier,
+                        'primaryKeyList' => $targetModel->primaryKeyList,
+                        'isAutoIncrement' => $targetModel->isAutoIncrement,
+                        'columnList' => $targetModel->getColumnList(),
+                        'strList' => $targetModel->strList,
+                        'intList' => $targetModel->intList,
+                        'fileList' => $targetModel->fileList,
+                        'diffList' => $targetModel->determineDiffColumns(),
+                    ]
+                ]]
+            ], RestController::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $obj;
     }
 }

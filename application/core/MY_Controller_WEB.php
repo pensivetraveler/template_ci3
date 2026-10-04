@@ -65,33 +65,6 @@ class MY_Controller_WEB extends MY_Controller
         }
     }
 
-    protected function checkLogin(): bool
-    {
-        return false;
-    }
-
-    protected function validateToken()
-    {
-        $token = $this->input->post('token')?:$this->session->userdata('token');
-        if(empty($token)){
-			alert('토큰 값이 없습니다.', base_url($this->noLoginRedirect));
-        }else{
-            $decodedToken = $this->authorization_token->tokenParamCheck($token);
-            if($decodedToken['status'] === FALSE){
-				$this->session->unset_userdata('token');
-                switch ($decodedToken['message']) {
-                    case 'Token Time Expire.':
-						alert(lang('Token Expired'), base_url($this->noLoginRedirect));
-                    default:
-						alert(lang('Invalid Token'), base_url($this->noLoginRedirect));
-                }
-            }else{
-                $this->session->set_userdata('token', $token);
-                return $decodedToken['data'];
-            }
-        }
-    }
-
     protected function setTitleList($data = [])
     {
         $this->titleList = $data;
