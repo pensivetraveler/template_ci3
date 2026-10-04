@@ -41,6 +41,12 @@ class Josa
         return preg_replace_callback("/(.)\\{([".self::POSTPOSITION_LIST."])\\}/u", array($this, 'replace'), $str);
     }
 
+    function __replace($target, $conv)
+    {
+        $replaced = $this->__conv("{$target}{{$conv}}");
+        return mb_substr($replaced, -1, 1);
+    }
+
     // preg_replace_callback의 callback함수
     function replace($matches)
     {
