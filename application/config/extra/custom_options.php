@@ -37,6 +37,36 @@ $config['options'] = [
         'class' => '클래스',
         'method' => '메소드',
     ],
+    'access_type' => [
+        'auth' => '로그인/로그아웃',
+        'read' => '조회',
+        'create' => '등록',
+        'update' => '수정',
+        'delete' => '삭제',
+    ],
+    'log_threshold' => [
+        'ERROR' => 'Error',
+        'DEBUG' => 'Debug',
+        'INFO' => 'Information',
+    ],
+    'date_range' => [
+        'none' => 'None',
+        'today' => 'Today',
+        'yesterday' => 'Yesterday',
+        'last7days' => 'Last 7 Days',
+        'last30days' => 'Last 30 Days',
+        'currentMonth' => 'Current Month',
+        'lastMonth' => 'Last Month',
+    ],
+    'date_range_log' => [
+        'none' => 'None',
+        'last7days' => 'Last 7 Days',
+        'last30days' => 'Last 30 Days',
+        'currentMonth' => 'Current Month',
+        'lastMonth' => 'Last Month',
+        'thisYear' => 'This Year',
+        'lastYear' => 'Last Year',
+    ],
 ];
 
 $config['options']['search_category'] = [
@@ -44,5 +74,25 @@ $config['options']['search_category'] = [
         'id' => '아이디',
         'name' => '이름',
         'email' => '이메일',
+    ],
+];
+
+$config['options']['menu_auth'] = [
+    'title' => '메뉴명',
+    'class' => '클래스',
+    'method' => '메소드',
+];
+
+$config['options']['font_family'] = [
+    'YoonGothicPro' => '윤고딕',
+    'Pretendard' => 'Pretendard',
+    'NotoSansKr' => 'NotoSansKr',
+];
+
+$config['options']['search_category'] = [
+    'users' => [
+        'user.id' => '아이디',
+        'user.name' => '이름',
+        'user.email' => '이메일',
     ],
 ];
