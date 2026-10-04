@@ -19,6 +19,37 @@ $config['builder_list_base'] = [
     'options' => [],
 ];
 
+$config['list_visitors_config'] = [
+    [
+        'field' => 'vi_ip',
+        'label' => 'lang:visitor.vi_ip',
+    ],
+    [
+        'field' => 'vi_referrer',
+        'label' => 'lang:visitor.vi_referrer',
+    ],
+    [
+        'field' => 'vi_datetime',
+        'label' => 'lang:visitor.vi_datetime',
+    ],
+    [
+        'field' => 'vi_hit_count',
+        'label' => 'lang:visitor.vi_hit_count',
+    ],
+    [
+        'field' => 'vi_browser',
+        'label' => 'lang:visitor.vi_browser',
+    ],
+    [
+        'field' => 'vi_device',
+        'label' => 'lang:visitor.vi_device',
+    ],
+    [
+        'field' => 'vi_location',
+        'label' => 'lang:visitor.vi_location',
+    ],
+];
+
 $config['list_syscode_config'] = [
     [
         'field' => 'cmb_cd',
@@ -59,8 +90,8 @@ $config['list_menu_auth_config'] = [
         'subtype' => 'identifier',
     ],
     [
-        'field' => 'user_cd',
-        'label' => 'lang:system.user_cd',
+        'field' => 'grade_cd',
+        'label' => 'lang:system.grade_cd',
         'type' => 'hidden',
         'subtype' => 'identifier',
     ],
@@ -83,23 +114,53 @@ $config['list_menu_auth_config'] = [
         'label' => 'lang:menu.create',
         'type' => 'checkbox',
         'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
     ],
     [
         'field' => 'read',
         'label' => 'lang:menu.read',
         'type' => 'checkbox',
         'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
     ],
     [
         'field' => 'update',
         'label' => 'lang:menu.update',
         'type' => 'checkbox',
         'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
     ],
     [
         'field' => 'delete',
         'label' => 'lang:menu.delete',
         'type' => 'checkbox',
         'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
+    ],
+    [
+        'field' => 'export',
+        'label' => 'lang:menu.export',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
+    ],
+    [
+        'field' => 'import',
+        'label' => 'lang:menu.import',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
     ],
 ];
