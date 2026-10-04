@@ -140,6 +140,12 @@ function get_admin_form_radio($item, $value, $text, $id = null)
     return $output;
 }
 
+function get_admin_form_onoff($item, $formType)
+{
+    $ci =& get_instance();
+    return $ci->load->view('builder/layout/onoff', $item, true);
+}
+
 function get_admin_form_text($data, $add_class = array(), $attributes = array()): string
 {
     $ci =& get_instance();
@@ -204,10 +210,19 @@ function get_admin_form_list_item($item, $formType, $below = true, $disk = false
     }
 }
 
-function get_admin_form_ico($item, $size = 18): string
+function get_admin_form_ico($item, $formType = 'page', $size = 18): string
 {
-//    if(is_empty($item, 'icon')) return '';
     if($item['icon'] === 'none') return '';
+
+    if($formType === 'page') {
+        if($item['type'] === 'number' && $item['subtype'] === 'unit') return '';
+    }
+
+    return create_admin_form_ico($item, $size);
+}
+
+function create_admin_form_ico($item, $size = 18): string
+{
     if(strpos($item['icon'], 'svg:') !== false) {
         $classname = str_replace('svg:', '', $item['icon']);
         $svg = true;
@@ -237,7 +252,7 @@ function get_admin_form_ico_classname($item): ?string
     return get_icon_classname_by_type($item['type']);
 }
 
-function get_admin_form_attributes($item, $form_type = 'side'): array
+function get_admin_form_attributes($item, $form_type = 'side', $form_sub_type = 'base'): array
 {
     $ci =& get_instance();
 
@@ -263,7 +278,11 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
     $classList = ['form-control', 'dt-'.$item['field'], 'form-input_'.$item['category']];
 
     // form_attributes
-    if($item['form_attributes']['with_btn']) $classList[] = 'form-input_with-button';
+    if($item['field'])
+        $item['form_attributes']['form_field'] = $item['field'];
+
+    if($item['form_attributes']['with_btn'])
+        $classList[] = 'form-input_with-button';
 
     if($item['type'] === 'hidden' || isset($item['attributes']['readonly']) || $item['subtype'] === 'readonly') {
         $item['form_attributes']['detect_changed'] = false;
@@ -294,6 +313,7 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
             case 'cleave-bizno' :
                 $classList[] = 'cleave cleave-bizno';
                 $attributes['placeholder'] = '123-45-67890';
+                $ci->addFormAssets('cleave');
                 break;
         }
     }
@@ -306,6 +326,17 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
         }
     }
 
+    if($item['type'] === 'color') {
+        switch ($item['subtype']) {
+            case 'coloris' :
+                $item['type'] = 'text';
+                $classList[] = 'coloris';
+                $attributes['data-coloris'] = 1;
+                $ci->addFormAssets('coloris');
+                break;
+        }
+    }
+
     if($item['type'] === 'select') {
         $classList[] = 'form-select';
         switch ($item['subtype']) {
@@ -313,16 +344,19 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
                 $classList = array_diff(array_merge($classList, [
                     'w-100', 'selectpicker',
                 ]), ['form-control']);
+                $ci->addFormAssets('selectpicker');
                 break;
             case 'select2' :
                 $classList = array_diff(array_merge($classList, [
                     'select2',
                 ]), ['form-control']);
+                $ci->addFormAssets('select2');
                 break;
             case 'select2-repeater' :
                 $classList = array_diff(array_merge($classList, [
                     'select2-repeater',
                 ]), ['form-control']);
+                $ci->addFormAssets('select2');
                 break;
         }
     }
@@ -345,10 +379,12 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
             case 'cleave-hp' :
                 $classList[] = 'cleave cleave-hp';
                 $attributes['placeholder'] = '010-1234-5678';
+                $ci->addFormAssets('cleave');
                 break;
             case 'cleave-fulldate' :
                 $classList[] = 'cleave cleave-fulldate';
                 $attributes['placeholder'] = 'YYYY-MM-DD';
+                $ci->addFormAssets('cleave');
                 break;
             default :
                 break;
@@ -360,18 +396,22 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
             case 'flatpickr' :
                 $classList[] = 'flatpickr flatpickr-date';
                 $attributes['placeholder'] = 'YYYY-MM-DD';
+                $ci->addFormAssets('flatpickr');
                 break;
             case 'cleave-year' :
                 $classList[] = 'cleave cleave-year';
                 $attributes['placeholder'] = 'YYYY';
+                $ci->addFormAssets('cleave');
                 break;
             case 'cleave-month' :
                 $classList[] = 'cleave cleave-month';
                 $attributes['placeholder'] = 'MM';
+                $ci->addFormAssets('cleave');
                 break;
             case 'cleave-date' :
                 $classList[] = 'cleave cleave-date';
                 $attributes['placeholder'] = 'DD';
+                $ci->addFormAssets('cleave');
                 break;
             default :
                 break;
@@ -382,18 +422,22 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
         switch ($item['subtype']) {
             case 'flatpickr' :
                 $classList[] = 'flatpickr flatpickr-time';
+                $ci->addFormAssets('flatpickr');
                 break;
             case 'cleave-time' :
                 $classList[] = 'cleave cleave-time';
                 $attributes['placeholder'] = 'hh:mm';
+                $ci->addFormAssets('cleave');
                 break;
             case 'cleave-hour' :
                 $classList[] = 'cleave cleave-hour';
                 $attributes['placeholder'] = 'hh';
+                $ci->addFormAssets('cleave');
                 break;
             case 'cleave-minute' :
                 $classList[] = 'cleave cleave-minute';
                 $attributes['placeholder'] = 'mm';
+                $ci->addFormAssets('cleave');
                 break;
             default :
                 break;
@@ -422,6 +466,19 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
                 break;
             case 'dropzone-full' :
                 $classList[] = 'input-dropzone d-none';
+                $ci->addFormAssets('dropzone');
+                break;
+        }
+    }
+
+    if($item['type'] === 'checkbox') {
+        switch ($item['subtype']) {
+            case 'onoff' :
+                $attributes['data-custom-toggle'] = 1;
+                $item['options'] = [
+                    'Y' => 'Y'
+                ];
+                $ci->addFormAssets('custom-toggle');
                 break;
         }
     }
@@ -431,6 +488,15 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
         switch ($item['subtype']) {
             case 'tag-base' :
                 $classList[] = 'tagify h-auto';
+                $ci->addFormAssets('tagify');
+                break;
+            case 'domain_register' :
+                $ci->addFormAssets('domain-register');
+                break;
+            case 'ip_register' :
+                $ci->addFormAssets('ip-register');
+                break;
+            case 'dropzone' :
                 break;
         }
     }
@@ -491,21 +557,31 @@ function get_admin_form_attributes($item, $form_type = 'side'): array
     }
 
     // default value
-    if($item['default']) $attributes['data-default-value'] = $item['default'];
+    if(isset($item['form_attributes']['set_default_first'])
+        && $item['form_attributes']['set_default_first'] === true
+        && isset($item['options'])
+        && count($item['options']) > 0
+    ) {
+        $item['default'] = array_key_first($item['options']);
+    }
+    if(strlen($item['default'])) $attributes['data-default-value'] = $item['default'];
 
     // class
     $attributes['class'] = implode(' ', $classList);
 
     //attributes
-    return array_merge($item['attributes'], $attributes);
+
+    $item['attributes'] = array_merge($item['attributes'], $attributes);
+
+    return $item;
 }
 
-function restructure_admin_form_data($form_data, $form_type = 'side'): array
+function restructure_admin_form_data($form_data, $form_type = 'side', $form_sub_type = 'base'): array
 {
     // attributes 처리
-    $form_data = array_map(function($item) use($form_type) {
+    $form_data = array_map(function($item) use($form_type, $form_sub_type) {
         unset($item['list_attributes']);
-        if($item['type'] !== 'common') $item['attributes'] = get_admin_form_attributes($item, $form_type);
+        if($item['type'] !== 'common') $item = get_admin_form_attributes($item, $form_type, $form_sub_type);
         return $item;
     }, $form_data);
 
@@ -513,10 +589,13 @@ function restructure_admin_form_data($form_data, $form_type = 'side'): array
     $groups = array_unique(array_filter(array_column($form_data, 'group'), function ($item) {
         return $item !== 'base';
     }));
+
     if(count($groups) > 0) {
+        $ci =& get_instance();
         $diff = 0;
         foreach ($groups as $idx => $group_name) {
             if(!$group_name) continue;
+            if(!isset($form_data[$idx]['group_attributes'])) continue;
             $attr = $form_data[$idx]['group_attributes'];
 
             // idx 모두 가져오기
@@ -540,8 +619,24 @@ function restructure_admin_form_data($form_data, $form_type = 'side'): array
                 $data[$key] = $item;
             }
 
+            switch ($attr['type']) {
+                case 'carousel_simple' :
+                    $ci->addFormAssets('custom-carousel-simple');
+                    break;
+            }
+
             $form_data = array_diff_key($form_data, array_flip($indexes));
+
+            // 20260923 tab_index 추가
+            if(array_key_exists('tab_index', $attr)) {
+                $tab_index = $attr['tab_index'];
+                unset($attr['tab_index']);
+            }else{
+                $tab_index = 0;
+            }
+
             $form_data[$idx] = [
+                'id' => $group_name,
                 'category' => 'group',
                 'group' => $group_name,
                 'label' => $attr['label'],
@@ -549,7 +644,10 @@ function restructure_admin_form_data($form_data, $form_type = 'side'): array
                 'type' => $attr['type'] ?? 'base',
                 'attr' => $attr,
                 'data' => $data,
+                'colspan' => $attr['colspan'] ?? 12,
+                'tab_index' => $tab_index,
             ];
+
             $form_data[$idx]['view'] = $form_data[$idx]['type'];
             ksort($form_data);
             $diff += count($indexes)-1;
@@ -557,6 +655,12 @@ function restructure_admin_form_data($form_data, $form_type = 'side'): array
     }
 
     return array_values($form_data);
+}
+
+function set_dropdown_default_value($item)
+{
+    $default = $item['attributes']['data-set-default-first'] ? array_key_first($item['options']) : $item['default'];
+    return set_admin_form_value($item['field'], $default, null);
 }
 
 function set_admin_form_value($field, $default = '', $view = null, $html_escape = TRUE)
@@ -568,7 +672,7 @@ function set_admin_form_value($field, $default = '', $view = null, $html_escape 
     }
 }
 
-function get_help_block($data)
+function get_help_block($data): string
 {
     $defaults = array_merge(array(
         'tag' => 'span',
@@ -578,7 +682,7 @@ function get_help_block($data)
     return "<{$defaults['tag']} "._attributes_to_string($data['attr']).">".$defaults['text']."</{$defaults['tag']}>";
 }
 
-function trans_formdata_dit_type($form_data)
+function trans_formdata_dit_type($form_data): array
 {
     $list = [];
     foreach ($form_data as $item) {
@@ -605,7 +709,11 @@ function get_form_input_by_type($item, $formType): string
                 $item['attributes']
             );
         case 'checkbox' :
-            return get_admin_form_choice($item, $formType);
+            if($item['subtype'] === 'onoff') {
+                return get_admin_form_onoff($item, $formType);
+            }else{
+                return get_admin_form_choice($item, $formType);
+            }
         case 'radio' :
             if($formType === 'side') {
                 return get_admin_form_radio($item, $formType);
@@ -637,6 +745,43 @@ function get_form_input_by_type($item, $formType): string
                 'name' => $item['name'],
                 'id' => $item['id'],
             ], $item['attributes']);
+        case 'number' :
+            if($item['subtype'] === 'unit') {
+                if($formType === 'side') {
+                    return form_input(
+                        [
+                            'type' => $item['type'],
+                            'name' => $item['name'],
+                            'id' => $item['id'],
+                        ],
+                        set_admin_form_value($item['field'], $item['default']??'', null),
+                        $item['attributes']
+                    );
+                }else{
+                    $html = create_admin_form_ico($item);
+                    $html .= form_input(
+                        [
+                            'type' => $item['type'],
+                            'name' => $item['name'],
+                            'id' => $item['id'],
+                        ],
+                        set_admin_form_value($item['field'], $item['default']??'', null),
+                        $item['attributes']
+                    );
+                    $html .= "<span class='input-group-text border-left-0 input-group-text-unit text-primary'>{$item['form_attributes']['unit']}</span>";
+                }
+                return $html;
+            }else{
+                return form_input(
+                    [
+                        'type' => $item['type'],
+                        'name' => $item['name'],
+                        'id' => $item['id'],
+                    ],
+                    set_admin_form_value($item['field'], $item['default']??'', null),
+                    $item['attributes']
+                );
+            }
         default :
             return form_input(
                 [
@@ -678,51 +823,126 @@ function get_side_form_input_by_type($item, $formType): string
     return $html;
 }
 
-function restructure_form_data_by_type($formData, $formType = 'side'): array
+function get_side_form_input_adds($item, $formType): string
 {
-    $formData = restructure_admin_form_data($formData, $formType);
-    return reformat_form_data_by_type($formData, $formType);
+    if($item['type'] === 'number' && $item['subtype'] === 'unit') {
+        return "<span class='input-group-text border-left-0 input-group-text-unit text-primary'>{$item['form_attributes']['unit']}</span>";
+    } else {
+        return '';
+    }
 }
 
-function reformat_form_data_by_type($formData, $formType = 'side'): array
+function restructure_form_data_by_type($form_data, $form_type = 'side', $form_sub_type = 'base'): array
 {
+    $form_data = restructure_admin_form_data($form_data, $form_type, $form_sub_type);
+    return reformat_form_data_by_type($form_data, $form_type, $form_sub_type);
+}
+
+function reformat_form_data_by_type($form_data, $form_type = 'side', $form_sub_type = 'base'): array
+{
+    if($form_type === 'custom') {
+        return trans_formdata_dit_type($form_data);
+    }
+
     $data = [
-        'hiddens' => array_values(array_filter($formData, function($item) {
+        'hiddens' => array_values(array_filter($form_data, function($item) {
             return $item['type'] === 'hidden';
         })),
         'fields' => [],
     ];
 
-    $fields = array_map(function($item) use ($formType) {
+    $fields = array_map(function($item) use ($form_type, $form_sub_type) {
         if(is_empty($item, 'colspan')) {
-            $item['colspan'] = $formType === 'grid' ? 6 : 12;
+            $item['colspan'] = $form_sub_type === 'grid' ? 6 : 12;
         }
         return $item;
-    }, array_values(array_filter($formData, function($item) use ($formType) {
-        return $item['type'] !== 'hidden' && !($formType !== 'grid' && $item['type'] === 'common');
+    }, array_values(array_filter($form_data, function($item) use ($form_type, $form_sub_type) {
+        return $item['type'] !== 'hidden' && !($form_sub_type !== 'grid' && $item['type'] === 'common');
     })));
 
-    switch ($formType) {
-        case 'grid' :
-            $cols = 0;
-            $rows = 0;
-            foreach (array_column($fields, 'colspan') as $key=>$colspan){
-                if($cols + $colspan > 12) {
-                    $cols = 0;
-                    $rows++;
-                }
-                $data['fields'][$rows][] = $fields[$key];
-                $cols += $colspan;
-            }
-            break;
-        case 'custom' :
-            return trans_formdata_dit_type($formData);
-        default :
-            $data['fields'] = $fields;
-            break;
+    if($form_type === 'tabs') {
+        $tab_indexes = array_column($fields, 'tab_index');
+        for($i = min($tab_indexes); $i <= max($tab_indexes); $i++) {
+            $tab_fields = array_values(array_filter($fields, function($item) use ($i) {
+                return $item['tab_index'] === $i;
+            }));
+            $data['fields'][$i] = set_form_field_data($tab_fields, $form_sub_type);
+        }
+    }else{
+        $data['fields'] = set_form_field_data($fields, $form_sub_type);
     }
 
     return $data;
+}
+
+function set_form_field_data($fields, $form_sub_type)
+{
+    switch ($form_sub_type) {
+        case 'grid' :
+            return set_form_rows($fields);
+        default :
+            return $fields;
+    }
+}
+
+function set_form_rows($fields): array
+{
+    $result = [];
+
+    $cols = 0;
+    $rows = 0;
+    foreach (array_column($fields, 'colspan') as $key=>$colspan){
+        if($cols + $colspan > 12) {
+            $cols = 0;
+            $rows++;
+        }
+        $result[$rows][] = $fields[$key];
+        $cols += $colspan;
+    }
+
+    return $result;
+}
+
+function reformat_filter_data($filterData, $filterConfig): array
+{
+    $rowColumns = 0;
+    $rowIdx = 0;
+    $list = [];
+    foreach ($filterData as $idx=>$filter) {
+        if($rowColumns >= 12) {
+            $rowColumns = 0;
+            $rowIdx++;
+        }
+
+        $list[$rowIdx][] = $filter;
+        $rowColumns += $filter['colspan'];
+    }
+
+    if(count($list)) {
+        // lastRow
+        $lastRowColumns = $rowColumns;
+        if($lastRowColumns + FILTER_BASE_COLSPAN > 12) {
+            $rowIdx++;
+            $list[$rowIdx] = [
+                ['type' => 'common', 'subtype' => 'space', 'colspan' => 9],
+            ];
+            $lastRowColumns = 9;
+        }
+
+        $remains = 12 - $lastRowColumns - FILTER_BASE_COLSPAN;
+        if($remains > 0) {
+            $list[$rowIdx][] = ['type' => 'common', 'subtype' => 'space', 'colspan' => $remains];
+        }
+
+        $list[$rowIdx][] = [
+            'type' => 'common',
+            'subtype' => 'submit',
+            'search_btn' => $filterConfig['actions']['submit'],
+            'reset_btn' => $filterConfig['actions']['reset'],
+        ];
+    }
+
+    return $list;
 }
 
 function get_builder_form_label($item, $attr = []): string
@@ -731,4 +951,24 @@ function get_builder_form_label($item, $attr = []): string
     $id = $item['id']??'';
     $label = lang($item['label']).($required?'<span class="ms-2 text-danger">*</span>':'');
     return form_label($label, $id, $attr);
+}
+
+function set_dropzone_attributes($attributes = []): string
+{
+    return _parse_form_attributes([
+        'dz-style' => $attributes['style'] ?? 'base',
+        'dz-max-files' => $attributes['max'] ?? 1,
+        'dz-max-filesize' => $attributes['max_size'] ?? '',
+        'dz-accepted-files' => $attributes['accept'] ?? '',
+        'dz-multiple' => $attributes['multiple'] ?? 'false',
+    ], [
+        'dz-dict-default-message' => lang('Drop file here or click to upload'),
+        'dz-dict-remove-file' => lang('Delete'),
+    ]);
+}
+
+function get_form_item_id($field, $prefix = '')
+{
+    $field = str_replace('.', '_', $field);
+    return ($prefix ? : '').$field;
 }

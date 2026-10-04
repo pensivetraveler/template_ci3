@@ -22,9 +22,16 @@ if ( ! function_exists('get_breadcrumbs'))
         $CI =& get_instance();
 
         $html = '';
-        foreach ($title_list as $title) {
+        foreach ($title_list as $i=>$title) {
+            $active = $i === count($title_list)-1 ? 'active' : '';
+            $html .= "<li class='breadcrumb-item {$active}'>";
             $title = $CI->lang->line('nav.'.$title);
-            $html .= "<li class='breadcrumb-item'><a href='javascript:void(0);'>{$title}</a></li>";
+            if($i !== count($title_list)-1) {
+                $html .= "<a href='javascript:void(0);' class='pe-2'>{$title}</a><i class='breadcrumb-icon icon-base ri ri-arrow-right-s-line align-middle'></i>";
+            }else{
+                $html .= $title;
+            }
+            $html .= "</li>";
         }
         return $html;
     }
@@ -66,6 +73,8 @@ if ( ! function_exists('get_icon_classname_by_type'))
                 return 'ri-attachment-line';
             case "zipcode" :
                 return 'ri-building-line';
+            case "color" :
+                return 'ri-palette-line';
             case "text" :
                 return 'ri-text';
             case "tel" :

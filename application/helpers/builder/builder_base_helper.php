@@ -115,3 +115,11 @@ function get_menu_href($href = '', $params = [])
     }
     return $url;
 }
+
+function builder_misc_view($type)
+{
+    $CI =& get_instance();
+    echo '시스템 점검 중입니다.';
+//    $CI->load->view('builder/misc/under_maintenance');
+    exit;
+}
