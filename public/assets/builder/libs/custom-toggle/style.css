@@ -1,0 +1,67 @@
+.custom-toggle-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+.custom-toggle-wrapper input[type="checkbox"] {
+    display: none;
+}
+
+.custom-toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 24px;
+    border-radius: 24px;
+    background-color: #d6d6d6;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.custom-toggle-btn {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #fff;
+    transition: transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-toggle-wrapper input[type="checkbox"]:checked + .custom-toggle-label {
+    background-color: #666cff !important;
+}
+
+.custom-toggle-wrapper input[type="checkbox"]:checked + .custom-toggle-label .custom-toggle-btn {
+    transform: translateX(36px);
+}
+
+.custom-toggle-wrapper input[type="checkbox"] + .custom-toggle-label span.toggle-txt {
+    line-height: 24px;
+    font-size: 0.75rem !important;
+    position: absolute;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: .3s;
+}
+
+.custom-toggle-wrapper input[type="checkbox"] + .custom-toggle-label span.checked-txt {
+    opacity: 0;
+    left: 0.5rem;
+    color: white;
+}
+
+.custom-toggle-wrapper input[type="checkbox"] + .custom-toggle-label span.unchecked-txt {
+    opacity: 1;
+    right: 0.5rem;
+}
+
+.custom-toggle-wrapper input[type="checkbox"]:checked + .custom-toggle-label span.checked-txt {
+    opacity: 1;
+}
+
+.custom-toggle-wrapper input[type="checkbox"]:checked + .custom-toggle-label span.unchecked-txt {
+    opacity: 0;
+}

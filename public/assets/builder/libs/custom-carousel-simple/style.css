@@ -1,0 +1,50 @@
+.custom-carousel-simple-wrap .custom-carousel-item {
+    border-color: #cfd0d6;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    padding: 0.5rem !important;
+    position: relative;
+    list-style: none;
+    /*display: flex;*/
+    /*align-items: center;*/
+    /*justify-content: space-between;*/
+}
+.custom-carousel-item:after {
+    content: '';
+    position: absolute;
+    display: none;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #6d788d;
+    border-radius: 0.25rem;
+}
+.custom-carousel-item.ghost:after {
+    display: block;
+}
+.custom-carousel-simple-wrap .custom-carousel-item-img {
+    background-position: center;
+    background-size: cover;
+    width: 50%;
+    min-width: 200px;
+    height: 70px;
+    flex: 1 1 auto;
+    background-repeat: no-repeat;
+}
+.custom-carousel-simple-wrap .custom-carousel-no-items {
+    line-height: 32px;
+}
+.custom-carousel-simple-wrap .custom-carousel-list:not(:has(.custom-carousel-item)) .custom-carousel-no-items {
+    display: block;
+}
+.custom-carousel-simple-wrap .custom-carousel-list:has(.custom-carousel-item) .custom-carousel-no-items {
+    display: none;
+}
+.custom-carousel-simple-wrap .custom-carousel-list .custom-carousel-item:not(:first-child) {
+    margin-top: 0.5rem !important;
+}
+.ghost {
+    opacity: .5;
+    background: #C8EBFB;
+}

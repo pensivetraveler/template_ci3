@@ -1,0 +1,30 @@
+.json-viewer {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 16px;
+    /*border-radius: 8px;*/
+    font-family: monospace;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    min-height: 300px;
+}
+
+.json-key {
+    color: #60a5fa;
+}
+
+.json-value-string {
+    color: #34d399;
+}
+
+.json-value-number {
+    color: #f59e0b;
+}
+
+.json-value-boolean {
+    color: #f472b6;
+}
+
+.json-value-null {
+    color: #94a3b8;
+}
