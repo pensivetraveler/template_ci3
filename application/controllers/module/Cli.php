@@ -7,10 +7,21 @@ class Cli extends Common
 {
     public function __construct()
     {
-        parent::__construct();
+        $this->accessWays = ['cli'];
 
-        if (php_sapi_name() !== 'cli') {
-            show_error('Direct access is not allowed');
+        parent::__construct();
+    }
+
+    public function clear_expired_geoip_cache()
+    {
+        if (!$this->input->is_cli_request()) {
+            show_404();
         }
+
+        $this->load->model('Model_Geoip_Cache');
+
+        $this->Model_Geoip_Cache->delete_expired();
+
+        echo "Expired GeoIP cache deleted." . PHP_EOL;
     }
 }
