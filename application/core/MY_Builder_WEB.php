@@ -47,7 +47,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->baseViewPath = BUILDER_FLAGNAME."/layout/index";
         $this->baseUri = $this->flag === $this->router->routes['default_platform'] ? '' : $this->flag;
         $this->apiUri = base_url($this->flag . DIRECTORY_SEPARATOR . $this->apiFlag . DIRECTORY_SEPARATOR);
-        $this->isLoginRedirect = "$this->baseUri/{$this->config->item('platform_config.isLoginRedirect')}";
+        $this->loggedInRedirect = "$this->baseUri/{$this->config->item('platform_config.loggedInRedirect')}";
         $this->noLoginRedirect = "$this->baseUri/{$this->config->item('platform_config.noLoginRedirect')}";
 
         $this->titleList = [ucfirst($this->flag)];

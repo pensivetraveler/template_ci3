@@ -36,11 +36,11 @@ class Auth extends Common
 
     public function login()
     {
-        if($this->isLogin) redirect($this->isLoginRedirect);
+        if($this->isLogin) redirect($this->loggedInRedirect);
 
         $this->addJsVars([
             'API_URI_ADD' => 'login',
-            'REDIRECT_URI' => base_url($this->isLoginRedirect)
+            'REDIRECT_URI' => base_url($this->loggedInRedirect)
         ]);
 
         $data['subPage'] = 'admin/auth/login';
@@ -52,7 +52,7 @@ class Auth extends Common
 
     public function findId()
     {
-        if($this->isLogin) redirect($this->isLoginRedirect);
+        if($this->isLogin) redirect($this->loggedInRedirect);
 
         $this->addJsVars([
             'API_URI_ADD' => 'findId',
@@ -68,7 +68,7 @@ class Auth extends Common
 
     public function findPassword()
     {
-        if($this->isLogin) redirect($this->isLoginRedirect);
+        if($this->isLogin) redirect($this->loggedInRedirect);
 
         $this->addJsVars([
             'API_URI_ADD' => 'findPassword',

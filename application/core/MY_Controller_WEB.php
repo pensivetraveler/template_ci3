@@ -17,7 +17,7 @@ class MY_Controller_WEB extends MY_Controller
     protected array $validateCallback;
 
     public string $baseViewPath = '';
-    public string $isLoginRedirect;
+    public string $loggedInRedirect;
     public string $noLoginRedirect;
     public array $data;
     public array $titleList;

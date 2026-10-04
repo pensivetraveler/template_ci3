@@ -19,7 +19,7 @@ class Common extends MY_Builder_WEB
         $this->load->model('Model_Menu_Auth');
 
         $this->navAuth = [];
-        $this->defaultController = $this->config->get('platform_config.isLoginRedirect', 'dashboard');
+        $this->defaultController = $this->config->get('platform_config.loggedInRedirect', 'dashboard');
 
         $this->addCSS[] = base_url('public/assets/admin/css/style.css');
 
