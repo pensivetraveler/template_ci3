@@ -10,15 +10,9 @@ class Dashboard extends Common
 		parent::__construct();
 
 		$this->load->model('Model_Article');
-		$this->load->model('Model_User');
 
 		$this->titleList[] = 'Home';
 		$this->href = base_url('/admin/'.$this->router->class);
 		$this->viewPath = 'admin/'.$this->router->class;
-	}
-
-	public function view($key = 0)
-	{
-		$this->viewApp();
-	}
+    }
 }

@@ -62,14 +62,11 @@ class System extends Common
             base_url('public/assets/builder/vendor/libs/datatables-bs5/datatables-bootstrap5.js'),
         ];
 
-        if($this->isSystemAdmin) {
-            $data['actions'] = reformat_bool_type_list($this->methodConfig['actions']);
-            $data['buttons'] = $this->methodConfig['buttons']??[];
-        }else{
+        if(!$this->isSystemAdmin) {
             $this->addJsVars([
-                'LIST_COLUMNS' => array_slice($this->jsVars['LIST_COLUMNS'], 0, count($this->jsVars['LIST_COLUMNS'])-1),
-                'LIST_ACTIONS' => [],
-                'LIST_BUTTONS' => [],
+                'LIST_BUTTONS' => array_filter($this->jsVars['LIST_BUTTONS'], function ($item) {
+                    return !is_array($item);
+                }),
             ]);
         }
 
@@ -100,9 +97,10 @@ class System extends Common
 
         $data['menuConfList'] = $this->getMenuList();
         $data['menuCachedList'] = $this->cache->file->get('menu_done')===false?[]:$this->cache->file->get('menu_done');
+        $data['isMenuCached'] = !empty($data['menuCachedList']);
+        $data['btnDisabled'] = $data['isMenuCached']?'':'disabled';
 
         $this->addJS['tail'][] = [
-            base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js'),
             base_url('public/assets/builder/js/app-page-menu-list.js'),
         ];
 
@@ -122,7 +120,7 @@ class System extends Common
             'API_URI' => $this->apiUri.'menuAuth',
             'FORM_REGEXP' => $this->config->item('regexp'),
             'API_PARAMS' => [
-                'user_cd' => 'USR001'
+                'grade_cd' => 'USR001'
             ],
             'LIST_PAGING' => false,
         ]);

@@ -9,34 +9,32 @@ class Auth extends Common
     {
         parent::__construct();
 
-        if ($this->cache->file->get('init_done') === true) {
-            $this->addCSS[] = [
-                base_url('public/assets/builder/vendor/css/pages/page-auth.css'),
-                base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
-                base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
-            ];
+        $this->addCSS[] = [
+            base_url('public/assets/builder/vendor/css/pages/page-auth.css'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/form-validation.css'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css'),
+        ];
 
-            $this->addJS['tail'][] = [
-                base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
-                base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
-                base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
-                base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
-            ];
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/vendor/libs/@form-validation/popular.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/bootstrap5.js'),
+            base_url('public/assets/builder/vendor/libs/@form-validation/auto-focus.js'),
+            base_url('public/assets/builder/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js'),
+        ];
 
-            $this->addJS['tail'][] = [
-                base_url('public/assets/builder/js/app-page-auth.js'),
-            ];
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-auth.js'),
+        ];
 
-            $this->addJsVars([
-                'API_URI' => $this->apiUri.'auth/',
-                'FORM_REGEXP' => $this->config->item('regexp'),
-            ]);
-        }
+        $this->addJsVars([
+            'API_URI' => $this->apiUri.'auth/',
+            'FORM_REGEXP' => $this->config->item('regexp'),
+        ]);
     }
 
     public function login()
     {
-        if($this->isLogin) redirect($this->loggedInRedirect);
+        if($this->isLoggedIn) redirect($this->loggedInRedirect);
 
         $this->addJsVars([
             'API_URI_ADD' => 'login',
@@ -52,7 +50,7 @@ class Auth extends Common
 
     public function findId()
     {
-        if($this->isLogin) redirect($this->loggedInRedirect);
+        if($this->isLoggedIn) redirect($this->loggedInRedirect);
 
         $this->addJsVars([
             'API_URI_ADD' => 'findId',
@@ -68,7 +66,7 @@ class Auth extends Common
 
     public function findPassword()
     {
-        if($this->isLogin) redirect($this->loggedInRedirect);
+        if($this->isLoggedIn) redirect($this->loggedInRedirect);
 
         $this->addJsVars([
             'API_URI_ADD' => 'findPassword',

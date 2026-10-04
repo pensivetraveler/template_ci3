@@ -17,6 +17,6 @@ class MyInfo extends Common
 
 	public function edit($key = 0)
 	{
-		parent::edit($this->loginData->user_id);
+		parent::edit($this->sessionData['user_id']);
 	}
 }
