@@ -9,7 +9,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | Set to force the use of HTTPS for REST API calls
 |
 */
-$config['force_https'] = false;
+$config['force_https'] = ENVIRONMENT !== 'development';
 
 /*
 |--------------------------------------------------------------------------
@@ -72,7 +72,7 @@ $config['rest_status_field_name'] = 'status';
 | The field name for the message inside the response
 |
 */
-$config['rest_message_field_name'] = 'error';
+$config['rest_message_field_name'] = 'msg';
 
 /*
 |--------------------------------------------------------------------------
@@ -110,7 +110,7 @@ $config['rest_realm'] = 'REST API';
 |           authorization key
 |
 */
-$config['rest_auth'] = false;
+$config['rest_auth'] = 'session';
 
 /*
 |--------------------------------------------------------------------------
@@ -126,7 +126,7 @@ $config['rest_auth'] = false;
 | Note: If 'rest_auth' is set to 'session' then change 'auth_source' to the name of the session variable
 |
 */
-$config['auth_source'] = 'ldap';
+$config['auth_source'] = 'user_id';
 
 /*
 |--------------------------------------------------------------------------
@@ -179,10 +179,6 @@ $config['auth_library_function'] = '';
 | Acceptable values are; 'none', 'digest' and 'basic'.
 |
 */
-// $config['auth_override_class_method']['deals']['view'] = 'none';
-// $config['auth_override_class_method']['deals']['insert'] = 'digest';
-// $config['auth_override_class_method']['accounts']['user'] = 'basic';
-// $config['auth_override_class_method']['dashboard']['*'] = 'basic';
 
 // ---Uncomment list line for the wildard unit test
 // $config['auth_override_class_method']['wildcard_test_cases']['*'] = 'basic';
@@ -201,6 +197,15 @@ $config['auth_library_function'] = '';
 
 // ---Uncomment list line for the wildcard unit test
 // $config['auth_override_class_method_http']['wildcard_test_cases']['*']['options'] = 'basic';
+
+$config['auth_override_class_method_http']['auth']['dupCheck']['get'] = 'none';
+$config['auth_override_class_method_http']['auth']['idCheck']['get'] = 'none';
+$config['auth_override_class_method_http']['auth']['emailCheck']['get'] = 'none';
+$config['auth_override_class_method_http']['auth']['login']['post'] = 'none';
+$config['auth_override_class_method_http']['auth']['signup']['post'] = 'none';
+$config['auth_override_class_method_http']['auth']['findId']['post'] = 'none';
+$config['auth_override_class_method_http']['auth']['findPassword']['post'] = 'none';
+$config['auth_override_class_method_http']['auth']['passwordCheck']['post'] = 'none';
 
 /*
 |--------------------------------------------------------------------------
@@ -336,7 +341,7 @@ $config['rest_keys_table'] = 'user_token';
 |   ) ;
 |  |
 */
-$config['rest_enable_keys'] = false;
+$config['rest_enable_keys'] = ENVIRONMENT !== 'development';
 //$config['rest_enable_keys'] = true;
 
 /*
@@ -389,9 +394,21 @@ $config['rest_key_length'] = 40;
 | Note: Custom headers with the X- prefix are deprecated as of
 | 2012/06/12. See RFC 6648 specification for more details
 |
+| $config['rest_key_name'] = 'X-API-KEY'; // X-API-Key should be in header
+| $config['rest_key_name'] = 'Authorization'; // Authorization should be in header
 */
-//$config['rest_key_name'] = 'X-API-KEY';
 $config['rest_key_name'] = 'Authorization';
+
+/*
+|--------------------------------------------------------------------------
+| REST API Key Bearer
+|--------------------------------------------------------------------------
+|
+| Whether to read API key from "Authorization: Bearer {token}" format.
+| Only valid when rest_key_name is Authorization
+|
+*/
+$config['rest_key_bearer'] = false;
 
 /*
 |--------------------------------------------------------------------------
@@ -443,7 +460,7 @@ $config['rest_enable_logging'] = true;
 | table name to match e.g. my_logs
 |
 */
-$config['rest_logs_table'] = 'user_logs';
+$config['rest_logs_table'] = 'rest_logs';
 
 /*
 |--------------------------------------------------------------------------
@@ -490,7 +507,7 @@ $config['rest_logs_table'] = 'user_logs';
 |      EXECUTE PROCEDURE upd_timestamp();
 |
 */
-$config['rest_enable_access'] = true;
+$config['rest_enable_access'] = false;
 
 /*
 |--------------------------------------------------------------------------
@@ -587,7 +604,7 @@ $config['rest_ignore_http_accept'] = false;
 | Hint: This is good for production environments
 |
 */
-$config['rest_ajax_only'] = false;
+$config['rest_ajax_only'] = ENVIRONMENT !== 'development';
 
 /*
 |--------------------------------------------------------------------------
@@ -609,7 +626,7 @@ $config['rest_language'] = 'korean';
 | will access it through a browser
 |
 */
-$config['check_cors'] = false;
+$config['check_cors'] = true;
 
 /*
 |--------------------------------------------------------------------------
@@ -649,11 +666,12 @@ $config['allowed_cors_methods'] = [
 | CORS Allow Any Domain
 |--------------------------------------------------------------------------
 |
+
 | Set to TRUE to enable Cross-Origin Resource Sharing (CORS) from any
 | source domain
 |
 */
-$config['allow_any_cors_domain'] = false;
+$config['allow_any_cors_domain'] = true;
 
 /*
 |--------------------------------------------------------------------------
