@@ -51,8 +51,38 @@ if ( ! function_exists('get_error_views_path'))
             if(defined('BUILDER_FLAGNAME')) {
                 return VIEWPATH.BUILDER_FLAGNAME.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR;
             }else{
-                return '';
+                include APPPATH.'config'.DIRECTORY_SEPARATOR.'extra'.DIRECTORY_SEPARATOR.'builder'.DIRECTORY_SEPARATOR.'builder_base_constants.php';
+                return VIEWPATH.BUILDER_FLAGNAME.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR;
             }
         }
+    }
+}
+
+if( ! function_exists('get_safe_path'))
+{
+    function get_safe_path($path, $base_path = FCPATH, $must_be_directory = false): string
+    {
+        $base_real_path = realpath($base_path);
+
+        if (!$base_real_path) return false;
+
+        if ($must_be_directory) {
+            $real_path = realpath($path);
+        } else {
+            $real_path = realpath($path);
+        }
+
+        if (!$real_path) {
+            return false;
+        }
+
+        /**
+         * basePath 밖으로 나가는지 확인
+         */
+        if (strpos($real_path, $base_real_path) !== 0) {
+            return false;
+        }
+
+        return $real_path;
     }
 }

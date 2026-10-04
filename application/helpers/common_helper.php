@@ -223,3 +223,65 @@ if ( ! function_exists('guidV4'))
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 }
+
+if ( ! function_exists('str_contains'))
+{
+    function str_contains($haystack, $needle) {
+        return strpos($haystack, $needle) !== false;
+    }
+}
+
+if ( ! function_exists('is_ajax'))
+{
+    function is_ajax(): bool
+    {
+        $ci =& get_instance();
+
+        return $ci->input->is_ajax_request();
+    }
+}
+
+if ( ! function_exists('is_web'))
+{
+    function is_web(): bool
+    {
+        $ci =& get_instance();
+
+        // AJAX면 웹 페이지 호출로 보지 않음
+        if ($ci->input->is_ajax_request()) {
+            return false;
+        }
+
+        $accept = $ci->input->server('HTTP_ACCEPT') ?? '';
+        $secFetchMode = $ci->input->server('HTTP_SEC_FETCH_MODE') ?? '';
+        $secFetchDest = $ci->input->server('HTTP_SEC_FETCH_DEST') ?? '';
+
+        // 브라우저의 일반 페이지 이동 요청일 가능성이 높음
+        if (stripos($accept, 'text/html') !== false) {
+            return true;
+        }
+
+        // 최신 브라우저에서 페이지 이동 요청일 때 들어오는 경우가 많음
+        if ($secFetchMode === 'navigate') {
+            return true;
+        }
+
+        if ($secFetchDest === 'document') {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+if ( ! function_usable('search_item'))
+{
+    function search_item($list, $field, $value)
+    {
+        $columns = array_column($list, $field);
+        $index = array_search($value, $columns);
+        return $index !== FALSE
+            ? $list[$index]
+            : null;
+    }
+}

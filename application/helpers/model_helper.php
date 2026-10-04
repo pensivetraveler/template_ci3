@@ -1,46 +1,142 @@
 <?php
-function reorder($list, $addData = [], $sortKey = 'sort_order', $notPermitSpace = false, $start = 1)
-{
-    $lastKey = count($list);
-    if(empty($addData)) {
-        foreach ($list as $i=>$data) {
-            if(is_array($data)){
-                $list[$i][$sortKey] = $i+1;
-            }else{
-                $list[$i]->{$sortKey} = $i+1;
+if( !function_exists('has_inner_array') ) {
+    function has_inner_array($arr): bool
+    {
+        foreach ($arr as $value) {
+            if (is_array($value)) {
+                return true;
             }
         }
-    }else{
+
+        return false;
+    }
+}
+
+function reorder($list, $addData = [], $sortKey = 'sort_order', $start = 1)
+{
+    $lastKey = count($list);
+    if(!empty($addData)) {
         $addKey = (int)is_array($addData)?$addData[$sortKey]:$addData->{$sortKey};
         if($addKey > $lastKey) {
             $list[] = $addData;
-
-            if($notPermitSpace) {
-                $j = $start;
-                for($i = 0; $i < count($list); $i++) {
-                    if(is_array($list[$i])) {
-                        $list[$i][$sortKey] = $j;
-                    }else{
-                        $list[$i]->{$sortKey} = $j;
-                    }
-                    $j++;
-                }
-            }
         }else{
             for($i = count($list); $i > -1; $i--){
-                if($i > $addKey-1) {
-                    if(is_array($list[$i-1])){
-                        $list[$i-1][$sortKey]++;
-                    }else{
-                        $list[$i-1]->{$sortKey}++;
-                    }
+                if($i >= $addKey) {
                     $list[$i] = $list[$i-1];
                 }
-                if($i === $addKey-1) $list[$i] = $addData;
             }
+            $list[$addKey-1] = $addData;
         }
     }
+
+    for($i = 0; $i < count($list); $i++) {
+        if(!is_array($list[$i])) $list[$i] = (array)$list[$i];
+        $list[$i][$sortKey] = $i+$start;
+    }
+
     return $list;
+}
+
+function resolve_select_column_table(string $default_table, string $column): array
+{
+    $default_table = trim($default_table);
+    $column = trim($column);
+
+    // alias 제거 대상:
+    // name as username
+    // partner.partner_cd as grade_cd
+    $asPattern = '/^\s*(?<source>(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?[a-zA-Z_][a-zA-Z0-9_]*)\s+as\s+(?<alias>[a-zA-Z_][a-zA-Z0-9_]*)\s*$/i';
+
+    if (preg_match($asPattern, $column, $m)) {
+        $column = $m['source'];
+    }
+
+    // plain column 대상:
+    // name
+    // partner.partner_cd
+    $plainPattern = '/^\s*(?<source>(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?[a-zA-Z_][a-zA-Z0-9_]*)\s*$/';
+
+    if (!preg_match($plainPattern, $column, $m)) {
+        return [$default_table, $column];
+    }
+
+    $source = $m['source'];
+
+    if (strpos($source, '.') !== false) {
+        [$table, $field] = explode('.', $source, 2);
+
+        return [trim($table), $field];
+    }
+
+    return [$default_table, $column];
+}
+
+function parse_select_column(string $column): array
+{
+    $column = trim($column);
+
+    // 1. 일반 컬럼 alias
+    // menu_auth as base_auth
+    // menu.menu_auth as base_auth
+    $normalAsPattern = '/^\s*(?<column>(?:[a-zA-Z_][a-zA-Z0-9_]*\.)*[a-zA-Z_][a-zA-Z0-9_]*)\s+as\s+(?<alias>[a-zA-Z_][a-zA-Z0-9_]*)\s*$/i';
+
+    if (preg_match($normalAsPattern, $column, $m)) {
+        return [
+            'type' => 'alias',
+            'column' => $m['column'],
+            'alias' => $m['alias'],
+            'raw' => $column,
+        ];
+    }
+
+    // 2. 백틱 컬럼 alias
+    // `menu_auth` as `base_auth`
+    // `menu`.`menu_auth` as `base_auth`
+    $backtickAsPattern = '/^\s*(?<column>(?:`?[a-zA-Z_][a-zA-Z0-9_]*`?\.)*`?[a-zA-Z_][a-zA-Z0-9_]*`?)\s+as\s+(?<alias>`?[a-zA-Z_][a-zA-Z0-9_]*`?)\s*$/i';
+
+    if (preg_match($backtickAsPattern, $column, $m)) {
+        return [
+            'type' => 'alias_backtick',
+            'column' => $m['column'],
+            'alias' => $m['alias'],
+            'raw' => $column,
+        ];
+    }
+
+    // 3. 함수/표현식 alias
+    // COUNT(*) as total_count
+    // IFNULL(menu_auth, "00000") as base_auth
+    $exprAsPattern = '/^\s*(?<expr>.+?)\s+as\s+(?<alias>`?[a-zA-Z_][a-zA-Z0-9_]*`?)\s*$/i';
+
+    if (preg_match($exprAsPattern, $column, $m)) {
+        return [
+            'type' => 'alias_expr',
+            'column' => $m['expr'],
+            'alias' => $m['alias'],
+            'raw' => $column,
+        ];
+    }
+
+    // 4. 일반 컬럼
+    // menu_auth
+    // menu.menu_auth
+    $plainPattern = '/^\s*(?<column>(?:[a-zA-Z_][a-zA-Z0-9_]*\.)*[a-zA-Z_][a-zA-Z0-9_]*)\s*$/';
+
+    if (preg_match($plainPattern, $column, $m)) {
+        return [
+            'type' => 'plain',
+            'column' => $m['column'],
+            'alias' => null,
+            'raw' => $column,
+        ];
+    }
+
+    return [
+        'type' => 'invalid',
+        'column' => $column,
+        'alias' => null,
+        'raw' => $column,
+    ];
 }
 
 function getColumnList($queryParentTogether, $befList, $newList)

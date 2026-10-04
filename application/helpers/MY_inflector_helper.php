@@ -19,6 +19,24 @@ if ( ! function_exists('snakeize'))
 
 // --------------------------------------------------------------------
 
+if ( ! function_exists('dashed'))
+{
+    /**
+     * Dashed
+     *
+     * Takes multiple words separated by underscores and dashed them
+     *
+     * @param   string    $str    Input string
+     * @return	string
+     */
+    function dashed($str)
+    {
+        return str_replace('_', '-', $str);
+    }
+}
+
+// --------------------------------------------------------------------
+
 if ( ! function_exists('percentize'))
 {
 	/**
@@ -37,7 +55,6 @@ if ( ! function_exists('percentize'))
 		return $formatter->format($fraction);
 	}
 }
-
 
 // --------------------------------------------------------------------
 
@@ -108,5 +125,31 @@ if( ! function_exists('entity_to_literal'))
         // &nbsp; → U+00A0(non-breaking space)로 디코딩되는데,
         // 이를 일반 공백(U+0020)로 바꿔 주고 싶다면 아래도 추가합니다.
         return str_replace("\xC2\xA0", ' ', $decoded);
+    }
+}
+
+if( ! function_exists('to_positive_number'))
+{
+    function to_positive_number($value)
+    {
+        if (!is_numeric($value)) {
+            return 0;
+        }
+
+        return max(
+            0,
+            round((float) $value, 3)
+        );
+    }
+}
+
+if( ! function_exists('to_boolean_integer'))
+{
+    function to_boolean_integer($value): int
+    {
+        return filter_var(
+            $value,
+            FILTER_VALIDATE_BOOLEAN
+        ) ? 1 : 0;
     }
 }
