@@ -2,7 +2,7 @@
 	echo form_open_multipart('', [
 		'id' => $formName??'formRecord',
 		'name' => $formName??'formRecord',
-		'class' => "add-new-record pt-0 row g-3 needs-validation form-type-{$formType}",
+		'class' => "add-new-record pt-0 row g-3 needs-validation form-type-{$formType} form-subtype-{$formSubType}",
 		'onsubmit' => 'return false',
 	], [
 		'_mode' => '',
@@ -27,16 +27,19 @@
 		foreach ($formData['fields'] as $item):
 			if(!is_empty($item, 'group') && $item['group'] !== 'base'):
 				builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
+			elseif($item['type'] === 'file' && strpos($item['subtype'], 'dropzone') !== false):
+				builder_view("{$platformName}/layout/form_{$formType}_file_".$item['view'], ['item' => $item]);
 			elseif($item['type'] === 'custom'):
 				builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
 			else:
 ?>
 <div class="col-sm-12 form-validation-unit">
 	<div class="input-group input-group-merge">
-		<?=get_admin_form_ico($item)?>
+		<?=get_admin_form_ico($item, $formType)?>
 		<div class="form-floating form-floating-outline">
-			<?=get_side_form_input_by_type($item, 'side')?>
+			<?=get_side_form_input_by_type($item, $formType)?>
 		</div>
+		<?=get_side_form_input_adds($item, $formType)?>
 	</div>
 	<?=get_admin_form_text($item)?>
 	<?=get_admin_form_list_item($item, $formType)?>
