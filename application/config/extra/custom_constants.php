@@ -23,7 +23,14 @@ define('CLI_YN', php_sapi_name() === 'cli');
 */
 define('ABS_PATH', $_SERVER['DOCUMENT_ROOT']);
 define('PUBLIC_PATH', FCPATH.'public/');
+define('PUBLIC_URI', 'public/');
 define('ASSET_PATH', PUBLIC_PATH.'assets/');
+define('ASSET_URI', PUBLIC_URI.'assets/');
+define('BASE_ASSET_PATH', ASSET_PATH.'base/');
+define('BASE_ASSET_URI', ASSET_URI.'base/');
+define('BASE_ASSET_CSS_URI', BASE_ASSET_URI.'css/');
+define('BASE_ASSET_JS_URI', BASE_ASSET_URI.'js/');
+define('BASE_ASSET_VENDOR_URI', BASE_ASSET_URI.'vendor/');
 define('UPLOAD_PATH', PUBLIC_PATH.'uploads/');
 define('PAGE_NUMBER', 10);
 define('PAGE_SIZE', 10);
@@ -58,9 +65,11 @@ const RECENT_DT_COLUMN_NAME = 'recent_dt';
 */
 // THIS_DOMAIN은 끝에 / 없도록.
 if(ENVIRONMENT === 'development'){
-	define("THIS_DOMAIN","");
+    define("THIS_DOMAIN","");
+    define("IS_PRODUCTION", false);
 }else{
-	define("THIS_DOMAIN","");
+    define("THIS_DOMAIN","");
+    define("IS_PRODUCTION", true);
 }
 
 /*
@@ -69,13 +78,13 @@ if(ENVIRONMENT === 'development'){
 |--------------------------------------------------------------------------
 */
 if(php_sapi_name() === 'cli') {
-	define("_HTTP", "https://");
+    define("_HTTP", "https://");
 }else{
-	if((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) {
-		define("_HTTP", "https://");
-	}else{
-		define("_HTTP", "http://");
-	}
+    if((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) {
+        define("_HTTP", "https://");
+    }else{
+        define("_HTTP", "http://");
+    }
 }
 
 /*
@@ -84,17 +93,17 @@ if(php_sapi_name() === 'cli') {
 |--------------------------------------------------------------------------
 */
 const API_CALL_PATH = [
-	'api', 'adm'
+    'api', 'adm'
 ];
 
 const PRESET_API_NOT_EXIST = [
-	'code' => 'API_NOT_EXIST',
-	'msg' => '존재하지 않는 경로입니다.',
+    'code' => 'API_NOT_EXIST',
+    'msg' => '존재하지 않는 경로입니다.',
 ];
 
 const PRESET_ERR_OCCUR = [
-	'code' => 'INTERNAL_SERVER_ERROR',
-	'msg' => '오류가 발생했습니다.',
+    'code' => 'INTERNAL_SERVER_ERROR',
+    'msg' => '오류가 발생했습니다.',
 ];
 
 /*
@@ -140,3 +149,18 @@ const WEB_HISTORY_BACK = 'history.back();';
 |--------------------------------------------------------------------------
 */
 const SPCDEINFO_SERVICE_KEY = '';
+
+/*
+|--------------------------------------------------------------------------
+| AUTH CONSTANT
+|
+| Create / Read / Update / Delete / Export / Import
+|--------------------------------------------------------------------------
+*/
+const INIT_AUTH_CHAR = '111111';
+const BASE_AUTH_CHAR = '000000';
+const AUTH_CREATE = 0;
+const AUTH_READ   = 1;
+const AUTH_UPDATE = 2;
+const AUTH_DELETE = 3;
+const AUTH_EXPORT = 4;
