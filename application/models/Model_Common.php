@@ -10,6 +10,7 @@ class Model_Common extends MY_Model
 
     function getList($select = [], $dto = [], $filter = [])
     {
+        if(has_inner_array($select)) show_error('Select Parameter is Unacceptable');
         if(empty($select)) $this->db->select($this->getSelectList());
         if(count($filter) > 0) $this->setFilter($this->table, $filter);
         $this->setCondition($this->table, $dto);
@@ -23,6 +24,7 @@ class Model_Common extends MY_Model
 
     function getData($select = [], $dto = [])
     {
+        if(has_inner_array($select)) show_error('Select Parameter is Unacceptable');
         if(empty($select)) $this->db->select($this->getSelectList());
         $this->setCondition($this->table, $dto, false);
         return parent::getDataPDO($this->table, $select);
@@ -47,31 +49,25 @@ class Model_Common extends MY_Model
 
     function addList($set)
     {
-        $set = $this->getValidSetList($set);
+        $set = $this->getValidSetList($set, false);
 
         return parent::addListPDO($this->table, $set);
     }
 
     function addData($set, $bool = false)
     {
-        $this->setCreatedDt($set);
-
-        $this->setCreatedId($set);
-
         if(!$this->isAutoIncrement) $bool = false;
 
-        $set = $this->getValidSetData($set);
+        $set = $this->getValidSetData($set, false);
 
         return parent::addDataPDO($this->table, $set, $bool);
     }
 
     function modData($set, $where, $bool = false)
     {
-        $this->setUpdatedDt($set);
-
-        $this->setUpdatedId($set);
-
         if(!$this->isAutoIncrement) $bool = false;
+
+        $this->validateWhereCondition($where);
 
         $set = $this->getValidSetData($set);
 
@@ -80,26 +76,29 @@ class Model_Common extends MY_Model
 
     function modNumb($field, $count, $where, $bool = false)
     {
-        $this->setUpdatedDt();
-
-        $this->setUpdatedId();
-
         if ($count > 0) {
             $this->db->set($field, $field . '+' . $count, false);
         } else {
             $this->db->set($field, $field . $count, false);
         }
 
-        return $this->modDataPDO($this->table, [], $where, $bool);
+        $this->validateWhereCondition($where);
+
+        $set = $this->getValidSetData([]);
+
+        return $this->modDataPDO($this->table, $set, $where, $bool);
     }
 
     function delData($where, $bool = false, $isSoftDelete = true, $set = [])
     {
+        $this->validateWhereCondition($where);
+
         if($this->isDelYn) {
             if($isSoftDelete) {
-                $this->db->set(DEL_YN_COLUMN_NAME, 'Y')->set(UPDATED_DT_COLUMN_NAME, 'now()', false);
-                $this->setUpdatedId($set);
-                return parent::modDataPDO($this->table, [], $where, $bool);
+                $set = $this->getValidSetData(array_merge($set, [
+                    DEL_YN_COLUMN_NAME => 'Y'
+                ]));
+                return parent::modDataPDO($this->table, $set, $where, $bool);
             }else{
                 return parent::delDataPDO($this->table, $where, $bool);
             }
@@ -127,7 +126,7 @@ class Model_Common extends MY_Model
     {
         $columnList = $this->getColumnList();
         if(!in_array($sortField, $columnList)) return false;
-        if(!$this->identifier && !count($this->primaryKeyList)) return false;
+        if(!count($this->primaryKeyList)) return false;
 
         if($sortItem) {
             foreach ($sortItem as $key=>$val) $this->db->where("$key <> $val");
@@ -191,88 +190,210 @@ class Model_Common extends MY_Model
         return $columnList;
     }
 
-    protected function getValidSetList($set): array
+    protected function getValidSetList($set, $isUpdate = true): array
     {
         return array_map(function($item) {
             if(!is_array($item)) $item = (array)$item;
-
-            $this->setCreatedDt($item);
-            $this->setCreatedId($item);
-
-            return $this->getValidSetData($item);
+            return $this->getValidSetData($item, false, true);
         }, $set);
     }
 
-    protected function getValidSetData($set): array
+    protected function getValidSetData($set, $isUpdate = true, $isListData = false): array
     {
         $columnList = $this->getColumnList();
-        return array_filter($set, function($key) use ($columnList) {
+
+        $set = array_filter($set, function($key) use ($columnList) {
             return in_array($key, $columnList);
         }, ARRAY_FILTER_USE_KEY);
+
+        if(!$isUpdate) {
+            $set = $this->setCreatedDt($set, $isListData);
+            $set = $this->setCreatedId($set, $isListData);
+        }else{
+            $set = $this->setUpdatedDt($set, $isListData);
+            $set = $this->setUpdatedId($set, $isListData);
+        }
+
+        return $set;
     }
 
     public function getColumnList(): array
     {
-        return array_values(array_unique(
+        $list = array_values(array_unique(
             array_filter(
                 array_merge(
-                    [$this->identifier],
-                    $this->primaryKeyList,
                     $this->notNullList,
                     $this->nullList
                 )
             )
         ));
+
+        if($this->isDelYn && !in_array(DEL_YN_COLUMN_NAME, $list)) $list[] = DEL_YN_COLUMN_NAME;
+        if($this->isUseYn && !in_array(USE_YN_COLUMN_NAME, $list)) $list[] = USE_YN_COLUMN_NAME;
+
+        return $list;
     }
 
-    protected function setCreatedDt($set = array())
+    public function getTypedColumnList(): array
+    {
+        $list = array_values(array_unique(array_filter([
+            ...$this->strList,
+            ...$this->intList,
+            ...$this->fileList,
+        ])));
+
+        if ($this->isDelYn && !in_array(DEL_YN_COLUMN_NAME, $list, true)) {
+            $list[] = DEL_YN_COLUMN_NAME;
+        }
+
+        if ($this->isUseYn && !in_array(USE_YN_COLUMN_NAME, $list, true)) {
+            $list[] = USE_YN_COLUMN_NAME;
+        }
+
+        return $list;
+    }
+
+    protected function setCreatedDt($set = array(), $isListData = false)
     {
         if($this->isCreatedDt) {
-            if(is_empty($set, CREATED_DT_COLUMN_NAME)) {
-                $this->db->set(CREATED_DT_COLUMN_NAME, 'now()', false);
+            $value = is_empty($set, CREATED_DT_COLUMN_NAME) ? date('Y-m-d H:i:s') : $set[CREATED_DT_COLUMN_NAME];
+            if($isListData) {
+                $set[CREATED_DT_COLUMN_NAME] = $value;
             }else{
-                $this->db->set(CREATED_DT_COLUMN_NAME, $set[CREATED_DT_COLUMN_NAME]);
+                $this->db->set(CREATED_DT_COLUMN_NAME, $value);
             }
         }
+        return $set;
     }
 
-    protected function setCreatedId($set = array())
+    protected function setCreatedId($set = array(), $isListData = false)
     {
         if($this->isCreatedId) {
             $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
-            $this->db->set(CREATED_ID_COLUMN_NAME, is_empty($set, CREATED_ID_COLUMN_NAME) ? $userId : $set[CREATED_ID_COLUMN_NAME]);
+            $value = is_empty($set, CREATED_ID_COLUMN_NAME) ? $userId : $set[CREATED_ID_COLUMN_NAME];
+            if($isListData) {
+                $set[CREATED_ID_COLUMN_NAME] = $value;
+            }else{
+                $this->db->set(CREATED_ID_COLUMN_NAME, $value);
+            }
         }
+        return $set;
     }
 
-    protected function setUpdatedDt($set = array())
+    protected function setUpdatedDt($set = array(), $isListData = false)
     {
         if($this->isUpdatedDt) {
-            if(is_empty($set, UPDATED_DT_COLUMN_NAME)) {
-                $this->db->set(UPDATED_DT_COLUMN_NAME, 'now()', false);
+            $value = is_empty($set, UPDATED_DT_COLUMN_NAME) ? date('Y-m-d H:i:s') : $set[UPDATED_DT_COLUMN_NAME];
+            if($isListData) {
+                $set[UPDATED_DT_COLUMN_NAME] = $value;
             }else{
-                $this->db->set(UPDATED_DT_COLUMN_NAME, $set[UPDATED_DT_COLUMN_NAME]);
+                $this->db->set(UPDATED_DT_COLUMN_NAME, $value);
             }
         }
+        return $set;
     }
 
-    protected function setUpdatedId($set = array())
+    protected function setUpdatedId($set = array(), $isListData = false)
     {
         if($this->isCreatedId) {
             $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
-            $this->db->set(UPDATED_ID_COLUMN_NAME, is_empty($set, UPDATED_ID_COLUMN_NAME) ? $userId : $set[UPDATED_ID_COLUMN_NAME]);
+            $value = is_empty($set, UPDATED_ID_COLUMN_NAME) ? $userId : $set[UPDATED_ID_COLUMN_NAME];
+            if($isListData) {
+                $set[UPDATED_ID_COLUMN_NAME] = $value;
+            }else{
+                $this->db->set(UPDATED_ID_COLUMN_NAME, $value);
+            }
         }
+        return $set;
     }
 
     public function determineDiffColumns(): array
     {
-        $arr1 = $this->getColumnList();
-        $arr2 = array_unique([...$this->strList, ...$this->intList, ...$this->fileList]);
-        return array_values(array_diff(array_merge($arr1, $arr2), array_intersect($arr1, $arr2)));
+        $columnList = $this->getColumnList();
+        $typedColumnList = $this->getTypedColumnList();
+
+        return [
+            'missingTypeDefinition' => array_values(array_diff($columnList, $typedColumnList)),
+            'missingColumnDefinition' => array_values(array_diff($typedColumnList, $columnList)),
+        ];
     }
 
-    public function validateTableColumns(): bool
+    protected function validateModelColumns(): bool
     {
-        return count($this->getColumnList()) === count(array_unique([...$this->strList, ...$this->intList, ...$this->fileList]));
+        $diff = $this->determineDiffColumns();
+
+        return empty($diff['missingTypeDefinition'])
+            && empty($diff['missingColumnDefinition']);
+    }
+
+    protected function validatePrimaryKeyDefinition(): bool
+    {
+        if ($this->isAutoIncrement) {
+            if (count($this->primaryKeyList) !== 1) {
+                return false;
+            }
+
+            if (!$this->identifier) {
+                return false;
+            }
+
+            if (!in_array($this->identifier, $this->primaryKeyList)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function validateNullDefinition(): bool
+    {
+        $duplicated = array_intersect($this->notNullList, $this->nullList);
+
+        return count($duplicated) === 0;
+    }
+
+    public function validateColumnRoleDefinition(): bool
+    {
+        $columnList = $this->getColumnList();
+
+        if ($this->identifier && !in_array($this->identifier, $columnList, true)) {
+            return false;
+        }
+
+        foreach ($this->primaryKeyList as $column) {
+            if (!in_array($column, $columnList, true)) {
+                return false;
+            }
+        }
+
+        foreach ($this->uniqueKeyList as $column) {
+            if (!in_array($column, $columnList, true)) {
+                return false;
+            }
+        }
+
+        if (property_exists($this, 'foreignKeyList')) {
+            foreach ($this->foreignKeyList as $column => $config) {
+                if (!in_array($column, $columnList, true)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function validateModelDefinition()
+    {
+        return $this->validateNullDefinition()
+            && $this->validateModelColumns()
+            && $this->validateColumnRoleDefinition()
+            && $this->validatePrimaryKeyDefinition();
+    }
+
+    public function setSelect($table, $data)
+    {
+
     }
 
     public function setCondition($table, $data, $list = true)
@@ -300,6 +421,10 @@ class Model_Common extends MY_Model
 
         $this->setFilterWhere($table, $filter['where'] ?? []);
 
+        $this->setFilterWhereIn($table, $filter['whereIn'] ?? []);
+
+        $this->setFilterWhereNot($table, $filter['whereNot'] ?? []);
+
         $this->setFilterLike($table, $filter['like'] ?? []);
 
         $this->setFilterDate($table, $filter['date'] ?? []);
@@ -308,6 +433,16 @@ class Model_Common extends MY_Model
     public function setFilterWhere($table, $data)
     {
         $this->where($table, $data);
+    }
+
+    public function setFilterWhereIn($table, $data)
+    {
+        $this->whereIn($table, $data);
+    }
+
+    public function setFilterWhereNot($table, $data)
+    {
+        $this->whereNot($table, $data);
     }
 
     public function setFilterLike($table, $data)
@@ -325,8 +460,8 @@ class Model_Common extends MY_Model
 
     public function setFilterDate($table, $data)
     {
-        if($this->isCreatedDt) {
-            $columnName = 'DATE_FORMAT('.CREATED_DT_COLUMN_NAME.',"%Y-%m-%d")';
+        if($this->filteringDateColumn) {
+            $columnName = 'DATE_FORMAT('.$this->filteringDateColumn.',"%Y-%m-%d")';
             if(array_key_exists('on_date', $data) && !empty($data['on_date'])) {
                 $this->db->where($columnName, $data['on_date']);
             }else{
@@ -364,7 +499,7 @@ class Model_Common extends MY_Model
 
     public function getNotNullColumns($tableName)
     {
-        $tableName = $this->db->dbprefix.$tableName;
+        $tableName = $this->dbprefix.$tableName;
         $query = $this->db->query("
             SELECT COLUMN_NAME
             FROM INFORMATION_SCHEMA.COLUMNS
@@ -407,5 +542,11 @@ SET FOREIGN_KEY_CHECKS = 1;
     public function truncate()
     {
         $this->db->truncate($this->table);
+    }
+
+    protected function validateWhereCondition($where): void
+    {
+        if(has_inner_array($where)) show_error(__FUNCTION__ . ': Please check the where condition');
+        return;
     }
 }

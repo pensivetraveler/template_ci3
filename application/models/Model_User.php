@@ -9,9 +9,9 @@ class Model_User extends Model_Common
 	public string  $identifier = 'user_id';
 	public array   $primaryKeyList = ['user_id'];
 	public array   $uniqueKeyList = ['id','email'];
-	public array   $notNullList = ['user_id','user_cd','id','name','tel','del_yn','withdraw_yn',];
-	public array   $nullList = ['password','email','withdraw_dt'];
-	public array   $strList = ['user_cd','id','password','name','email','tel','del_yn','withdraw_yn','withdraw_dt',];
+	public array   $notNullList = ['user_id','user_cd','id','name','del_yn','withdraw_yn',];
+	public array   $nullList = ['password','email','tel','withdraw_dt','user_api_key'];
+	public array   $strList = ['user_cd','id','password','name','email','tel','del_yn','withdraw_yn','withdraw_dt','user_api_key'];
 	public array   $intList = ['user_id',];
 	public array   $fileList = [];
 

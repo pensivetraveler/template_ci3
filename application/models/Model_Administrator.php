@@ -5,14 +5,21 @@ require_once __DIR__.'/Model_Common.php';
 
 class Model_Administrator extends Model_Common
 {
-    public string  $table = 'admin';
-    public string  $identifier = 'admin_id';
-    public array   $primaryKeyList = ['admin_id','user_id',];
+    public string  $table = 'administrator';
+    public string  $identifier = 'administrator_id';
+    public array   $primaryKeyList = ['administrator_id'];
     public array   $uniqueKeyList = [];
-    public array   $notNullList = ['admin_id','user_id','admin_cd'];
+    public array   $foreignKeyList = [
+        'user_id' => [
+            'table' => 'user',
+            'column' => 'user_id',
+            'model' => 'Model_User',
+        ],
+    ];
+    public array   $notNullList = ['administrator_id','user_id',];
     public array   $nullList = [];
-    public array   $strList = ['admin_cd',];
-    public array   $intList = ['admin_id','user_id',];
+    public array   $strList = [];
+    public array   $intList = ['administrator_id','user_id',];
     public array   $fileList = [];
 
     public bool    $isAutoIncrement = true;
@@ -63,5 +70,4 @@ class Model_Administrator extends Model_Common
         ];
         return parent::getCnt($dto, $filter);
     }
-
 }
