@@ -25,15 +25,19 @@ class MY_Hooks
 
         define("APP_NAME", getenv('APP_NAME'));
         define("APP_NAME_KR", getenv('APP_NAME_KR'));
+        define("APP_GIT", getenv('APP_GIT'));
         define("COMP_NAME", getenv('COMP_NAME'));
         define("COMP_NAME_KR", getenv('COMP_NAME_KR'));
+        define("COMP_URL", getenv('COMP_URL'));
     }
 
     public function systemOfInspection()
     {
         if(getenv('SYSTEM_INSPECTION') === 'true') {
-            echo '시스템 점검 중입니다.';
-            exit;
+            $allowedIps = json_decode(getenv('ALLOWED_IPS'));
+            if(!in_array($_SERVER['REMOTE_ADDR'], $allowedIps)) {
+                builder_misc_view('');
+            }
         }
     }
 
@@ -108,7 +112,8 @@ class MY_Hooks
         $token_prefix = $CI->config->item('token_prefix')?$CI->config->item('token_prefix').' ':'';
 
         $data = [
-            'BASE_URI' => base_url().get_path().'/',
+            'HOST_URI' => base_url(),
+            'BASE_URI' => base_url().get_path(),
             'CURRENT_URI' => base_url().get_path().'/'.$CI->router->class,
             'HOOK_PHPTOJS_VAR_ISLOGIN' => $CI->session->userdata('logged_in'),
             'HOOK_PHPTOJS_VAR_TOKEN' => $token_prefix.$CI->session->userdata('token'),
@@ -126,6 +131,7 @@ class MY_Hooks
 
         $CI->config->set_item('life_cycle', 'post_controller');
     }
+
     public function setFormValidation()
     {
         $CI =& get_instance();
