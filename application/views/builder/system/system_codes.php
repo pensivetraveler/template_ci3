@@ -1,11 +1,11 @@
 <div class="row g-6 mb-6">
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb"><?=get_breadcrumbs($titleList)?></ol>
+        <ol class="breadcrumb breadcrumb-custom-icon"><?=get_breadcrumbs($titleList)?></ol>
     </nav>
 </div>
 <div class="row g-6 mb-6">
     <div class="card mb-6">
-        <div class="card-header">
+        <div class="card-header pb-0">
             <div class="nav-align-top system-code-nav">
                 <ul class="nav nav-tabs nav-fill" role="tablist">
                     <li class="nav-item" data-id="">
@@ -40,9 +40,9 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="tab-content">
+            <div class="tab-content py-0">
                 <div class="tab-pane show active" id="navs-justified-caution" role="tabpanel">
-                    <div class="h-px-400">
+                    <div class="h-px-400 pt-10">
                         <h4>⚠️ 중요 안내</h4>
                         <h6>이 화면에서 수정되는 모든 설정값은 시스템 전반에 즉시 반영되어, 메일 송·수신, 결제 연동, 외부 API 호출 등 주요 기능에 직접적인 영향을 미칩니다.</h6>
                         <h6>비인가 사용자가 임의로 변경할 경우 서비스 장애나 보안 사고가 발생할 수 있으니, 반드시 권한이 부여된 담당자만 접근해 주세요.</h6>

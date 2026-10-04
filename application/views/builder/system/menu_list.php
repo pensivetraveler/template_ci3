@@ -1,6 +1,7 @@
+
 <div class="row g-6 mb-6">
 	<nav aria-label="breadcrumb">
-		<ol class="breadcrumb"><?=get_breadcrumbs($titleList)?></ol>
+		<ol class="breadcrumb breadcrumb-custom-icon"><?=get_breadcrumbs($titleList)?></ol>
 	</nav>
 </div>
 <div class="row g-6 mb-6">
@@ -41,16 +42,20 @@
 				<div class="tab-pane show active" id="navs-justified-menuList" role="tabpanel">
 					<div class="row">
 						<div class="col-12 mb-6 text-end">
-							<button class="btn btn-outline-danger" id="addMenuCodeBtn"><?=lang('Add Menu Code')?></button>
-							<button class="btn btn-outline-primary" id="addMenuBtn"><?=lang('Add New Menu')?></button>
-							<button class="btn btn-warning" id="resetMenuBtn"><?=lang('Reset Menu')?></button>
-							<button class="btn btn-primary" id="saveMenuBtn"><?=lang('Submit')?></button>
+							<button class="btn btn-outline-danger" id="addMenuCodeBtn" <?=$btnDisabled?>><?=lang('Add Menu Code')?></button>
+							<button class="btn btn-outline-primary" id="addMenuBtn" <?=$btnDisabled?>><?=lang('Add New Menu')?></button>
+							<button class="btn btn-warning" id="resetMenuBtn" <?=$btnDisabled?>><?=lang('Reset Menu')?></button>
+							<button class="btn btn-primary" id="saveMenuBtn" <?=$btnDisabled?>><?=lang('Submit')?></button>
 						</div>
 						<div class="col-12">
 							<div class="card">
 								<div class="card-body">
 									<div id="menuContainer" class="menu-container">
 										<!-- Add Menu Items Dynamically -->
+										<?php
+											if(!$isMenuCached)
+												echo '<p class="text-center my-8 py-8 text-danger fw-bold text-uppercase">'.lang('Menu Data is not cached yet.').'</p>';
+										?>
 									</div>
 								</div>
 							</div>
@@ -81,13 +86,13 @@
 						</div>
 					</div>
 					<div class="row menu-check-wrapper">
-						<div class="col-md-6 d-none">
+						<div class="col-md-6 <?=!$isMenuCached ? '' : 'd-none' ?>">
 							<div class="card">
 								<div class="card-header border-bottom">
 									<h5 class="mb-0 text-center text-primary fw-bold"><?=lang('Config')?></h5>
 								</div>
 								<div class="card-body">
-									<div class="menu-container p-4" id="menuConfContainer">
+									<div class="menu-container p-4" id="menuConfContainer" data-sortable="0">
 										<?=get_menu_list_tree($menuConfList); ?>
 									</div>
 								</div>
@@ -99,19 +104,19 @@
 									<h5 class="mb-0 text-center text-primary fw-bold"><?=lang('Cached')?></h5>
 								</div>
 								<div class="card-body">
-									<div class="menu-container p-4" id="menuCachedContainer">
+									<div class="menu-container p-4" id="menuCachedContainer" data-sortable="1">
 										<?=get_menu_list_tree($menuCachedList); ?>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="col-md-6">
+						<div class="col-md-6 <?=!$isMenuCached ? 'd-none' : '' ?>">
 							<div class="card">
 								<div class="card-header border-bottom">
 									<h5 class="mb-0 text-center text-primary fw-bold"><?=lang('DB')?></h5>
 								</div>
 								<div class="card-body">
-									<div class="menu-container p-4" id="menuDBContainer">
+									<div class="menu-container p-4" id="menuDBContainer" data-sortable="1">
 									</div>
 								</div>
 							</div>

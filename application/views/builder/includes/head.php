@@ -15,7 +15,7 @@
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 	<meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no"/>
-	<?php if(file_exists(PLATFORM_ASSET_PATH.'favicon.ico')): ?>
+	<?php if(defined('PLATFORM_ASSET_PATH') && file_exists(PLATFORM_ASSET_PATH.'favicon.ico')): ?>
 	<link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url(PLATFORM_ASSET_URI.'/favicon.ico');?>">
 	<?php else: ?>
 	<link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url('public/assets/builder/img/favicon/favicon.ico');?>">
@@ -43,24 +43,25 @@
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/typeahead-js/typeahead.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/animate-css/animate.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/sweetalert2/sweetalert2.css');?>" />
+
+	<!-- Form Related CSS -->
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/flatpickr/flatpickr.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/flatpickr-month-select/style.css');?>" />
-	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/select2/select2.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/bootstrap-select/bootstrap-select.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/quill/editor.css');?>" />
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/libs/spinkit/spinkit.css');?>" />
 
-	<!-- Custom CSS -->
-	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/css/custom.css');?>" />
-
 	<!-- Page CSS -->
-	<!-- Page -->
 	<?php if(isset($addCSS)) add_stylesheet($addCSS); ?>
 	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/vendor/css/pages/page-misc.css');?>" />
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="<?php echo base_url('public/assets/builder/css/custom.css');?>" />
 
 	<!-- Base JS -->
 	<script src="<?php echo base_url('public/assets/base/js/html5.min.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/placeholder.min.js');?>"></script>
+	<script src="<?php echo base_url('public/assets/base/js/clipboard.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/utils.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/josa.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/pattern.js');?>"></script>
@@ -80,7 +81,7 @@
 	<script src="<?php echo base_url('public/assets/builder/js/config.js');?>"></script>
 
 	<!-- Custom JS -->
-	<script src="<?php echo base_url('public/assets/builder/js/app-page-preset.js');?>"></script>
+<!--	<script src="--><?php //echo base_url('public/assets/builder/js/app-page-preset.js');?><!--"></script>-->
 	<script src="<?php echo base_url('public/assets/builder/js/app-page-utils.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/builder/js/app-page-errors.js');?>"></script>
 
@@ -104,7 +105,7 @@
 	?>
 	<?php endif; ?>
 
-	<?php if(ENVIRONMENT === 'production'): ?>
+	<?php if(IS_PRODUCTION): ?>
 	<script>
 		document.oncontextmenu = function(){return false;}
 	</script>

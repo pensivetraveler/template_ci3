@@ -12,10 +12,10 @@
 										  </script>
 										  , Made by
 										</span>
-										<a href="https://pixinvent.com" target="_blank" class="footer-link fw-medium footer-theme-link text-primary"><?=COMP_NAME?></a>
+										<a href="<?=COMP_URL?>" target="_blank" class="footer-link fw-medium footer-theme-link text-primary"><?=COMP_NAME?></a>
 									</div>
 									<div>
-										<a href="https://github.com/pixinvent" class="footer-link me-4" target="_blank"><i class="ri-github-fill"></i></a>
+										<a href="<?=APP_GIT?>" class="footer-link me-4" target="_blank"><i class="ri-github-fill"></i></a>
 									</div>
 								</div>
 							</div>
