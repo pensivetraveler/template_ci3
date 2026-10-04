@@ -104,7 +104,7 @@ function plural(str) {
  * @return	string
  */
 function camelize(str) {
-    return str.replace(/_([a-z]?)/g, (m, g) => g.toUpperCase());
+    return str.replace(/[-_]+([a-zA-Z])/g, (m, g) => g.toUpperCase());
 }
 
 /**
@@ -187,6 +187,18 @@ function capitalize(str) {
  */
 function pascalize(str) {
     return capitalize(camelize(str))
+}
+
+/**
+ * Dashed
+ *
+ * Takes multiple words separated by underscores and dashed them
+ *
+ * @param	string	str	Input string
+ * @return	string
+ */
+function dashed(str) {
+    return str.replace(/_/g, '-');
 }
 
 /**

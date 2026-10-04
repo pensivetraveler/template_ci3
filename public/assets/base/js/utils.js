@@ -423,9 +423,27 @@ function isValidSelector(selector) {
 }
 
 function isAttributeValueTrue(node, attr) {
+    if(!node.hasAttribute(attr)) return false;
 	let val = node.getAttribute(attr);
-	if(isNumeric(val)) val = parseInt(val);
-	return Boolean(val);
+    val = parseDataValue(val);
+    if(isNaN(val) || typeof val === 'boolean') {
+        return Boolean(val);
+    }else{
+        return parseInt(val);
+    }
+}
+
+function parseDataValue(value) {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    if (value === 'null') return null;
+    if (value === 'undefined') return undefined;
+
+    if (value !== '' && !isNaN(value)) {
+        return Number(value);
+    }
+
+    return value;
 }
 
 function arrayToBrackets(arr) {
