@@ -585,8 +585,12 @@ abstract class RestController extends \MY_Controller {
         $this->_end_rtime = microtime(TRUE);
 
         // Log the loading time to the log table
-        if ($this->config->item('rest_enable_logging') === TRUE)
-        {
+        if (
+            $this->config->item('rest_enable_logging') === TRUE &&
+            !empty($this->_insert_id) &&
+            isset($this->rest) &&
+            isset($this->rest->db)
+        ) {
             $this->_log_access_time();
         }
     }
@@ -662,10 +666,17 @@ abstract class RestController extends \MY_Controller {
                 exit;
             }
 
-            $this->response([
-                $this->config->item('rest_status_field_name') => FALSE,
-                $this->config->item('rest_message_field_name') => sprintf($this->lang->line('text_rest_invalid_api_key'), $this->rest->key)
-            ], self::HTTP_FORBIDDEN);
+            if(empty($this->rest->key)) {
+                $this->response([
+                    $this->config->item('rest_status_field_name') => FALSE,
+                    $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_empty_api_key')
+                ], self::HTTP_FORBIDDEN);
+            }else{
+                $this->response([
+                    $this->config->item('rest_status_field_name') => FALSE,
+                    $this->config->item('rest_message_field_name') => sprintf($this->lang->line('text_rest_invalid_api_key'), $this->rest->key)
+                ], self::HTTP_FORBIDDEN);
+            }
         }
 
         // Check to see if this key has access to the requested controller
@@ -1013,8 +1024,20 @@ abstract class RestController extends \MY_Controller {
         $this->rest->ignore_limits = FALSE;
 
         // Find the key from server or arguments
-        if (($key = isset($this->_args[$api_key_variable]) ? $this->_args[$api_key_variable] : $this->input->server($key_name)))
+        if ($key = $this->_args[$api_key_variable] ?? $this->input->server($key_name))
         {
+            if ($this->config->item('rest_key_bearer') === TRUE && $api_key_variable === 'Authorization') {
+                if (!preg_match('/^Bearer\s+(.+)$/i', $key, $matches)) {
+                    return FALSE;
+                }
+
+                $key = trim($matches[1]);
+
+                if ($key === '') {
+                    return FALSE;
+                }
+            }
+
             if ( ! ($row = $this->rest->db->where($this->config->item('rest_key_column'), $key)->get($this->config->item('rest_keys_table'))->row()))
             {
                 return FALSE;
@@ -2219,38 +2242,57 @@ abstract class RestController extends \MY_Controller {
     protected function _check_cors()
     {
         // Convert the config items into strings
-        $allowed_headers = implode(' ,', $this->config->item('allowed_cors_headers'));
-        $allowed_methods = implode(' ,', $this->config->item('allowed_cors_methods'));
+        $allowed_headers = $this->config->item('allowed_cors_headers');
+        $allowed_methods = $this->config->item('allowed_cors_methods');
 
-        // If we want to allow any domain to access the API
-        if ($this->config->item('allow_any_cors_domain') === TRUE)
-        {
+        if (!is_array($allowed_headers)) {
+            $allowed_headers = [];
+        }
+
+        if (!is_array($allowed_methods)) {
+            $allowed_methods = [];
+        }
+
+        // Automatically include the configured API key header in the allowed CORS headers.
+        $rest_key_name = $this->config->item('rest_key_name');
+
+        if (!empty($rest_key_name) && !in_array($rest_key_name, $allowed_headers, true)) {
+            $allowed_headers[] = $rest_key_name;
+        }
+
+        // Include headers commonly used by CORS preflight requests.
+        foreach (['Access-Control-Request-Method', 'Access-Control-Request-Headers'] as $header) {
+            if (!in_array($header, $allowed_headers, true)) {
+                $allowed_headers[] = $header;
+            }
+        }
+
+        // Remove duplicate values and convert the arrays into header-safe strings.
+        $allowed_headers = implode(', ', array_unique($allowed_headers));
+        $allowed_methods = implode(', ', array_unique($allowed_methods));
+
+        if ($this->config->item('allow_any_cors_domain') === true) {
+            // Allow requests from any origin.
             header('Access-Control-Allow-Origin: *');
-            header('Access-Control-Allow-Headers: '.$allowed_headers);
-            header('Access-Control-Allow-Methods: '.$allowed_methods);
-        }
-        else
-        {
-            // We're going to allow only certain domains access
-            // Store the HTTP Origin header
-            $origin = $this->input->server('HTTP_ORIGIN');
-            if ($origin === NULL)
-            {
-                $origin = '';
-            }
+        } else {
+            $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-            // If the origin domain is in the allowed_cors_origins list, then add the Access Control headers
-            if (in_array($origin, $this->config->item('allowed_cors_origins')))
-            {
-                header('Access-Control-Allow-Origin: '.$origin);
-                header('Access-Control-Allow-Headers: '.$allowed_headers);
-                header('Access-Control-Allow-Methods: '.$allowed_methods);
+            $allowed_origins = $this->config->item('allowed_cors_origins');
+
+            // Allow the request origin only when it is explicitly listed.
+            if (is_array($allowed_origins) && in_array($origin, $allowed_origins, true)) {
+                header('Access-Control-Allow-Origin: ' . $origin);
+                header('Vary: Origin');
             }
         }
 
-        // If the request HTTP method is 'OPTIONS', kill the response and send it to the client
-        if ($this->input->method() === 'options')
-        {
+        // Send the allowed headers and methods for CORS.
+        header('Access-Control-Allow-Headers: ' . $allowed_headers);
+        header('Access-Control-Allow-Methods: ' . $allowed_methods);
+
+        // Stop here for preflight requests.
+        // The actual controller method should not be executed for OPTIONS requests.
+        if ($this->input->method() === 'options') {
             exit;
         }
     }
