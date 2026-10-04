@@ -39,14 +39,19 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
             }
         })
             .then(response => response.json())
             .then(result => {
                 if (result.code === 2001 && Array.isArray(result.data)) {
-                    renderMenuTree(result.data);
-                    initializeSortable();
+                    if(result.data.length > 0) {
+                        renderMenuTree(result.data);
+                        initializeSortable();
+                    }else{
+                        document.getElementById('checkConfigBtn').classList.add('d-none');
+                    }
                 } else {
                     console.error('메뉴 데이터 로드 실패:', result.msg);
                 }
@@ -197,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Sortable 초기화 함수
     function initializeSortable() {
-        const containers = document.querySelectorAll('.menu-container');
+        const containers = document.querySelectorAll('.menu-container[data-sortable="1"]');
         containers.forEach(container => {
             new Sortable(container, {
                 group: {
@@ -288,6 +293,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         executeAjax({
             url: common.API_URI + '/' + 'saveAll',
+            headers: {
+                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+            },
             method: 'post',
             data: JSON.stringify(menuOrder),
             dataType: 'json',
@@ -326,6 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Add new menu');
         $('[name="depth"]').val(1);
         $('[name="srt"]').val(document.querySelectorAll('#menuContainer .menu-item[data-depth="1"]').length+1);
+
         readyFrmInputs(formRecord, 'add', common.FORMDATA);
     }
 
@@ -339,6 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('[name="depth"]').val(2);
         $('[name="is_sub_menu"]').val(subItems>0);
         $('[name="srt"]').val(subItems+1);
+
         readyFrmInputs(formRecord, 'add', common.FORMDATA);
     }
 
@@ -378,6 +388,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleResetMenu() {
         executeAjax({
             url: common.API_URI + '/' + 'reset',
+            headers: {
+                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+            },
             success: function(response) {
                 showAlert({
                     type: 'success',
@@ -395,6 +408,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         executeAjax({
             url: common.API_URI + '/' + 'caching',
+            headers: {
+                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+            },
             success: function(response) {
                 showAlert({
                     type: 'success',
@@ -412,6 +428,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         executeAjax({
             url: common.API_URI + '/' + 'generateMenuCode',
+            headers: {
+                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+            },
             success: function(response) {
                 showAlert({
                     type: 'success',
@@ -446,7 +465,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const formRecord = document.querySelector(formSelector);
     if(formRecord === null) throw new Error(`formRecord is not exist`);
+    onLoadedLayout(document.querySelector(formSelector));
     preparePlugins(formRecord);
+    resetFrmInputs(formRecord, common.EXTRA_FORMDATA);
 
     offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
 
@@ -466,7 +487,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     offCanvasElement.addEventListener('hidden.bs.offcanvas', function(e) {
         resetFrmInputs(document.querySelector(formSelector), common.EXTRA_FORMDATA);
-        fv.resetForm(true);
 
         if ($('[data-repeater-item]').length) {
             $('[data-repeater-item]').each(function (i, v) {

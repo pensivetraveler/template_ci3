@@ -2,10 +2,10 @@ function setViewCount() {
 	executeAjax({
 		async: false,
 		url: '/api/articleRead/',
-		method: 'put',
 		headers: {
 			'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
 		},
+        method: 'put',
 		data: isObject(common.KEY) ? common.KEY : {
 			article_id : common.KEY,
 		},

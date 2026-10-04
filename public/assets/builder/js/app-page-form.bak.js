@@ -43,7 +43,6 @@ function updateFormLifeCycle(state, form = null, detail = {}) {
 }
 
 function onLoadedLayout(form) {
-    console.log('onLoadedLayout : ', form.id)
 	updateFormLifeCycle('onLoadedLayout', form)
 }
 
@@ -323,6 +322,7 @@ function resetFrmInputs(form, fields = []) {
 				}
 				break;
 			case 'SELECT' :
+                console.log(1)
                 bindSelectValue(node, null)
 				break;
 			case 'TEXTAREA' :
@@ -372,7 +372,7 @@ function resetFrmInputs(form, fields = []) {
 	});
 
     // form validation reset
-    if(typeof fv !== 'undefined') safeReset(fv);
+    if(fv !== undefined) safeReset(fv);
 
 	// 마지막에 폼 전체 및 레코드 리셋
 	record = null;
@@ -658,6 +658,7 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
 			}
 
             if (form[name] && Object.hasOwn(data, fieldName)) {
+                console.log(2)
                 bindSelectValue(form[name], data[fieldName]);
             }
 			break;
@@ -778,27 +779,60 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
 
 function refreshPlugins(form, data = null) {
     // selectpicker
+    let shouldRefreshSelectpicker = false;
     $(form).find('select.selectpicker').each(function() {
         const select = this;
         const $select = $(select);
 
-        if (select.dataset.editable === undefined) return;
-
-        const shouldDisabled =
-            parseInt(select.dataset.editable, 10) === 0 &&
-            form._mode.value === 'edit';
-
-        /*
-         * 이미 원하는 상태라면 처리하지 않는다.
+        /**
+         * 1. editable 상태 처리
          */
-        if ($select.prop('disabled') === shouldDisabled) return;
+        if (select.dataset.editable !== undefined) {
+            const shouldDisabled =
+                parseInt(select.dataset.editable) === 0 &&
+                form._mode.value === 'edit';
 
-        /*
-         * 원본 select 상태 변경
+            if ($select.prop('disabled') !== shouldDisabled) {
+                $select.prop('disabled', shouldDisabled);
+                shouldRefreshSelectpicker = true;
+            }
+        }
+
+        /**
+         * 2. 빈 option 제거
          */
-        $select.prop('disabled', shouldDisabled);
-        syncSelectpickerDisabled(select);
+        const $removeTargets = $select.find('option').filter(function () {
+            const $opt = $(this);
+
+            const hasValueAttr = $opt.is('[value]');
+            const val = $opt.attr('value');
+
+            const isValueEmpty =
+                !hasValueAttr ||
+                String(val).trim() === '';
+
+            const isTextEmpty =
+                !hasValueAttr &&
+                $opt.text().trim() === '';
+
+            const isPlaceholder =
+                $opt.hasClass('bs-title-option') ||
+                $opt.data('placeholder') === true ||
+                $opt.is(':disabled') && $opt.is(':selected') && $opt.index() === 0 ||
+                $opt.data('hidden') === true ||
+                $opt.prop('hidden') === true;
+
+            const isDivider = $opt.data('divider') === true;
+
+            return (isValueEmpty || isTextEmpty) && !isPlaceholder && !isDivider;
+        });
+
+        if ($removeTargets.length > 0) {
+            $removeTargets.remove();
+            shouldRefreshSelectpicker = true;
+        }
     });
+    if (shouldRefreshSelectpicker) refreshSelectpicker(form);
 
     // textarea-autosize
 	if($(form).find('.textarea-autosize').length) {
@@ -1038,24 +1072,14 @@ function prepareSelectOptions(node, data = []) {
     });
 
     if ($node.hasClass('selectpicker')) {
-        if (!$node.find('option').length) {
-            $node.prepend(
-                `<option value="" disabled>${getLocale(
-                    'No Option Available',
-                    common.LOCALE
-                )}</option>`
-            );
+        if(!$node.find('option').length) {
+            $node.prepend(`<option value="" disabled>${getLocale('No Option Available', common.LOCALE)}</option>`);
         }
-
-        rebuildSelectpicker(node);
+        $node.selectpicker('refresh');
     }
 
     // 4) select2에게 "내부 <select>이 바뀌었음" 알리기
-    bindSelectValue(
-        node,
-        valueInOptions ? originalValue : null,
-        'handler'
-    );
+    bindSelectValue(node, valueInOptions?originalValue:null, 'handler');
 }
 
 function setSelectEmptyOption($node) {
@@ -1365,7 +1389,6 @@ function activateFilterForm(selector = null, callback = undefined, params = unde
 
             onLoadedLayout(document.querySelector(selector));
             preparePlugins(document.querySelector(selector));
-            resetFrmInputs(document.querySelector(selector), common.FILTER_COLUMNS);
             readyFrmInputs(document.querySelector(selector), 'filter', common.FILTER_COLUMNS);
             refreshPlugins(document.querySelector(selector));
 
@@ -1383,14 +1406,6 @@ function activateFilterForm(selector = null, callback = undefined, params = unde
                     }
                 }
 
-                window.dispatchEvent(
-                    new CustomEvent('filterSearchClicked', {
-                        bubbles : false,
-                        cancelable : true,
-                        composed : false,
-                    }),
-                );
-
                 if(typeof callback === 'function') callback(params);
             });
 
@@ -1399,14 +1414,6 @@ function activateFilterForm(selector = null, callback = undefined, params = unde
                 resetFrmInputs(document.querySelector(selector), common.FILTER_COLUMNS);
                 readyFrmInputs(document.querySelector(selector), 'filter', common.FILTER_COLUMNS);
                 refreshPlugins(document.querySelector(selector));
-
-                window.dispatchEvent(
-                    new CustomEvent('filterResetClicked', {
-                        bubbles : false,
-                        cancelable : true,
-                        composed : false,
-                    }),
-                );
 
                 if(typeof callback === 'function') callback(params);
             });

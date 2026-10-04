@@ -7,6 +7,8 @@ $(function () {
 
     const formRecord = document.querySelector(formSelector);
     if(formRecord === null) throw new Error(`formRecord is not exist`);
+
+    onLoadedLayout(formRecord);
     preparePlugins(formRecord);
 
     offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
@@ -84,7 +86,7 @@ $(function () {
                     container: function (field, element) {
                         // Dropzone 필드 메시지를 특정 컨테이너에 표시
                         if (dropzoneList.find((item) => item.field === field)) {
-                            return document.querySelector(`#${field}-dropzone-container`);
+                            return document.querySelector(`#${field}-dropzone-wrapper`);
                         }
                         return element.closest('.form-validation-unit');
                     },

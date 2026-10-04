@@ -27,6 +27,7 @@ $(function () {
 
     const formBigCd = document.querySelector(formBigCdSelector);
     if(formBigCd === null) throw new Error(`formBigCd is not exist`);
+    onLoadedLayout(formBigCd);
     preparePlugins(formBigCd);
 
     offCanvasBigCd = new bootstrap.Offcanvas(offCanvasBigCdEl);

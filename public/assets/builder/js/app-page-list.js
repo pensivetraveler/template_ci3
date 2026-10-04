@@ -1,7 +1,7 @@
 'use strict';
 
 $.fn.dataTable.ext.errMode = 'throw';
-let fv, offCanvasEl;
+let fv, offCanvasEl, isFirstDraw = true;
 
 // Datatable (jquery)
 $(function () {
@@ -31,270 +31,251 @@ $(function () {
 	if(dt_table.find('thead th').length !== 1+common.LIST_CHEKBOX+common.LIST_COLUMNS.length)
 		throw new Error(`th and LIST_COLUMNS length are not matched.`);
 
-	var dt = dt_table.DataTable({
-		scrollX: true,
-		scrollCollapse: true,
-		processing: true,
-		serverSide: true,
-		paging: common.LIST_PAGING,
-		ajax: getAjaxOptions({
-			url: common.API_URI,
-			headers: {
-				'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-			},
-			data: function(data) {
-				const req = {
-					_mode : 'list',
-					...common.API_PARAMS,
-					...{
-						format: 'datatable',
-						draw: data.draw,
-						pageNo: Math.floor(data.start / data.length) ,
-						limit: data.length,
-						searchWord: data.search.value || '',
-						searchCategory: data.search.category || '',
-					},
-					filters : {},
-				};
+	var dt = dt_table
+        .on('preXhr.dt', function (e, settings, json, xhr) {
+            $('#loading').show();
+        })
+        .on('xhr.dt', function (e, settings, json, xhr) {
+            if(isFirstDraw) isFirstDraw = false;
+            $('#loading').hide();
+        })
+        .DataTable({
+            scrollX: true,
+            scrollCollapse: true,
+            processing: true,
+            serverSide: true,
+            paging: common.LIST_PAGING,
+            ajax: getAjaxOptions({
+                url: common.API_URI,
+                headers: {
+                    'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+                },
+                data: function(data) {
+                    const req = {
+                        _mode : 'list',
+                        ...common.API_PARAMS,
+                        ...{
+                            format: 'datatable',
+                            draw: data.draw,
+                            pageNo: Math.floor(data.start / data.length) ,
+                            limit: data.length,
+                            searchWord: data.search.value || '',
+                            searchCategory: data.search.category || '',
+                        },
+                        filters : {},
+                    };
 
-				if($('#formFilter').length) req.filters = getFilterData('#formFilter');
+                    if($('#formFilter').length) req.filters = getFilterData('#formFilter', isFirstDraw);
 
-				return req;
-			},
-			complete: function(data) {
-				// console.log(data.responseJSON)
-				// console.table(data.responseJSON.data)
-			},
-		}),
-		columns: [
-			// columns according to JSON
-			{ data: null },
-			...(common.LIST_CHEKBOX
-				? [{ data: null }]
-				: []),
-			...common.LIST_COLUMNS.map(function (column) {
-				return {
-					data : column.field,
-					title : getLocale(column.label, common.LOCALE),
-				}
-			}),
-		],
-		columnDefs: [
-			{
-				// For Responsive
-				className: 'control',
-				searchable: false,
-				orderable: false,
-				responsivePriority: 2,
-				targets: 0,
-				render: function (data, type, full, meta) {
-					return '';
-				}
-			},
-			...(common.LIST_CHEKBOX
-				? [
-					{
-						// For Checkboxes
-						targets: 1,
-						orderable: false,
-						render: function () {
-							return '<input type="checkbox" class="dt-checkboxes form-check-input">';
-						},
-						checkboxes: {
-							selectAllRender: '<input type="checkbox" class="form-check-input">'
-						}
-					},
-				]
-				: []),
-			// ...fields,
-			...common.LIST_COLUMNS.map(function (column, index) {
-				switch (column.type) {
-					case 'row_num' : // Row Num
-						return {
-							targets: 1+common.LIST_CHEKBOX,
-							searchable: false,
-							orderable: false,
-							render: function (data, type, full, meta) {
-								// 전체 행 개수
-								var totalRows = meta.settings._iRecordsDisplay;
-								// 내림차순 번호 계산
-								return totalRows - (meta.row + meta.settings._iDisplayStart);
-								// return meta.row + meta.settings._iDisplayStart + 1;
-							}
-						};
-					case 'actions' : // Actions
-						return {
-							targets: 1+common.LIST_CHEKBOX+common.LIST_COLUMNS.length-1,
-							searchable: false,
-							orderable: false,
-							render: function (data, type, full, meta) {
-								return getListActions(common.LIST_ACTIONS, full, common.IDENTIFIER);
-							}
-						}
-					case 'select' :
-						return {
-							targets: 1+common.LIST_CHEKBOX+index,
-							searchable: false,
-							orderable: false,
-							render: function(data, type, full, meta) {
-								return renderSelectColumn(data, type, full, meta, column)
-							},
-						}
-					default :
-						return {
-							searchable: true,
-							orderable: false,
-							targets: 1+common.LIST_CHEKBOX+index,
-							render: function (data, type, full, meta) {
-								if(column.render && column.render.callback && typeof window[`${column.render.callback}`] !== 'function'){
-									console.warn(`DataTable : '${column.render.callback}' render function is not defined.`);
-								}
+                    return req;
+                },
+                complete: function(jqXHR) {
+                    const code = jqXHR.responseJSON.code;
+                    if(Math.floor(code/10) !== 200) {
+                        showAlert({
+                            type: 'warning',
+                            text: jqXHR.responseJSON.msg,
+                        })
+                    }
+                },
+            }),
+            columns: [
+                // columns according to JSON
+                { data: null },
+                ...(common.LIST_CHEKBOX
+                    ? [{ data: null }]
+                    : []),
+                ...common.LIST_COLUMNS.map(function (column) {
+                    return {
+                        data : column.field,
+                        title : getLocale(column.label, common.LOCALE),
+                    }
+                }),
+            ],
+            columnDefs: [
+                {
+                    // For Responsive
+                    className: 'control',
+                    searchable: false,
+                    orderable: false,
+                    responsivePriority: 2,
+                    targets: 0,
+                    render: function (data, type, full, meta) {
+                        return '';
+                    }
+                },
+                ...(common.LIST_CHEKBOX
+                    ? [
+                        {
+                            // For Checkboxes
+                            targets: 1,
+                            orderable: false,
+                            render: function () {
+                                return '<input type="checkbox" class="dt-checkboxes form-check-input">';
+                            },
+                            checkboxes: {
+                                selectAllRender: '<input type="checkbox" class="form-check-input">'
+                            }
+                        },
+                    ]
+                    : []),
+                // ...fields,
+                ...common.LIST_COLUMNS.map(function (column, index) {
+                    switch (column.type) {
+                        case 'row_num' : // Row Num
+                            return {
+                                targets: 1+common.LIST_CHEKBOX,
+                                searchable: false,
+                                orderable: false,
+                                render: function (data, type, full, meta) {
+                                    // 전체 행 개수
+                                    var totalRows = meta.settings._iRecordsDisplay;
+                                    // 내림차순 번호 계산
+                                    return totalRows - (meta.row + meta.settings._iDisplayStart);
+                                    // return meta.row + meta.settings._iDisplayStart + 1;
+                                }
+                            };
+                        case 'actions' : // Actions
+                            return {
+                                targets: 1+common.LIST_CHEKBOX+common.LIST_COLUMNS.length-1,
+                                searchable: false,
+                                orderable: false,
+                                render: function (data, type, full, meta) {
+                                    return getListActions(common.LIST_ACTIONS, full, common.IDENTIFIER);
+                                }
+                            }
+                        case 'select' :
+                            return {
+                                targets: 1+common.LIST_CHEKBOX+index,
+                                searchable: false,
+                                orderable: false,
+                                render: function(data, type, full, meta) {
+                                    return renderSelectColumn(data, type, full, meta, column)
+                                },
+                            }
+                        default :
+                            return {
+                                searchable: true,
+                                orderable: false,
+                                targets: 1+common.LIST_CHEKBOX+index,
+                                render: function (data, type, full, meta) {
+                                    if(column.render && column.render.callback && typeof window[`${column.render.callback}`] !== 'function'){
+                                        console.warn(`DataTable : '${column.render.callback}' render function is not defined.`);
+                                    }
 
-								if(column.render && column.render.callback && typeof window[`${column.render.callback}`] === 'function') {
-									// callback 이 정의되어있을 경우
-									return window[column.render.callback](data, type, full, meta, column, column.render.params??null);
-								}else if(typeof window[`renderColumn${pascalize(column.field)}`] === 'function') {
-									// page 별 custom js 파일에 render func 가 정의된 경우
-									return window[`renderColumn${pascalize(column.field)}`](data, type, full, meta, column);
-								}else {
-									// if(column.type === 'button') {
-									//     return renderButtonColumn(data, type, full, meta, column);
-									// }else if{
-									// if(full[column.field]) {
-									return renderColumn(data, type, full, meta, column);
-									// }else{
-									//     console.warn(`dtTable : ${column.field} data is missing !!`);return '-';
-									// }
-								}
-							}
-						};
-				}
-			}),
-		],
-		order: [[1+common.LIST_CHEKBOX, 'desc']],
-		dom:
-			'<"card-header d-flex rounded-0 flex-wrap pb-md-0 pt-0 justify-content-end"' +
-			// '<"d-flex justify-content-start align-items-center me-5 ms-n2"<"search-category-wrap me-2">f>' +
-			// '<"me-5 ms-n2"f>' +
-			'<"d-flex justify-content-start justify-content-md-end align-items-baseline"<"dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4"lB>>' +
-			'>t' +
-			'<"row mx-1"' +
-			'<"col-sm-12 col-md-6"i>' +
-			'<"col-sm-12 col-md-6"p>' +
-			'>',
-		language: {
-			sLengthMenu: '_MENU_',
-			search: '',
-			searchPlaceholder: getLocale('Search', common.LOCALE),
-			info: '검색결과 총 _TOTAL_ 개 데이터 중 _START_ ~ _END_ 표시'
-		},
-		// Buttons with Dropdown
-		buttons: getListButtons(),
-		// For responsive popup
-		responsive: {
-			details: {
-				display: $.fn.dataTable.Responsive.display.modal({
-					header: function (row) {
-						return 'Details of ' + common.TITLE;
-					}
-				}),
-				type: 'column',
-				renderer: function (api, rowIdx, columns) {
-					var data = $.map(columns, function (col, i) {
-						return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
-							? '<tr data-dt-row="' +
-							col.rowIndex +
-							'" data-dt-column="' +
-							col.columnIndex +
-							'">' +
-							'<td>' +
-							col.title +
-							':' +
-							'</td> ' +
-							'<td>' +
-							col.data +
-							'</td>' +
-							'</tr>'
-							: '';
-					}).join('');
+                                    if(column.render && column.render.callback && typeof window[`${column.render.callback}`] === 'function') {
+                                        // callback 이 정의되어있을 경우
+                                        return window[column.render.callback](data, type, full, meta, column, column.render.params??null);
+                                    }else if(typeof window[`renderColumn${pascalize(column.field)}`] === 'function') {
+                                        // page 별 custom js 파일에 render func 가 정의된 경우
+                                        return window[`renderColumn${pascalize(column.field)}`](data, type, full, meta, column);
+                                    }else {
+                                        // if(column.type === 'button') {
+                                        //     return renderButtonColumn(data, type, full, meta, column);
+                                        // }else if{
+                                        // if(full[column.field]) {
+                                        return renderColumn(data, type, full, meta, column);
+                                        // }else{
+                                        //     console.warn(`dtTable : ${column.field} data is missing !!`);return '-';
+                                        // }
+                                    }
+                                }
+                            };
+                    }
+                }),
+            ],
+            order: [[1+common.LIST_CHEKBOX, 'desc']],
+            dom:
+                '<"card-header d-flex rounded-0 flex-wrap pb-md-0 pt-0 justify-content-end"' +
+                // '<"d-flex justify-content-start align-items-center me-5 ms-n2"<"search-category-wrap me-2">f>' +
+                // '<"me-5 ms-n2"f>' +
+                '<"d-flex justify-content-start justify-content-md-end align-items-baseline"<"dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4"lB>>' +
+                '>t' +
+                '<"row mx-1"' +
+                '<"col-sm-12 col-md-6"i>' +
+                '<"col-sm-12 col-md-6"p>' +
+                '>',
+            language: {
+                sLengthMenu: '_MENU_',
+                search: '',
+                searchPlaceholder: getLocale('Search', common.LOCALE),
+                info: '검색결과 총 _TOTAL_ 개 데이터 중 _START_ ~ _END_ 표시'
+            },
+            // Buttons with Dropdown
+            buttons: getListButtons(),
+            // For responsive popup
+            responsive: {
+                details: {
+                    display: $.fn.dataTable.Responsive.display.modal({
+                        header: function (row) {
+                            return 'Details of ' + common.TITLE;
+                        }
+                    }),
+                    type: 'column',
+                    renderer: function (api, rowIdx, columns) {
+                        var data = $.map(columns, function (col, i) {
+                            return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
+                                ? '<tr data-dt-row="' +
+                                col.rowIndex +
+                                '" data-dt-column="' +
+                                col.columnIndex +
+                                '">' +
+                                '<td>' +
+                                col.title +
+                                ':' +
+                                '</td> ' +
+                                '<td>' +
+                                col.data +
+                                '</td>' +
+                                '</tr>'
+                                : '';
+                        }).join('');
 
-					return data ? $('<table class="table"/><tbody />').append(data) : false;
-				}
-			}
-		},
-		preDrawCallback: function(settings) {
-			// console.log('preDrawCallback', settings)
-			// $('<div class="loading">Loading</div>').appendTo('body');
-			if(appPlugins.list.datatable.preDrawCallback !== null && typeof appPlugins.list.datatable.preDrawCallback === 'function'){
-				appPlugins.list.datatable.preDrawCallback(settings)
-			}
-		},
-		initComplete: function (settings, json) {
-			// ajax 옵션을 사용해서 테이블이 완전히 초기화되고 데이터가 로드되고 그려지는 시점
-			// console.log('initComplete', settings);
-			// $('div.loading').remove();
-			if(appPlugins.list.datatable.initComplete !== null && typeof appPlugins.list.datatable.initComplete === 'function'){
-				appPlugins.list.datatable.initComplete(settings, json)
-			}
+                        return data ? $('<table class="table"/><tbody />').append(data) : false;
+                    }
+                }
+            },
+            preInitCallback: function (settings) {
+                console.log('preInit')
+            },
+            preDrawCallback: function(settings) {
+                // Datatable 첫 생성 시 및 ajax 실행 이후 각 1회씩 호출됨.
+                // console.log('preDrawCallback', settings)
+                if(appPlugins.list.datatable.preDrawCallback !== null && typeof appPlugins.list.datatable.preDrawCallback === 'function'){
+                    appPlugins.list.datatable.preDrawCallback(settings)
+                }
+                activateFilterForm('#formFilter', reloadDatatable, this.api());
+            },
+            initComplete: function (settings, json) {
+                // ajax 옵션을 사용해서 테이블이 완전히 초기화되고 데이터가 로드되고 그려지는 시점
+                // console.log('initComplete', settings);
+                // $('div.loading').remove();
+                if(appPlugins.list.datatable.initComplete !== null && typeof appPlugins.list.datatable.initComplete === 'function'){
+                    appPlugins.list.datatable.initComplete(settings, json)
+                }
+            },
+            drawCallback: function(settings) {
+                // 테이블의 draw 이벤트가 발생할 때마다 취해야 하는 action 을 실행
+                // console.log('drawCallback', settings)
+                if(appPlugins.list.datatable.drawCallback !== null && typeof appPlugins.list.datatable.drawCallback === 'function'){
+                    appPlugins.list.datatable.drawCallback(settings)
+                }
 
-			if($('#formFilter').length > 0) {
-				$('#formFilter').on('preparePlugins', (e) => {
-					const form = document.getElementById(e.detail.formSelector);
-					if(form !== null && form.querySelector('[name="_onloaded"]') !== undefined)
-						form.querySelector('[name="_onloaded"]').value = 1;
-				});
-
-				preparePlugins(document.querySelector('#formFilter'));
-				refreshPlugins(document.querySelector('#formFilter'));
-
-				$('.form-type-filter').find('.btn-search').on('click', function(e) {
-					const start_date = $('#formFilter').find('[name="date[start_date]"]').val() ?? null;
-					const end_date = $('#formFilter').find('[name="date[end_date]"]').val() ?? null;
-					if(start_date !== null && end_date !== null) {
-						if(new Date(start_date) > new Date(end_date)) {
-							showAlert({
-								type: 'warning',
-								text: getLocale('End Date must be on or after Start Date', common.LOCALE),
-							});
-							return;
-						}
-					}
-					dt.ajax.reload();
-				});
-
-				$('.form-type-filter').find('.btn-reset').on('click', function(e) {
-					e.preventDefault();
-					resetFrmInputs(document.querySelector('#formFilter'));
-					if($('.form-type-filter').find('.form-select').length) {
-						$('.form-type-filter').find('.form-select').trigger('change')
-					}
-					preparePlugins(document.querySelector('#formFilter'));
-					dt.ajax.reload();
-				});
-			}
-		},
-		drawCallback: function(settings) {
-			// console.log('drawCallback', settings)
-			// 테이블의 draw 이벤트가 발생할 때마다 취해야 하는 action 을 실행
-			if(appPlugins.list.datatable.drawCallback !== null && typeof appPlugins.list.datatable.drawCallback === 'function'){
-				appPlugins.list.datatable.drawCallback(settings)
-			}
-
-			if($(this).find('.datatable-selectpicker').length > 0){
-				$(this).find('.datatable-selectpicker').selectpicker({
-					width: 'fit',
-					container: 'body',
-					style: 'btn-outline-primary p-2',
-				});
-			}
-		},
-		rowCallback: function (row, data, displayNum, displayIndex, dataIndex) {
-			// data[3] -> Age 컬럼 값이 40 이상이면 행 색깔 변경
-			if(appPlugins.list.datatable.rowCallback !== null && typeof appPlugins.list.datatable.rowCallback === 'function'){
-				appPlugins.list.datatable.rowCallback(row, data, displayNum, displayIndex, dataIndex)
-			}
-		}
-	});
+                if($(this).find('.datatable-selectpicker').length > 0){
+                    $(this).find('.datatable-selectpicker').selectpicker({
+                        width: 'fit',
+                        container: 'body',
+                        style: 'btn-outline-primary p-2',
+                    });
+                }
+            },
+            rowCallback: function (row, data, displayNum, displayIndex, dataIndex) {
+                // data[3] -> Age 컬럼 값이 40 이상이면 행 색깔 변경
+                if(appPlugins.list.datatable.rowCallback !== null && typeof appPlugins.list.datatable.rowCallback === 'function'){
+                    appPlugins.list.datatable.rowCallback(row, data, displayNum, displayIndex, dataIndex)
+                }
+            }
+        });
 
 	$('.dataTables_wrapper').on('click', '.view-record', function() {
 		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
@@ -329,7 +310,10 @@ $(function () {
 
 		const formRecord = document.querySelector(formSelector);
 		if(formRecord === null) throw new Error(`formRecord is not exist`);
+
+        onLoadedLayout(formRecord);
 		preparePlugins(formRecord);
+        resetFrmInputs(formRecord, common.FORM_DATA);
 
 		offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
 
@@ -349,7 +333,6 @@ $(function () {
 
 		offCanvasElement.addEventListener('hidden.bs.offcanvas', function(e) {
 			resetFrmInputs(document.querySelector(formSelector), common.FORM_DATA);
-			safeReset(fv);
 		});
 
 		$('.dataTables_wrapper').on('click', '.edit-record', function(e) {
@@ -362,6 +345,9 @@ $(function () {
 			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 			executeAjax({
 				url: getUrlWithIdentifiers(common.API_URI + '/' + 'duplicate', getRedirectActionData(this, common.IDENTIFIER)),
+                headers: {
+                    'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+                },
 				success: function(response) {
 					showAlert({
 						type: 'success',
@@ -378,7 +364,6 @@ $(function () {
 		});
 
 		formRecord.addEventListener("fetchFrmValues", (e) => {
-			readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
 			applyFrmValues(formRecord, record, common.FORM_DATA);
 			offCanvasEl.show();
 		});
@@ -390,7 +375,11 @@ $(function () {
 		for(const rule of Object.keys(customValidatorsPreset.validators))
 			FormValidation.validators[rule] = customValidatorsPreset.validators[rule];
 
-		const dropzoneList = common.FORM_DATA.filter((item) => item.subtype.indexOf('dropzone') !== -1);
+		const dropzoneFieldSet = new Set(
+			common.FORM_DATA
+				.filter((item) => item.subtype.indexOf('dropzone') !== -1)
+				.map((item) => item.field)
+		);
 
 		// Form validation for Add new record
 		fv = FormValidation.formValidation(
@@ -398,24 +387,28 @@ $(function () {
 			{
 				fields: reformatFormData(formRecord, common.FORM_DATA, common.FORM_REGEXP, false),
 				plugins: {
-					message: new FormValidation.plugins.Message({
-						container: function (field, element) {
-							// Dropzone 필드 메시지를 특정 컨테이너에 표시
-							if (dropzoneList.find((item) => item.field === field)) {
-								return document.querySelector(`#${field}-dropzone-container`);
-							}
-							return element.closest('.form-validation-unit');
-						},
-					}),
+					// message: new FormValidation.plugins.Message({
+					// 	container: function (field, element) {
+					// 		// Dropzone 필드 메시지를 특정 컨테이너에 표시
+					// 		if (dropzoneList.find((item) => item.field === field)) {
+					// 			return document.querySelector(`#${field}-dropzone-wrapper`);
+					// 		}
+					// 		return element.closest('.form-validation-unit');
+					// 	},
+					// }),
 					trigger: new FormValidation.plugins.Trigger(),
 					bootstrap5: new FormValidation.plugins.Bootstrap5({
 						// Use this for enabling/changing valid/invalid class
 						// eleInvalidClass: '',
 						eleValidClass: '',
 						rowSelector: function(field, ele) {
-							switch (field) {
-								default:
-									return '.form-validation-unit';
+							if (dropzoneFieldSet.has(field)) {
+								return `#${field}-dropzone-wrapper`;
+							}else{
+								switch (field) {
+									default:
+										return '.form-validation-unit';
+								}
 							}
 						},
 					}),
@@ -424,21 +417,24 @@ $(function () {
 					// defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
 					autoFocus: new FormValidation.plugins.AutoFocus(),
 				},
-				init: instance => {
-					instance.on('plugins.message.placed', function (e) {
-						// 중복된 fv-plugins-message-container 제거
-						const containers = e.element.closest('.form-validation-unit').querySelectorAll('.fv-plugins-message-container');
-						if (containers.length > 1) containers[1].remove();
-
-						//* Move the error message out of the `input-group` element
-						if (e.element.parentElement.classList.contains('input-group')) {
-							// `e.field`: The field name
-							// `e.messageElement`: The message element
-							// `e.element`: The field element
-							e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
-						}
-					});
-				}
+				// init: instance => {
+				// 	instance.on('plugins.message.placed', function (e) {
+				// 		// console.log('[message placed]', e.field, e.messageElement);
+				// 		const containers = e.element.closest('.form-validation-unit').querySelectorAll('.fv-plugins-message-container');
+				// 		for(let i = 0; i < containers.length - 1; i++) containers[i].remove();
+				// 		//* Move the error message out of the `input-group` element
+				// 		if (e.element.parentElement.classList.contains('input-group')) {
+				// 			// `e.field`: The field name
+				// 			// `e.messageElement`: The message element
+				// 			// `e.element`: The field element
+				// 			e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+				// 		}
+				// 	});
+				//
+				// 	instance.on('plugins.essage.displayed', function (e) {
+				// 		// console.log('[message displayed]', e.field, e.messageElement);
+				// 	});
+				// }
 			}
 		).on('plugins.message.displayed', function (event) {
 			// e.messageElement presents the error message element
@@ -547,9 +543,13 @@ function renderColumn(data, type, full, meta, column) {
 			wrap = document.createElement('button');
 			wrap.classList.add('btn', 'btn-sm', 'btn-info', 'waves-effect', 'waves-light', 'pe-3', 'ps-3');
 			break;
+        case 'checkbox':
+            wrap = document.createElement('label');
+            wrap.classList.add('d-inline-block')
+            break;
 		case 'text':
 		case 'icon':
-		case 'img':
+        case 'img':
 		default :
 			wrap = document.createElement('span');
 			wrap.classList.add('d-inline-block')
@@ -579,7 +579,14 @@ function renderColumn(data, type, full, meta, column) {
 				inner = column.text?getLocale(column.text, common.LOCALE):data;
 				break;
 			case 'button':
-				if(['popup', 'redirect', 'download'].includes(column.onclick.kind) && (data === null || data.length === 0)) return '-';
+                if(data === undefined) {
+                    console.warn(`${column.field} is not defined.`, column)
+                    return '-';
+                }else if(['popup', 'redirect', 'download'].includes(column.onclick.kind)
+                    && (data === null || data.length === 0)) {
+                    console.warn(`${column.field} onclick data is empty`, column)
+                    return '-';
+                }
 				inner = column.text?getLocale(column.text, common.LOCALE):getLocale(column.field, common.LOCALE);
 				break;
 			case 'icon':
@@ -648,22 +655,26 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 		wrap.classList.add('cursor-pointer');
 		attrs.onclick = getColumnOnclick(data, full, column);
 
-		if(!Object.hasOwn(column.onclick, 'noValue')) {
-			column.onclick.noValue = false;
-		}
-
+		if(!Object.hasOwn(column.onclick, 'noValue')) column.onclick.noValue = false;
 		if(!column.onclick.noValue && value === '') inner = '';
 
-		if(column.onclick.kind === 'bs') {
-			if(column.onclick.noValue || value !== '') {
-				if(!Object.hasOwn(column.onclick, 'attrs')) column.onclick.attrs = {};
-				if(Object.keys(column.onclick.attrs).length) {
-					Object.entries(column.onclick.attrs).map(([key, value]) => attrs[`data-bs-${key}`] = value )
-				}
-			}
-		}
-
-		if(column.onclick.kind === 'view' && column.type !== 'button') wrap.classList.add('text-primary', 'text-decoration-underline')
+        switch (column.onclick.kind) {
+            case 'bs' :
+                if(column.onclick.noValue || value !== '') {
+                    if(!Object.hasOwn(column.onclick, 'attrs')) column.onclick.attrs = {};
+                    if(Object.keys(column.onclick.attrs).length) {
+                        Object.entries(column.onclick.attrs).map(([key, value]) => attrs[`data-bs-${key}`] = value )
+                    }
+                }
+                break;
+            case 'redirect' :
+                break;
+            case 'view' :
+                if(column.type !== 'button') {
+                    wrap.classList.add('text-primary', 'text-decoration-underline')
+                }
+                break;
+        }
 	}
 
 	Object.entries(attrs).map(([key, value]) => wrap.setAttribute(key, value));
@@ -730,7 +741,7 @@ function renderButtonColumn(data, type, full, meta, column) {
 
 function getColumnOnclick(data, full, column) {
 	let onClick = '';
-	if(Object.hasOwn(column.onclick, 'onClick') || Object.hasOwn(column.onclick, 'onclick')) {
+	if(Object.hasOwn(column, 'onClick') || Object.hasOwn(column, 'onclick')) {
 		const key = Object.hasOwn(column, 'onClick')?'onClick':'onclick';
 		if(!column[key].kind) throw new Error(`getColumnOnclick : onclick kind is not defined. (${column.field})`);
 
@@ -908,22 +919,7 @@ function getListExports() {
 						: `<i class="ri-file-excel-line me-1"></i>${getLocale('Excel', common.LOCALE)}`,
 					className: 'dropdown-item',
 					action: function (e, dt, node, config) {
-						executeAjax({
-							async: false,
-							data : {
-								exportType: kind !== 'csv' ? 'xlsx' : kind,
-								filters: getFilterData('#formFilter')
-							},
-							url : getUrlWithIdentifiers(common.API_URI+'/prepareExports', {}, common.API_PARAMS),
-							headers: {
-								'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-							},
-							success: function(response, textStatus, jqXHR) {
-								const token = encodeURIComponent(response.data[0].filename);
-								const iframe = document.getElementById('downloadFrame');
-								iframe.src = common.API_URI+'/downloadExports?filename='+response.data[0].filename;
-							},
-						});
+                        prepareExports(kind, getFilterData('#formFilter'));
 					},
 				})
 				break;
@@ -1036,8 +1032,11 @@ function getListActions(btns, full, identifiers = []) {
 }
 
 function afterSelectColumnChange(idData, field, value) {
-	$.ajax({
+    executeAjax({
 		url: getUrlWithIdentifiers(common.API_URI, idData),
+        headers : {
+            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+        },
 		method: 'patch',
 		data: { [field]: value },
 		success: function (response) {
@@ -1065,8 +1064,11 @@ function openViewModal(dataId, modalId = '') {
 }
 
 function afterCheckboxColumnChange(idData, field, value) {
-	$.ajax({
+    executeAjax({
 		url: getUrlWithIdentifiers(common.API_URI, idData),
+        headers : {
+            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+        },
 		method: 'patch',
 		data: { [field]: value },
 		success: function (response) {
@@ -1074,7 +1076,7 @@ function afterCheckboxColumnChange(idData, field, value) {
 				type: 'success',
 				title: 'Complete',
 				text: 'Your Data Is Updated',
-				callback: $('.datatables-records').DataTable().ajax.reload(),
+				callback: $('.datatables-records').DataTable().ajax.reload,
 				params: [null, false]
 			});
 		},
@@ -1087,49 +1089,6 @@ function afterCheckboxColumnChange(idData, field, value) {
 	});
 }
 
-function getFilterData(selector) {
-	const filters = {
-		where : {},
-		like : [],
-		date : {
-			start_date : null,
-			end_date : null,
-			on_date : null,
-		},
-		text : {},
-	};
-
-	if($(selector).find('[name="_onloaded"]').val() === '1') {
-		filters.date.start_date = $(selector).find('[name="date[start_date]"]').val() ?? null;
-		filters.date.end_date = $(selector).find('[name="date[end_date]"]').val() ?? null;
-		filters.date.on_date = $(selector).find('[name="date[on_date]"]').val() ?? null;
-
-		$(selector).find('[name^="like"]').each(function() {
-			const match = this.name.match(/\[(.*?)\]/);
-			if(match) {
-				const key = match[1];
-				if(key === 'value') {
-					filters.like.push({
-						field: $(selector).find('[name="like[field]"]').val() ?? null,
-						value: $(selector).find('[name="like[value]"]').val() ?? null,
-					})
-				}else if(key !== 'field'){
-					filters.like.push({
-						field: key,
-						value: this.value,
-					})
-				}
-			}
-		});
-
-		$(selector).find('[name^="where"]').each(function() {
-			const match = this.name.match(/\[(.*?)\]/);
-			if (match) {
-				const key = match[1];
-				filters.where[key] = this.value;
-			}
-		});
-	}
-
-	return filters;
+function reloadDatatable(datatable) {
+    datatable.ajax.reload();
 }

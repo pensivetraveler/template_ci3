@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         return $badge;
       }
-      select2Focus(eventLabel);
+      focusSelect2(eventLabel);
       eventLabel.wrap('<div class="position-relative"></div>').select2({
         placeholder: 'Select value',
         dropdownParent: eventLabel.parent(),
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         return $avatar;
       }
-      select2Focus(eventGuests);
+      focusSelect2(eventGuests);
       eventGuests.wrap('<div class="position-relative"></div>').select2({
         placeholder: 'Select value',
         dropdownParent: eventGuests.parent(),

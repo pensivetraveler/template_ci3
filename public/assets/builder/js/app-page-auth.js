@@ -5,6 +5,7 @@ $(function() {
 	const formRecord = document.querySelector(formSelector);
 	if(formRecord === null) throw new Error(`formRecord is not exist`);
 
+    onLoadedLayout(formRecord);
 	preparePlugins(formRecord);
 	resetFrmInputs(formRecord, common.FORM_DATA);
 	readyFrmInputs(formRecord, 'add', common.FORM_DATA);
@@ -25,7 +26,7 @@ $(function() {
 					container: function (field, element) {
 						// Dropzone 필드 메시지를 특정 컨테이너에 표시
 						if (dropzoneList.find((item) => item.field === field)) {
-							return document.querySelector(`#${field}-dropzone-container`);
+							return document.querySelector(`#${field}-dropzone-wrapper`);
 						}
 						return element.closest('.form-validation-unit');
 					},
@@ -110,19 +111,28 @@ $(function() {
 		// Send the form data to back-end
 		// You need to grab the form data and create an Ajax request to send them
 		submitAjax(formSelector, {
-			success: function(response) {
-				if(response.data.aul_key) setCookie('autologin', response.data.autologin, 30);
-				if(response.data.result !== undefined) {
-					let key = Object.keys(response.data.result)[0];
-					let val = response.data.result[key];
+            success: function(response) {
+                console.log(response)
+				if(response.data !== undefined && response.data.length > 0) {
+					const data = response.data[0];
+					if(data.aul_key) setCookie('autologin', data.autologin, 30);
+					if(data.result !== undefined) {
+						let key = Object.keys(data.result)[0];
+						let val = data.result[key];
+						showAlert({
+							type: 'success',
+							html: `데이터가 조회되었습니다.<br><p class="text-danger mt-2 mb-0">(${getLocale('user.'+key, common.LOCALE)} : ${val})</p>`,
+							callback: redirect,
+							params: data.redirect_to??common.REDIRECT_URI??null,
+						})
+					}else{
+						redirect(data.redirect_to??common.REDIRECT_URI??null)
+					}
+				}else{
 					showAlert({
 						type: 'success',
-						html: `데이터가 조회되었습니다.<br><p class="text-danger mt-2 mb-0">(${getLocale('user.'+key, common.LOCALE)} : ${val})</p>`,
-						callback: redirect,
-						params: response.data.redirect_to??common.REDIRECT_URI??null,
+						html: response.msg,
 					})
-				}else{
-					redirect(response.data.redirect_to??common.REDIRECT_URI??null)
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {

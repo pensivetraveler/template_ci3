@@ -9,6 +9,7 @@ const appPlugins = {
 	},
 	view: {},
 	form: {},
+	filter: {},
 };
 
 if(!Object.hasOwn(window[appName], 'ERRORS'))
@@ -42,10 +43,10 @@ window.onload = function(){
 // 순수 JS 버전
 document.addEventListener('click', function(e) {
 	// 클릭된 요소가 a 태그이면서 target="popup"일 때
-	const el = e.target.closest('a[target="_popup"]');
-	if (!el) return;
-
-	e.preventDefault();                      // 기본 동작(새 탭/새 창 열기) 막기
-	window.open(el.href, '_blank',          // 새 팝업 창 열기
-		'width=600,height=400');    // 옵션(크기 등) 지정 가능
+	if(e.target.closest('a[target="_popup"]') !== null) {
+		e.preventDefault();                      // 기본 동작(새 탭/새 창 열기) 막기
+		const el = e.target.closest('a[target="_popup"]');
+		window.open(el.href, '_blank',          // 새 팝업 창 열기
+			'width=600,height=400');    // 옵션(크기 등) 지정 가능
+	}
 });

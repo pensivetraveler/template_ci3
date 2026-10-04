@@ -20,7 +20,10 @@ function getFormData(form = null) {
                     }
                 }
             }else {
-                formData.append(node.name, node.value);
+                // select2 - multiple 처리
+                // formData.append(node.name, node.value);
+                console.log(node.name)
+                formData.append(node.name, $(node).val());
             }
         }
     });
@@ -55,7 +58,9 @@ function checkInputSubmittable(node, form) {
             return true;
         }else if(node.type === 'checkbox') {
             if(node.checked === true) return true;
-        }else if(node.getAttribute('required') === 'required') {
+        }else if(node.type === 'radio') {
+            if(node.checked === true) return true;
+        }else if(node.hasAttribute('required')) {
             return true;
         }else if(isAttributeValueTrue(node, 'data-input-changed')) {
             return true;
@@ -233,6 +238,9 @@ function deleteData(dataId = null, callback = {}) {
 
             executeAjax({
                 url: getUrlWithIdentifiers(common.API_URI, dataId, common.API_PARAMS),
+                headers: {
+                    'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+                },
                 method: 'delete',
                 after : {
                     callback: showAlert,
@@ -276,14 +284,14 @@ function logout() {
     let result = false;
     executeAjax({
         async: false,
-        method: 'post',
         url: common.API_BASE_URI + '/auth/logout',
         headers: {
             'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
         },
+        method: 'post',
         dataType: 'json',
         success: function (response, textStatus, jqXHR) {
-            redirect(common.BASE_URI);
+            redirect(common.NO_LOGIN_REDIRECT);
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.log(jqXHR)
@@ -353,4 +361,23 @@ function getRedirectActionData(node, identifiers = []) {
 
 function getRedirectActionUrl(button, url, identifiers = []) {
     return getUrlWithIdentifiers(url, getRedirectActionData(button, identifiers));
+}
+
+function prepareExports(kind, filterData = null) {
+    executeAjax({
+        async: false,
+        data : {
+            exportType: kind !== 'csv' ? 'xlsx' : kind,
+            filters: filterData
+        },
+        url : getUrlWithIdentifiers(common.API_URI+'/prepareExports', {}, common.API_PARAMS),
+        headers: {
+            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+        },
+        success: function(response, textStatus, jqXHR) {
+            const token = encodeURIComponent(response.data[0].filename);
+            const iframe = document.getElementById('downloadFrame');
+            iframe.src = common.API_URI+'/downloadExports?filename='+response.data[0].filename;
+        },
+    });
 }

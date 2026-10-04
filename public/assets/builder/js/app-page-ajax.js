@@ -26,10 +26,8 @@ function getAjaxOptions(obj = {}) {
 			data = obj.data;
 		}
 
-		const async = obj.async === undefined?false:obj.async;
-
 		const ajaxOption = {
-			async: false,
+			async: obj.async === undefined?false:obj.async,
 			url: url,
 			method: method,
 			data: data,

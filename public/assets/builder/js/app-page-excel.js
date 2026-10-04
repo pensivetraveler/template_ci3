@@ -39,13 +39,15 @@ function getEditableColumns(tableSelector, excludeIndices = [0]) {
 }
 
 function resetExcelFile() {
-	$.ajax({
+	executeAjax({
 		url: common.API_URI + '/deleteExcelFile',
-		type: "PATCH",
+        headers : {
+            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+        },
+		method: "PATCH",
 		data: {
 			class: document.body.getAttribute('data-class'),
 		},
-		dataType: 'json',
 		success: function(response, textStatus, jqXHR) {
 			showAlert({
 				type: "success",
