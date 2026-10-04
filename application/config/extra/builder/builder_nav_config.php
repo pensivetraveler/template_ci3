@@ -23,7 +23,7 @@ $config['builder_nav_menu_base'] = [
     'subMenu' => [],
     'isSubMenu' => false,
     'isLogin' => true,
-    'isAuth' => false,
+    'isAuth' => true,
     'isSuper' => false,
     'isUse' => true,
 ];
