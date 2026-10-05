@@ -145,7 +145,6 @@ if ( ! function_exists('custom_password_verify'))
 {
     function custom_password_verify($password, $hash, $decryption = false): bool
     {
-        return true;
         if(!$decryption) return password_verify($password, $hash);
 
         $CI =& get_instance();
