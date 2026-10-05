@@ -48,6 +48,10 @@ class File extends Common
 
         $this->output->set_content_type('application/json', 'utf-8');
 
+        if (!$this->session->userdata('token')) {
+            $this->json_response(false, 'Login Needed', [], 401);
+        }
+
         $this->load->helper(['file', 'directory']);
         $this->load->library('zip');
     }
@@ -68,16 +72,16 @@ class File extends Common
         $safePath = $this->getSafePath($targetPath, true);
 
         if (!$safePath) {
-            return $this->json_response(false, '잘못된 디렉토리 경로입니다.');
+            $this->json_response(false, '잘못된 디렉토리 경로입니다.');
         }
 
         if (!is_dir($safePath)) {
-            return $this->json_response(false, '디렉토리가 존재하지 않습니다.');
+            $this->json_response(false, '디렉토리가 존재하지 않습니다.');
         }
 
         $tree = $this->scanDirectory($safePath, realpath($this->basePath));
 
-        return $this->json_response(true, 'success', [
+        $this->json_response(true, 'success', [
             'base_dir' => $dir,
             'tree' => $tree
         ]);
@@ -93,7 +97,7 @@ class File extends Common
         $path = $this->input->get('path', true);
 
         if (!$path) {
-            return $this->json_response(false, 'path 값이 없습니다.');
+            $this->json_response(false, 'path 값이 없습니다.');
         }
 
         $targetPath = $this->basePath . ltrim($path, '/');
@@ -101,26 +105,26 @@ class File extends Common
         $safePath = $this->getSafePath($targetPath, false);
 
         if (!$safePath) {
-            return $this->json_response(false, '잘못된 파일 경로입니다.');
+            $this->json_response(false, '잘못된 파일 경로입니다.');
         }
 
         if (!is_file($safePath)) {
-            return $this->json_response(false, '파일이 존재하지 않습니다.');
+            $this->json_response(false, '파일이 존재하지 않습니다.');
         }
 
         $ext = strtolower(pathinfo($safePath, PATHINFO_EXTENSION));
 
         if (!$this->isEditableExtension($ext)) {
-            return $this->json_response(false, '편집할 수 없는 파일 형식입니다.');
+            $this->json_response(false, '편집할 수 없는 파일 형식입니다.');
         }
 
         $content = file_get_contents($safePath);
 
         if ($content === false) {
-            return $this->json_response(false, '파일을 읽을 수 없습니다.');
+            $this->json_response(false, '파일을 읽을 수 없습니다.');
         }
 
-        return $this->json_response(true, 'success', [
+        $this->json_response(true, 'success', [
             'path' => $this->normalizeRelativePath($safePath),
             'filename' => basename($safePath),
             'extension' => $ext,
@@ -145,14 +149,14 @@ class File extends Common
         $data = json_decode($raw, true);
 
         if (!is_array($data)) {
-            return $this->json_response(false, '잘못된 요청 형식입니다.');
+            $this->json_response(false, '잘못된 요청 형식입니다.');
         }
 
         $path = isset($data['path']) ? trim($data['path']) : '';
         $content = isset($data['content']) ? $data['content'] : '';
 
         if (!$path) {
-            return $this->json_response(false, 'path 값이 없습니다.');
+            $this->json_response(false, 'path 값이 없습니다.');
         }
 
         $targetPath = $this->basePath . ltrim($path, '/');
@@ -164,13 +168,13 @@ class File extends Common
         $safeDir = $this->getSafePath(dirname($targetPath), true);
 
         if (!$safeDir) {
-            return $this->json_response(false, '잘못된 저장 경로입니다.');
+            $this->json_response(false, '잘못된 저장 경로입니다.');
         }
 
         $ext = strtolower(pathinfo($targetPath, PATHINFO_EXTENSION));
 
         if (!$this->isEditableExtension($ext)) {
-            return $this->json_response(false, '저장할 수 없는 파일 형식입니다.');
+            $this->json_response(false, '저장할 수 없는 파일 형식입니다.');
         }
 
         /**
@@ -180,7 +184,7 @@ class File extends Common
             json_decode($content, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return $this->json_response(false, 'JSON 문법 오류: ' . json_last_error_msg());
+                $this->json_response(false, 'JSON 문법 오류: ' . json_last_error_msg());
             }
         }
 
@@ -191,17 +195,17 @@ class File extends Common
             $backupResult = $this->backupFile($targetPath);
 
             if (!$backupResult) {
-                return $this->json_response(false, '백업 파일 생성에 실패했습니다.');
+                $this->json_response(false, '백업 파일 생성에 실패했습니다.');
             }
         }
 
         $result = file_put_contents($targetPath, $content, LOCK_EX);
 
         if ($result === false) {
-            return $this->json_response(false, '파일 저장에 실패했습니다.');
+            $this->json_response(false, '파일 저장에 실패했습니다.');
         }
 
-        return $this->json_response(true, '저장되었습니다.', [
+        $this->json_response(true, '저장되었습니다.', [
             'path' => $this->normalizeRelativePath($targetPath),
             'bytes' => $result
         ]);
@@ -217,23 +221,23 @@ class File extends Common
         $path = $this->input->get('path', true);
 
         if (!$path) {
-            return $this->json_response(false, 'path 값이 없습니다.');
+            $this->json_response(false, 'path 값이 없습니다.');
         }
 
         $targetPath = $this->basePath . ltrim($path, '/');
         $safePath = $this->getSafePath($targetPath, false);
 
         if (!$safePath || !is_file($safePath)) {
-            return $this->json_response(false, '이미지 파일이 존재하지 않습니다.');
+            $this->json_response(false, '이미지 파일이 존재하지 않습니다.');
         }
 
         $ext = strtolower(pathinfo($safePath, PATHINFO_EXTENSION));
 
         if (!$this->isImageExtension($ext)) {
-            return $this->json_response(false, '이미지 파일이 아닙니다.');
+            $this->json_response(false, '이미지 파일이 아닙니다.');
         }
 
-        return $this->json_response(true, 'success', [
+        $this->json_response(true, 'success', [
             'path' => $this->normalizeRelativePath($safePath),
             'filename' => basename($safePath),
             'extension' => $ext,
@@ -255,11 +259,11 @@ class File extends Common
         $path = $this->input->post('path', true);
 
         if (!$path) {
-            return $this->json_response(false, 'path 값이 없습니다.');
+            $this->json_response(false, 'path 값이 없습니다.');
         }
 
         if (empty($_FILES['image'])) {
-            return $this->json_response(false, '업로드된 이미지가 없습니다.');
+            $this->json_response(false, '업로드된 이미지가 없습니다.');
         }
 
         $targetPath = $this->basePath . ltrim($path, '/');
@@ -268,20 +272,20 @@ class File extends Common
         $safeDir = $this->getSafePath($targetDir, true);
 
         if (!$safeDir) {
-            return $this->json_response(false, '잘못된 저장 경로입니다.');
+            $this->json_response(false, '잘못된 저장 경로입니다.');
         }
 
         $targetExt = strtolower(pathinfo($targetPath, PATHINFO_EXTENSION));
 
         if (!$this->isImageExtension($targetExt)) {
-            return $this->json_response(false, '허용되지 않는 이미지 확장자입니다.');
+            $this->json_response(false, '허용되지 않는 이미지 확장자입니다.');
         }
 
         $uploadName = $_FILES['image']['name'];
         $uploadExt = strtolower(pathinfo($uploadName, PATHINFO_EXTENSION));
 
         if (!$this->isImageExtension($uploadExt)) {
-            return $this->json_response(false, '업로드할 수 없는 이미지 형식입니다.');
+            $this->json_response(false, '업로드할 수 없는 이미지 형식입니다.');
         }
 
         /**
@@ -291,7 +295,7 @@ class File extends Common
             $backupResult = $this->backupFile($targetPath);
 
             if (!$backupResult) {
-                return $this->json_response(false, '백업 파일 생성에 실패했습니다.');
+                $this->json_response(false, '백업 파일 생성에 실패했습니다.');
             }
         }
 
@@ -301,10 +305,10 @@ class File extends Common
         $result = move_uploaded_file($_FILES['image']['tmp_name'], $targetPath);
 
         if (!$result) {
-            return $this->json_response(false, '이미지 저장에 실패했습니다.');
+            $this->json_response(false, '이미지 저장에 실패했습니다.');
         }
 
-        return $this->json_response(true, '이미지가 저장되었습니다.', [
+        $this->json_response(true, '이미지가 저장되었습니다.', [
             'path' => $this->normalizeRelativePath($targetPath),
             'url' => base_url('templates/' . $this->normalizeRelativePath($targetPath)) . '?t=' . time()
         ]);
@@ -327,14 +331,14 @@ class File extends Common
         $data = json_decode($raw, true);
 
         if (!is_array($data)) {
-            return $this->json_response(false, '잘못된 요청 형식입니다.');
+            $this->json_response(false, '잘못된 요청 형식입니다.');
         }
 
         $path = isset($data['path']) ? trim($data['path']) : '';
         $content = isset($data['content']) ? $data['content'] : '';
 
         if (!$path) {
-            return $this->json_response(false, 'path 값이 없습니다.');
+            $this->json_response(false, 'path 값이 없습니다.');
         }
 
         $targetPath = $this->basePath . ltrim($path, '/');
@@ -343,17 +347,17 @@ class File extends Common
         $safeDir = $this->getSafePath($targetDir, true);
 
         if (!$safeDir) {
-            return $this->json_response(false, '잘못된 생성 경로입니다.');
+            $this->json_response(false, '잘못된 생성 경로입니다.');
         }
 
         if (file_exists($targetPath)) {
-            return $this->json_response(false, '이미 같은 이름의 파일이 존재합니다.');
+            $this->json_response(false, '이미 같은 이름의 파일이 존재합니다.');
         }
 
         $ext = strtolower(pathinfo($targetPath, PATHINFO_EXTENSION));
 
         if (!$this->isEditableExtension($ext) && !$this->isImageExtension($ext)) {
-            return $this->json_response(false, '생성할 수 없는 파일 형식입니다.');
+            $this->json_response(false, '생성할 수 없는 파일 형식입니다.');
         }
 
         if ($ext === 'json' && trim($content) === '') {
@@ -363,10 +367,10 @@ class File extends Common
         $result = file_put_contents($targetPath, $content, LOCK_EX);
 
         if ($result === false) {
-            return $this->json_response(false, '파일 생성에 실패했습니다.');
+            $this->json_response(false, '파일 생성에 실패했습니다.');
         }
 
-        return $this->json_response(true, '파일이 생성되었습니다.', [
+        $this->json_response(true, '파일이 생성되었습니다.', [
             'path' => $this->normalizeRelativePath($targetPath)
         ]);
     }
@@ -387,26 +391,26 @@ class File extends Common
         $data = json_decode($raw, true);
 
         if (!is_array($data)) {
-            return $this->json_response(false, '잘못된 요청 형식입니다.');
+            $this->json_response(false, '잘못된 요청 형식입니다.');
         }
 
         $path = isset($data['path']) ? trim($data['path']) : '';
 
         if (!$path) {
-            return $this->json_response(false, 'path 값이 없습니다.');
+            $this->json_response(false, 'path 값이 없습니다.');
         }
 
         $targetPath = $this->basePath . ltrim($path, '/');
         $safePath = $this->getSafePath($targetPath, false);
 
         if (!$safePath || !is_file($safePath)) {
-            return $this->json_response(false, '파일이 존재하지 않습니다.');
+            $this->json_response(false, '파일이 존재하지 않습니다.');
         }
 
         $ext = strtolower(pathinfo($safePath, PATHINFO_EXTENSION));
 
         if (!$this->isEditableExtension($ext) && !$this->isImageExtension($ext)) {
-            return $this->json_response(false, '삭제할 수 없는 파일 형식입니다.');
+            $this->json_response(false, '삭제할 수 없는 파일 형식입니다.');
         }
 
         $this->backupFile($safePath);
@@ -414,10 +418,10 @@ class File extends Common
         $result = unlink($safePath);
 
         if (!$result) {
-            return $this->json_response(false, '파일 삭제에 실패했습니다.');
+            $this->json_response(false, '파일 삭제에 실패했습니다.');
         }
 
-        return $this->json_response(true, '파일이 삭제되었습니다.');
+        $this->json_response(true, '파일이 삭제되었습니다.');
     }
 
     /**

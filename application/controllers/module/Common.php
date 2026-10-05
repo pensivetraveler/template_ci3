@@ -48,9 +48,9 @@ class Common extends MY_Controller
                 'success' => $success,
                 'message' => $message,
                 'data' => $data
-            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-
-        return;
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+            ->_display();
+        exit;
     }
 
     protected function handle_cors()
