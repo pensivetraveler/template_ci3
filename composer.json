@@ -13,6 +13,7 @@
 	"require": {
 		"php": ">=7.4",
 		"symfony/dotenv": "^5.4",
+        "ext-json": "*"
 	},
 	"suggest": {
 		"paragonie/random_compat": "Provides better randomness in PHP 5.x"
