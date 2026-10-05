@@ -1,4 +1,3 @@
-
 <?php
 /* status codes */
 $lang['status_code'][HTTP_CONTINUE] = 'HTTP_CONTINUE';
@@ -96,6 +95,7 @@ $lang['status_code'][API_NOT_EXIST] = 'API is not registered.';
 $lang['status_code'][ERROR_DOWNLOAD_NOTFILE] = 'Download file is not available.';
 $lang['status_code'][NO_REMAIN_ADMINS] = 'One Administrator should be exist at least.';
 $lang['status_code'][FILE_NOT_EXIST] = 'File does not exist';
+$lang['status_code'][METHOD_NOT_ALLOWED] = 'Method Not Allowed.';
 $lang['status_code'][DATA_ALREADY_EXIST] = 'The data already exists.';
 $lang['status_code'][COUNT_LIMIT_REACHED] = 'The data count limit has been reached.';
 $lang['status_code'][ID_ALREADY_EXIST] = 'The ID already exists.';

@@ -12,6 +12,11 @@ $lang['common'] = [
     'del_yn' => 'Delete YN',
     'use_yn' => 'Use YN',
     'year_month' => 'Year Month',
+    'thumbnail' => 'Thumbnail',
+    'ip_limit' => 'Limited IP List',
+    'preview' => 'Preview',
+    'date_range' => 'Date Range',
+    'date' => 'Date',
 ];
 
 $lang['auth'] = [
@@ -33,6 +38,7 @@ $lang['user'] = [
     'memo' => 'Memo',
     'withdraw_dt' => 'Withdraw Date',
     'user_cd' => 'User Kind',
+    'user_api_key' => 'User API Key',
 ];
 
 $lang['board'] = [
@@ -61,6 +67,7 @@ $lang['system'] = [
     'cfg_name' => 'Config Name',
     'cfg_val' => 'Config Value',
     'cfg_desc' => 'Config Desc.',
+    'cfg_type' => 'Config Type',
     'cmb_cd' => 'Code Key',
     'big_cd' => 'Category',
     'sml_cd' => 'Sub Category',
@@ -89,80 +96,33 @@ $lang['menu'] = [
     'read' => 'Read',
     'update' => 'Update',
     'delete' => 'Delete',
+    'export' => 'Export',
+    'import' => 'Import',
     'user_cd' => 'User Kind',
     'is_show' => 'Show YN',
 ];
 
 $lang['company'] = [
-    'comp_code' => 'Company Code',
-    'comp_name' => 'Company Name',
-    'comp_ceo' => 'CEO',
-    'comp_tel' => 'Tel',
-    'comp_addr' => 'Address',
-    'comp_zipcode' => 'Zipcode',
-    'comp_addr1' => 'Address',
-    'comp_addr2' => 'Detail Address',
-    'comp_memo' => 'Memo',
+    'company_id' => 'Company',
+    'company_cd' => 'Company Kind',
+    'company_code' => 'Company Code',
+    'company_name' => 'Company Name',
+    'company_ceo' => 'CEO',
+    'company_tel' => 'Tel',
+    'company_addr' => 'Address',
+    'company_zipcode' => 'Zipcode',
+    'company_addr1' => 'Address',
+    'company_addr2' => 'Detail Address',
+    'company_memo' => 'Memo',
 ];
 
-$lang['application'] = [
-    'family_name' => 'Family Name',
-    'first_name' => 'First Name',
-    'passport_number' => 'Passport Number',
-    'issuing_country' => 'Issuing Country',
-    'issuance_date' => 'Issuance Date',
-    'expiration_date' => 'Expiration Date',
-    'citizenship_country' => 'Citizenship Country',
-    'date_of_birth' => 'Date of Birth',
-    'birth_country' => 'Birth Country',
-    'other_citizenship_country' => 'Other Citizenship',
-    'email_address' => 'Email',
-    'address_line' => 'Address',
-    'address_line1' => 'State',
-    'address_line2' => 'Region',
-    'address_line3' => 'Extra Address',
-    'zipcode' => 'Zipcode',
-    'city' => 'City',
-    'contact_country' => 'State',
-    'country_code' => 'Country Tel Code',
-    'phone_number' => 'Phone Number',
-    'job_title' => 'Job Title',
-    'face_photo' => 'Face Photo',
-    'passport_photo' => 'Passport Photo',
-    'application_status' => 'App. Status',
-    'proxy_status' => 'Proxy Status',
-];
-
-$lang['order'] = [
-    'application_id' => 'Application',
-    'transaction_id' => 'Transaction ID',
-    'capture_id' => 'Capture ID',
-    'amount' => 'Amount',
-    'card_type' => 'Card Type',
-    'last_digits' => 'Last Digits',
-    'exp_date' => 'Expiration Date',
-    'exp_year' => 'Expiration Year',
-    'exp_month' => 'Expiration Month',
-    'family_name' => 'Family Name',
-    'first_name' => 'First Name',
-    'order_status' => 'Order State',
-    'error_message' => 'Error Message',
-    'refund_yn' => 'Refund YN',
-    'refund_dt' => 'Refund Date',
-];
-
-$lang['inquiry'] = [
-    'inquiry_type' => 'Inquiry Type',
-    'family_name' => 'Family Name',
-    'first_name' => 'First Name',
-    'passport_number' => 'Passport Number',
-    'emergency_email' => 'Email',
-    'message' => 'Message',
-    'reply_yn' => 'Reply YN',
-    'inquiry_status' => 'Inquiry Status',
-    'reply_message' => 'Replied',
-    'reply' => 'Reply',
-    'reply_dt' => 'Reply Date',
+$lang['category'] = [
+    'category_id' => 'Category',
+    'category_name' => 'Category Name',
+    'category_nick' => 'Category Nick',
+    'category_alias' => 'Category Alias',
+    'category_icon' => 'Category Icon',
+    'category_srt' => 'Category Sequence',
 ];
 
 $lang['country'] = [
@@ -173,7 +133,19 @@ $lang['country'] = [
     'lang_code' => 'Language Code',
 ];
 
-$lang['log'] = [
+$lang['visitor'] = [
+    'vi_ip' => 'IP Address',
+    'vi_datetime' => 'Visit Datetime',
+    'vi_referrer' => 'Referrer',
+    'vi_browser' => 'Browser',
+    'vi_device' => 'Device',
+    'vi_traffics' => 'Traffics(GB)',
+    'vi_visitors' => 'Visitors',
+    'vi_location' => 'Location',
+    'vi_hit_count' => 'Hit Count',
+];
+
+$lang['email_log'] = [
     'email_type' => 'Email Type',
     'doc_id' => 'Doc. ID',
     'email_address' => 'Email',

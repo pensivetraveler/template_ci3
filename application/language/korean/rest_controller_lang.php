@@ -2,6 +2,7 @@
 /*
  * Korean language
  */
+$lang['text_rest_empty_api_key'] = 'API Key 값이 전달되지 않았습니다.';
 $lang['text_rest_invalid_api_key'] = '유효하지 않은 API 키 : %s'; // %s is the REST API key
 $lang['text_rest_invalid_credentials'] = '잘못된 자격 증명';
 $lang['text_rest_ip_denied'] = '허용되지 않은 IP';

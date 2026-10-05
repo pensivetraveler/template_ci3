@@ -12,6 +12,11 @@ $lang['common'] = [
     'del_yn' => '삭제 여부',
     'use_yn' => '사용 여부',
     'year_month' => '연월',
+    'thumbnail' => '썸네일',
+    'ip_limit' => 'IP 접근 제한 목록',
+    'preview' => '미리보기',
+    'date_range' => '기간',
+    'date' => '날짜',
 ];
 
 $lang['auth'] = [
@@ -33,6 +38,7 @@ $lang['user'] = [
     'memo' => '메모',
     'withdraw_dt' => '탈퇴일자',
     'user_cd' => '사용자 구분',
+    'user_api_key' => '사용자 API Key',
 ];
 
 $lang['board'] = [
@@ -90,18 +96,61 @@ $lang['menu'] = [
     'read' => '조회',
     'update' => '수정',
     'delete' => '삭제',
+    'export' => 'Export',
+    'import' => 'Import',
     'user_cd' => '사용자 구분',
     'is_show' => '노출 여부',
 ];
 
 $lang['company'] = [
-    'comp_code' => '코드',
-    'comp_name' => '회사명',
-    'comp_ceo' => '대표자명',
-    'comp_tel' => '연락처',
-    'comp_addr' => '주소',
-    'comp_zipcode' => '우편번호',
-    'comp_addr1' => '주소',
-    'comp_addr2' => '상세주소',
-    'comp_memo' => '비고',
+    'company_id' => '업체',
+    'company_cd' => '구분',
+    'company_code' => '코드',
+    'company_name' => '회사명',
+    'company_ceo' => '대표자명',
+    'company_tel' => '연락처',
+    'company_addr' => '주소',
+    'company_zipcode' => '우편번호',
+    'company_addr1' => '주소',
+    'company_addr2' => '상세주소',
+    'company_memo' => '비고',
+];
+
+$lang['category'] = [
+    'category_id' => '카테고리',
+    'category_name' => '카테고리 노출명',
+    'category_nick' => '카테고리 영문명',
+    'category_alias' => '카테고리 별칭',
+    'category_icon' => '아이콘',
+    'category_srt' => '노출 순서',
+];
+
+$lang['country'] = [
+    'code' => 'ISO Code',
+    'code3' => 'ISO Code 3',
+    'country_name' => '국가 명',
+    'use_yn' => '사용 여부',
+    'lang_code' => '언어 코',
+];
+
+$lang['visitor'] = [
+    'vi_ip' => 'IP 주소',
+    'vi_datetime' => '방문 일시',
+    'vi_date' => '날짜',
+    'vi_referrer' => '레퍼럴',
+    'vi_browser' => '브라우저',
+    'vi_device' => '장치',
+    'vi_traffics' => '트래픽(GB)',
+    'vi_visitors' => '방문자(명)',
+    'vi_location' => '접속 위치',
+    'vi_hit_count' => '접속 회수',
+];
+
+
+$lang['email_log'] = [
+    'email_type' => '이메일 타입',
+    'doc_id' => '이메일 ID',
+    'email_address' => '이메일 주소',
+    'success_yn' => '발신 여부',
+    'debug_message' => '오류 메세지',
 ];

@@ -41,6 +41,7 @@ $lang['Enter The Whole YouTube Link'] = '유튜브 전체 링크를 입력하세
 $lang['Upload File Only'] = '%s 파일만 업로드하세요.';
 $lang['Store'] = '스토어';
 $lang['Download'] = '다운로드';
+$lang['Redirect'] = '이동하기';
 $lang['Uploads List'] = '%s 목록';
 $lang['Would you like to cancel the operation?'] = '작업을 취소하시겠습니까?';
 $lang['Comments'] = '댓글';
@@ -68,6 +69,10 @@ $lang['Settings'] = '설정';
 $lang['Add Record'] = '등록';
 $lang['Edit Record'] = '수정';
 $lang['Data replication has been completed'] = '데이터 복제가 완료되었습니다.';
+$lang['Drop files here or click to upload'] = '파일을 드래그하거나 클릭하여 업로드하세요.';
+$lang['No logs found'] = '기록된 로그가 없습니다.';
+$lang['No logs match the current filters'] = '검색 조건에 부합된 로그가 존재하지 않습니다.';
+$lang['No Option Available'] = '선택 가능한 옵션이 없습니다.';
 
 /**
  * system

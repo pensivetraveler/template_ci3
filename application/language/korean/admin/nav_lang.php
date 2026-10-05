@@ -6,9 +6,17 @@ $lang['nav']['View'] = '조회';
 $lang['nav']['Add'] = '등록';
 $lang['nav']['Edit'] = '수정';
 $lang['nav']['Excel'] = '일괄 등록';
+$lang['nav']['Graph'] = '그래프';
+$lang['nav']['Table'] = '테이블';
 
 $lang['nav']['Administrators'] = '관리자';
 $lang['nav']['Administrators Management'] = '관리자 관리';
+
+$lang['nav']['Categories'] = '카테고리';
+$lang['nav']['Categories Management'] = '카테고리 관리';
+
+$lang['nav']['Visitors'] = '접속자';
+$lang['nav']['Visitors Management'] = '접속자 관리';
 
 $lang['nav']['System'] = '시스템 설정';
 $lang['nav']['System Management'] = '시스템 설정';
@@ -30,3 +38,5 @@ $lang['nav']['Statistics'] = '접속 통계';
 $lang['nav']['Logs'] = '로그';
 $lang['nav']['EmailLogs'] = '이메일 로그';
 $lang['nav']['Help'] = '유지관리 요청';
+$lang['nav']['ErrorLogs'] = '에러 로그';
+$lang['nav']['UserAccess'] = '사용자 로그';

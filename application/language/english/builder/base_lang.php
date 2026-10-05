@@ -41,6 +41,7 @@ $lang['Enter The Whole YouTube Link'] = 'Enter The Whole YouTube Link';
 $lang['Upload File Only'] = 'Upload File Only';
 $lang['Store'] = 'Store';
 $lang['Download'] = 'Download';
+$lang['Redirect'] = 'Redirect';
 $lang['Uploads List'] = 'Uploads List';
 $lang['Would you like to cancel the operation?'] = 'Would you like to cancel the operation?';
 $lang['Comments'] = 'Comments';
@@ -68,6 +69,10 @@ $lang['Settings'] = 'Settings';
 $lang['Add Record'] = 'New Record';
 $lang['Edit Record'] = 'Edit Record';
 $lang['Data replication has been completed'] = 'Data replication has been completed.';
+$lang['Drop files here or click to upload'] = 'Drop files here or click to upload.';
+$lang['No logs found'] = 'No logs found.';
+$lang['No logs match the current filters'] = 'No logs match the current filters.';
+$lang['No Option Available'] = 'No options available.';
 
 /**
  * system
