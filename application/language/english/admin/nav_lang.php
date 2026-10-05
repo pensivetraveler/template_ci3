@@ -12,6 +12,12 @@ $lang['nav']['Table'] = 'Table';
 $lang['nav']['Administrators'] = 'Administrators';
 $lang['nav']['Administrators Management'] = 'Administrators Management';
 
+$lang['nav']['Partners'] = 'Partners';
+$lang['nav']['Partners Management'] = 'Partners Management';
+
+$lang['nav']['Partner Auth'] = 'Partners Menu Auth';
+$lang['nav']['Partner Auth Management'] = 'Partners Menu Auth';
+
 $lang['nav']['Categories'] = 'Categories';
 $lang['nav']['Categories Management'] = 'Categories Management';
 
