@@ -29,11 +29,13 @@ class MY_Hooks
         define("COMP_NAME", getenv('COMP_NAME'));
         define("COMP_NAME_KR", getenv('COMP_NAME_KR'));
         define("COMP_URL", getenv('COMP_URL'));
+        define("PASSWORD_DECRYPTABLE", filter_var(getenv('PASSWORD_DECRYPTABLE'), FILTER_VALIDATE_BOOLEAN));
+        define("SYSTEM_INSPECTION", filter_var(getenv('SYSTEM_INSPECTION'), FILTER_VALIDATE_BOOLEAN));
     }
 
     public function systemOfInspection()
     {
-        if(getenv('SYSTEM_INSPECTION') === 'true') {
+        if(SYSTEM_INSPECTION) {
             $allowedIps = json_decode(getenv('ALLOWED_IPS'));
             if(!in_array($_SERVER['REMOTE_ADDR'], $allowedIps)) {
                 builder_misc_view('');
