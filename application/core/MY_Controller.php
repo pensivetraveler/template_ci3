@@ -15,7 +15,6 @@ class MY_Controller extends CI_Controller
             'driver' => 'openssl',
             'cipher' => 'aes-256',
             'mode' => 'ctr',
-            'key' => getenv('APP_NAME')
         ));
 
         $this->devMode = ENVIRONMENT !== 'production';

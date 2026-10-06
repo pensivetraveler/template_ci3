@@ -31,6 +31,16 @@ class MY_Hooks
         define("COMP_URL", getenv('COMP_URL'));
         define("PASSWORD_DECRYPTABLE", filter_var(getenv('PASSWORD_DECRYPTABLE'), FILTER_VALIDATE_BOOLEAN));
         define("SYSTEM_INSPECTION", filter_var(getenv('SYSTEM_INSPECTION'), FILTER_VALIDATE_BOOLEAN));
+
+        // encryption key 변경
+        $key = APP_NAME;
+        if ($key === false || $key === '') {
+            show_error('ENCRYPTION_KEY is not set in .env');
+        }
+        if (strpos($key, 'hex:') === 0) {
+            $key = hex2bin(substr($key, 4));
+        }
+        $this->config['encryption_key'] = $key;
     }
 
     public function systemOfInspection()
