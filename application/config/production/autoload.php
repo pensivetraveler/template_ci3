@@ -89,7 +89,8 @@ $autoload['drivers'] = array('cache');
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = array('string', 'array', 'url', 'file', 'function', 'cookie', 'inflector', 'directory', 'path', 'download', 'language', 'model', 'format', 'date', 'common', 'env', 'log');
+$autoload['helper'] = array('string', 'array', 'url', 'file', 'function', 'cookie', 'inflector',
+    'directory', 'path', 'download', 'language', 'model', 'format', 'date', 'common', 'env', 'log', 'encryption');
 
 /*
 | -------------------------------------------------------------------
@@ -134,4 +135,5 @@ $autoload['language'] = array('common');
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-$autoload['model'] = array('Model_Common', 'Model_User', 'Model_File', 'Model_User_Token', 'Model_User_Autologin', 'Model_Sys_Cfg', 'Model_Sys_Code', 'Model_Menu', 'Model_Menu_Auth');
+$autoload['model'] = array('Model_Common', 'Model_User', 'Model_File', 'Model_User_Token', 'Model_User_Autologin',
+    'Model_Sys_Cfg', 'Model_Sys_Code', 'Model_Menu', 'Model_Menu_Auth');
