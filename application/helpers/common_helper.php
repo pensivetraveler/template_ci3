@@ -188,42 +188,6 @@ if ( ! function_exists('get_time_text'))
     }
 }
 
-if ( ! function_exists('get_starred_id'))
-{
-    function get_starred_id($id) {
-        $len = strlen($id);
-        $res = substr($id, 0, 2);
-        $res .= substr($id, 2, min($len-2,3));
-        if(strlen($id) > 5) {
-            $res .= substr($id, 5);
-        }
-        return $res;
-    }
-}
-
-if ( ! function_exists('get_starred_password'))
-{
-    function get_starred_password($password) {
-        $len = strlen($password);
-        $res = substr($password, 0, 2);
-        $res .= substr($password, 2, min($len-2,5));
-        if(strlen($password) > 7) {
-            $res .= substr($password, 7);
-        }
-        return $res;
-    }
-}
-
-if ( ! function_exists('guidV4'))
-{
-    function guidV4(): string {
-        $data = random_bytes(16);
-        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
-        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-    }
-}
-
 if ( ! function_exists('str_contains'))
 {
     function str_contains($haystack, $needle) {

@@ -141,29 +141,13 @@ if ( ! function_exists('replace_field_id_index'))
     }
 }
 
-if ( ! function_exists('custom_password_verify'))
-{
-    function custom_password_verify($password, $hash, $decryption = false): bool
-    {
-        if(!$decryption) return password_verify($password, $hash);
-
-        $CI =& get_instance();
-        return $CI->encryption->decrypt($password) === $hash;
-    }
-
-}
-
 if ( ! function_exists('get_starred_id'))
 {
     function get_starred_id($id): string
     {
-        $len = strlen($id);
-        $res = substr($id, 0, 2);
-        $res .= substr($id, 2, min($len-2,3));
-        if(strlen($id) > 5) {
-            $res .= substr($id, 5);
-        }
-        return $res;
+        $len = mb_strlen($id);
+        if ($len <= 2) return str_repeat('*', $len);
+        return mb_substr($id, 0, 2) . str_repeat('*', $len - 2);
     }
 }
 
@@ -171,13 +155,9 @@ if ( ! function_exists('get_starred_password'))
 {
     function get_starred_password($password): string
     {
-        $len = strlen($password);
-        $res = substr($password, 0, 2);
-        $res .= substr($password, 2, min($len-2,5));
-        if(strlen($password) > 7) {
-            $res .= substr($password, 7);
-        }
-        return $res;
+        $len = mb_strlen($password);
+        if ($len <= 2) return str_repeat('*', $len);
+        return mb_substr($password, 0, 2) . str_repeat('*', $len - 2);
     }
 }
 
