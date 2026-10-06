@@ -5,15 +5,15 @@ require_once __DIR__.'/Common.php';
 
 class Auth extends Common
 {
-	function __construct()
-	{
-		parent::__construct();
+    function __construct()
+    {
+        parent::__construct();
 
-		$this->load->model('Model_User', 'Model');
+        $this->load->model('Model_User', 'Model');
 
-		$this->setProperties($this->Model, false);
+        $this->setProperties($this->Model, false);
 
-		$this->noIndexMethod = true;
+        $this->noIndexMethod = true;
 
         // 공개 API: key 필요 없음, 로그도 생략
         $this->methods['dupCheck_get'] = [
@@ -59,91 +59,92 @@ class Auth extends Common
     }
 
     public function dupCheck_get()
-	{
-		$key = $this->input->get('key');
-		$value = $this->input->get('value');
-		if(!$key || !$value){
-			$this->response([
-				'code' => EMPTY_REQUIRED_DATA,
-				'data' => $this->input->get(),
-			]);
-		}else{
-			$count = $this->Model->getCntWhere([$key => $value]);
-			if($count) {
-				$this->response([
-					'code' => DATA_ALREADY_EXIST,
-				]);
-			}else{
-				$this->response([
-					'code' => DATA_AVAILABLE,
-				]);
-			}
-		}
-	}
+    {
+        $key = $this->input->get('key');
+        $value = $this->input->get('value');
+        if(!$key || !$value){
+            $this->response([
+                'code' => EMPTY_REQUIRED_DATA,
+                'data' => $this->input->get(),
+            ]);
+        }else{
+            $count = $this->Model->getCntWhere([$key => $value]);
+            if($count) {
+                $this->response([
+                    'code' => DATA_ALREADY_EXIST,
+                ]);
+            }else{
+                $this->response([
+                    'code' => DATA_AVAILABLE,
+                ]);
+            }
+        }
+    }
 
-	public function idCheck_get()
-	{
-		$id = $this->input->get('id');
-		if(!$id){
-			$this->response([
-				'code' => EMPTY_REQUIRED_DATA,
-			]);
-		}else{
-			$count = $this->Model->getCntWhere(['id' => $id]);
-			if($count) {
-				$this->response([
-					'code' => ID_ALREADY_EXIST,
-				]);
-			}else{
-				$this->response([
-					'code' => ID_IS_AVAILABLE,
-				]);
-			}
-		}
-	}
+    public function idCheck_get()
+    {
+        $id = $this->input->get('id');
+        if(!$id){
+            $this->response([
+                'code' => EMPTY_REQUIRED_DATA,
+            ]);
+        }else{
+            $count = $this->Model->getCntWhere(['id' => $id]);
+            if($count) {
+                $this->response([
+                    'code' => ID_ALREADY_EXIST,
+                ]);
+            }else{
+                $this->response([
+                    'code' => ID_IS_AVAILABLE,
+                ]);
+            }
+        }
+    }
 
-	public function emailCheck_get()
-	{
-		$email = $this->input->get('email');
-		if(!$email){
-			$this->response([
-				'code' => EMPTY_REQUIRED_DATA,
-			]);
-		}else{
-			$count = $this->Model->getCntWhere(['email' => $email]);
-			if($count) {
-				$this->response([
-					'code' => EMAIL_ALREADY_EXIST,
-				]);
-			}else{
-				$this->response([
-					'code' => EMAIL_IS_AVAILABLE,
-				]);
-			}
-		}
-	}
+    public function emailCheck_get()
+    {
+        $email = $this->input->get('email');
+        if(!$email){
+            $this->response([
+                'code' => EMPTY_REQUIRED_DATA,
+            ]);
+        }else{
+            $count = $this->Model->getCntWhere(['email' => $email]);
+            if($count) {
+                $this->response([
+                    'code' => EMAIL_ALREADY_EXIST,
+                ]);
+            }else{
+                $this->response([
+                    'code' => EMAIL_IS_AVAILABLE,
+                ]);
+            }
+        }
+    }
 
-	public function login_post()
-	{
-		$this->validateFormRules('form_login_config');
+    public function login_post()
+    {
+        $this->validateFormRules('form_login_config');
 
-		$params = [
-			'id' => $this->input->post('id'),
-		];
-		if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
+        $params = [
+            'id' => $this->input->post('id'),
+        ];
+        if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
 
-		$password = $this->input->post('password');
+        $password = $this->input->post('password');
 
-		$count = $this->Model->getCntWhere($params);
-		if(!$count) $this->response(['code' => USER_NOT_EXIST,]);
+        $count = $this->Model->getCntWhere($params);
+        if(!$count) $this->response(['code' => USER_NOT_EXIST,]);
 
-		$userData = $this->Model->getDataWhere([], $params);
-		if($userData->withdraw_yn === 'Y') $this->response(['code' => WITHDRWAN_USER]);
+        $userData = $this->Model->getDataWhere([], $params);
+        if($userData->withdraw_yn === 'Y') $this->response(['code' => WITHDRWAN_USER]);
 
-		if(!custom_password_verify($userData->password, $password, true)) $this->response(['code' => PASSWORD_IS_NOT_MATCHED, 'data' => []]);
+        if(!custom_password_verify($password, $userData->password, PASSWORD_DECRYPTABLE))
+            $this->response(['code' => PASSWORD_IS_NOT_MATCHED, 'data' => []]);
 
-		if ($this->input->post('autologin')) {
-			$vericode = array('$', '/', '.');
+        if ($this->input->post('autologin')) {
+            $vericode = array('$', '/', '.');
 
             $hash = str_replace(
                 $vericode,
@@ -167,156 +168,169 @@ class Auth extends Common
             $cookie_value = $hash;
 
             set_cookie('autologin', $cookie_value, 2592000); // 30일간 저장
-		}
+        }
 
         $this->session->set_userdata([
             'name' => $userData->name,
             'id' => $userData->id,
-			'user_id' => $userData->user_id,
+            'user_id' => $userData->user_id,
             'user_cd' => $userData->user_cd,
-			'is_sys_admin' => in_array($userData->user_cd, ['USR000']),
-			'is_admin' => in_array($userData->user_cd, ['USR000', 'USR001', 'USR002']),
+            'is_sys_admin' => in_array($userData->user_cd, ['USR000']),
+            'is_admin' => in_array($userData->user_cd, ['USR000', 'USR001', 'USR002']),
             'token' => $this->setToken([
                 'user_id' => $userData->user_id,
             ]),
-		]);
+        ]);
 
         $this->loggingUserlog();
 
-		$this->response([
-			'code' => DATA_AVAILABLE,
-			'data' => [
-				'aul_key' => $cookie_value ?? '',
-			],
-		]);
-	}
+        $this->response([
+            'code' => DATA_AVAILABLE,
+            'data' => [
+                'aul_key' => $cookie_value ?? '',
+            ],
+        ]);
+    }
 
-	public function signup_post()
-	{
-		$this->validateFormRules('form_signup_config');
+    public function signup_post()
+    {
+        $this->validateFormRules('form_signup_config');
 
-		$this->defaultList = [
-			'user_id' => '',
-			'student_id' => '',
-			'approve_yn' => 'N',
-			'withdraw_yn' => 'N',
-			'del_yn' => 'N',
-		];
+        $this->defaultList = [
+            'user_id' => '',
+            'student_id' => '',
+            'approve_yn' => 'N',
+            'withdraw_yn' => 'N',
+            'del_yn' => 'N',
+        ];
 
-		$dto = $this->beforePost(0, $this->Model);
-		$dtoChild = $this->beforePost(0, $this->Model_Child);
-		$dtoChild[$this->Model->identifier] = $this->Model->addData($dto, false);
-		$dtoChild[$this->Model_Child->identifier] = $this->Model_Child->addData($dtoChild, false);
-		$dto = array_merge($dto, $dtoChild);
+        $dto = $this->beforePost(0, $this->Model);
+        $dtoChild = $this->beforePost(0, $this->Model_Child);
+        $dtoChild[$this->Model->identifier] = $this->Model->addData($dto, false);
+        $dtoChild[$this->Model_Child->identifier] = $this->Model_Child->addData($dtoChild, false);
+        $dto = array_merge($dto, $dtoChild);
 
         $this->loggingUserlog();
 
-		$this->response([
-			'code' => DATA_CREATED,
-			'data' => [
-				$this->Model_Child->identifier => $dto[$this->Model_Child->identifier],
-			],
-		], RestController::HTTP_CREATED);
-	}
+        $this->response([
+            'code' => DATA_CREATED,
+            'data' => [
+                $this->Model_Child->identifier => $dto[$this->Model_Child->identifier],
+            ],
+        ], RestController::HTTP_CREATED);
+    }
 
-	public function findId_post()
-	{
-		$this->validateFormRules('form_find_id_config');
+    public function findId_post()
+    {
+        $this->validateFormRules('form_find_id_config');
 
-		$params = [
-			'email' => $this->input->post('email'),
-			'tel' => $this->input->post('tel'),
-		];
-		if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
+        $params = [
+            'email' => $this->input->post('email'),
+            'tel' => $this->input->post('tel'),
+        ];
+        if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
 
-		$count = $this->Model->getCntWhere($params);
+        $count = $this->Model->getCntWhere($params);
 
-		if(!$count) {
-			$this->response(['code' => USER_NOT_EXIST,]);
-		}else{
-			$this->response([
-				'code' => DATA_RETRIEVED,
-				'data' => [
-					'result' => [
-						'id' => getStarredId($this->Model->getDataWhere(['id'], $params)),
-					],
-					'redirect_to' => '',
-				],
-			]);
-		}
-	}
+        if(!$count) {
+            $this->response(['code' => USER_NOT_EXIST,]);
+        }else{
+            $id = $this->Model->getDataWhere(['id'], $params);
 
-	public function findPassword_post()
-	{
-		$this->validateFormRules('form_find_id_config');
+            $this->response([
+                'code' => DATA_RETRIEVED,
+                'data' => [
+                    'result' => [
+                        'id' => get_starred_id($id),
+                    ],
+                    'redirect_to' => '',
+                ],
+            ]);
+        }
+    }
 
-		$params = [
-			'id' => $this->input->post('id'),
-			'email' => $this->input->post('email'),
-			'tel' => $this->input->post('tel'),
-		];
-		if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
+    public function findPassword_post()
+    {
+        $this->validateFormRules('form_find_id_config');
 
-		$count = $this->Model->getCntWhere($params);
+        $params = [
+            'id' => $this->input->post('id'),
+            'email' => $this->input->post('email'),
+            'tel' => $this->input->post('tel'),
+        ];
+        if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
 
-		if(!$count) {
-			$this->response(['code' => USER_NOT_EXIST,]);
-		}else{
-			$password = $this->Model->getDataWhere(['password'], ['where' => $params]);
-			$password = $this->encryption->decrypt($password);
+        $count = $this->Model->getCntWhere($params);
 
-			$this->response([
-				'code' => DATA_RETRIEVED,
-				'data' => [
-					'result' => [
-						'password' => getStarredPassword($password),
-					],
-					'redirect_to' => '',
-				],
-			]);
-		}
-	}
+        if(!$count) {
+            $this->response(['code' => USER_NOT_EXIST,]);
+        }else{
+            if(PASSWORD_DECRYPTABLE) {
+                $stored = $this->Model->getDataWhere(['password'], $params);
+                $password = $this->encryption->decrypt($stored);
 
-	public function withdraw_post()
-	{
-		$this->Model->modData([
-			'withdraw_yn' => 'Y',
-			'withdraw_dt' => date('Y-m-d'),
-		], [
-			'user_id' => $this->session->userdata('user_id'),
-		]);
+                $this->response([
+                    'code' => DATA_RETRIEVED,
+                    'data' => [
+                        'result' => [
+                            'password' => get_starred_password($password),
+                        ],
+                        'redirect_to' => '',
+                    ],
+                ]);
+            }else{
+                // 이메일 활성되어있다면 이메일로 발송
+                // TODO email check and send email
 
-		$this->Model_User_Autologin->delData([
-			'user_id' => $this->session->userdata('user_id'),
-		]);
+                // 관리자에게 문의해달라고 팝업
+                $this->response([
+                    'code' => BAD_REQUEST,
+                    'msg' => '관리자에게 문의해주세요.',
+                ]);
+            }
+        }
+    }
+
+    public function withdraw_post()
+    {
+        $this->Model->modData([
+            'withdraw_yn' => 'Y',
+            'withdraw_dt' => date('Y-m-d'),
+        ], [
+            'user_id' => $this->session->userdata('user_id'),
+        ]);
+
+        $this->Model_User_Autologin->delData([
+            'user_id' => $this->session->userdata('user_id'),
+        ]);
 
         $this->destroyUserData();
 
-		$this->response([
-			'code' => DATA_PROCESSED,
-		]);
-	}
+        $this->response([
+            'code' => DATA_PROCESSED,
+        ]);
+    }
 
-	public function passwordCheck_post()
-	{
-		$params = [
-			'password' => $this->input->post('password'),
-		];
+    public function passwordCheck_post()
+    {
+        $params = [
+            'password' => $this->input->post('password'),
+        ];
 
-		$userData = $this->Model->getData([], [
-			'where' => ['user_id' => $this->session->userdata('user_id'),]
-		]);
+        $userData = $this->Model->getData([], [
+            'where' => ['user_id' => $this->session->userdata('user_id'),]
+        ]);
 
-		if(!custom_password_verify($userData->password, $params['password'], true)){
+        if(!custom_password_verify($params['password'], $userData->password, PASSWORD_DECRYPTABLE)){
             $this->response([
                 'code' => PASSWORD_IS_NOT_MATCHED,
             ]);
         }
 
-		$this->response([
-			'code' => DATA_PROCESSED,
-		]);
-	}
+        $this->response([
+            'code' => DATA_PROCESSED,
+        ]);
+    }
 
     public function logout_post()
     {

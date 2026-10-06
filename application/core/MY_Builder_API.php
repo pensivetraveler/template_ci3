@@ -375,7 +375,7 @@ class MY_Builder_API extends MY_Controller_API
                     break;
                 case 'password' :
                     if($value) {
-                        $data[$field] = $this->encryption->encrypt($value);
+                        $data[$field] = create_hash($value);
                     }else{
                         unset($data[$field]);
                     }

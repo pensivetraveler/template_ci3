@@ -26,14 +26,20 @@ class Setup extends Common
             ]);
         }else{
             $columns = $this->getSystemUserColumn();
+
             $set = array_merge([
                 USER_CD_COLUMN_NAME => 'USR000',
             ], array_intersect_key($this->input->post(), array_flip($columns)));
+
             if(array_key_exists('password', $set))
-                $set['password'] = $this->encryption->encrypt($this->input->post('password'));
+                $set['password'] = PASSWORD_DECRYPTABLE
+                    ? $this->encryption->encrypt($this->input->post('password'))
+                    : create_hash($this->input->post('password'));
 
             $redirectTo = base_url();
-            if($this->input->post('redirect_to')) $redirectTo = base_url($this->input->post('redirect_to'));
+
+            if($this->input->post('redirect_to'))
+                $redirectTo = base_url($this->input->post('redirect_to'));
 
             $this->Model_User->addData($set);
 
