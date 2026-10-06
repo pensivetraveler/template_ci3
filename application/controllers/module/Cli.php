@@ -14,10 +14,6 @@ class Cli extends Common
 
     public function clear_expired_geoip_cache()
     {
-        if (!$this->input->is_cli_request()) {
-            show_404();
-        }
-
         $this->load->model('Model_Geoip_Cache');
 
         $this->Model_Geoip_Cache->delete_expired();

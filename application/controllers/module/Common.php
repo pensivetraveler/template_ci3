@@ -16,7 +16,7 @@ class Common extends MY_Controller
     {
         $valid = false;
 
-        foreach (['cli', 'ajax', 'page'] as $way) {
+        foreach (['cli', 'ajax', 'web'] as $way) {
             if($valid) continue;
             if(!in_array($way, $this->accessWays)) continue;
             switch($way) {
@@ -31,7 +31,7 @@ class Common extends MY_Controller
                     $is_ajax = is_ajax();
                     $valid = $is_ajax||$is_beacon;
                     break;
-                case 'page':
+                case 'web':
                     $valid = is_web();
                     break;
             }
