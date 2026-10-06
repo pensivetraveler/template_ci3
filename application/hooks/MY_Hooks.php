@@ -33,7 +33,7 @@ class MY_Hooks
         define("SYSTEM_INSPECTION", filter_var(getenv('SYSTEM_INSPECTION'), FILTER_VALIDATE_BOOLEAN));
 
         // encryption key 변경
-        $key = APP_NAME;
+        $key = getenv('ENCRYPTION_KEY');
         if ($key === false || $key === '') {
             show_error('ENCRYPTION_KEY is not set in .env');
         }
