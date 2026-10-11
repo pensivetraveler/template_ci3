@@ -31,7 +31,6 @@
 				if(!is_empty($item, 'group') && $item['group'] !== 'base'):
 					builder_view("{$platformName}/layout/form_{$formSubType}_group_".$item['view'], ['item' => $item]);
 				elseif($item['type'] === 'custom'):
-					echo "{$platformName}/layout/form_{$formSubType}_custom_".$item['view'];exit;
 					builder_view("{$platformName}/layout/form_{$formSubType}_custom_".$item['view'], ['item' => $item]);
 				else:
 ?>
@@ -40,12 +39,14 @@
     <div class="col-sm-10">
         <div class="input-group input-group-merge">
             <?php
-            echo get_admin_form_ico($item);
-            echo get_page_form_input_by_type($item, 'page');
+				echo get_admin_form_ico($item);
+				echo get_page_form_input_by_type($item, 'page');
             ?>
         </div>
-        <?=get_admin_form_text($item)?>
-        <?=get_admin_form_list_item($item, $formSubType)?>
+		<?php
+				echo get_admin_form_text($item);
+				echo get_admin_form_list_item($item, $formSubType);
+		?>
     </div>
 </div>
 <?php
@@ -79,8 +80,10 @@
 				echo get_page_form_input_by_type($item, 'page');
 			?>
 		</div>
-		<?=get_admin_form_text($item)?>
-		<?=get_admin_form_list_item($item, $formSubType)?>
+		<?php
+				echo get_admin_form_text($item);
+				echo get_admin_form_list_item($item, $formSubType);
+		?>
 	</div>
 	<?php
 			endif;
