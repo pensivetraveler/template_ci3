@@ -34,7 +34,7 @@
                     data-bs-toggle="tab"
                     data-bs-target="#navs-pills-justified-home"
                     aria-controls="navs-pills-justified-home"
-                    aria-selected="true">
+                    aria-selected="false">
                     <i class="tf-icons ri-home-smile-line me-2"></i> 기본
                 </button>
             </li>
@@ -44,8 +44,8 @@
                     class="nav-link"
                     role="tab"
                     data-bs-toggle="tab"
-                    data-bs-target="#navs-pills-justified-profile"
-                    aria-controls="navs-pills-justified-profile"
+                    data-bs-target="#navs-pills-justified-banner"
+                    aria-controls="navs-pills-justified-banner"
                     aria-selected="false">
 					<i class="tf-icons ri-image-line me-2"></i> 배너관리
                 </button>
@@ -56,31 +56,50 @@
                     class="nav-link"
                     role="tab"
                     data-bs-toggle="tab"
-                    data-bs-target="#navs-pills-justified-messages"
-                    aria-controls="navs-pills-justified-messages"
+                    data-bs-target="#navs-pills-justified-style"
+                    aria-controls="navs-pills-justified-style"
                     aria-selected="false">
 					<i class="tf-icons ri-paint-brush-line me-2"></i> 색상 및 폰트
                 </button>
             </li>
+            <li class="nav-item">
+                <button
+                    type="button"
+                    class="nav-link"
+                    role="tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#navs-pills-justified-features"
+                    aria-controls="navs-pills-justified-features"
+                    aria-selected="false">
+					<i class="tf-icons ri-equalizer-line me-2"></i> 기능
+                </button>
+            </li>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="navs-pills-justified-home" role="tabpanel">
+            <div class="tab-pane show active" id="navs-pills-justified-home" role="tabpanel">
                 <?php builder_view("{$platformName}/layout/form_inputs", [
                     'formData' => $formData['fields'][0],
                     'formType' => $formType,
                     'formSubType' => $formSubType,
                 ]); ?>
             </div>
-            <div class="tab-pane fade" id="navs-pills-justified-profile" role="tabpanel">
+            <div class="tab-pane fade" id="navs-pills-justified-banner" role="tabpanel">
 				<?php builder_view("{$platformName}/layout/form_inputs", [
 						'formData' => $formData['fields'][1],
 						'formType' => $formType,
 						'formSubType' => $formSubType,
 				]); ?>
             </div>
-            <div class="tab-pane fade" id="navs-pills-justified-messages" role="tabpanel">
+            <div class="tab-pane fade" id="navs-pills-justified-style" role="tabpanel">
 				<?php builder_view("{$platformName}/layout/form_inputs", [
 						'formData' => $formData['fields'][2],
+						'formType' => $formType,
+						'formSubType' => $formSubType,
+				]); ?>
+            </div>
+            <div class="tab-pane fade" id="navs-pills-justified-features" role="tabpanel">
+				<?php builder_view("{$platformName}/layout/form_inputs", [
+						'formData' => $formData['fields'][3],
 						'formType' => $formType,
 						'formSubType' => $formSubType,
 				]); ?>
