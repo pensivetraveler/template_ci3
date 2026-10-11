@@ -164,6 +164,17 @@ function getSwalOption(obj) {
             obj.type = 'warning';
             if(title === undefined) title = 'Warning!';
             if(text === undefined) text = getLocale('Are you sure you want to do this?', common.LOCALE);
+            obj = Object.assign(obj, {
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: getLocale('Yes', common.LOCALE),
+                cancelButtonText: getLocale('No', common.LOCALE),
+                customClass: {
+                    confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+                    cancelButton: 'btn btn-outline-secondary waves-effect'
+                },
+                buttonsStyling: false
+            });
             break;
         case 'success' :
             if(title === undefined) title = 'Success!';
@@ -627,8 +638,8 @@ function initSelectpicker(scope) {
                 $select
                     .off('changed.bs.select.formSelectpicker')
                     .on('changed.bs.select.formSelectpicker', () => {
-                    window[changeAfter.callback](this, changeAfter.params??{})
-                });
+                        window[changeAfter.callback](this, changeAfter.params??{})
+                    });
             }
         }
 
