@@ -249,3 +249,18 @@ if ( ! function_usable('search_item'))
             : null;
     }
 }
+
+if ( ! function_usable('recursive_ksort')) {
+    function recursive_ksort(array &$array): void
+    {
+        ksort($array);
+
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                recursive_ksort($value);
+            }
+        }
+
+        unset($value);
+    }
+}
