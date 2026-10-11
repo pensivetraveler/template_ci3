@@ -22,7 +22,6 @@ function getFormData(form = null) {
             }else {
                 // select2 - multiple 처리
                 // formData.append(node.name, node.value);
-                console.log(node.name)
                 formData.append(node.name, $(node).val());
             }
         }
@@ -56,10 +55,6 @@ function checkInputSubmittable(node, form) {
             return true;
         }else if(node.type === 'hidden') {
             return true;
-        }else if(node.type === 'checkbox') {
-            if(node.checked === true) return true;
-        }else if(node.type === 'radio') {
-            if(node.checked === true) return true;
         }else if(node.hasAttribute('required')) {
             return true;
         }else if(isAttributeValueTrue(node, 'data-input-changed')) {
@@ -67,6 +62,10 @@ function checkInputSubmittable(node, form) {
         }else if(node.hasAttribute('required-mod')) {
             const requireMod = node.getAttribute('required-mod').split('|');
             if (requireMod.includes(form['_mode'].value)) return true;
+        }else if(node.type === 'checkbox') {
+            if(node.checked === true) return true;
+        }else if(node.type === 'radio') {
+            if (node.checked === true) return true;
         }
     }
     return false;
