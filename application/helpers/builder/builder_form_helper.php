@@ -160,7 +160,13 @@ function get_admin_form_text($data, $add_class = array(), $attributes = array())
         $line = '';
         $default['class'][] = 'd-none';
     }else{
-        $line = $ci->lang->line(is_array($text)?$text:'form_text.'.$text);
+        if($ci->lang->line_exists($text)) {
+            $line = $ci->lang->line($text);
+        }elseif($ci->lang->line_exists('form_text.'.$text)) {
+            $line = $ci->lang->line('form_text.'.$text);
+        }else{
+            $line = $text;
+        }
         $icon = $text['icon'] ?? '';
         if($icon) $line = get_icon($icon, false, $text['icon_size'] ?? '', '.ms-1.align-middle').convert_selector_to_html('span.mx-1.align-middle', true, $line);
     }
@@ -581,7 +587,8 @@ function restructure_admin_form_data($form_data, $form_type = 'side', $form_sub_
     // attributes 처리
     $form_data = array_map(function($item) use($form_type, $form_sub_type) {
         unset($item['list_attributes']);
-        if($item['type'] !== 'common') $item = get_admin_form_attributes($item, $form_type, $form_sub_type);
+        if($item['type'] !== 'common')
+            $item = get_admin_form_attributes($item, $form_type, $form_sub_type);
         return $item;
     }, $form_data);
 
@@ -864,6 +871,9 @@ function reformat_form_data_by_type($form_data, $form_type = 'side', $form_sub_t
         $tab_indexes = array_column($fields, 'tab_index');
         for($i = min($tab_indexes); $i <= max($tab_indexes); $i++) {
             $tab_fields = array_values(array_filter($fields, function($item) use ($i) {
+                if(!array_key_exists('tab_index', $item)) {
+                    print_data($item);
+                }
                 return $item['tab_index'] === $i;
             }));
             $data['fields'][$i] = set_form_field_data($tab_fields, $form_sub_type);
