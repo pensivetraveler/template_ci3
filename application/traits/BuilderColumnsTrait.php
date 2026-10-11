@@ -53,13 +53,16 @@ trait BuilderColumnsTrait
 
     protected function setFormColumn($item)
     {
-        if(isset($item['type']) && $item['type'] === 'common') return $item;
-
         $item = array_merge(
             $this->config->get("builder_form_base", []),
-            ['label' => 'lang:'.$this->router->class.'.'.$item['field']],
             $item
         );
+
+        if(isset($item['type']) && $item['type'] === 'common') return $item;
+
+        if(!array_key_exists('label', $item)) {
+            $item['label'] = 'lang:'.$this->router->class.'.'.$item['field'];
+        }
 
         if(sscanf($item['label'], 'lang:%s', $line) === 1)
             $item['label'] = $line;
