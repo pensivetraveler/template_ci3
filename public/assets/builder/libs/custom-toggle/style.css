@@ -1,6 +1,7 @@
 .custom-toggle-wrapper {
     display: inline-flex;
     align-items: center;
+    height: 48px;
 }
 
 .custom-toggle-wrapper input[type="checkbox"] {
