@@ -2,15 +2,15 @@ let record;
 let editors = {};
 
 const FORM_LIFECYCLE = {
-	onLoadedLayout : false,
-	preparePlugins : false,
-	resetFrmInputs : false,
-	readyFrmInputs : false,
-	fetchFrmValues : false,
-	applyFrmValues : false,
-	refreshPlugins : false,
-	checkFrmValues : false,
-	transFrmValues : false,
+    onLoadedLayout : false,
+    preparePlugins : false,
+    resetFrmInputs : false,
+    readyFrmInputs : false,
+    fetchFrmValues : false,
+    applyFrmValues : false,
+    refreshPlugins : false,
+    checkFrmValues : false,
+    transFrmValues : false,
 };
 
 common.FORM_LIFECYCLE = [];
@@ -18,243 +18,243 @@ common.FORM_REPEATER = [];
 common.DYNAMIC_FIELDS = [];
 
 function updateFormLifeCycle(state, form = null, detail = {}) {
-	if(common.FORM_LIFECYCLE[form.getAttribute('name')] === undefined) {
-		common.FORM_LIFECYCLE[form.getAttribute('name')] = FORM_LIFECYCLE;
-	}
+    if(common.FORM_LIFECYCLE[form.getAttribute('name')] === undefined) {
+        common.FORM_LIFECYCLE[form.getAttribute('name')] = FORM_LIFECYCLE;
+    }
 
-	common.FORM_LIFECYCLE[form.getAttribute('name')][state] = true;
+    common.FORM_LIFECYCLE[form.getAttribute('name')][state] = true;
 
-	// Event trigger
-	const target = form ?? window;
-	if(form) {
-		detail = Object.assign({
-			formSelector: form.getAttribute('id'),
-		}, detail);
-	}
+    // Event trigger
+    const target = form ?? window;
+    if(form) {
+        detail = Object.assign({
+            formSelector: form.getAttribute('id'),
+        }, detail);
+    }
 
-	target.dispatchEvent(
-		new CustomEvent(state, {
-			bubbles : false,
-			cancelable : true,
-			composed : false,
-			detail : detail,
-		}),
-	);
+    target.dispatchEvent(
+        new CustomEvent(state, {
+            bubbles : false,
+            cancelable : true,
+            composed : false,
+            detail : detail,
+        }),
+    );
 }
 
 function onLoadedLayout(form) {
     console.log('onLoadedLayout : ', form.id)
-	updateFormLifeCycle('onLoadedLayout', form)
+    updateFormLifeCycle('onLoadedLayout', form)
 }
 
 function preparePlugins(form) {
-	// select picker
-	if ($(form).find('.selectpicker').length) {
+    // select picker
+    if ($(form).find('.selectpicker').length) {
         initSelectpicker(form);
-	}
+    }
 
-	// select2
-	if ($(form).find('.select2').length) {
-		$(form).find('.select2').each(function () {
-			initSelect2(this);
-		});
-	}
+    // select2
+    if ($(form).find('.select2').length) {
+        $(form).find('.select2').each(function () {
+            initSelect2(this);
+        });
+    }
 
-	// Bootstrap Max Length
-	if ($(form).find('.form-maxlength').length) {
-		$(form).find('.form-maxlength').each(function () {
-			$(this).maxlength({
-				warningClass: 'label label-success bg-success text-white',
-				limitReachedClass: 'label label-danger',
-				separator: getLocale(' out of ', common.LOCALE),
-				preText: getLocale('You typed ', common.LOCALE),
-				postText: getLocale(' chars available', common.LOCALE),
-				validate: true,
-				threshold: +this.getAttribute('maxlength')
-			});
-		});
-	}
+    // Bootstrap Max Length
+    if ($(form).find('.form-maxlength').length) {
+        $(form).find('.form-maxlength').each(function () {
+            $(this).maxlength({
+                warningClass: 'label label-success bg-success text-white',
+                limitReachedClass: 'label label-danger',
+                separator: getLocale(' out of ', common.LOCALE),
+                preText: getLocale('You typed ', common.LOCALE),
+                postText: getLocale(' chars available', common.LOCALE),
+                validate: true,
+                threshold: +this.getAttribute('maxlength')
+            });
+        });
+    }
 
-	// textarea-autosize
-	if($(form).find('.form-input_textarea-autosize').length) {
-		$(form).find('.textarea-autosize').each(function() {
-			autosize(this);
-		})
-	}
+    // textarea-autosize
+    if($(form).find('.form-input_textarea-autosize').length) {
+        $(form).find('.textarea-autosize').each(function() {
+            autosize(this);
+        })
+    }
 
-	if ($(form).find('.select2-repeater').length) {
-		$(form).find('.select2-repeater').each(function () {
-			var $this = $(this);
-			$this.prepend('<option value="" disabled selected></option>');
-			$this.wrap('<div class="position-relative"></div>').select2({
-				allowClear: true,
-				dropdownParent: $this.parent(),
-				placeholder: $this.data('placeholder') // for dynamic placeholder
-			});
-		});
-	}
+    if ($(form).find('.select2-repeater').length) {
+        $(form).find('.select2-repeater').each(function () {
+            var $this = $(this);
+            $this.prepend('<option value="" disabled selected></option>');
+            $this.wrap('<div class="position-relative"></div>').select2({
+                allowClear: true,
+                dropdownParent: $this.parent(),
+                placeholder: $this.data('placeholder') // for dynamic placeholder
+            });
+        });
+    }
 
-	// form-repeater-jquery
-	if($(form).find('[data-repeater-type="jquery"]').length) {
-		$(form).find('[data-repeater-type="jquery"]').each(function() {
-			var formType = $(this).data('form-type');
-			var groupName = $(this).data('group-name');
-			var repeater = common.FORM_REPEATER[groupName] = $(this).repeater({
-				initEmpty: false,
-				defaultValues: {},
-				show: function () {
-					var row = parseInt($(this).closest('[data-repeater-type]').attr('data-repeater-count'))+1;
-					var wrap = this;
-					var withList = false;
-					var formControl = $(this).find('input, select, textarea');
-					var formLabel = $(this).find('.form-label');
-					formControl.each(function (i, item) {
-						var id = `form_${formType}-${groupName}-` + (row-1) + '-' + $(item).data('group-field');
+    // form-repeater-jquery
+    if($(form).find('[data-repeater-type="jquery"]').length) {
+        $(form).find('[data-repeater-type="jquery"]').each(function() {
+            var formType = $(this).data('form-type');
+            var groupName = $(this).data('group-name');
+            var repeater = common.FORM_REPEATER[groupName] = $(this).repeater({
+                initEmpty: false,
+                defaultValues: {},
+                show: function () {
+                    var row = parseInt($(this).closest('[data-repeater-type]').attr('data-repeater-count'))+1;
+                    var wrap = this;
+                    var withList = false;
+                    var formControl = $(this).find('input, select, textarea');
+                    var formLabel = $(this).find('.form-label');
+                    formControl.each(function (i, item) {
+                        var id = `form_${formType}-${groupName}-` + (row-1) + '-' + $(item).data('group-field');
 
-						// label
-						if(item.nextElementSibling.tagName === 'LABEL') $(item.nextElementSibling).attr('for', id);
+                        // label
+                        if(item.nextElementSibling.tagName === 'LABEL') $(item.nextElementSibling).attr('for', id);
 
-						// list-item-wrap
-						if($(item).data('with-list')) {
-							withList = true;
-							$(wrap).find(`#${item.id}-list`).attr('id', id+'-list');
-						}
+                        // list-item-wrap
+                        if($(item).data('with-list')) {
+                            withList = true;
+                            $(wrap).find(`#${item.id}-list`).attr('id', id+'-list');
+                        }
 
-						$(item).attr('id', id);
-					});
+                        $(item).attr('id', id);
+                    });
 
-					$(this).attr('data-row-index', row);
-					$(this).closest('[data-repeater-type]').attr('data-repeater-count', row)
+                    $(this).attr('data-row-index', row);
+                    $(this).closest('[data-repeater-type]').attr('data-repeater-count', row)
 
-					window.dispatchEvent(
-						new CustomEvent('addRepeaterItem', {
-							bubbles : false,
-							cancelable : true,
-							composed : false,
-							detail : {
-								node : wrap
-							},
-						}),
-					);
+                    window.dispatchEvent(
+                        new CustomEvent('addRepeaterItem', {
+                            bubbles : false,
+                            cancelable : true,
+                            composed : false,
+                            detail : {
+                                node : wrap
+                            },
+                        }),
+                    );
 
-					// list-item-wrap
-					if(withList) $(this).find('.form-list-item-wrap').addClass('d-none').empty();
+                    // list-item-wrap
+                    if(withList) $(this).find('.form-list-item-wrap').addClass('d-none').empty();
 
-					const cbName = camelize(`after_${groupName}_repeater_show`);
-					if(typeof cbName === 'function') window[cbName](this);
+                    const cbName = camelize(`after_${groupName}_repeater_show`);
+                    if(typeof cbName === 'function') window[cbName](this);
 
-					$(this).slideDown();
-				},
-				hide: function (deleteElement) {
-					const repeater = this;
-					const form = repeater.closest('form');
-					const identifier = form[common.IDENTIFIER].value;
-					if(!identifier) {
-						$(this).slideUp(deleteElement);
-					}else{
-						const wrap = repeater.closest('[data-repeater-type]');
-						if(repeaterId = wrap.getAttribute('data-repeater-id')) {
-							if(repeater.querySelector(`[data-group-field="${repeaterId}"]`).value === ''){
-								$(this).slideUp(deleteElement);
-								return;
-							}
-						}
+                    $(this).slideDown();
+                },
+                hide: function (deleteElement) {
+                    const repeater = this;
+                    const form = repeater.closest('form');
+                    const identifier = form[common.IDENTIFIER].value;
+                    if(!identifier) {
+                        $(this).slideUp(deleteElement);
+                    }else{
+                        const wrap = repeater.closest('[data-repeater-type]');
+                        if(repeaterId = wrap.getAttribute('data-repeater-id')) {
+                            if(repeater.querySelector(`[data-group-field="${repeaterId}"]`).value === ''){
+                                $(this).slideUp(deleteElement);
+                                return;
+                            }
+                        }
 
-						showSwalAlert({
-							type: 'delete',
-							callback: deleteRepeater,
-							params: {repeater, deleteElement},
-						})
-					}
-				},
-				ready: function(setIndexes) {
-					console.log('Repeater is ready');
-					setIndexes(); // If you need to set index
-				},
-				isFirstItemUndeletable: false
-			});
-		})
-	}
+                        showSwalAlert({
+                            type: 'delete',
+                            callback: deleteRepeater,
+                            params: {repeater, deleteElement},
+                        })
+                    }
+                },
+                ready: function(setIndexes) {
+                    console.log('Repeater is ready');
+                    setIndexes(); // If you need to set index
+                },
+                isFirstItemUndeletable: false
+            });
+        })
+    }
 
-	/**
-	 * file list sortable
-	 */
-	if($('.form-list-item-wrap_sorter').length){
-		$('.form-list-item-wrap_sorter').each((k, v) => {
-			Sortable.create(v, {
-				animation: 150,
-				group: 'handleList',
-				handle: '.drag-handle',
-				swap: true,
-				onEnd: function (event) {
-					const newIndex = parseInt(event.newIndex)+1;
-					const item = event.item;
-					const articleId = item.getAttribute('data-article-id')
-					const fileId = item.getAttribute('data-file-id')
-					executeAjax({
-						url : common.API_URI + '/reorder',
-						headers : {
-							'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-						},
-						method : 'patch',
-						data : {
-							new_index : newIndex,
-							article_id : articleId,
-							file_id : fileId,
-						},
-						success: function(response) {
-							showAlert({
-								type: 'success',
-								title: 'Complete',
-								text: response.msg,
-							});
-						},
-					});
-				}
-			});
-		})
-	}
+    /**
+     * file list sortable
+     */
+    if($('.form-list-item-wrap_sorter').length){
+        $('.form-list-item-wrap_sorter').each((k, v) => {
+            Sortable.create(v, {
+                animation: 150,
+                group: 'handleList',
+                handle: '.drag-handle',
+                swap: true,
+                onEnd: function (event) {
+                    const newIndex = parseInt(event.newIndex)+1;
+                    const item = event.item;
+                    const articleId = item.getAttribute('data-article-id')
+                    const fileId = item.getAttribute('data-file-id')
+                    executeAjax({
+                        url : common.API_URI + '/reorder',
+                        headers : {
+                            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+                        },
+                        method : 'patch',
+                        data : {
+                            new_index : newIndex,
+                            article_id : articleId,
+                            file_id : fileId,
+                        },
+                        success: function(response) {
+                            showAlert({
+                                type: 'success',
+                                title: 'Complete',
+                                text: response.msg,
+                            });
+                        },
+                    });
+                }
+            });
+        })
+    }
 
-	// [data-show-if-target]
-	if($('[data-show-if-field]').length > 0) {
-		$('[data-show-if-field]').each((k, v) => {
-			const target = $(v).attr('data-show-if-field');
-			if(target) $(v).closest('form').find(`.form-validation-unit:has([name="${target}"])`).addClass('d-none');
-		});
-	}
+    // [data-show-if-target]
+    if($('[data-show-if-field]').length > 0) {
+        $('[data-show-if-field]').each((k, v) => {
+            const target = $(v).attr('data-show-if-field');
+            if(target) $(v).closest('form').find(`.form-validation-unit:has([name="${target}"])`).addClass('d-none');
+        });
+    }
 
-	// FlatPickr Initialization & Validation
-	$(form).find('.flatpickr').each(function() {
-		setFlatpickr(this);
-	})
+    // FlatPickr Initialization & Validation
+    $(form).find('.flatpickr').each(function() {
+        setFlatpickr(this);
+    })
 
-	// Cleave Initialization & Validation
-	$(form).find('.cleave').each(function() {
-		setCleave(this);
-	})
+    // Cleave Initialization & Validation
+    $(form).find('.cleave').each(function() {
+        setCleave(this);
+    })
 
-	// Tagify
-	$(form).find('.tagify').each(function () {
-		new Tagify(this,
-			Object.hasOwn(appPlugins.form, 'tagify') && Object.hasOwn(appPlugins.form.tagify, this.name)
-				? appPlugins.form.tagify[this.name]
-				: {
-					// valuesArr 는 [{value:…}, {value:…}, …]
-					originalInputValueFormat: valuesArr => {
-						// ["aa","bb"] 형태의 배열을 JSON 문자열로
-						return valuesArr.map(item => item.value);
-					}
-				}
-		);
-	})
+    // Tagify
+    $(form).find('.tagify').each(function () {
+        new Tagify(this,
+            Object.hasOwn(appPlugins.form, 'tagify') && Object.hasOwn(appPlugins.form.tagify, this.name)
+                ? appPlugins.form.tagify[this.name]
+                : {
+                    // valuesArr 는 [{value:…}, {value:…}, …]
+                    originalInputValueFormat: valuesArr => {
+                        // ["aa","bb"] 형태의 배열을 JSON 문자열로
+                        return valuesArr.map(item => item.value);
+                    }
+                }
+        );
+    })
 
-	// Dropzone
-	$(form).find('.dropzone-wrapper').each(function () {
-		setDropzone(this)
-	});
+    // Dropzone
+    $(form).find('.dropzone-wrapper').each(function () {
+        setDropzone(this)
+    });
 
     // Coloris
-	$(form).find('.coloris').each(function () {
+    $(form).find('.coloris').each(function () {
         this.addEventListener('click', e => {
             Coloris({
                 theme: 'polaroid',
@@ -264,7 +264,7 @@ function preparePlugins(form) {
                 }
             });
         });
-	});
+    });
 
     // clipboard
     $(form).find('[clipboard]').each(function () {
@@ -284,7 +284,7 @@ function preparePlugins(form) {
         });
     });
 
-	updateFormLifeCycle('preparePlugins', form)
+    updateFormLifeCycle('preparePlugins', form)
 }
 
 /**
@@ -294,91 +294,91 @@ function preparePlugins(form) {
  * @param fields
  */
 function resetFrmInputs(form, fields = []) {
-	// value resets
-	form.querySelectorAll('input, textarea, select').forEach(function(node) {
-		if(
+    // value resets
+    form.querySelectorAll('input, textarea, select').forEach(function(node) {
+        if(
             !isAttributeValueTrue(node, 'data-reset-value')
             || isAttributeValueTrue(node, 'data-default-value')
             || isAttributeValueTrue(node, 'data-set-default-first')
         ) return;
 
-		switch (node.tagName) {
-			case 'INPUT' :
-				switch(node.type) {
-					case 'radio' :
-					case 'checkbox' :
-						node.checked = false;
-						break;
-					case 'text' :
-					case 'date' :
-					case 'tel' :
-					case 'number' :
-					case 'hidden' :
-					case 'password' :
-						node.value = '';
-						break;
-					case 'file' :
-						const newNode = node.cloneNode(true);
-						node.parentNode.replaceChild(newNode, node);
-				}
-				break;
-			case 'SELECT' :
+        switch (node.tagName) {
+            case 'INPUT' :
+                switch(node.type) {
+                    case 'radio' :
+                    case 'checkbox' :
+                        node.checked = false;
+                        break;
+                    case 'text' :
+                    case 'date' :
+                    case 'tel' :
+                    case 'number' :
+                    case 'hidden' :
+                    case 'password' :
+                        node.value = '';
+                        break;
+                    case 'file' :
+                        const newNode = node.cloneNode(true);
+                        node.parentNode.replaceChild(newNode, node);
+                }
+                break;
+            case 'SELECT' :
                 bindSelectValue(node, null)
-				break;
-			case 'TEXTAREA' :
-				node.value = '';
-				break;
-		}
+                break;
+            case 'TEXTAREA' :
+                node.value = '';
+                break;
+        }
 
-		// input change attr 초기화
-		if(node.type !== 'hidden' && !isAttributeValueTrue(node, 'data-detect-changed')){
-			node.setAttribute('data-input-changed', 'false');
-		}
+        // input change attr 초기화
+        if(node.type !== 'hidden' && !isAttributeValueTrue(node, 'data-detect-changed')){
+            node.setAttribute('data-input-changed', 'false');
+        }
 
-		// original value attr 초기화
-		if(node.hasAttribute('data-original-value')){
-			node.removeAttribute('data-original-value');
-		}
-	});
+        // original value attr 초기화
+        if(node.hasAttribute('data-original-value')){
+            node.removeAttribute('data-original-value');
+        }
+    });
 
-	// file type 초기화
-	form.querySelectorAll('input[type="file"]').forEach(function (v, i){
-		v.value = '';
-	})
+    // file type 초기화
+    form.querySelectorAll('input[type="file"]').forEach(function (v, i){
+        v.value = '';
+    })
 
-	// list 초기화
-	fields.map(function(item) {
-		if(list = document.querySelector('#'+item.id+'-list')) {
-			list.innerHTML = '';
-			list.classList.add('d-none');
-		}
-	})
+    // list 초기화
+    fields.map(function(item) {
+        if(list = document.querySelector('#'+item.id+'-list')) {
+            list.innerHTML = '';
+            list.classList.add('d-none');
+        }
+    })
 
-	// repeater 초기화
-	if($('[data-repeater-type="jquery"]').length) {
-		$('[data-repeater-type="jquery"]').attr('data-repeater-count', 1);
-	}
+    // repeater 초기화
+    if($('[data-repeater-type="jquery"]').length) {
+        $('[data-repeater-type="jquery"]').attr('data-repeater-count', 1);
+    }
 
-	if ($('[data-repeater-item]').length) {
-		$('[data-repeater-item]').each(function (i, v) {
-			if(i > 0) $(v).remove();
-		});
-	}
+    if ($('[data-repeater-item]').length) {
+        $('[data-repeater-item]').each(function (i, v) {
+            if(i > 0) $(v).remove();
+        });
+    }
 
-	// life cycle 초기화
-	Object.keys(common.FORM_LIFECYCLE[form.getAttribute('name')]).forEach((v, k) => {
-		if(!k) return;
-		common.FORM_LIFECYCLE[form.getAttribute('name')][v] = false;
-	});
+    // life cycle 초기화
+    Object.keys(common.FORM_LIFECYCLE[form.getAttribute('name')]).forEach((v, k) => {
+        if(!k) return;
+        common.FORM_LIFECYCLE[form.getAttribute('name')][v] = false;
+    });
 
     // form validation reset
     if(typeof fv !== 'undefined') safeReset(fv);
 
-	// 마지막에 폼 전체 및 레코드 리셋
-	record = null;
+    // 마지막에 폼 전체 및 레코드 리셋
+    record = null;
 
-	// Event trigger
-	updateFormLifeCycle('resetFrmInputs', form);
+    // Event trigger
+    updateFormLifeCycle('resetFrmInputs', form);
 }
 
 /**
@@ -389,42 +389,42 @@ function resetFrmInputs(form, fields = []) {
  * @param fields
  */
 function readyFrmInputs(form, mode = null, fields = []) {
-	form.querySelectorAll('[data-view-mod]').forEach((node) => {
-		const modList = node.getAttribute('data-view-mod').split('|');
-		if(modList.includes(mode)){
-			node.closest('.form-validation-unit').classList.remove('d-none');
-		}else{
-			node.closest('.form-validation-unit').classList.add('d-none');
-		}
-	});
+    form.querySelectorAll('[data-view-mod]').forEach((node) => {
+        const modList = node.getAttribute('data-view-mod').split('|');
+        if(modList.includes(mode)){
+            node.closest('.form-validation-unit').classList.remove('d-none');
+        }else{
+            node.closest('.form-validation-unit').classList.add('d-none');
+        }
+    });
 
     form.querySelectorAll('[data-writable="0"]').forEach((node) => {
         node.setAttribute('readonly', 'readonly');
     });
 
-	form.querySelectorAll('[data-editable="0"]').forEach((node) => {
-		if(mode === 'edit') {
-			node.setAttribute('readonly', 'readonly');
-		}else{
-			node.removeAttribute('readonly');
-		}
-	});
+    form.querySelectorAll('[data-editable="0"]').forEach((node) => {
+        if(mode === 'edit') {
+            node.setAttribute('readonly', 'readonly');
+        }else{
+            node.removeAttribute('readonly');
+        }
+    });
 
-	if(form['_mode'] !== undefined) form['_mode'].value = mode;
+    if(form['_mode'] !== undefined) form['_mode'].value = mode;
 
-	if(mode === 'add' || mode === 'filter') {
+    if(mode === 'add' || mode === 'filter') {
         const data = {};
-		form.querySelectorAll('[data-default-value], [data-set-default-first]').forEach(function (node, i){
+        form.querySelectorAll('[data-default-value], [data-set-default-first]').forEach(function (node, i){
             const value = node.getAttribute('data-default-value');
             data[node.dataset.formField] = isNumeric(value)?parseInt(value):value;
-		});
-        if(Object.keys(data).length) applyFrmValues(form, data, fields)
-	}
+        });
+        if(Object.keys(data).length) applyFrmValues(form, data, fields, mode === 'filter')
+    }
 
-	// Event trigger
-	updateFormLifeCycle('readyFrmInputs', form, {
-		mode : mode,
-	});
+    // Event trigger
+    updateFormLifeCycle('readyFrmInputs', form, {
+        mode : mode,
+    });
 }
 
 /**
@@ -435,46 +435,46 @@ function readyFrmInputs(form, mode = null, fields = []) {
  * @returns {*}
  */
 function fetchFrmValues(form = null, key = {}, params = {}) {
-	let data;
+    let data;
 
-	executeAjax({
-		async: false,
-		url : getUrlWithIdentifiers(common.API_URI, key, common.API_PARAMS),
-		data: {
-			_mode : 'form',
-			...params,
-		},
-		headers: {
-			'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-		},
-		success: function(response, textStatus, jqXHR) {
-			data = isObject(response.data)?response.data:response.data[0];
-			if(form) {
-				record = data;
+    executeAjax({
+        async: false,
+        url : getUrlWithIdentifiers(common.API_URI, key, common.API_PARAMS),
+        data: {
+            _mode : 'form',
+            ...params,
+        },
+        headers: {
+            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+        },
+        success: function(response, textStatus, jqXHR) {
+            data = isObject(response.data)?response.data:response.data[0];
+            if(form) {
+                record = data;
 
-				// Event trigger
-				updateFormLifeCycle('fetchFrmValues', form, {
-					record : data,
-				});
-			}
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			console.warn(jqXHR.responseJSON)
+                // Event trigger
+                updateFormLifeCycle('fetchFrmValues', form, {
+                    record : data,
+                });
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.warn(jqXHR.responseJSON)
 
-			const opt = {
-				type: 'warning',
-				text: jqXHR.responseJSON.msg,
-			};
+            const opt = {
+                type: 'warning',
+                text: jqXHR.responseJSON.msg,
+            };
 
-			if(['view','edit'].includes(form._mode.value)) {
-				opt.callback = back;
-			}
+            if(['view','edit'].includes(form._mode.value)) {
+                opt.callback = back;
+            }
 
-			showAlert(opt);
-		}
-	});
+            showAlert(opt);
+        }
+    });
 
-	return data;
+    return data;
 }
 
 /**
@@ -484,296 +484,304 @@ function fetchFrmValues(form = null, key = {}, params = {}) {
  * @param data
  * @param fields
  */
-function applyFrmValues(form, data, fields = []) {
-	if(!fields.length) return;
+function applyFrmValues(form, data, fields = [], triggerEvent = true) {
+    if(!fields.length) return;
 
-	// 단순 복제로 원본 fields object(common.FORM_DATA)에 대해서도
-	// 변경이 반영되는 것을 방지하기 위해 깊은 복제 실행.
-	const cloneFields = structuredClone(fields);
+    // 단순 복제로 원본 fields object(common.FORM_DATA)에 대해서도
+    // 변경이 반영되는 것을 방지하기 위해 깊은 복제 실행.
+    const cloneFields = structuredClone(fields);
 
-	const initGroupProperties = () => {
-		return {
-			inputs : [],
-			selects : [],
-			checkboxes : [],
-			radios : [],
-			textareas : [],
-			excepts : [],
-			files : [],
-			customs : [],
-		};
-	};
-	const groups = {
-		base : initGroupProperties(),
-	};
-	const groupAttrs = {
-		base : {
-			group_name : 'base',
-		}
-	};
+    const initGroupProperties = () => {
+        return {
+            inputs : [],
+            selects : [],
+            checkboxes : [],
+            radios : [],
+            textareas : [],
+            excepts : [],
+            files : [],
+            customs : [],
+        };
+    };
+    const groups = {
+        base : initGroupProperties(),
+    };
+    const groupAttrs = {
+        base : {
+            group_name : 'base',
+        }
+    };
 
-	/**
-	 * classify cloneFields into groups
-	 */
-	cloneFields.forEach((item) => {
-		if(item.group && !Object.hasOwn(groups, item.group)) {
-			groups[item.group] = initGroupProperties();
-			groupAttrs[item.group] = Object.assign(item.group_attributes, {
-				group_name : item.group,
-			});
-		}
-		const groupName = item.group ? item.group : 'base';
-		switch (item.type) {
-			case 'select' : groups[groupName].selects.push(item.field); break;
-			case 'checkbox' : groups[groupName].checkboxes.push(item.field); break;
-			case 'radio' : groups[groupName].radios.push(item.field); break;
-			case 'textarea' : groups[groupName].textareas.push(item.field); break;
-			case 'file' : groups[groupName].files.push(item.field); break;
-			case 'custom' : groups[groupName].customs.push(item.field); break;
-			default :
-				if(['password'].includes(item.type)) {
-					groups[groupName].excepts.push(item.field);
-				}else{
-					groups[groupName].inputs.push(item.field);
-				}
-		}
-	});
+    /**
+     * classify cloneFields into groups
+     */
+    cloneFields.forEach((item) => {
+        if(item.group && !Object.hasOwn(groups, item.group)) {
+            groups[item.group] = initGroupProperties();
+            groupAttrs[item.group] = Object.assign(item.group_attributes, {
+                group_name : item.group,
+            });
+        }
+        const groupName = item.group ? item.group : 'base';
+        switch (item.type) {
+            case 'select' : groups[groupName].selects.push(item.field); break;
+            case 'checkbox' : groups[groupName].checkboxes.push(item.field); break;
+            case 'radio' : groups[groupName].radios.push(item.field); break;
+            case 'textarea' : groups[groupName].textareas.push(item.field); break;
+            case 'file' : groups[groupName].files.push(item.field); break;
+            case 'custom' : groups[groupName].customs.push(item.field); break;
+            default :
+                if(['password'].includes(item.type)) {
+                    groups[groupName].excepts.push(item.field);
+                }else{
+                    groups[groupName].inputs.push(item.field);
+                }
+        }
+    });
 
-	Object.keys(groups).forEach((groupName, i) => {
-		const dto = groups[groupName];
+    Object.keys(groups).forEach((groupName, i) => {
+        const dto = groups[groupName];
 
-		// group_repeater row 생성
-		if(groupAttrs[groupName].group_repeater) {
-			// group_repeater type jquery
-			if(groupAttrs[groupName].repeater_type === 'jquery' && $('[data-repeater-type="jquery"]').length) {
-				const repeater = document.querySelector(`[data-repeater-type="jquery"][data-group-name="${groupName}"]`);
-				const rowCount = parseInt(repeater.getAttribute('data-repeater-count'));
-				if(data.hasOwnProperty(groupName)) {
-					for(let i = rowCount+1; i <= data[groupName].length; i++) repeater.querySelector('[data-repeater-create]').click();
-					repeater.setAttribute('data-repeater-count', data[groupName].length === 0 ? 1 : data[groupName].length);
-				}
-			}
-		}
+        // group_repeater row 생성
+        if(groupAttrs[groupName].group_repeater) {
+            // group_repeater type jquery
+            if(groupAttrs[groupName].repeater_type === 'jquery' && $('[data-repeater-type="jquery"]').length) {
+                const repeater = document.querySelector(`[data-repeater-type="jquery"][data-group-name="${groupName}"]`);
+                const rowCount = parseInt(repeater.getAttribute('data-repeater-count'));
+                if(data.hasOwnProperty(groupName)) {
+                    for(let i = rowCount+1; i <= data[groupName].length; i++) repeater.querySelector('[data-repeater-create]').click();
+                    repeater.setAttribute('data-repeater-count', data[groupName].length === 0 ? 1 : data[groupName].length);
+                }
+            }
+        }
 
-		if(typeof window[`applyFrmValues${pascalize(groupName)}`] === 'function') {
-			window[`applyFrmValues${pascalize(groupName)}`](form, data[groupName], groupAttrs[groupName], cloneFields, dto);
-		}else{
-			Object.keys(dto).map((category) => {
-				if(dto[category].length > 0) {
-					if(groupName === 'base') {
-						dto[category].forEach((fieldName) => {
-							applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, data);
-						});
-					}else{
-						if(groupAttrs[groupName].envelope_name) {
-							if(!Object.hasOwn(data, groupName)) return;
+        if(typeof window[`applyFrmValues${pascalize(groupName)}`] === 'function') {
+            window[`applyFrmValues${pascalize(groupName)}`](form, data[groupName], groupAttrs[groupName], cloneFields, dto);
+        }else{
+            Object.keys(dto).map((category) => {
+                if(dto[category].length > 0) {
+                    if(groupName === 'base') {
+                        dto[category].forEach((fieldName) => {
+                            applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, data);
+                        });
+                    }else{
+                        if(groupAttrs[groupName].envelope_name) {
+                            if(!Object.hasOwn(data, groupName)) return;
 
-							let frmData = data[groupName];
-							if(groupAttrs[groupName].group_repeater) {
-								// 데이터 개수에 따라, field의 id, name 을 data index 의 값으로 대체해야 함.
-								for(let dataIndex = 0; dataIndex < frmData.length; dataIndex++) {
-									Object.keys(frmData[dataIndex]).map((fieldName) => {
-										if(!dto[category].includes(fieldName)) return;
-										if(common.IDENTIFIER) frmData[dataIndex][common.IDENTIFIER] = data[common.IDENTIFIER];
-										applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, frmData[dataIndex], dataIndex);
-									});
-								}
-							}else{
-								if(common.IDENTIFIER) frmData[common.IDENTIFIER] = data[common.IDENTIFIER];
-								dto[category].forEach((fieldName) => {
-									applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, frmData);
-								});
-							}
-						}else{
-							dto[category].forEach((fieldName) => {
-								applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, data);
-							});
-						}
-					}
-				}
-			});
-		}
-	});
+                            let frmData = data[groupName];
+                            if(groupAttrs[groupName].group_repeater) {
+                                // 데이터 개수에 따라, field의 id, name 을 data index 의 값으로 대체해야 함.
+                                for(let dataIndex = 0; dataIndex < frmData.length; dataIndex++) {
+                                    Object.keys(frmData[dataIndex]).map((fieldName) => {
+                                        if(!dto[category].includes(fieldName)) return;
+                                        if(common.IDENTIFIER) frmData[dataIndex][common.IDENTIFIER] = data[common.IDENTIFIER];
+                                        applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, frmData[dataIndex], dataIndex);
+                                    });
+                                }
+                            }else{
+                                if(common.IDENTIFIER) frmData[common.IDENTIFIER] = data[common.IDENTIFIER];
+                                dto[category].forEach((fieldName) => {
+                                    applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, frmData);
+                                });
+                            }
+                        }else{
+                            dto[category].forEach((fieldName) => {
+                                applyFrmValuesByCategory(category, groupAttrs[groupName], fieldName, cloneFields, form, data);
+                            });
+                        }
+                    }
+                }
+            });
+        }
+    });
 
-	updateFormLifeCycle('applyFrmValues', form, {
-		record : data,
-	});
+    if(triggerEvent) {
+        updateFormLifeCycle('applyFrmValues', form, {
+            record : data,
+        });
+    }
 }
 
 function getFrmInputDto(groupAttrs, field, dataIndex = 0) {
-	const groupName = groupAttrs.group_name === 'base'?'':groupAttrs.group_name;
+    const groupName = groupAttrs.group_name === 'base'?'':groupAttrs.group_name;
 
-	if(!groupName) {
-		return field;
-	}else{
-		if(!groupAttrs.group_repeater) {
-			return field;
-		}else{
-			let regexId, regexName;
-			if(groupAttrs.envelope_name) {
-				regexId = new RegExp(`(-${groupName}-)\\d+(-${field.field})`);
-				field.id = field.id.replace(regexId, `$1${dataIndex}$2`);
+    if(!groupName) {
+        return field;
+    }else{
+        if(!groupAttrs.group_repeater) {
+            return field;
+        }else{
+            let regexId, regexName;
+            if(groupAttrs.envelope_name) {
+                regexId = new RegExp(`(-${groupName}-)\\d+(-${field.field})`);
+                field.id = field.id.replace(regexId, `$1${dataIndex}$2`);
 
-				regexName = new RegExp(`(${groupName}\\[)\\d+(\\]\\[${field.field}\\])`);
-				field.name = field.name.replace(regexName, `$1${dataIndex}$2`);
-			}else{
-				regexId = new RegExp(`(-${field.field}-)\\d+`);
-				field.id = field.id.replace(regex, `$1${dataIndex}`);
+                regexName = new RegExp(`(${groupName}\\[)\\d+(\\]\\[${field.field}\\])`);
+                field.name = field.name.replace(regexName, `$1${dataIndex}$2`);
+            }else{
+                regexId = new RegExp(`(-${field.field}-)\\d+`);
+                field.id = field.id.replace(regex, `$1${dataIndex}`);
 
-				regexName = new RegExp(`(${listName}\\[)\\d+(\\])`);
-				field.name = field.name.replace(regexName, `$1${dataIndex}$2`);
-			}
-			return field;
-		}
-	}
+                regexName = new RegExp(`(${listName}\\[)\\d+(\\])`);
+                field.name = field.name.replace(regexName, `$1${dataIndex}$2`);
+            }
+            return field;
+        }
+    }
 }
 
 function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, data, dataIndex = 0) {
-	if(!data) return;
-	const groupName = groupAttr.group_name;
-	const fieldIndex = fields.findIndex(item => item.field === fieldName && item.group === groupName);
-	if(fieldIndex < 0) return;
-	const field = getFrmInputDto(groupAttr, fields[fieldIndex], dataIndex);
+    if(!data) return;
+    const groupName = groupAttr.group_name;
+    const fieldIndex = fields.findIndex(item => item.field === fieldName && item.group === groupName);
+    if(fieldIndex < 0) return;
+    const field = getFrmInputDto(groupAttr, fields[fieldIndex], dataIndex);
 
-	const name = field.name;
-	const id = field.id;
+    const name = field.name;
+    const id = field.id;
 
-	switch (category) {
-		case 'inputs' :
-			switch (field.subtype) {
-				default:
-					if(form[name] && data[fieldName] && data[fieldName] !== '0000-00-00') form[name].value = data[fieldName];
-			}
-			break;
-		case 'selects' :
-			switch (field.subtype) {
-				case 'select2':
-					if(Object.hasOwn(appPlugins.form, 'select2') &&
-						Object.hasOwn(appPlugins.form.select2, name) &&
-						Object.hasOwn(appPlugins.form.select2[name], 'beforeHand')
-					) {
-						appPlugins.form.select2[name].beforeHand();
-					}
-					break;
-			}
+    switch (category) {
+        case 'inputs' :
+            switch (field.subtype) {
+                default:
+                    if(form[name] && data[fieldName] && data[fieldName] !== '0000-00-00') form[name].value = data[fieldName];
+            }
+            break;
+        case 'selects' :
+            switch (field.subtype) {
+                case 'select2':
+                    if(Object.hasOwn(appPlugins.form, 'select2') &&
+                        Object.hasOwn(appPlugins.form.select2, name) &&
+                        Object.hasOwn(appPlugins.form.select2[name], 'beforeHand')
+                    ) {
+                        appPlugins.form.select2[name].beforeHand();
+                    }
+                    break;
+            }
 
             if (form[name] && Object.hasOwn(data, fieldName)) {
                 bindSelectValue(form[name], data[fieldName]);
             }
-			break;
-		case 'checkboxes' :
-			switch (field.subtype) {
-				case 'single' :
-					if(!data[fieldName]) return;
-					form.querySelectorAll(`[name="${name}"]`).forEach((input) => {
-						if(input.value == data[fieldName]) input.checked = true;
-					});
-					break;
-				default:
-					if(!data[fieldName]) return;
-					form.querySelectorAll(`[name="${name}[]"]`).forEach((input) => {
-						if(typeof data[fieldName] === 'string') {
-							if(data[fieldName].split(',').includes(input.value)) input.checked = true;
-						}else{
-							if(data[fieldName].includes(input.value)) input.checked = true;
-						}
-					});
-			}
-			break;
-		case 'radios' :
-			switch (field.subtype) {
-				default:
-					if(!data[fieldName]) return;
-					form.querySelectorAll(`[name="${name}"]`).forEach((input) => {
-						if(input.value == data[fieldName]) input.checked = true;
-					});
-			}
-			break;
-		case 'textareas' :
-			switch (field.subtype) {
-				default:
-					if(form[name] && data[fieldName]) form[name].value = data[fieldName];
-			}
-			break;
-		case 'files' :
-			switch (field.subtype) {
-				case 'base' :
-				case 'thumbnail' :
-				case 'single' :
-				case 'multiple' :
-				case 'readonly' :
-					// setFormListItem(`#${id}-list`, data[fieldName], field);
-					break;
-				default :
-					if(data[fieldName] === undefined) console.warn(`applyFrmValues : data doesn't have '${name}'.`);
-					if(form[name] === undefined) console.warn(`applyFrmValues : form doesn't have '${name}'.`);
-					if(data[fieldName] !== undefined && form[name] !== undefined)
-						form[name].value = data[fieldName];
-					break;
-			}
-			break;
-		case 'customs' :
-			if(typeof window[`applyFrmValuesCustom${pascalize(fieldName)}`] === "function") {
-				window[`applyFrmValuesCustom${pascalize(fieldName)}`](form, data[fieldName]);
-			}else{
-				switch (field.subtype) {
-					case 'tag' :
-						form[name].value = data[fieldName];
-						break;
-					case 'youtube' :
-						setFormListItem(`#${id}-list`, data, field);
-						break;
-					case 'quill' :
-						document.getElementById(`${id}-quill`).innerHTML = data[fieldName];
-						form[name].value = data[fieldName];
-						break;
-					case 'reply_list' :
-						// setFormListItem(`#${id}`, data[fieldName], field);
-						break;
-					case 'dropzone-full' :
-						setTimeout(() => {
-							if(data[fieldName] === undefined) console.warn(`applyFrmValues : data doesn't have '${name}'.`);
-							if(data[fieldName]) {
-								const inst = Dropzone.instances.find((item) => item.element.getAttribute('data-field') === 'thumbnail');
-								const mockFile = {
-									name: data[fieldName][0].file_name,
-									size: data[fieldName][0].file_size,
-									accepted: true,
-								};
-								inst.displayExistingFile(mockFile, data[fieldName][0].file_link)
-								inst.mockup = true;
-							}
-						},0);
-						break;
-					default :
-						if(data[fieldName] === undefined) console.warn(`applyFrmValues : data doesn't have '${name}'.`);
-						if(form[name] === undefined) console.warn(`applyFrmValues : form doesn't have '${name}'.`);
-						if(data[fieldName] !== undefined && form[name] !== undefined)
-							form[name].value = data[fieldName];
-						break;
-				}
-				break;
-			}
-	}
+            break;
+        case 'checkboxes' :
+            switch (field.subtype) {
+                case 'single' :
+                    if(!data[fieldName]) return;
+                    form.querySelectorAll(`[name="${name}"]`).forEach((input) => {
+                        if(input.value == data[fieldName]) input.checked = true;
+                    });
+                    break;
+                case 'onoff' :
+                    if(!data[fieldName]) return;
+                    form.querySelectorAll(`[name="${name}"]`).forEach((input) => {
+                        input.checked = true;
+                    });
+                    break;
+                default:
+                    if(!data[fieldName]) return;
+                    form.querySelectorAll(`[name="${name}[]"]`).forEach((input) => {
+                        if(typeof data[fieldName] === 'string') {
+                            if(data[fieldName].split(',').includes(input.value)) input.checked = true;
+                        }else{
+                            if(data[fieldName].includes(input.value)) input.checked = true;
+                        }
+                    });
+            }
+            break;
+        case 'radios' :
+            switch (field.subtype) {
+                default:
+                    if(!data[fieldName]) return;
+                    form.querySelectorAll(`[name="${name}"]`).forEach((input) => {
+                        if(input.value == data[fieldName]) input.checked = true;
+                    });
+            }
+            break;
+        case 'textareas' :
+            switch (field.subtype) {
+                default:
+                    if(form[name] && data[fieldName]) form[name].value = data[fieldName];
+            }
+            break;
+        case 'files' :
+            switch (field.subtype) {
+                case 'base' :
+                case 'thumbnail' :
+                case 'single' :
+                case 'multiple' :
+                case 'readonly' :
+                    // setFormListItem(`#${id}-list`, data[fieldName], field);
+                    break;
+                default :
+                    if(data[fieldName] === undefined) console.warn(`applyFrmValues : data doesn't have '${name}'.`);
+                    if(form[name] === undefined) console.warn(`applyFrmValues : form doesn't have '${name}'.`);
+                    if(data[fieldName] !== undefined && form[name] !== undefined)
+                        form[name].value = data[fieldName];
+                    break;
+            }
+            break;
+        case 'customs' :
+            if(typeof window[`applyFrmValuesCustom${pascalize(fieldName)}`] === "function") {
+                window[`applyFrmValuesCustom${pascalize(fieldName)}`](form, data[fieldName]);
+            }else{
+                switch (field.subtype) {
+                    case 'tag' :
+                        form[name].value = data[fieldName];
+                        break;
+                    case 'youtube' :
+                        setFormListItem(`#${id}-list`, data, field);
+                        break;
+                    case 'quill' :
+                        document.getElementById(`${id}-quill`).innerHTML = data[fieldName];
+                        form[name].value = data[fieldName];
+                        break;
+                    case 'reply_list' :
+                        // setFormListItem(`#${id}`, data[fieldName], field);
+                        break;
+                    case 'dropzone-full' :
+                        setTimeout(() => {
+                            if(data[fieldName] === undefined) console.warn(`applyFrmValues : data doesn't have '${name}'.`);
+                            if(data[fieldName]) {
+                                const inst = Dropzone.instances.find((item) => item.element.getAttribute('data-field') === 'thumbnail');
+                                const mockFile = {
+                                    name: data[fieldName][0].file_name,
+                                    size: data[fieldName][0].file_size,
+                                    accepted: true,
+                                };
+                                inst.displayExistingFile(mockFile, data[fieldName][0].file_link)
+                                inst.mockup = true;
+                            }
+                        },0);
+                        break;
+                    default :
+                        if(data[fieldName] === undefined) console.warn(`applyFrmValues : data doesn't have '${name}'.`);
+                        if(form[name] === undefined) console.warn(`applyFrmValues : form doesn't have '${name}'.`);
+                        if(data[fieldName] !== undefined && form[name] !== undefined)
+                            form[name].value = data[fieldName];
+                        break;
+                }
+                break;
+            }
+    }
 
-	if(field.form_attributes.with_btn) {
-		if(field.form_attributes.btn_type === 'dup_check') {
-			form[name].setAttribute('data-original-value', data[fieldName]);
-		}
-	}
+    if(field.form_attributes.with_btn) {
+        if(field.form_attributes.btn_type === 'dup_check') {
+            form[name].setAttribute('data-original-value', data[fieldName]);
+        }
+    }
 
-	if(field.form_attributes.with_list) {
-		setFormListItem(`#${id}-list`, data, field);
-	}
+    if(field.form_attributes.with_list) {
+        setFormListItem(`#${id}-list`, data, field);
+    }
 
-	if(field.form_attributes.show_if_field) {
-		const target = field.form_attributes.show_if_field;
-		if(data[fieldName] == field.form_attributes.show_if_value) {
-			form[target].closest('.form-validation-unit').classList.remove('d-none');
-		}else{
-			form[target].closest('.form-validation-unit').classList.add('d-none');
-		}
-	}
+    if(field.form_attributes.show_if_field) {
+        const target = field.form_attributes.show_if_field;
+        if(data[fieldName] == field.form_attributes.show_if_value) {
+            form[target].closest('.form-validation-unit').classList.remove('d-none');
+        }else{
+            form[target].closest('.form-validation-unit').classList.add('d-none');
+        }
+    }
 }
 
 function refreshPlugins(form, data = null) {
@@ -801,44 +809,44 @@ function refreshPlugins(form, data = null) {
     });
 
     // textarea-autosize
-	if($(form).find('.textarea-autosize').length) {
-		$(form).find('.textarea-autosize').each(function() {
-			if(this.scrollHeight > this.clientHeight) {
-				//textarea height 확장
-				this.style.height = this.scrollHeight + "px";
-			}else{
-				//textarea height 축소
-				this.style.removeProperty('height');
-				autosize(this);
-				this.style.height = this.scrollHeight + "px";
-			}
-		})
-	}
+    if($(form).find('.textarea-autosize').length) {
+        $(form).find('.textarea-autosize').each(function() {
+            if(this.scrollHeight > this.clientHeight) {
+                //textarea height 확장
+                this.style.height = this.scrollHeight + "px";
+            }else{
+                //textarea height 축소
+                this.style.removeProperty('height');
+                autosize(this);
+                this.style.height = this.scrollHeight + "px";
+            }
+        })
+    }
 
-	// textarea-quill
-	if($(form).find('.textarea-quill').length) {
-		$(form).find('.textarea-quill').each(function() {
-			editors[this.id] = new Quill(`#${this.id}`, {
-				bounds: `#${this.id}`,
-				placeholder: 'Type Something...',
-				modules: {
-					formula: true,
-					toolbar: toolbarDefault.quill
-				},
-				theme: 'snow'
-			});
+    // textarea-quill
+    if($(form).find('.textarea-quill').length) {
+        $(form).find('.textarea-quill').each(function() {
+            editors[this.id] = new Quill(`#${this.id}`, {
+                bounds: `#${this.id}`,
+                placeholder: 'Type Something...',
+                modules: {
+                    formula: true,
+                    toolbar: toolbarDefault.quill
+                },
+                theme: 'snow'
+            });
 
-			$(`#${this.id}`).on('keydown', function(e) {
-				$(`[data-textarea-id="${this.id}"]`).val(editors[this.id].root.innerHTML)
-			});
-		})
-	}
+            $(`#${this.id}`).on('keydown', function(e) {
+                $(`[data-textarea-id="${this.id}"]`).val(editors[this.id].root.innerHTML)
+            });
+        })
+    }
 
-	$(form).find('.form-list-item-wrap').each(function() {
-		if(!this.children.length) {
+    $(form).find('.form-list-item-wrap').each(function() {
+        if(!this.children.length) {
             this.classList.add('d-none');
         }
-	});
+    });
 
     // coloris
     $(form).find('.form-input_color-coloris').each(function () {
@@ -847,53 +855,53 @@ function refreshPlugins(form, data = null) {
         }
     });
 
-	updateFormLifeCycle('refreshPlugins', form, {
-		record : data,
-	});
+    updateFormLifeCycle('refreshPlugins', form, {
+        record : data,
+    });
 }
 
 function setFormListItem(selector, data, field) {
-	if(!isValidSelector(selector) || document.querySelector(selector) === null) return;
+    if(!isValidSelector(selector) || document.querySelector(selector) === null) return;
 
-	let html = '';
-	const key = field.form_attributes.list_field ?? field.field;
-	if(!isEmpty(data[key])) {
-		let list = [];
-		isArray(data[key]) ? list = data[key] : list.push(data[key]);
-		list.forEach((item) => {
-			if(common.IDENTIFIER && Object.hasOwn(data, common.IDENTIFIER)) item[common.IDENTIFIER] = data[common.IDENTIFIER];
-			const identifier = common.IDENTIFIER?data[common.IDENTIFIER]:null;
-			switch (field.form_attributes.list_type ?? field.subtype) {
-				case 'thumbnail' :
-					html += setFormListItemThumbnail(field, item, identifier);
-					break;
-				case 'youtube' :
-					html += setFormListItemYoutube(field, item, identifier);
-					break;
-				case 'reply_list' :
-					html += setFormListItemReplyList(field, item, identifier);
-					break;
-				default :
-					html += setFormListItemFile(field, item, identifier);
-					break;
-			}
-		});
-		document.querySelector(selector).classList.remove('d-none');
-		if(field.subtype === 'readonly') document.querySelector(selector).closest('.form-validation-unit').classList.remove('d-none');
-	}else{
-		document.querySelector(selector).classList.add('d-none');
-		if(field.subtype === 'readonly') document.querySelector(selector).closest('.form-validation-unit').classList.add('d-none');
-	}
+    let html = '';
+    const key = field.form_attributes.list_field ?? field.field;
+    if(!isEmpty(data[key])) {
+        let list = [];
+        isArray(data[key]) ? list = data[key] : list.push(data[key]);
+        list.forEach((item) => {
+            if(common.IDENTIFIER && Object.hasOwn(data, common.IDENTIFIER)) item[common.IDENTIFIER] = data[common.IDENTIFIER];
+            const identifier = common.IDENTIFIER?data[common.IDENTIFIER]:null;
+            switch (field.form_attributes.list_type ?? field.subtype) {
+                case 'thumbnail' :
+                    html += setFormListItemThumbnail(field, item, identifier);
+                    break;
+                case 'youtube' :
+                    html += setFormListItemYoutube(field, item, identifier);
+                    break;
+                case 'reply_list' :
+                    html += setFormListItemReplyList(field, item, identifier);
+                    break;
+                default :
+                    html += setFormListItemFile(field, item, identifier);
+                    break;
+            }
+        });
+        document.querySelector(selector).classList.remove('d-none');
+        if(field.subtype === 'readonly') document.querySelector(selector).closest('.form-validation-unit').classList.remove('d-none');
+    }else{
+        document.querySelector(selector).classList.add('d-none');
+        if(field.subtype === 'readonly') document.querySelector(selector).closest('.form-validation-unit').classList.add('d-none');
+    }
 
-	document.querySelector(selector).innerHTML = html;
+    document.querySelector(selector).innerHTML = html;
 }
 
 function setFormListItemFile(field, item, identifier = '') {
-	const fullItem = JSON.stringify(item).replace(/"/g, "'");
-	const articleId = item.article_id ?? '';
-	const fileId = item.file_id;
-	if(Object.hasOwn(field.form_attributes, 'list_sorter') && field.form_attributes.list_sorter) {
-		let output = `
+    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    const articleId = item.article_id ?? '';
+    const fileId = item.file_id;
+    if(Object.hasOwn(field.form_attributes, 'list_sorter') && field.form_attributes.list_sorter) {
+        let output = `
             <li class="form-list-item list-group-item d-flex justify-content-between align-items-center px-2" data-identifier-val="${identifier}" data-full-item="${fullItem}" data-article-id="${articleId}" data-file-id="${fileId}">
                 <div class="d-flex justify-content-between align-items-center pe-4">
                     <i class="drag-handle cursor-move ri-menu-line align-text-bottom me-2"></i>
@@ -904,21 +912,21 @@ function setFormListItemFile(field, item, identifier = '') {
                         <i class="ri-file-download-line ri-16px align-middle"></i>
                     </button>
         `;
-		if(field.form_attributes.list_delete.length > 0){
-			output += `
+        if(field.form_attributes.list_delete.length > 0){
+            output += `
                     <button class="btn btn-danger waves-effect p-1 ms-1" type="button" onclick="deleteFile(this, '${field.form_attributes.list_delete}')">
                         <i class="ri-close-line ri-16px align-middle"></i>
                     </button>
             `;
-		}
-		output += `
+        }
+        output += `
                 </div>
             </li>
         `;
-		return output;
-	}else{
-		const url = common.BASE_URI+'/common';
-		return `
+        return output;
+    }else{
+        const url = common.BASE_URI+'/common';
+        return `
         <div class="form-list-item d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
             <div class="badge text-body text-truncate">
                 <a href="${url}/downloader/${fileId}">
@@ -928,13 +936,13 @@ function setFormListItemFile(field, item, identifier = '') {
             </div>
         </div>
     `;
-	}
+    }
 }
 
 function setFormListItemThumbnail(field, item, identifier = '') {
-	const url = common.BASE_URI+'/common';
-	const fullItem = JSON.stringify(item).replace(/"/g, "'");
-	return `
+    const url = common.BASE_URI+'/common';
+    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    return `
         <div class="form-list-item d-flex align-items-start flex-column justify-content-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
             <div class="d-flex align-items-center justify-content-between w-100 mb-2">
                 <div class="badge text-body text-truncate">
@@ -955,9 +963,9 @@ function setFormListItemThumbnail(field, item, identifier = '') {
 }
 
 function setFormListItemPreview(field, item, identifier = '') {
-	const url = location.origin+location.pathname;
-	const fullItem = JSON.stringify(item).replace(/"/g, "'");
-	return `
+    const url = location.origin+location.pathname;
+    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    return `
         <div class="form-list-item d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
             <div class="badge text-body text-truncate">
                 <a href="${url}/downloader/${item.file_id}">
@@ -970,9 +978,9 @@ function setFormListItemPreview(field, item, identifier = '') {
 }
 
 function setFormListItemYoutube(field, item, identifier = '') {
-	const url = location.origin+location.pathname;
-	const fullItem = JSON.stringify(item).replace(/"/g, "'");
-	return `
+    const url = location.origin+location.pathname;
+    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    return `
         <div class="d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
             <div class="badge text-body text-truncate">
                 <a href="#" role="button" data-bs-toggle="modal" data-bs-target="#youTubeModal" data-value="${item}">
@@ -985,9 +993,9 @@ function setFormListItemYoutube(field, item, identifier = '') {
 }
 
 function setFormListItemReplyList(field, item, identifier = '') {
-	const url = location.origin+location.pathname;
-	const fullItem = JSON.stringify(item).replace(/"/g, "'");
-	return `
+    const url = location.origin+location.pathname;
+    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    return `
         <li class="form-list-item mb-1 ps-0 p-2" data-identifier-val="${identifier}" data-full-item="${fullItem}">
             <p class="h6 mb-1">${item.content}</p>
             <p class="text-end mb-0">${item.created_id} ${item.created_dt}</p>
@@ -1088,23 +1096,23 @@ function initSelect2(node, addOption = {}) {
 
     setSelectEmptyOption($this);
 
-	focusSelect2($this);
+    focusSelect2($this);
 
-	const option = {
-		allowClear: !node.dataset.defaultValue,
-		placeholder: $this.attr('placeholder'),
-		dropdownParent: $this.parent(),
-		processResults: function(json) {
-			return {
-				results: json.data
-					.filter(row => row.id != null && row.text && row.text.trim() !== '')
-					.map(row => ({
-						id:   row.id,
-						text: row.text
-					}))
-			};
-		}
-	}
+    const option = {
+        allowClear: !node.dataset.defaultValue,
+        placeholder: $this.attr('placeholder'),
+        dropdownParent: $this.parent(),
+        processResults: function(json) {
+            return {
+                results: json.data
+                    .filter(row => row.id != null && row.text && row.text.trim() !== '')
+                    .map(row => ({
+                        id:   row.id,
+                        text: row.text
+                    }))
+            };
+        }
+    }
 
     let addHandler = node.dataset.changeAfter !== undefined;
 
@@ -1133,13 +1141,13 @@ function initSelect2(node, addOption = {}) {
                 option[key] = appPlugins.form.select2[node.name][key];
             }
         }
-	}
+    }
 
-	if(Object.keys(addOption).length) {
-		Object.assign(option, addOption);
-	}
+    if(Object.keys(addOption).length) {
+        Object.assign(option, addOption);
+    }
 
-	$this
+    $this
         .wrap('<div class="position-relative w-100"></div>')
         .select2(option)
         .off('change.formSelect2 select2:select.formSelect2')
@@ -1151,13 +1159,13 @@ function initSelect2(node, addOption = {}) {
 }
 
 function setDynamicSelectOptions(selector, params) {
-	const node = document.querySelector(selector);
-	if(!node.value) {
+    const node = document.querySelector(selector);
+    if(!node.value) {
         prepareSelectOptions(document.querySelector(params.target))
         return;
     }
 
-	const data = {
+    const data = {
         _mode: 'option',
         [node.dataset.formField] : node.value
     }
@@ -1166,108 +1174,108 @@ function setDynamicSelectOptions(selector, params) {
         data.render = params.render;
     }
 
-	let url;
-	if(Object.hasOwn(params, 'url')) {
-		url = params.url;
-	}else if(Object.hasOwn(params, 'add_uri')){
-		url = common.BASE_URI + '/' + params.add_uri;
-	}else{
+    let url;
+    if(Object.hasOwn(params, 'url')) {
+        url = params.url;
+    }else if(Object.hasOwn(params, 'add_uri')){
+        url = common.BASE_URI + '/' + params.add_uri;
+    }else{
         url = common.API_URI + '/options';
-	}
+    }
 
-	// 2) AJAX로 method 리스트를 가져온다
-	$.get(url, data)
-		.done(function(json) {
+    // 2) AJAX로 method 리스트를 가져온다
+    $.get(url, data)
+        .done(function(json) {
             if (!json || !Object.hasOwn(json, 'data'))
                 console.warn('data가 반환되지 않음', json);
 
             prepareSelectOptions(document.querySelector(params.target), json.data)
-		})
-		.fail(function() {
-			console.error(`${params.target} 리스트 로드 실패`);
-		});
+        })
+        .fail(function() {
+            console.error(`${params.target} 리스트 로드 실패`);
+        });
 }
 
 // select2 option selected 유동적 부여
 function reloadSelect2(selector, url, preselectedIds = [], template = {id:'id',text:'text'}) {
-	// 비워주기
-	const $sel = $(selector);
-	$sel.val(null);
-	$sel.empty(); // 옵션 싹 비움
+    // 비워주기
+    const $sel = $(selector);
+    $sel.val(null);
+    $sel.empty(); // 옵션 싹 비움
 
-	$.getJSON(url).done(function (json) {
-		const rows = json.data || [];
-		rows.forEach(function (row) {
-			const id   = row[template.id];
-			const text = row[template.text];
-			const isSelected = Array.isArray(preselectedIds)
-				? preselectedIds.includes(id)
-				: preselectedIds === id;
+    $.getJSON(url).done(function (json) {
+        const rows = json.data || [];
+        rows.forEach(function (row) {
+            const id   = row[template.id];
+            const text = row[template.text];
+            const isSelected = Array.isArray(preselectedIds)
+                ? preselectedIds.includes(id)
+                : preselectedIds === id;
 
-			// new Option(text, value, defaultSelected, selected)
-			const opt = new Option(text, id, isSelected, isSelected);
-			$sel.append(opt);
-		});
+            // new Option(text, value, defaultSelected, selected)
+            const opt = new Option(text, id, isSelected, isSelected);
+            $sel.append(opt);
+        });
 
-		// 다 채운 후 Select2 갱신
-		$sel.trigger('change.formSelect2');
-	});
+        // 다 채운 후 Select2 갱신
+        $sel.trigger('change.formSelect2');
+    });
 }
 
 function resetSelect2(selector, removeOptions = false) {
-	const defaultValue = $(selector).attr('data-default-value')??null;
-	$(selector).val(defaultValue).trigger('change')
-	if(removeOptions) $(selector).empty();
+    const defaultValue = $(selector).attr('data-default-value')??null;
+    $(selector).val(defaultValue).trigger('change')
+    if(removeOptions) $(selector).empty();
 }
 
 function setSelect2Readonly(selector, reverse = false) {
-	if(reverse) {
-		document.querySelector(selector).classList.remove('readonly');
-	}else{
-		document.querySelector(selector).classList.add('readonly');
-	}
+    if(reverse) {
+        document.querySelector(selector).classList.remove('readonly');
+    }else{
+        document.querySelector(selector).classList.add('readonly');
+    }
 }
 
 /**
  * Dynamic Fields 관련 methods
  */
 function addDynamicField(fvInstance, name, options) {
-	const form = fvInstance.form; // 또는 document.querySelector('form');
-	const formName = form.getAttribute('name');
+    const form = fvInstance.form; // 또는 document.querySelector('form');
+    const formName = form.getAttribute('name');
 
-	if(common.DYNAMIC_FIELDS[formName] === undefined) {
-		common.DYNAMIC_FIELDS[formName] = new Set();
-	}
+    if(common.DYNAMIC_FIELDS[formName] === undefined) {
+        common.DYNAMIC_FIELDS[formName] = new Set();
+    }
 
-	// 이미 등록되어 있으면 중복 추가 방지
-	if (!Object.hasOwn(fvInstance.getFields(), name)) {
-		fvInstance.addField(name, options);
-		common.DYNAMIC_FIELDS[formName].add(name);
-	}
+    // 이미 등록되어 있으면 중복 추가 방지
+    if (!Object.hasOwn(fvInstance.getFields(), name)) {
+        fvInstance.addField(name, options);
+        common.DYNAMIC_FIELDS[formName].add(name);
+    }
 }
 
 // 2) 안전 리셋: 동적 필드 먼저 정리 후 전체 resetForm
 function safeReset(fvInstance) {
-	const form = fvInstance.form; // 또는 document.querySelector('form');
-	const formName = form.getAttribute('name');
+    const form = fvInstance.form; // 또는 document.querySelector('form');
+    const formName = form.getAttribute('name');
 
-	if(common.DYNAMIC_FIELDS[formName] !== undefined) {
-		for (const name of common.DYNAMIC_FIELDS[formName]) {
-			const el = form.querySelector(`[name="${name}"]`);
-			if (!el || common.DYNAMIC_FIELDS[formName]) {
-				// DOM에 없거나 완전히 제거하고 싶다면 FV에서 먼저 제거
-				fvInstance.removeField(name);
-			} else {
-				// DOM에는 남겨두고 값만 초기화하고 싶다면 필드 단위 리셋
-				// true = 값까지 초기화
-				fvInstance.resetField(name, true);
-			}
-		}
-		common.DYNAMIC_FIELDS[formName].clear();
-	}
+    if(common.DYNAMIC_FIELDS[formName] !== undefined) {
+        for (const name of common.DYNAMIC_FIELDS[formName]) {
+            const el = form.querySelector(`[name="${name}"]`);
+            if (!el || common.DYNAMIC_FIELDS[formName]) {
+                // DOM에 없거나 완전히 제거하고 싶다면 FV에서 먼저 제거
+                fvInstance.removeField(name);
+            } else {
+                // DOM에는 남겨두고 값만 초기화하고 싶다면 필드 단위 리셋
+                // true = 값까지 초기화
+                fvInstance.resetField(name, true);
+            }
+        }
+        common.DYNAMIC_FIELDS[formName].clear();
+    }
 
-	// 마지막에 폼 전체 리셋
-	fvInstance.resetForm(true); // 값/상태/메시지 초기화
+    // 마지막에 폼 전체 리셋
+    fvInstance.resetForm(true); // 값/상태/메시지 초기화
 }
 
 function getFilterData(selector, isFirstDraw = null) {
