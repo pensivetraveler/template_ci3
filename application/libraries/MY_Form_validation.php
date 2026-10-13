@@ -287,8 +287,16 @@ class MY_Form_validation extends CI_Form_validation
         if(!isset($this->CI->db)) return false;
 
         sscanf($params, '%[^.].%[^.].%[^.]', $table, $field, $key);
+
+        // 삭제 표시(del_yn = 'Y')된 행은 중복으로 보지 않음 (Model_Common::checkDuplicate와 같은 기준)
+        // del_yn 컬럼이 없는 테이블은 기존처럼 전체 행 기준
+        $hasDelYn = $this->CI->db->field_exists(DEL_YN_COLUMN_NAME, $table);
+
         if($key && isset($this->_field_data[$key], $this->_field_data[$key]['postdata'])) {
             $this->CI->db->where_not_in($key, [$this->_field_data[$key]['postdata']]);
+        }
+        if($hasDelYn) {
+            $this->CI->db->where(DEL_YN_COLUMN_NAME, 'N');
         }
 
         return $this->CI->db->limit(1)->get_where($table, array($field => $value))->num_rows() === 0;
