@@ -131,6 +131,15 @@ class MY_Controller_WEB extends MY_Controller
         if(!$this->config->item('error_occurs')) $this->load->view($this->baseViewPath, $data);
     }
 
+    /**
+     * 화면 출력 직전 처리 (CI_Output::_display에서 호출)
+     * - 로컬 js/css 주소에 파일 수정 시각 버전 추가
+     */
+    public function _output($output)
+    {
+        echo add_asset_version((string)$output);
+    }
+
 	protected function addJsVars($data)
 	{
 		foreach ($data as $key => $val) {
