@@ -80,7 +80,7 @@ if(ENVIRONMENT === 'development'){
 if(php_sapi_name() === 'cli') {
     define("_HTTP", "https://");
 }else{
-    if((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) {
+    if((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 || strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https') {
         define("_HTTP", "https://");
     }else{
         define("_HTTP", "http://");
