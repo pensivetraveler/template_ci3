@@ -211,14 +211,16 @@ class MY_Controller extends CI_Controller
         $data = $this->Model_File->getDataWhere([], ['file_id' => $key]);
         if (!$data) return $response;
 
-        if (!is_file($data->full_path)) {
+        $this->load->library('storage');
+        $content = $this->storage->read($this->storage->keyFromUri($data->full_path));
+        if ($content === null) {
             $response['code'] = ERROR_DOWNLOAD_NOTFILE;
             return $response;
         }
 
         try {
             $this->Model_File->modNumb('download_cnt', 1, ['file_id' => $key]);
-            force_download($data->client_name, file_get_contents($data->full_path));
+            force_download($data->client_name, $content);
         } catch (Exception $e) {
             log_message('error', 'downloader : modNumb error ' . $this->db->last_query());
             return [
@@ -320,11 +322,13 @@ class MY_Controller extends CI_Controller
 
     protected function delFileData($dto)
     {
-        $fileData = $this->getFileData($dto);
+        // delData와 같은 조건(['file_id' => ...])으로 조회 (getFileData는 ['where' => ...] 형식이라 조건이 무시됨)
+        $fileData = $this->Model_File->getDataWhere([], $dto);
         if(!$fileData) $this->response(['code' => UPLOAD_DATA_NOT_EXIST]);
 
         $this->Model_File->delData($dto);
-        if(!unlink($fileData->full_path)) $this->response(['code' => INTERNAL_SERVER_ERROR]);
+        $this->load->library('storage');
+        if(!$this->storage->delete($this->storage->keyFromUri($fileData->full_path))) $this->response(['code' => INTERNAL_SERVER_ERROR]);
     }
 
     protected function getOptions($field, $attr = []): array

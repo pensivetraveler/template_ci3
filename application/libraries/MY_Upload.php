@@ -5,10 +5,46 @@ class MY_Upload extends CI_Upload
 {
 	protected array $uploadConfig;
 
+	/**
+	 * 저장소가 S3이면 업로드한 파일의 s3:// 경로 (data()의 full_path로 돌려줌)
+	 */
+	protected $storedUri = null;
+
+	/**
+	 * 업로드 후 저장소가 S3이면 S3로 올리고 로컬 파일은 지운다
+	 */
+	public function do_upload($field = 'userfile')
+	{
+		$this->storedUri = null;
+		if (!parent::do_upload($field)) return FALSE;
+
+		$this->_CI->load->library('storage');
+		if (!$this->_CI->storage->isS3()) return TRUE;
+
+		$localPath = $this->upload_path . $this->file_name;
+		$key = $this->_CI->storage->keyFromUri($localPath);
+		$stored = $this->_CI->storage->putFile($key, $localPath);
+		@unlink($localPath);
+
+		if (!$stored) {
+			$this->set_error('upload_destination_error', 'error');
+			return FALSE;
+		}
+
+		$this->storedUri = $this->_CI->storage->uri($key);
+		return TRUE;
+	}
+
 	function data($index = NULL)
 	{
-		$data = parent::data($index);
+		$data = parent::data();
+		if ($this->storedUri) {
+			$data['full_path'] = $this->storedUri;
+			$data['file_path'] = dirname($this->storedUri) . '/';
+		}
 		$data['file_link'] = get_filepath_from_link($data['full_path']);
+
+		if (!empty($index)) return $data[$index] ?? NULL;
 		return $data;
 	}
 

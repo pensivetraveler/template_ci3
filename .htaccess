@@ -32,7 +32,7 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php/$1 [L,QSA]
     #<Files ~ "\.(env|env.development|env.production|json|config.js|md|gitignore|gitattributes|lock)$">
-    <Files ~ "\.(env|env.development|env.production|config.js|md|gitignore|gitattributes|lock)$">
+    <Files ~ "\.(env|env.development|env.production|config.js|md|gitignore|gitattributes|lock|bak)$">
         Order allow,deny
         Deny from all
     </Files>

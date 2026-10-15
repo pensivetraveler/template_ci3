@@ -14,7 +14,8 @@
         "php": ">=7.4",
         "symfony/dotenv": "^5.4",
         "ext-json": "*",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "aws/aws-sdk-php": "^3.337"
     },
     "suggest": {
         "paragonie/random_compat": "Provides better randomness in PHP 5.x"
@@ -41,6 +42,12 @@
         },
         "platform": {
             "php": "7.4.33"
+        },
+        "audit": {
+            "ignore": {
+                "PKSA-4t1p-xpk2-nsss": "CloudFront 정책 서명 기능은 쓰지 않음 (PHP 7.4 지원 마지막 3.337.x에 남아 있는 권고)",
+                "PKSA-dxyf-6n16-t87m": "S3 Encryption Client는 쓰지 않음 (PHP 7.4 지원 마지막 3.337.x에 남아 있는 권고)"
+            }
         }
     }
 }

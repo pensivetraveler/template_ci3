@@ -42,4 +42,12 @@ $config['kakao_login']['callback_url'] = 'kakao/callback';
 $config['kakao_login']['cliend_id'] = '';
 $config['kakao_login']['secret'] = '';
 
+/*
+|--------------------------------------------------------------------------
+| FILE EDITOR (module/file)
+|--------------------------------------------------------------------------
+| 편집기로 열람·수정할 수 있는 최상위 경로 (FCPATH 기준, 끝에 /)
+*/
+$config['file_editor_roots'] = ['public/'];
+
 require_once __DIR__.'/custom_options.php';

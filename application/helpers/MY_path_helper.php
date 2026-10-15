@@ -1,9 +1,14 @@
 <?php
 if ( ! function_exists('get_filepath_from_link'))
 {
-    // path 로부터 link return
+    // path 로부터 link return (S3에 저장한 파일은 s3://버킷/키)
     function get_filepath_from_link($path): string
     {
+        if (strpos((string)$path, 's3://') === 0) {
+            $ci =& get_instance();
+            $ci->load->library('storage');
+            return $ci->storage->url($ci->storage->keyFromUri($path));
+        }
         return base_url('/'.str_replace(FCPATH, '', $path));
     }
 }
