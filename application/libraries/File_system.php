@@ -120,14 +120,16 @@ class File_system
         $data = $this->CI->Model_File->getDataWhere([], ['file_id' => $key]);
         if (!$data) return $response;
 
-        if (!is_file($data->full_path)) {
+        $this->CI->load->library('storage');
+        $content = $this->CI->storage->read($this->CI->storage->keyFromUri($data->full_path));
+        if ($content === null) {
             $response['code'] = ERROR_DOWNLOAD_NOTFILE;
             return $response;
         }
 
         try {
             $this->CI->Model_File->modNumb('download_cnt', 1, ['file_id' => $key]);
-            force_download($data->client_name, file_get_contents($data->full_path));
+            force_download($data->client_name, $content);
         } catch (Exception $e) {
             log_message('error', 'downloader : modNumb error ' . $this->CI->db->last_query());
             return [
@@ -190,7 +192,8 @@ class File_system
         if(!$fileData) $this->CI->response(['code' => UPLOAD_DATA_NOT_EXIST]);
 
         $this->CI->Model_File->delData($dto);
-        if(!unlink($fileData->full_path)) $this->CI->response(['code' => INTERNAL_SERVER_ERROR]);
+        $this->CI->load->library('storage');
+        if(!$this->CI->storage->delete($this->CI->storage->keyFromUri($fileData->full_path))) $this->CI->response(['code' => INTERNAL_SERVER_ERROR]);
     }
 
     public function makeFolderZipData($path): array

@@ -6,14 +6,14 @@ require_once __DIR__.'/Common.php';
 class File extends Common
 {
     /**
-     * 편집을 허용할 최상위 디렉토리
+     * 편집을 허용할 최상위 경로 (FCPATH 기준, config: file_editor_roots)
      *
-     * 예:
-     * /var/www/html/templates/
+     * 예: ['public/templates/']
      *
-     * 이 폴더 밖으로는 접근 불가하게 막는다.
+     * 이 경로 밖으로는 접근 불가하게 막는다.
+     * 파일은 Storage 라이브러리로 읽고 쓴다 (로컬 디스크 / S3)
      */
-    private $basePath;
+    private $roots = [];
 
     /**
      * 편집 가능한 확장자
@@ -44,7 +44,7 @@ class File extends Common
 
         parent::__construct();
 
-        $this->basePath = FCPATH;
+        $this->roots = $this->config->item('file_editor_roots') ?: ['public/'];
 
         $this->output->set_content_type('application/json', 'utf-8');
 
@@ -53,6 +53,7 @@ class File extends Common
         }
 
         $this->load->helper(['file', 'directory']);
+        $this->load->library('storage');
         $this->load->library('zip');
     }
 
@@ -67,19 +68,17 @@ class File extends Common
         $dir = $this->input->get('dir', true);
         $dir = $dir ? trim($dir, '/') : '';
 
-        $targetPath = $this->basePath . $dir;
-
-        $safePath = $this->getSafePath($targetPath, true);
+        $safePath = $this->getSafePath($dir);
 
         if (!$safePath) {
             $this->json_response(false, '잘못된 디렉토리 경로입니다.');
         }
 
-        if (!is_dir($safePath)) {
+        if (!$this->storage->isDir($safePath)) {
             $this->json_response(false, '디렉토리가 존재하지 않습니다.');
         }
 
-        $tree = $this->scanDirectory($safePath, realpath($this->basePath));
+        $tree = $this->buildTree($safePath, $this->storage->listFiles($safePath));
 
         $this->json_response(true, 'success', [
             'base_dir' => $dir,
@@ -100,16 +99,10 @@ class File extends Common
             $this->json_response(false, 'path 값이 없습니다.');
         }
 
-        $targetPath = $this->basePath . ltrim($path, '/');
-
-        $safePath = $this->getSafePath($targetPath, false);
+        $safePath = $this->getSafePath($path);
 
         if (!$safePath) {
             $this->json_response(false, '잘못된 파일 경로입니다.');
-        }
-
-        if (!is_file($safePath)) {
-            $this->json_response(false, '파일이 존재하지 않습니다.');
         }
 
         $ext = strtolower(pathinfo($safePath, PATHINFO_EXTENSION));
@@ -118,14 +111,14 @@ class File extends Common
             $this->json_response(false, '편집할 수 없는 파일 형식입니다.');
         }
 
-        $content = file_get_contents($safePath);
+        $content = $this->storage->read($safePath);
 
-        if ($content === false) {
-            $this->json_response(false, '파일을 읽을 수 없습니다.');
+        if ($content === null) {
+            $this->json_response(false, '파일이 존재하지 않습니다.');
         }
 
         $this->json_response(true, 'success', [
-            'path' => $this->normalizeRelativePath($safePath),
+            'path' => $safePath,
             'filename' => basename($safePath),
             'extension' => $ext,
             'content' => $content
@@ -159,15 +152,9 @@ class File extends Common
             $this->json_response(false, 'path 값이 없습니다.');
         }
 
-        $targetPath = $this->basePath . ltrim($path, '/');
+        $targetPath = $this->getSafePath($path);
 
-        /**
-         * 저장 대상 파일이 아직 존재하지 않을 수도 있으므로
-         * 파일 자체 realpath()가 아니라 dirname 기준으로 검증한다.
-         */
-        $safeDir = $this->getSafePath(dirname($targetPath), true);
-
-        if (!$safeDir) {
+        if (!$targetPath || !$this->storage->isDir(dirname($targetPath))) {
             $this->json_response(false, '잘못된 저장 경로입니다.');
         }
 
@@ -191,22 +178,18 @@ class File extends Common
         /**
          * 기존 파일이 있으면 백업 생성
          */
-        if (is_file($targetPath)) {
-            $backupResult = $this->backupFile($targetPath);
-
-            if (!$backupResult) {
-                $this->json_response(false, '백업 파일 생성에 실패했습니다.');
-            }
+        if (!$this->backupFile($targetPath)) {
+            $this->json_response(false, '백업 파일 생성에 실패했습니다.');
         }
 
-        $result = file_put_contents($targetPath, $content, LOCK_EX);
+        $result = $this->storage->write($targetPath, (string)$content);
 
         if ($result === false) {
             $this->json_response(false, '파일 저장에 실패했습니다.');
         }
 
         $this->json_response(true, '저장되었습니다.', [
-            'path' => $this->normalizeRelativePath($targetPath),
+            'path' => $targetPath,
             'bytes' => $result
         ]);
     }
@@ -224,10 +207,9 @@ class File extends Common
             $this->json_response(false, 'path 값이 없습니다.');
         }
 
-        $targetPath = $this->basePath . ltrim($path, '/');
-        $safePath = $this->getSafePath($targetPath, false);
+        $safePath = $this->getSafePath($path);
 
-        if (!$safePath || !is_file($safePath)) {
+        if (!$safePath || !$this->storage->exists($safePath)) {
             $this->json_response(false, '이미지 파일이 존재하지 않습니다.');
         }
 
@@ -238,10 +220,10 @@ class File extends Common
         }
 
         $this->json_response(true, 'success', [
-            'path' => $this->normalizeRelativePath($safePath),
+            'path' => $safePath,
             'filename' => basename($safePath),
             'extension' => $ext,
-            'url' => base_url($this->normalizeRelativePath($safePath)) . '?t=' . time()
+            'url' => $this->storage->url($safePath) . '?t=' . time()
         ]);
     }
 
@@ -266,12 +248,9 @@ class File extends Common
             $this->json_response(false, '업로드된 이미지가 없습니다.');
         }
 
-        $targetPath = $this->basePath . ltrim($path, '/');
-        $targetDir = dirname($targetPath);
+        $targetPath = $this->getSafePath($path);
 
-        $safeDir = $this->getSafePath($targetDir, true);
-
-        if (!$safeDir) {
+        if (!$targetPath || !$this->storage->isDir(dirname($targetPath))) {
             $this->json_response(false, '잘못된 저장 경로입니다.');
         }
 
@@ -291,26 +270,23 @@ class File extends Common
         /**
          * 기존 파일이 있으면 백업
          */
-        if (is_file($targetPath)) {
-            $backupResult = $this->backupFile($targetPath);
-
-            if (!$backupResult) {
-                $this->json_response(false, '백업 파일 생성에 실패했습니다.');
-            }
+        if (!$this->backupFile($targetPath)) {
+            $this->json_response(false, '백업 파일 생성에 실패했습니다.');
         }
 
         /**
          * 확장자를 유지해서 덮어쓰기
          */
-        $result = move_uploaded_file($_FILES['image']['tmp_name'], $targetPath);
+        $tmpName = $_FILES['image']['tmp_name'];
+        $result = is_uploaded_file($tmpName) && $this->storage->putFile($targetPath, $tmpName);
 
         if (!$result) {
             $this->json_response(false, '이미지 저장에 실패했습니다.');
         }
 
         $this->json_response(true, '이미지가 저장되었습니다.', [
-            'path' => $this->normalizeRelativePath($targetPath),
-            'url' => base_url('templates/' . $this->normalizeRelativePath($targetPath)) . '?t=' . time()
+            'path' => $targetPath,
+            'url' => $this->storage->url($targetPath) . '?t=' . time()
         ]);
     }
 
@@ -341,16 +317,13 @@ class File extends Common
             $this->json_response(false, 'path 값이 없습니다.');
         }
 
-        $targetPath = $this->basePath . ltrim($path, '/');
-        $targetDir = dirname($targetPath);
+        $targetPath = $this->getSafePath($path);
 
-        $safeDir = $this->getSafePath($targetDir, true);
-
-        if (!$safeDir) {
+        if (!$targetPath || !$this->storage->isDir(dirname($targetPath))) {
             $this->json_response(false, '잘못된 생성 경로입니다.');
         }
 
-        if (file_exists($targetPath)) {
+        if ($this->storage->exists($targetPath)) {
             $this->json_response(false, '이미 같은 이름의 파일이 존재합니다.');
         }
 
@@ -364,14 +337,14 @@ class File extends Common
             $content = "{}";
         }
 
-        $result = file_put_contents($targetPath, $content, LOCK_EX);
+        $result = $this->storage->write($targetPath, (string)$content);
 
         if ($result === false) {
             $this->json_response(false, '파일 생성에 실패했습니다.');
         }
 
         $this->json_response(true, '파일이 생성되었습니다.', [
-            'path' => $this->normalizeRelativePath($targetPath)
+            'path' => $targetPath
         ]);
     }
 
@@ -400,10 +373,9 @@ class File extends Common
             $this->json_response(false, 'path 값이 없습니다.');
         }
 
-        $targetPath = $this->basePath . ltrim($path, '/');
-        $safePath = $this->getSafePath($targetPath, false);
+        $safePath = $this->getSafePath($path);
 
-        if (!$safePath || !is_file($safePath)) {
+        if (!$safePath || !$this->storage->exists($safePath)) {
             $this->json_response(false, '파일이 존재하지 않습니다.');
         }
 
@@ -415,7 +387,7 @@ class File extends Common
 
         $this->backupFile($safePath);
 
-        $result = unlink($safePath);
+        $result = $this->storage->delete($safePath);
 
         if (!$result) {
             $this->json_response(false, '파일 삭제에 실패했습니다.');
@@ -425,46 +397,19 @@ class File extends Common
     }
 
     /**
-     * 디렉토리 재귀 스캔
+     * 파일 키 목록으로 트리 구성
      *
      * 정렬 기준:
      * 1. directory 먼저
      * 2. file 나중
      * 3. 각각 이름 기준 오름차순 정렬
      */
-    private function scanDirectory($dir, $baseRealPath)
+    private function buildTree($base, array $keys)
     {
-        $directories = [];
-        $files = [];
+        $root = ['dirs' => [], 'files' => []];
 
-        $items = scandir($dir);
-
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-
-            /**
-             * 숨김 파일 제외
-             */
-            if (substr($item, 0, 1) === '.') {
-                continue;
-            }
-
-            $fullPath = $dir . DIRECTORY_SEPARATOR . $item;
-
-            if (is_dir($fullPath)) {
-                $directories[] = [
-                    'type' => 'directory',
-                    'name' => $item,
-                    'path' => $this->normalizeRelativePath($fullPath),
-                    'children' => $this->scanDirectory($fullPath, $baseRealPath)
-                ];
-
-                continue;
-            }
-
-            $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+        foreach ($keys as $key) {
+            $ext = strtolower(pathinfo($key, PATHINFO_EXTENSION));
 
             /**
              * 화면에 보여줄 파일만 제한
@@ -473,64 +418,79 @@ class File extends Common
                 continue;
             }
 
-            $files[] = [
+            $segments = explode('/', substr($key, strlen($base) + 1));
+            $name = array_pop($segments);
+
+            $node =& $root;
+            $path = $base;
+            foreach ($segments as $segment) {
+                $path .= '/' . $segment;
+                if (!isset($node['dirs'][$segment])) {
+                    $node['dirs'][$segment] = ['path' => $path, 'dirs' => [], 'files' => []];
+                }
+                $node =& $node['dirs'][$segment];
+            }
+
+            $node['files'][] = [
                 'type' => 'file',
-                'name' => $item,
-                'path' => $this->normalizeRelativePath($fullPath),
+                'name' => $name,
+                'path' => $key,
                 'extension' => $ext,
                 'editable' => $this->isEditableExtension($ext),
                 'image' => $this->isImageExtension($ext)
             ];
+            unset($node);
         }
 
-        /**
-         * 디렉토리 이름순 정렬
-         */
+        return $this->flattenTree($root);
+    }
+
+    private function flattenTree(array $node)
+    {
+        $directories = [];
+        foreach ($node['dirs'] as $name => $child) {
+            $directories[] = [
+                'type' => 'directory',
+                'name' => (string)$name,
+                'path' => $child['path'],
+                'children' => $this->flattenTree($child)
+            ];
+        }
+
+        $files = $node['files'];
+
         usort($directories, function ($a, $b) {
             return strcasecmp($a['name'], $b['name']);
         });
 
-        /**
-         * 파일 이름순 정렬
-         */
         usort($files, function ($a, $b) {
             return strcasecmp($a['name'], $b['name']);
         });
 
-        /**
-         * directory 먼저, file 나중
-         */
         return array_merge($directories, $files);
     }
 
     /**
      * 경로 보안 검증
      *
-     * $mustBeDirectory = true 이면 디렉토리 기준 검증
-     * $mustBeDirectory = false 이면 파일 기준 검증
+     * 허용 경로(roots) 안의 FCPATH 기준 상대 경로로 바꿔 돌려준다. 벗어나면 false
      */
-    private function getSafePath($path, $mustBeDirectory = false)
+    private function getSafePath($path)
     {
-        return get_safe_path($path, $this->basePath, $mustBeDirectory);
-    }
+        $path = trim(str_replace('\\', '/', (string)$path), '/');
 
-    /**
-     * 절대 경로를 basePath 기준 상대 경로로 변환
-     */
-    private function normalizeRelativePath($fullPath)
-    {
-        $baseRealPath = realpath($this->basePath);
-        $fullRealPath = realpath($fullPath);
-
-        if (!$fullRealPath) {
-            $fullRealPath = $fullPath;
+        if ($path === '' || strpos($path, "\0") !== false || preg_match('#(^|/)\.\.?(/|$)#', $path)) {
+            return false;
         }
 
-        $relativePath = str_replace($baseRealPath, '', $fullRealPath);
-        $relativePath = str_replace('\\', '/', $relativePath);
-        $relativePath = trim($relativePath, '/');
+        foreach ($this->roots as $root) {
+            $root = trim($root, '/');
+            if ($path === $root || strpos($path, $root . '/') === 0) {
+                return $path;
+            }
+        }
 
-        return $relativePath;
+        return false;
     }
 
     private function isEditableExtension($ext)
@@ -545,10 +505,12 @@ class File extends Common
 
     /**
      * 저장/삭제 전 백업
+     *
+     * S3는 버킷 버전 관리가 이전 내용을 남기므로 따로 백업하지 않는다
      */
     private function backupFile($targetPath)
     {
-        if (!is_file($targetPath)) {
+        if ($this->storage->isS3() || !is_file(FCPATH . $targetPath)) {
             return true;
         }
 
@@ -560,11 +522,10 @@ class File extends Common
             }
         }
 
-        $relativePath = $this->normalizeRelativePath($targetPath);
-        $safeName = str_replace(['/', '\\'], '__', $relativePath);
+        $safeName = str_replace(['/', '\\'], '__', $targetPath);
 
         $backupFile = $backupBasePath . $safeName . '.' . date('His') . '.bak';
 
-        return copy($targetPath, $backupFile);
+        return copy(FCPATH . $targetPath, $backupFile);
     }
 }
