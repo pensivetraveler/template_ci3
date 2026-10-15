@@ -322,7 +322,8 @@ class MY_Controller extends CI_Controller
 
     protected function delFileData($dto)
     {
-        $fileData = $this->getFileData($dto);
+        // delData와 같은 조건(['file_id' => ...])으로 조회 (getFileData는 ['where' => ...] 형식이라 조건이 무시됨)
+        $fileData = $this->Model_File->getDataWhere([], $dto);
         if(!$fileData) $this->response(['code' => UPLOAD_DATA_NOT_EXIST]);
 
         $this->Model_File->delData($dto);

@@ -188,7 +188,8 @@ class File_system
     {
         if(!$this->fileModelLoaded) show_error('File Model not loaded');
 
-        $fileData = $this->getFileData($dto);
+        // delData와 같은 조건(['file_id' => ...])으로 조회 (getFileData는 ['where' => ...] 형식이라 조건이 무시됨)
+        $fileData = $this->CI->Model_File->getDataWhere([], $dto);
         if(!$fileData) $this->CI->response(['code' => UPLOAD_DATA_NOT_EXIST]);
 
         $this->CI->Model_File->delData($dto);

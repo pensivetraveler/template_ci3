@@ -219,6 +219,7 @@ class Storage
                 'Key' => $this->s3Key($key),
                 'Body' => $content,
                 'ContentType' => $this->contentType($key),
+                'CacheControl' => $this->cacheControl($key),
             ]);
             $this->forget($key);
             return strlen($content);
@@ -248,6 +249,7 @@ class Storage
                 'Key' => $this->s3Key($key),
                 'SourceFile' => $localPath,
                 'ContentType' => $this->contentType($key),
+                'CacheControl' => $this->cacheControl($key),
             ]);
             $this->forget($key);
             return true;
@@ -449,6 +451,19 @@ class Storage
 
         get_instance()->load->helper('file');
         return get_mime_by_extension($key) ?: 'application/octet-stream';
+    }
+
+    /**
+     * 브라우저·CDN 캐시 (루트 .htaccess와 같은 기준)
+     * - css/js/html/json: 매번 변경 여부 확인 (?v= 가 붙은 주소는 CloudFront 캐시 키가 달라짐)
+     */
+    protected function cacheControl($key): string
+    {
+        $ext = strtolower(pathinfo($key, PATHINFO_EXTENSION));
+        if (in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico'])) return 'public, max-age=3600';
+        if (in_array($ext, ['woff', 'woff2', 'ttf', 'otf', 'eot'])) return 'public, max-age=2592000';
+
+        return 'no-cache';
     }
 
     protected function connectRedis()
