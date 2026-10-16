@@ -1,3 +1,7 @@
+<IfModule mod_setenvif.c>
+    #Authorization 헤더를 PHP에 전달 (Apache는 기본으로 $_SERVER['HTTP_AUTHORIZATION']에 넣지 않음, REST API 키 검사에 필요)
+    SetEnvIf Authorization "(.+)" HTTP_AUTHORIZATION=$1
+</IfModule>
 <IfModule mod_php.c>
     #Session Auto Start Off
     php_flag session.auto_start off
