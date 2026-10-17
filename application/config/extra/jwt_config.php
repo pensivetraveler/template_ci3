@@ -6,7 +6,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | JWT Secure Key
 |--------------------------------------------------------------------------
 */
-$config['jwt_key'] = 'enMB8ms2Nh8RNz7nRKrGTiMRG9aRPp8G5d';
+// .env JWT_KEY (비워 두면 토큰 라이브러리가 멈춤)
+$config['jwt_key'] = getenv('JWT_KEY') ?: '';
 
 /*
 |-----------------------
