@@ -59,6 +59,9 @@ class Authorization_token
          * Load Config Items Values 
          */
         $this->token_key = $this->CI->config->item('jwt_key');
+        if (!$this->token_key) {
+            show_error('JWT_KEY is not set in .env');
+        }
         $this->token_algorithm = $this->CI->config->item('jwt_algorithm');
         $this->token_prefix = $this->CI->config->item('token_prefix');
         $this->token_header = $this->CI->config->item('token_header');
