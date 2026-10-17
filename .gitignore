@@ -212,3 +212,8 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 
 visitors/*
 public/uploads/*
+
+### env (비밀 값, 커밋하지 않음 — .env.example 참고)
+.env
+.env.*
+!.env.example
