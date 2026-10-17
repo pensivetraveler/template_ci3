@@ -46,8 +46,10 @@ class MY_Hooks
     public function systemOfInspection()
     {
         if(SYSTEM_INSPECTION) {
-            $allowedIps = json_decode(getenv('ALLOWED_IPS'));
-            if(!in_array($_SERVER['REMOTE_ADDR'], $allowedIps)) {
+            $allowedIps = json_decode((string)getenv('ALLOWED_IPS'), true) ?: [];
+            // 로드밸런서 뒤에서는 REMOTE_ADDR가 로드밸런서 주소이므로 CI ip_address() (proxy_ips + X-Forwarded-For)
+            $clientIp = get_instance()->input->ip_address();
+            if(!in_array($clientIp, $allowedIps, true)) {
                 builder_misc_view('');
             }
         }
