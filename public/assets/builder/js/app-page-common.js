@@ -51,6 +51,11 @@ function checkInputSubmittable(node, form) {
     if(node.type === 'file') {
         if(node.files.length > 0) return true;
     }else{
+        // 체크 해제된 체크박스·라디오는 변경 여부와 관계없이 보내지 않음 (값이 'Y' 등이라 보내면 켜짐으로 저장됨)
+        if((node.type === 'checkbox' || node.type === 'radio') && node.checked !== true) {
+            return false;
+        }
+
         if(node.hasAttribute('data-detect-changed') && !isAttributeValueTrue(node, 'data-detect-changed')) {
             return true;
         }else if(node.type === 'hidden') {
