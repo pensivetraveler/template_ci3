@@ -156,6 +156,17 @@ function get_admin_form_text($data, $add_class = array(), $attributes = array())
         'form-text'
     ];
 
+    // form_text: 문자열 또는 ['line' => 언어 키/문구, 'replace' => %s 치환값, 'icon' => 아이콘, 'icon_size' => 크기]
+    $icon = '';
+    $iconSize = '';
+    $replace = null;
+    if(is_array($text)) {
+        $icon = $text['icon'] ?? '';
+        $iconSize = $text['icon_size'] ?? '';
+        $replace = $text['replace'] ?? null;
+        $text = $text['line'] ?? '';
+    }
+
     if(!$text){
         $line = '';
         $default['class'][] = 'd-none';
@@ -167,8 +178,8 @@ function get_admin_form_text($data, $add_class = array(), $attributes = array())
         }else{
             $line = $text;
         }
-        $icon = $text['icon'] ?? '';
-        if($icon) $line = get_icon($icon, false, $text['icon_size'] ?? '', '.ms-1.align-middle').convert_selector_to_html('span.mx-1.align-middle', true, $line);
+        if($replace !== null && strpos($line, '%') !== false) $line = vsprintf($line, (array)$replace);
+        if($icon) $line = get_icon($icon, false, $iconSize, '.ms-1.align-middle').convert_selector_to_html('span.mx-1.align-middle', true, $line);
     }
 
     if(isset($data['form_attributes'])){
