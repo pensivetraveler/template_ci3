@@ -143,7 +143,7 @@ function get_admin_form_radio($item, $value, $text, $id = null)
 function get_admin_form_onoff($item, $formType)
 {
     $ci =& get_instance();
-    return $ci->load->view('builder/layout/onoff', $item, true);
+    return $ci->load->view('builder/custom/onoff', $item, true);
 }
 
 function get_admin_form_text($data, $add_class = array(), $attributes = array()): string
