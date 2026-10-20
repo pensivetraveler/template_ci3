@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 event.element.value = editors[`${textareaId}`].root.innerHTML;
             }
         }
-        console.log('value : ', event.element.value);
+        console.log('value : ', event.element.type === 'password' ? '********' : event.element.value);
     }).on('core.validator.validated', function(event) {
         // 특정 요소에 대한 유효성 검사 시작 후
         console.log('%c Validator for the field ' + event.field + ' is validated.', 'color: skyblue');

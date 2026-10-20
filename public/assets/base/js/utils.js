@@ -406,6 +406,8 @@ function logFormData(formData) {
 		for (const [key, value] of formData.entries()) {
 			if(value instanceof File){
 				json[key] = value.name;
+			}else if(/pass|pwd|secret|token/i.test(key)){
+				json[key] = '********';
 			}else{
 				json[key] = value;
 			}
