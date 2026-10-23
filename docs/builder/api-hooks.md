@@ -657,7 +657,7 @@ $this->responseError(
 
 모든 조회에 `isDelYn`이면 `del_yn='N'`, `isUseYn`이면(where에 `use_yn` 키가 없을 때) `use_yn='Y'`가 자동으로 붙는다. 비활성 행까지 보려면 where에 `use_yn`을 명시하거나 모델의 `useUseYnAsBase`를 끈다.
 
-GET 요청이 조건으로 바뀌는 규칙(`reformat_get_data()`): `exceptValidateKeys`(`_mode, _event, _, select, format, draw, pageNo, limit, searchWord, searchCategory, filters`)를 뺀 **truthy 파라미터는 모두 `where[key] = value`**, `filters`는 `filter`, `render`와 `select`는 그대로 전달된다.
+GET 요청이 조건으로 바뀌는 규칙(`reformat_get_data()`): `exceptValidateKeys`(`_mode, _event, _, select, format, draw, pageNo, limit, searchWord, searchCategory, filters`)를 뺀 **truthy 파라미터는 모두 `where[key] = value`**, `filters`는 `filter`, `render`는 그대로 전달된다. `select`는 `reformat_request_select()`가 단순 컬럼명(`[a-zA-Z_][a-zA-Z0-9_]*`)만 남긴다. 함수·별칭·서브쿼리가 필요한 select는 hook이나 모델 코드에서 직접 지정한다.
 
 > **주의**
 > - `MY_Model::orderBy()`가 `$this->defaultOrderBy`가 아닌 미정의 지역변수를 읽어 `defaultOrderBy`는 효과가 없다. 정렬은 `executeList/beforeList`에서 지정한다.

@@ -103,8 +103,32 @@ if ( ! function_exists('reformat_get_data'))
             }
         }
 
-        $return['select'] = $data['select']??[];
+        $return['select'] = reformat_request_select($data['select'] ?? []);
 
         return $return;
+    }
+}
+
+if ( ! function_exists('reformat_request_select'))
+{
+    /**
+     * 요청 파라미터로 받은 select 를 단순 컬럼명만 남기도록 정리한다.
+     * MY_Model::select() 는 "식 as 별칭" 형태를 이스케이프 없이 쿼리에 넣으므로,
+     * 클라이언트 값에서 함수·서브쿼리·별칭·테이블 접두어를 허용하면 SQL 인젝션이 된다.
+     * 식이 필요한 select 는 컨트롤러/모델 코드에서 직접 지정한다.
+     */
+    function reformat_request_select($select): array
+    {
+        if(is_string($select)) $select = explode(',', $select);
+        if(!is_array($select)) return [];
+
+        $columns = [];
+        foreach ($select as $column) {
+            if(!is_string($column)) continue;
+            $column = trim($column);
+            if(preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $column)) $columns[] = $column;
+        }
+
+        return array_values(array_unique($columns));
     }
 }
