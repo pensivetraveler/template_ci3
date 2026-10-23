@@ -488,7 +488,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }
 
         if($methodConfig['category'] === 'action') {
-            $this->methodConfig = $methodConfig;
+            // 화면 없는 메서드도 setupPlatform·_remap이 읽는 mode·actions·buttons·properties 기본값은 채움 (category는 action 유지)
+            $this->methodConfig = fill_config_properties($methodConfig, $this->config->get("method_base_config", []));
             return;
         }
 

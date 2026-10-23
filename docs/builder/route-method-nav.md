@@ -196,7 +196,7 @@ route_config[class]                    (가장 우선)
   - `routeConfig['methods']`에서 찾고, 없으면 소문자로 다시 찾는다.
   - 목록에 없는 method면 `trigger_error` 후 생성자 안에서 `$this->index()`를 호출한다(이 시점엔 로그인 확인 전이라 `allowNoLogin=false` route는 `noLoginRedirect`로 간다).
   - `category`가 없으면 항목 내용을 **무시하고** `method_base_config`를 그대로 쓴다.
-  - `category === 'action'`이면 레이어링 없이 원본을 그대로 쓴다.
+  - `category === 'action'`(화면 없는 메서드, 예: 파일 다운로드)이면 category별 레이어링은 하지 않고 `method_base_config`로 빈 키만 채운다. `mode`를 지정하지 않으면 `read`가 된다.
   - 그 외에는 `BuilderCommonTrait::fillMethodConfigProperties()`를 거친다.
 
 ### 레이어링 체인 (`BuilderCommonTrait::fillMethodConfigProperties()`)
@@ -321,7 +321,6 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
 > **주의**
 > - view 파이프라인은 `subtype === 'view'`에서만 동작하는데 그런 config가 없다 — 현재 `VIEW_COLUMNS`/`prepareViewData()`는 어디서도 실행되지 않음. dashboard는 `builder/layout/view.php`가 잡혀 `$viewType` 미정의.
 > - form 페이지의 `$formType`은 `type`, JS `FORM_TYPE`은 `subtype` — 이름은 같고 의미가 다르다. `layout/form_{type}.php`는 base/side/modal/tabs만 있어 auth/menu/article type은 컨트롤러가 `subPage`를 직접 지정해야 한다.
-> - `category: 'action'` 항목은 레이어링되지 않지만 `setJSVariables()`가 `actions`, `buttons`, `properties.identifier`를 읽으므로 직접 넣어야 한다.
 > - baseMethod 항목에 `category`가 없으면 `setupPlatformPage()`에서 notice, list가 아닌 baseMethod route는 mode 검사를 전혀 하지 않는다.
 > - `method_list_base_config`의 `buttons.excel=true` 기본값 때문에 excel method가 없어도 base_auth의 I 비트가 켜진다.
 > - excel 페이지는 `getExcelHeaders()` 버그로 현재 항상 에러 — [view-excel.md](view-excel.md) 참고.

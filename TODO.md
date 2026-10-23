@@ -267,7 +267,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Builder_WEB::__construct` `admin_base_config.php`가 builder base와 같은 내용으로 최상위 교체 (base config 깊은 병합 필요 — TODO 주석 존재)
 - [ ] `builder_route_helper.php::fill_config_properties` 빈 배열로 상위 기본값을 끌 방법이 없음 (키마다 `false` 필요 — `null`/명시적 리스트 등 끄기 규칙 정의)
 - [ ] `MY_Builder_WEB::setMethodConfig` `category` 없는 method 항목은 내용이 통째로 버려지고 `method_base_config`로 대체 (경고 없이 설정 무시)
-- [ ] `MY_Builder_WEB::setMethodConfig` `category: 'action'`은 레이어링을 생략하는데 `setJSVariables()`가 `actions`/`buttons`/`properties.identifier`를 요구 (action 전용 기본값 config 필요)
+- [x] `MY_Builder_WEB::setMethodConfig` `category: 'action'`은 레이어링을 생략하는데 `setJSVariables()`가 `actions`/`buttons`/`properties.identifier`를 요구 (action 전용 기본값 config 필요) → `method_base_config`로 빈 키를 채우도록 수정
 - [ ] `MY_Builder_API::__construct` method/nav config를 로드하지 않아 `getMethodList()`·`MenuList::options_get()`이 원본 route를 별도 규칙으로 해석 (WEB 레이어링 결과와 불일치)
 - [ ] 설정 이름 규칙 이원화: WEB `BuilderColumnsTrait::setConfigList`는 `snakeize(class)`와 탐색 순서, `MY_Builder_API::__construct`는 `form_/list_/view_{strtolower(class)}_config`, `MY_Builder_WEB::setViewColumns`는 `view_{resourceConfig}_config`(둘 다 `setConfigList` 미적용) (camelCase 클래스·resourceConfig 사용 시 WEB/API가 다른 설정을 읽음)
 - [ ] `MY_Builder_API::setProperties` API `formConfig`가 `builder_form_base`와만 얕게 병합되고 form/group_attributes 기본값 미병합 (WEB `BuilderColumnsTrait::setFormColumn`과 해석 다름)
