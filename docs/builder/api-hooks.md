@@ -223,7 +223,9 @@ add($dto, $bool=false)
 modify($key, $dto, $bool=true)
  ├ ★beforeModify($key, $dto)      기본 동작 없음(그대로 반환)
  ├ ★executeModify($key, $dto, $bool, $model=null)
- │    $model=null 이면 각 모델마다 setModData($dto, $m) → [$set, $where] → modData($set, $where, $bool, $m)
+ │    $model=null 이면 각 모델마다 setModData($dto, $m) → [$set, $where]
+ │      메인 Model은 $where를 $this->idData(URL·쿼리로 확인한 식별자)로 바꿈
+ │      checkModifyIdData($where, $m): 식별자가 빠지면 400 → $set에서 식별자 컬럼 제거 → modData($set, $where, $bool, $m)
  │       AI 모델:     where = [identifier => $dto[identifier]]       ← $this->idData가 아니라 바디 값
  │       non-AI 모델: where = 바디의 PK+unique 값 (set에서는 제거)
  │    $model 지정 시 setData 후 modData($dto, $this->idData, …)
@@ -278,7 +280,7 @@ remove($key, $data, $bool=true)
 
 > **주의**
 > - `beforePost()`에서 parent 이후에 바꾼 값은 검증·중복검사를 거치지 않는다. 검증 대상이 되어야 하면 parent 호출 전에 `$_POST`를 바꾸거나 `beforeAdd/beforeModify`에서 직접 검사한다.
-> - 기본 `executeModify()`는 `$this->idData`가 아니라 **바디의 식별자/PK**로 where를 만든다. 바디에 PK가 없는 non-AI 모델은 where가 비어 **테이블 전체가 갱신**된다. PATCH 토글을 받는 non-AI 모델은 `MenuAuth`처럼 `executeModify()`를 오버라이드한다(5-6).
+> - 기본 `executeModify()`는 메인 `Model`의 수정 대상을 `$this->idData`(URL·쿼리로 확인한 식별자)로 정한다. 부모·자식 모델은 바디의 식별자/PK를 쓰므로 폼에 해당 hidden 필드가 있어야 한다. 식별자가 하나라도 빠지면 `checkModifyIdData()`가 400으로 멈추고, 모델 단에서도 `Model_Common::validateWhereCondition()`이 빈 WHERE의 수정·삭제를 거부한다.
 > - `afterAdd/afterModify/afterRemove`가 부르는 `beforeResponse()`의 반환값은 버려진다. 응답 data는 `idData`로 고정이다.
 > - JSON 바디는 읽히지 않는다(`input->post()`가 빈 배열을 돌려 `?? json()`이 동작하지 않음). DELETE의 `$data`는 항상 `[]`이다.
 > - 각 INSERT/UPDATE는 개별 커밋된다. `afterAdd/afterModify`에서 오류 응답을 보내도 앞서 저장된 행은 남는다.
@@ -318,7 +320,7 @@ remove($key, $data, $bool=true)
 | `executeAdd($dto, $bool, $model = null)` | beforeAdd 다음 | `$bool=false`(insert id를 받음) | 생성 id가 병합된 `$dto` | 선택. 보통 parent 호출 후 추가 작업 | 2 / 3 |
 | `afterAdd($dto)` | executeAdd 다음 | 생성 id가 들어간 dto(비컬럼 필드 포함) | 응답 후 exit | **마지막** | 0 / 3 |
 | `beforeModify($key, $dto)` | `modify()` 첫 단계 | URL key, 바디 dto | 수정된 `$dto` | 선택(기본 동작 없음). 관례상 `return parent::beforeModify($key, $dto);` | 2 / 3 |
-| `executeModify($key, $dto, $bool, $model = null)` | beforeModify 다음 | `$bool=true` | `$dto` | 선택. where 계산 방식에 주의(3-4) | 4 / 4 |
+| `executeModify($key, $dto, $bool, $model = null)` | beforeModify 다음 | `$bool=true` | `$dto` | 선택. 오버라이드할 때도 `checkModifyIdData()`로 식별자를 확인한다(3-4) | 4 / 4 |
 | `afterModify($key, $dto)` | executeModify 다음 | 입력 dto | 응답 후 exit | **마지막** | 4 / 6 |
 | `beforeRemove($key, $data = [])` | `remove()` 첫 단계 | `$data`는 항상 `[]` | `$data` | 선택. 삭제 거부는 여기서 `response()` | 1 / 3 |
 | `executeRemove($key, $data, $bool)` | beforeRemove 다음 | | `$data` | 선택. 보통 parent 후 정렬 재계산 등 | 2 / 2 |
@@ -339,7 +341,8 @@ remove($key, $data, $bool=true)
 | 메서드 | 용도 | 비고 |
 |---|---|---|
 | `setData($data, $model = null)` | 저장 직전 정규화: 모델 컬럼만 남김, 공백 압축·trim, `strList` 빈 값 `''`, `intList` `(int)`, `gender` 대문자, `password` 해시(빈 값이면 제외), checkbox 배열 join, onoff 미전송 시 `'N'` | 필드별 규칙을 추가하려면 parent 결과에 덧붙인다 |
-| `setModData($data, $model = null)` | `setData` + 수정 where 계산 | 3-4 참고 |
+| `setModData($data, $model = null)` | `setData` + 바디 기준 수정 where 계산 | 3-4 참고 |
+| `checkModifyIdData($idData, $model)` | 수정 where가 식별자(AI면 identifier, 아니면 primaryKeyList 전체)를 모두 갖췄는지 확인, 아니면 400 | 3-4 참고 |
 | `validate($data, $model, $validate, $configName, $exceptRequiredKeys)` | 폼 규칙 + 필수값 검사. 다른 config로 검사할 때 직접 호출 | 실패 시 응답 후 exit |
 | `validateFormRules($configName = '', $data = [])` | `form_*_config` 규칙 검사(422) | [form.md](form.md) 9-2 |
 | `checkUniqueExist($dto, $model)` / `checkDuplicate($unique, $model, $dto, $isIncludeDeleted)` | 고유값 검사 | 409로 응답 |
@@ -564,7 +567,7 @@ public array $foreignKeyList = [
 
 1. 검증(`beforePost`): 각 모델의 `notNullList`를 검사한다. `Model`의 `user_id`는 앞 모델(`Model_Parent`, AI)이 생성할 FK로 판단되어 필수 검사에서 빠진다(`fk.model == get_class(앞 모델)` 또는 `fk.table == 앞 모델 table`, 그리고 `fk.column == 앞 모델 identifier`). 부모의 필수 컬럼은 `defaultList`로 채운다.
 2. 등록(`executeAdd`): `Model_Parent` INSERT → `dto['user_id']` 채워짐 → `Model`의 `applyForeignKeyValues()`가 빈 `user_id`를 `dto[fk.column]`로 채움 → `Model` INSERT. 응답 `data`는 두 identifier가 모두 든 `idData`.
-3. 수정(`executeModify`): 모델마다 **바디의 identifier**로 where를 만든다. 폼에 `user_id`, `administrator_id` hidden 필드가 있어야 한다.
+3. 수정(`executeModify`): 메인 `Model`은 URL 식별자(`$this->idData`), 부모·자식 모델은 **바디의 identifier**로 where를 만든다. 폼에 `user_id` 같은 부모 식별자 hidden 필드가 있어야 하며, 없으면 400이 난다.
 4. 삭제(`executeRemove`): `Model->getDataWhere(idData)`로 기준 행을 읽고(join으로 `user_id` 포함) `Model_Child → Model → Model_Parent` 순서로 각 모델의 identifier 값으로 `delData()`. 기준 행에 부모 identifier 컬럼이 같은 이름으로 있어야 부모까지 삭제된다.
 
 조회는 모델 쪽 join이 담당한다(`Model_Administrator::getList/getData/getCnt`가 `user`를 join).

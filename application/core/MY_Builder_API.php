@@ -410,7 +410,9 @@ class MY_Builder_API extends MY_Controller_API
 
         $idData = [];
         if($model->isAutoIncrement) {
-            $idData[$model->identifier] = $data[$model->identifier];
+            if(isset($data[$model->identifier]) && $data[$model->identifier] !== '') {
+                $idData[$model->identifier] = $data[$model->identifier];
+            }
         }else if(count($model->primaryKeyList) > 0){
             $idData = array_reduce(array_merge($model->primaryKeyList, $model->uniqueKeyList), function ($carry, $item) use ($data) {
                 if(isset($data[$item])) {
@@ -422,6 +424,34 @@ class MY_Builder_API extends MY_Controller_API
         }
 
         return [$data, $idData];
+    }
+
+    /**
+     * 수정 조건(WHERE)이 식별자를 모두 갖췄는지 확인한다.
+     * 비어 있거나 일부 키가 빠진 조건으로 UPDATE 하면 여러 행(최악은 테이블 전체)이 바뀌므로 400으로 멈춘다.
+     */
+    protected function checkModifyIdData(array $idData, $model): void
+    {
+        if($model->isAutoIncrement) {
+            $requiredKeys = $model->identifier ? [$model->identifier] : [];
+        }else{
+            $requiredKeys = $model->primaryKeyList;
+        }
+
+        $missing = array_values(array_filter($requiredKeys, function ($field) use ($idData) {
+            return !isset($idData[$field]) || $idData[$field] === '';
+        }));
+
+        if(!count($requiredKeys) || count($missing)) {
+            $this->responseError([
+                'location' => __METHOD__,
+                'param' => [
+                    'table' => $model->table,
+                    'missing' => $missing,
+                ],
+                'msg' => "Identifier value is missing",
+            ], [], RestController::HTTP_BAD_REQUEST);
+        }
     }
 
     /* --------------------------------------------------------------- */
@@ -508,11 +538,17 @@ class MY_Builder_API extends MY_Controller_API
             foreach (['Model_Parent', 'Model', 'Model_Child'] as $modelName) {
                 if(property_exists($this, $modelName)) {
                     list($params, $idData) = $this->setModData($dto, $this->{$modelName});
+                    // 메인 Model은 요청 본문이 아니라 checkIdentifierExist()가 URL·쿼리로 확인한 식별자로 수정 대상을 정함
+                    if($modelName === 'Model' && count($this->idData)) $idData = $this->idData;
+                    $this->checkModifyIdData($idData, $this->{$modelName});
+                    // 식별자 컬럼 자체는 SET에서 빼서 수정 대상 행의 키가 바뀌지 않게 함
+                    $params = array_diff_key($params, $idData);
                     $this->modData($params, $idData, $bool, $this->{$modelName});
                 }
             }
         }else{
             $dto = $this->setData($dto, $model);
+            $this->checkModifyIdData($this->idData, $model);
             $this->modData($dto, $this->idData, $bool, $model);
         }
 

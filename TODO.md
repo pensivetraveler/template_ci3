@@ -98,7 +98,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 
 ### 보안
 - [x] `builder_api_helper.php::reformat_get_data` + `MY_Model::select` GET `select[]` 값이 그대로 `getList()` select로 들어가고, `parse_select_column()`의 `alias_expr` 분기가 `db->select("{expr} as {alias}", false)`(escape 없음)로 실행된다. `?select[]=(SELECT password FROM user LIMIT 1) as x` 같은 서브쿼리 주입 가능 (모든 builder GET 목록·`prepareExports_get`, 로그인 사용자 누구나) → `reformat_request_select()`로 요청 select는 단순 컬럼명만 허용 (식·별칭·테이블 접두어 제거)
-- [ ] `MY_Builder_API::executeModify`/`setModData` 기본 흐름이 where를 `$this->idData`가 아니라 바디에서 계산한다. non-AI 모델은 바디에 PK가 없으면 where `[]` → `UPDATE` 테이블 전체 (PATCH 인라인 수정, query string으로만 PK를 준 PUT/POST). AI 모델은 identifier가 없으면 Notice + `IS NULL`로 무변경 (MenuAuth/PartnerAuth가 우회 오버라이드 중)
+- [x] `MY_Builder_API::executeModify`/`setModData` 기본 흐름이 where를 `$this->idData`가 아니라 바디에서 계산한다. non-AI 모델은 바디에 PK가 없으면 where `[]` → `UPDATE` 테이블 전체 (PATCH 인라인 수정, query string으로만 PK를 준 PUT/POST). AI 모델은 identifier가 없으면 Notice + `IS NULL`로 무변경 (MenuAuth/PartnerAuth가 우회 오버라이드 중) → 메인 Model은 `$this->idData`로 수정, `checkModifyIdData()`가 식별자 누락 시 400, `Model_Common::validateWhereCondition()`이 빈 WHERE의 수정·삭제를 거부
 - [ ] `MY_Builder_API` 전반 API 인가가 rest_config `session`(user_id 존재)뿐이다. admin WEB의 `user_cd`/`IS_ADMIN` 검사가 API엔 없고, `flag !== 'admin'` 검사(SysCode, MenuAuth, MenuList, PartnerAuth, SysCfg)는 URL 첫 세그먼트라 `/admin/api/...`로 호출하면 통과 (일반 로그인 사용자가 관리자·권한·코드 CRUD 가능)
 - [ ] `Model_Common::getSelectList` / `Model_Administrator::getList`·`Model_Partner::getList`(join select `'*'`) 기본 select에 `password` 해시, `user_api_key`가 포함되어 Users/Administrators/Partners 목록·상세 응답으로 그대로 나간다 (자격증명 노출)
 - [ ] `MY_Builder_API::deleteFile_patch` body `file_id`만으로 `delFileData()` 실행, 엔티티 소속·작성자 확인 없음 (임의 파일 삭제). `type` 파라미터는 필수인데 쓰이지 않음

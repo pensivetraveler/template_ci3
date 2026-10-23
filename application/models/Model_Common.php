@@ -546,6 +546,8 @@ SET FOREIGN_KEY_CHECKS = 1;
 
     protected function validateWhereCondition($where): void
     {
+        // 빈 조건으로 수정·삭제하면 테이블 전체가 바뀌므로 막음 (soft delete도 UPDATE라 같은 위험)
+        if(!is_array($where) || !count($where)) show_error(__FUNCTION__ . ': Where condition is empty');
         if(has_inner_array($where)) show_error(__FUNCTION__ . ': Please check the where condition');
         return;
     }
