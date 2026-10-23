@@ -164,6 +164,7 @@ WEB은 form·list·filter 설정을 다음 순서로 찾고 처음 존재하는 
 
 - 설정 키의 `{class}`는 컨트롤러 클래스명(소문자)과 정확히 같아야 한다. 단수·복수가 다르면(`company` vs `companies`) 찾지 못한다.
 - form 설정의 `field`는 Model 컬럼명과 같아야 한다.
+- 설정만으로 부족한 동작은 API 컨트롤러에서 `transformView`, `beforeList`, `executeList`, `beforeAdd`/`afterModify` 같은 공통 메서드를 오버라이드해서 넣는다. [api-hooks.md](docs/builder/api-hooks.md) 참고
 - 필요하면 `{platform}/js/{class}_preset.js`, `{class}_onload.js`로 화면별 스크립트를 붙인다. 처음 접근할 때 빈 파일이 자동으로 만들어진다.
 
 ---
@@ -176,5 +177,6 @@ WEB은 form·list·filter 설정을 다음 순서로 찾고 처음 존재하는 
 | [form.md](docs/builder/form.md) | form 필드 키, type/subtype별 렌더링, `form_attributes`·`option_attributes`·`group_attributes`, 검증, 파일 필드, JS 폼 라이프사이클 |
 | [list-filter.md](docs/builder/list-filter.md) | list 컬럼과 셀 렌더링, onclick/onchange/render, DataTable 요청·응답, 버튼·행 액션·내보내기, filter 설정 |
 | [view-excel.md](docs/builder/view-excel.md) | 상세 보기(view) 설정과 화면, 엑셀 가져오기 설정 |
+| [api-hooks.md](docs/builder/api-hooks.md) | API 컨트롤러에서 오버라이드하는 공통 메서드(hook): 요청별 호출 순서, hook 레퍼런스, 자주 쓰는 패턴, 공통 모델 메서드 |
 
 문서는 코드 동작 기준으로 썼다. 동작하지 않거나 구현되지 않은 항목은 문서에 `**미구현**`, `**주의**`로 짧게 표시했고, 전체 목록은 [`TODO.md` 6장 "빌더 설정 조사"](TODO.md#6-빌더-설정-조사-2026-10-23)에 있다.

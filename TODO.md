@@ -72,11 +72,11 @@
 - [ ] `api/Setup.php`: 파일 캐시(`init_done`, TTL 1일)만으로 보호 → DB 상태로 판정, SQL 실행은 CLI 마이그레이션으로
 
 ### 버그
-- [ ] `api/SysCode.php:53` `category_srt` → `cd_srt`
+- [ ] `api/SysCode.php:53` `category_srt` → `cd_srt` (추가: `SysCode::executeModify`의 `$original->category_srt` 비교 때문에 정렬 변경 여부와 무관하게 reorder 실행)
 - [ ] `api/Comments.php` `in_array($id, $adminList)` 객체 배열 비교로 `is_admin` 항상 false, 댓글 N+1 쿼리
 - [ ] `app-page-common.js:166` 선언되지 않은 `identifier` (추가: `deleteRepeater`에서 ReferenceError → 리피터 행 삭제 요청 실패)
 - [ ] `app-page-utils.js` `replaceValidationMessage` 중복 정의
-- [ ] `MY_Model::orderBy` 정의되지 않은 `$defaultOrderBy`, `querySql`의 `strpos(...) !== -1`
+- [ ] `MY_Model::orderBy` 정의되지 않은 `$defaultOrderBy`, `querySql`의 `strpos(...) !== -1` (추가: orderBy는 재귀 호출 인자(`$table`) 누락으로 `defaultOrderBy` 프로퍼티가 전혀 적용되지 않음, querySql은 UPDATE/DELETE도 `insert_id()` 반환)
 
 ### 구조
 - [ ] `MY_Builder_API`(약 2000줄), `MY_Builder_WEB`(약 1300줄) 기능별 분리 (Validator, Exporter, 권한 서비스)
@@ -97,7 +97,15 @@
 README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 짧게 표시하고 전체 목록은 여기에 둔다.
 
 ### 보안
-- [ ] `api/MenuList::reset_get` GET 요청 하나로 `menu`, `menu_auth`, `partner_auth`를 truncate하고 캐시 삭제 (CSRF·링크 프리페치로 전체 메뉴/권한 유실 가능 — POST/DELETE + 확인 절차 필요)
+- [ ] `builder_api_helper.php::reformat_get_data` + `MY_Model::select` GET `select[]` 값이 그대로 `getList()` select로 들어가고, `parse_select_column()`의 `alias_expr` 분기가 `db->select("{expr} as {alias}", false)`(escape 없음)로 실행된다. `?select[]=(SELECT password FROM user LIMIT 1) as x` 같은 서브쿼리 주입 가능 (모든 builder GET 목록·`prepareExports_get`, 로그인 사용자 누구나)
+- [ ] `MY_Builder_API::executeModify`/`setModData` 기본 흐름이 where를 `$this->idData`가 아니라 바디에서 계산한다. non-AI 모델은 바디에 PK가 없으면 where `[]` → `UPDATE` 테이블 전체 (PATCH 인라인 수정, query string으로만 PK를 준 PUT/POST). AI 모델은 identifier가 없으면 Notice + `IS NULL`로 무변경 (MenuAuth/PartnerAuth가 우회 오버라이드 중)
+- [ ] `MY_Builder_API` 전반 API 인가가 rest_config `session`(user_id 존재)뿐이다. admin WEB의 `user_cd`/`IS_ADMIN` 검사가 API엔 없고, `flag !== 'admin'` 검사(SysCode, MenuAuth, MenuList, PartnerAuth, SysCfg)는 URL 첫 세그먼트라 `/admin/api/...`로 호출하면 통과 (일반 로그인 사용자가 관리자·권한·코드 CRUD 가능)
+- [ ] `Model_Common::getSelectList` / `Model_Administrator::getList`·`Model_Partner::getList`(join select `'*'`) 기본 select에 `password` 해시, `user_api_key`가 포함되어 Users/Administrators/Partners 목록·상세 응답으로 그대로 나간다 (자격증명 노출)
+- [ ] `MY_Builder_API::deleteFile_patch` body `file_id`만으로 `delFileData()` 실행, 엔티티 소속·작성자 확인 없음 (임의 파일 삭제). `type` 파라미터는 필수인데 쓰이지 않음
+- [ ] `MY_Builder_API::duplicate_get` 권한 확인 없이 모든 엔티티에서 GET 한 번으로 INSERT 실행 (아래 버그와 결합)
+- [ ] `api/Common::sendEmail` bcc `pensive_lee@naver.com`, 발신자명 `'이광우'` 하드코딩 → 파생 프로젝트의 모든 발송 메일이 개인 주소로 복사됨
+- [ ] `MY_Model::addSqlSet`, `MY_Model::addSqlWhere` 값을 문자열 보간해 SQL 생성 (현재 호출부 없음, 사용 시 주입)
+- [ ] `api/MenuList::reset_get` GET 요청 하나로 `menu`, `menu_auth`, `partner_auth`를 truncate하고 캐시 삭제 (CSRF·링크 프리페치로 전체 메뉴/권한 유실 가능 — POST/DELETE + 확인 절차 필요) (추가: `MenuAuth::reset_get`, `PartnerAuth::reset_get`, `MenuList::generateMenuCode_get`도 GET으로 truncate/일괄 수정)
 - [ ] `MY_Builder_WEB::afterViewApp` 요청 class/method 이름으로 `public/assets/{platform}/js/*_preset.js`·`_onload.js`, `style.css`, `common.js`를 없으면 자동 생성, view 메서드도 제외 안 됨 (운영 웹 요청이 공개 디렉터리에 파일 생성 — devMode 한정 필요)
 - [ ] `MY_Builder_API::setProperties` GET/POST 외(PUT/PATCH/DELETE)는 설정을 읽기 전에 return → `beforePut`의 `validateFormRules`가 빈 설정으로 돌고 `setData`의 체크박스/onoff 처리도 빠짐 (API 직접 호출로 rules 검증 우회)
 - [ ] `MY_Builder_API::checkUniqueExist` `$this->mode`를 GET `_mode`로만 읽어 폼 POST의 add를 add로 인식 못함 → `editable=true`가 아닌 고유키는 add에서 중복검사 생략 (중복 데이터 저장)
@@ -105,12 +113,12 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `app-page-edit.js` FormValidation `core.validator.validating` 핸들러가 `event.element.value`를 마스킹 없이 console.log (edit 화면 비밀번호 평문 노출, add/list는 `32f07d5`에서 마스킹)
 - [ ] `MY_Builder_API::getExportsConfig` form config 전체로 컬럼을 정해 `password`, `user_api_key`, hidden 필드까지 CSV/XLSX로 내보냄 (비밀번호 해시·API 키 유출)
 - [ ] `MY_Builder_API::prepareExportsPath` 임시 파일을 웹 공개 경로 `public/temps/`에 저장하고 다운로드 안 된 파일은 남음 (파일명 유출 시 직접 접근, 잔존 파일 누적)
-- [ ] `builder_api_helper.php::reformat_get_data` 필터·top-level 파라미터의 필드명 화이트리스트 없음 → `filters[where|like][임의컬럼]`이 그대로 조건 (password LIKE로 해시 탐색 가능)
+- [ ] `builder_api_helper.php::reformat_get_data` 필터·top-level 파라미터의 필드명 화이트리스트 없음 → `filters[where|like][임의컬럼]`이 그대로 조건 (password LIKE로 해시 탐색 가능) (추가: `exceptValidateKeys` 외 모든 top-level GET 키도 where가 되어 `?password=...`로 값 추측(불리언 오라클) 가능)
 - [ ] `MY_Builder_WEB::setListActions` `actions.duplicate`는 권한 필터 대상이 아님 (create 권한 없이 복제 아이콘 노출)
 - [ ] `MY_Builder_API::uploadExcel_post` 기본 `validateExcelData`가 데이터를 그대로 반환하고 form rules·`checkUniqueExist`·`defaultList`·`fileList`를 거치지 않고 `Model->addList()`로 INSERT (검증 없는 대량 INSERT, POST 경로와 규칙 이원화 — form rules 재사용 검토)
 - [ ] `app-page-excel.js::validateData`/`submitData` `validateExcel`·`uploadExcel` AJAX에 `Authorization` 헤더 없음 (다른 호출과 인증 방식 불일치, 서버 측 우회 여부 확인 필요)
 - [ ] `MY_Builder_WEB::setupPlatformPage` mode 검사를 원본 `routeConfig['methods'][baseMethod]['category']`가 list일 때만 수행 (category 없는 baseMethod면 notice, list가 아닌 baseMethod route는 add/edit/excel 등 mode 권한 검사 전무)
-- [ ] `MY_Builder_API::deleteExcelFile_patch` `class` 입력을 검증 없이 파일 경로에 붙여 `unlink` (경로 조작으로 임의 `*_upload_sample.xlsx` 삭제 가능)
+- [ ] `MY_Builder_API::deleteExcelFile_patch` `class` 입력을 검증 없이 파일 경로에 붙여 `unlink` (경로 조작으로 임의 `*_upload_sample.xlsx` 삭제 가능) (추가: admin 확인도 없음, `public/sample` 밖 경로 삭제 가능)
 
 ### 버그
 
@@ -198,6 +206,31 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `app-page-excel.js` `#resetExcelForm` `colspan = th개수 + 2`로 이미 #·삭제 열이 포함된 수에 2를 더함 (빈 행 colspan 과다)
 - [ ] `views/builder/layout/excel.php` `JSON.parse('<?=json_encode(...)?>')` 작은따옴표 안에 JSON 출력 (라벨에 `'`나 `\`가 있으면 스크립트 오류)
 
+**API hooks·모델**
+- [ ] `Model_Common::checkDuplicate` `MY_Model::where()`가 `use_yn='Y'`를 붙인 뒤 `isIncludeDeleted=false`면 `use_yn='N'`을 추가 → isUseYn 모델은 항상 0, 고유값 중복검사 무력화. `isIncludeDeleted=true`여도 `where()`의 `del_yn='N'` 기본 조건 때문에 삭제 행이 포함되지 않아 form `check_delete` 무효
+- [ ] `MY_Builder_API::validateManually` `$this->request === 'post'` — RestController의 `$this->request`는 stdClass라 항상 false → 파일 컬럼의 `$_FILES` 검사 분기가 죽고, notNullList에 든 파일 컬럼은 POST 데이터에 없어 항상 `Required`로 실패
+- [ ] `MY_Controller_API::beforePost/beforePut/beforePatch/beforeDelete` `input->post() ?? input->json()` — `MY_Input::post()/put()/patch()`는 빈 배열을 반환하므로 json 폴백이 동작하지 않음 (JSON 바디 API 클라이언트 사용 불가). `beforeDelete`는 `put()`을 읽어 DELETE에서 `$data`가 항상 `[]`
+- [ ] `MY_Builder_API::duplicate_get` `Model->getData([], [identifier => key])` — getData는 `where` 등 조건 키만 읽으므로 조건 무시 → 요청한 행이 아니라 테이블 첫 행을 복제
+- [ ] `Model_Common::setCondition` `orLike` 키를 `$this->orLike($table, $val)`로 호출 → `orLike($table, $keys, $vals)` 인자 부족 ArgumentCountError
+- [ ] `MY_Model::addDataPDO/modDataPDO/addListPDO` 실패 시 rollback 없이 `db->error()` 배열(truthy)을 반환 → 호출부(`MY_Builder_API::addData`)가 성공으로 보고 insert id 자리에 배열 기록, 트랜잭션 미종료 (db_debug=FALSE 환경)
+- [ ] `api/Common::transformView` `created_id`/`updated_id`를 로그인 id 문자열로 덮어써 이후 user_id로 쓰는 코드가 깨짐: `Comments::transformList`가 parent 호출 뒤 `created_id`로 작성자 조회·`mine_yn`·`is_admin` 계산 → 최상위 댓글은 항상 실패. 사용자가 soft delete되면 `->id` on null Warning
+- [ ] `Comments::afterAddData` 존재하지 않는 hook 이름(실제는 `afterAdd`) → 댓글/답글 알림 메시지가 생성되지 않음
+- [ ] `Articles::transformView` 없는 메서드 `parent::viewAfter()` 호출 → Articles 목록·상세 Fatal
+- [ ] `Articles::afterModify`만 첨부 업로드 처리, `afterAdd` 없음 → 등록 시 `uploads` 첨부 유실
+- [ ] `ArticleRead::beforePut` parent 반환값 `[$key, $data]`를 dto로 사용 → where에 숫자 키 0/1이 들어가 SQL 오류, `$dto['article_id']` 미정의
+- [ ] `Auth::signup_post` 정의되지 않은 `$this->Model_Child` 사용 + `beforePost()` 반환값 `[$key, $data]`를 dto로 사용 → 회원가입 불가
+- [ ] `SysCode::beforeRemove/executeRemove` `$this->bigCd`는 `sml_cd === '000'`일 때만 대입 → 일반 코드 삭제 시 typed property 미초기화 Error (삭제는 이미 커밋된 뒤 500)
+- [ ] `Categories::executeRemove` `$data['parent_id']`(DELETE의 `$data`는 항상 `[]`) 미정의 + `whereNot ['sml_cd' => '000']`(category에 없는 컬럼, SysCode 복붙) → SQL 오류
+- [ ] `Logs::__construct`, `Auth::__construct` `noIndexMethod = true`를 parent 생성자 이후에 대입 → 검사는 `MY_Builder_API::__construct()` 안에서 이미 끝나 무효 (프로퍼티 기본값으로 선언해야 함)
+- [ ] `MY_Builder_API::beforeAdd` 존재 확인이 `del_yn='N'` 기본 조건을 타서 soft delete된 같은 PK가 있으면 409 대신 DB duplicate key 오류
+- [ ] `MY_Builder_API::checkDuplicate` `$dto[$model->identifier]` — 수정 시 바디에 identifier가 없거나 `checkDuplicate_get`에 다른 쿼리 키(`_mode` 등)가 있으면 Notice + `where_not_in(identifier, [null])`
+- [ ] `reformat_get_data` `exceptValidateKeys`에 `_submode`가 없음 → GET에 `_submode`를 붙이면 where `_submode` 컬럼 SQL 오류 (`_remap()`은 `_submode`를 읽도록 되어 있음)
+- [ ] `reformat_get_data` `if(!$value) continue` → `'0'` 값으로 where 불가 (예: `?depth=0`, `?is_show=0`)
+- [ ] `MY_Builder_API::prepareExports_get` `is_null($this->Model)` — Model 미정의 컨트롤러에서는 undefined property Warning을 내고 나서야 `MODEL_IS_NOT_DEFINED` (property_exists 필요)
+- [ ] `MY_Builder_API::beforeResponse` `_mode=option`으로 상세(view) 조회 시 `$data['list']` 미정의
+- [ ] `MY_Builder_API::beforeDelete` 식별자 없이 DELETE하면 `getDeleteBaseRow()`의 `show_error()`로 HTML 500 (JSON 아님)
+- [ ] `MY_Controller_API::response` `code` 없이 호출하면 `floor(0/10)=0` → RestController가 200으로 바꿔 HTTP 200 + `status:false, code:0` 응답
+
 ### 미구현·문서 불일치
 
 **공통·route/method/nav**
@@ -235,7 +268,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `views/builder/layout/form_base_custom_dropzone-single.php` 빈 파일 (custom/dropzone-single 미구현)
 - [ ] `type=textarea, subtype=quill` PHP 분기 없음 → 일반 textarea, `builder_form_helper.php::get_admin_form_textarea`는 dead code
 - [ ] `type=text, subtype=cleave-version` `get_admin_form_attributes`에 분기 없어 `.cleave` 클래스 미부여 (`setCleave` 분기 미실행)
-- [ ] `MY_Builder_API::reorder_patch` GET 파라미터만 검사 후 아무것도 안 함 (`list_sorter` 정렬 저장 안 됨)
+- [ ] `MY_Builder_API::reorder_patch` GET 파라미터만 검사 후 아무것도 안 함 (`list_sorter` 정렬 저장 안 됨) (추가: 파라미터가 있으면 아무 응답 없이 빈 200)
 - [ ] `MY_Builder_API::deleteRepeater_patch` `DATA_DELETED`만 응답하는 스텁 (컨트롤러 오버라이드 필요하다는 점이 코드에 명시 안 됨)
 - [ ] `MY_Builder_WEB::beforeViewApp` dropzone 에셋을 subtype이 정확히 `dropzone`일 때만 로드 (`dropzone-full` 사용 시 에셋 누락)
 
@@ -264,6 +297,15 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Builder_WEB::setJSVariables` list `actions.excel`이 `buttons.excel`과 병합되며 덮어써져 효과 없음 (`admin_route_config.php`의 `actions.excel=false` 무의미)
 - [ ] `admin_view_config.php`, `web_view_config.php`에 실제 `view_*_config` 예시 없음, 저장소에 `excel` method route와 `excel_*_config`도 없음 (동작 검증 수단 없음)
 
+**API hooks·모델**
+- [ ] `MY_Builder_API::beforePut` `uploadFileInList()` 호출 없음, `MY_Input::put()`은 urlencoded만 파싱 → PUT으로 파일·multipart 불가 (POST와 동작 차이)
+- [ ] `MY_Builder_API::beforePatch` 기본값·검증·고유값 검사·업로드 모두 없음 (인라인 수정 전용이라는 점이 코드/문서에 명시 안 됨)
+- [ ] `MY_Builder_API::afterAdd/afterModify/afterRemove` `beforeResponse()` 반환값을 버림 → 등록·수정·삭제 응답은 가공 불가(list/view만 반영)
+- [ ] `MY_Builder_API` 프로퍼티 `table`, `notNullList`, `nullList`, `strList`, `intList` 선언만 있고 어디서도 채우지 않음. `MY_Model`에 `isUpdatedId` 없음 — `updated_id`는 `isCreatedId`를 따름
+- [ ] `MY_Builder_API::__construct` `validateMessages`, `validateCallback`, `transTargetKeys`를 `[]`로 덮어씀, 템플릿/bizsoft 어디서도 설정하지 않음. `validateCallback` 메서드는 인자 없이 호출되어 대상 값을 받지 못함
+- [ ] `Categories::__construct` `$this->fileList` 재지정은 업로드에 영향 없음(`uploadFileInList()`는 `model->fileList` 사용), `$this->methods['list_post']`는 존재하지 않는 메서드
+- [ ] `api/Common::message_read_patch` 공통 클래스에 있어 모든 엔티티 API에 `/message_read/{id}` 노출, `Model_Message` 없는 파생 프로젝트에선 오류
+
 ### 구조
 - [ ] `MY_Builder_WEB::__construct` `admin_base_config.php`가 builder base와 같은 내용으로 최상위 교체 (base config 깊은 병합 필요 — TODO 주석 존재)
 - [ ] `builder_route_helper.php::fill_config_properties` 빈 배열로 상위 기본값을 끌 방법이 없음 (키마다 `false` 필요 — `null`/명시적 리스트 등 끄기 규칙 정의)
@@ -279,3 +321,9 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Builder_WEB::prepareListData` formExist=false일 때 `allows`에 없는 action을 `$actions`에서 제거하지만 뷰/JS는 `LIST_ACTIONS`만 사용 (죽은 코드)
 - [ ] `app-page-common.js::prepareExports` `encodeURIComponent`한 `token`을 만들고 쓰지 않고 원본 filename을 URL에 사용 (인코딩 누락)
 - [ ] `app-page-list.js` DataTable 정보 문구, `views/builder/layout/filter.php` 필터 버튼 문구(`검색`/`초기화`) 하드코딩 (다국어 미지원)
+- [ ] `MY_Builder_API::executeAdd/executeModify` 모델 순서를 `['Model_Parent','Model','Model_Child']`로 하드코딩, `beforePost/beforePut/executeRemove/isForeignKeyGeneratedByPreviousModel`은 `getModelPipeline()` 사용 → 파이프라인 오버라이드 시 검증·삭제와 저장 순서 불일치
+- [ ] 파이프라인·hook 전반에 트랜잭션 경계 없음: 모델별 `addData/modData`가 각자 commit → `Model` INSERT 실패 시 `Model_Parent` 행 잔존, `afterAdd/afterModify`에서 오류 응답해도 저장은 유지 (bizsoft `Templates::afterAdd`, `Apis::beforeRemove`의 선삭제 패턴)
+- [ ] `MY_Builder_API::beforePost/beforePut` `validateFormRules()`가 파이프라인 모델 수만큼 같은 formConfig로 반복 실행
+- [ ] `api/Common::transformView` 행마다 사용자 2회 조회(N+1), `Comments::transformList`(행당 3회+), `Partners::transformView`(회사 수만큼) → 목록 크기에 비례한 쿼리 수
+- [ ] `MY_Builder_API::loggingUserlog` 모든 GET(DataTable 재조회·옵션 조회 포함)마다 user_log INSERT, `log_id`는 RestController 요청 로그 id(`rest_enable_logging` 꺼져 있으면 `''`). `MenuList::beforeResponse`는 parent를 부르지 않아 메뉴 변경 로그 누락
+- [ ] `MY_Builder_API::checkIdentifierExist` non-AI 모델은 URL key를 무시하고 GET의 PK 파라미터만 사용 → `SysCode::beforeRemove`처럼 `$key`와 `idData`가 서로 다른 출처에서 올 수 있음
