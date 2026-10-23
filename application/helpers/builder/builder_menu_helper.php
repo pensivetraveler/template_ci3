@@ -2,6 +2,12 @@
 
 function make_base_auth_from_method(array $method): string
 {
+    // 화면 없는 action 메서드: 지정한 mode 자리만 켬 (setupPlatformPage가 이 mode로 권한 검사)
+    if (($method['category'] ?? '') === 'action') {
+        $key = array_search($method['mode'] ?? 'read', auth_char_map(), true); // mode 생략 시 setMethodConfig와 같이 read
+        return $key === false ? BASE_AUTH_CHAR : substr_replace(BASE_AUTH_CHAR, '1', $key, 1);
+    }
+
     // list category method 만 base_auth 계산 대상
     if (($method['category'] ?? '') !== 'list') {
         return '000000';

@@ -235,7 +235,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
 
 | 키 | 타입 | 값/기본값 | 설명 |
 |---|---|---|---|
-| `category` | string | `list` / `form` / `view` / `excel` / `action` / (`base`) | 레이어링 1단계, `setJSVariables()` 분기. `setupPlatformPage()`는 **baseMethod 원본 항목의 category**가 `list`인지 본다. `make_base_auth_from_method()`도 list만 계산 |
+| `category` | string | `list` / `form` / `view` / `excel` / `action` / (`base`) | 레이어링 1단계, `setJSVariables()` 분기. `setupPlatformPage()`는 **baseMethod 원본 항목의 category**가 `list`인지 본다. `make_base_auth_from_method()`는 list와 action만 계산 |
 | `type` | string | `'base'` | 레이어링 2단계. list는 `'table'`일 때만 `LIST_*` JS 변수를 만든다. form(add/edit)에서는 `$formType`이 되어 `layout/form_{type}.php`를 include(`prepareFormData()`, `layout/form.php`) |
 | `subtype` | string | `'base'` | 레이어링 3단계. list: `addListScripts(subtype)`(datatable일 때만 asset 로드). form: JS `FORM_TYPE`, `$formSubType` → `form_base.php`가 `base`/`grid`로 분기. view: **`'view'`일 때만** view 데이터·`VIEW_COLUMNS` 준비 |
 | `mode` | string | `read`/`create`/`update`/`delete`/`export`/`import`(권한 비트), `authenticate`/`process`/`''`(항상 허용) | 아래 [mode와 메뉴 권한](#mode와-메뉴-권한) 참고 |
@@ -302,6 +302,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
   4. route의 **baseMethod 항목이 list category**이고 현재 method가 baseMethod가 아님
 - list 화면 버튼/액션 권한 필터(`pageAuth` 기준): `buttons.add`→create, `buttons.excel`→import, `actions.view`→read, `actions.edit`→update, `actions.delete`→delete, `exports.*`→export. 시스템 관리자는 `pageAuth=INIT_AUTH_CHAR`(전체 허용).
 - 메뉴 기본 권한(`base_auth`)은 `builder_menu_helper.php` `make_base_auth_from_method()`가 **list category method에 대해서만** 계산한다: C=`buttons.add`, R=`actions.view`, U=`actions.edit`, D=`actions.delete`, E=`exports` 중 하나라도 true, I=`buttons.excel`. list가 아니면 `'000000'`. 예: administrators.list → `101100`.
+- `category: 'action'` 메서드는 `mode` 자리만 켠다(예: `export` → `000010`, mode 생략 시 `read`). `getMenuBaseAuth()`는 baseMethod 권한에 같은 route의 action 메서드 권한을 합친다. 그래서 다운로드처럼 화면 없는 메서드가 요구하는 권한도 메뉴 권한 화면에서 줄 수 있다.
 
 ### 예시 (`admin_route_config.php` `administrators.list`)
 
@@ -373,7 +374,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
 1. 파일 캐시 `menu_done`이 있으면 **`CACHING_MENU` 값과 상관없이** 캐시를 쓴다.
 2. 캐시가 없으면 config로 `getMenuList()`를 만든다. `env('CACHING_MENU')`가 true면 `saveMenuList()`를 호출한다.
    - 모든 `route_config`에 route/method 레이어링을 적용한다.
-   - 항목마다 `baseAuth = make_base_auth_from_method(해당 class의 method 설정)`(`getMenuBaseAuth()`). `index`면 baseMethod 기준, 하위 메뉴가 있거나 route가 없으면 `000000`.
+   - 항목마다 `baseAuth = make_base_auth_from_method(해당 class의 method 설정)` + 같은 route의 action 메서드 권한(`getMenuBaseAuth()`). `index`면 baseMethod 기준, 하위 메뉴가 있거나 route가 없으면 `000000`.
    - `srt`, `parentId`를 넣고 키를 snake_case로, 배열은 serialize해서 `Model_Menu::addData()`로 저장(`transformMenuData()`).
    - 결과를 `menu_done`(TTL 0)으로 저장하고 다시 읽는다.
 3. `setMenuAttributes()`로 href, class, active를 계산한다.

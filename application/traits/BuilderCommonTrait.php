@@ -233,7 +233,16 @@ trait BuilderCommonTrait
 
             $methodConfig = $routeConfig['methods'][$method];
 
-            return make_base_auth_from_method($methodConfig);
+            $baseAuth = make_base_auth_from_method($methodConfig);
+
+            // 같은 route의 action 메서드(다운로드 등)가 요구하는 권한도 메뉴 권한 화면에서 줄 수 있게 합침
+            foreach ($routeConfig['methods'] as $otherMethod) {
+                if (($otherMethod['category'] ?? '') === 'action') {
+                    $baseAuth = merge_auth($baseAuth, make_base_auth_from_method($otherMethod));
+                }
+            }
+
+            return $baseAuth;
         }else{
             return BASE_AUTH_CHAR;
         }
