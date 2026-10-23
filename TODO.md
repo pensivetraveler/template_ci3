@@ -201,6 +201,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 ### 미구현·문서 불일치
 
 **공통·route/method/nav**
+- [ ] `BuilderCommonTrait::saveMenuList` `tbl_menu.base_auth`는 메뉴 최초 생성 때만 계산되고, 다시 계산하려면 `MenuList::reset_get()`(메뉴·권한 truncate, menu_id 재생성)뿐 → route/method 설정을 바꾼 뒤 menu_id를 유지한 채 base_auth만 재계산하는 경로 필요 (bizsoft 다운로드 export 권한 반영 때 DB 직접 수정)
 - [ ] `BuilderCommonTrait::fillRouteConfigProperties` `properties.allows`를 `array_keys(methods)`로 무조건 덮어씀 (`projects`, `dashboard`의 `allows` 지정 무효 — 키 제거 또는 교집합 처리 결정)
 - [ ] `builder_route_config.php` route `category`(page/api)를 읽는 코드 없음 (구 README의 type `tabs`/`rest`/`cli`, subtype `json` config도 없음)
 - [ ] `builder_route_config.php` route `properties.formExist` 기본값이 있지만 route 레벨에서 읽지 않음 (method `properties.formExist`만 유효)
