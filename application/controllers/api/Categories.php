@@ -72,11 +72,13 @@ class Categories extends Common
 
     protected function executeRemove($key, $data, $bool): array
     {
+        // 삭제 전에 대상 행에서 parent_id 를 읽는다 (DELETE 바디에는 parent_id 가 없음)
+        $baseRow = $this->getDeleteBaseRow();
+
         $data = parent::executeRemove($key, $data, $bool);
 
         $this->reorderList('category_srt', 'category_id', 'parent_id', [
-            'where' => ['parent_id' => $data['parent_id'], 'use_yn' => 'Y'],
-            'whereNot' => ['sml_cd' => '000']
+            'where' => ['parent_id' => $baseRow->parent_id, 'use_yn' => 'Y'],
         ]);
 
         return $data;

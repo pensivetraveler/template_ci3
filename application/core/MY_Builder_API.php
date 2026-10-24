@@ -627,7 +627,18 @@ class MY_Builder_API extends MY_Controller_API
                 }
                 , []
             );
-            if($this->checkDataExist(['where' => $this->idData], $model)) $this->response(['code' => DATA_ALREADY_EXIST]);
+            if(count($this->idData)) {
+                // soft delete(del_yn='Y')·미사용(use_yn='N') 행도 같은 PK를 차지하므로 기본 조건 없이 확인 (DB duplicate key 오류 대신 409)
+                $useDelYnAsBase = $model->useDelYnAsBase;
+                $useUseYnAsBase = $model->useUseYnAsBase;
+                $model->useDelYnAsBase = false;
+                $model->useUseYnAsBase = false;
+                $exists = $this->checkDataExist(['where' => $this->idData], $model);
+                $model->useDelYnAsBase = $useDelYnAsBase;
+                $model->useUseYnAsBase = $useUseYnAsBase;
+
+                if($exists) $this->response(['code' => DATA_ALREADY_EXIST]);
+            }
         }
 
         return $dto;
@@ -636,7 +647,7 @@ class MY_Builder_API extends MY_Controller_API
     protected function executeAdd($dto, $bool, $model = null): array
     {
         if(is_null($model)) {
-            foreach (['Model_Parent', 'Model', 'Model_Child'] as $modelName) {
+            foreach ($this->getModelPipeline() as $modelName) {
                 if (property_exists($this, $modelName)) {
                     $targetModel = $this->{$modelName};
 
@@ -684,7 +695,7 @@ class MY_Builder_API extends MY_Controller_API
     protected function executeModify($key, $dto, $bool, $model = null): array
     {
         if(is_null($model)) {
-            foreach (['Model_Parent', 'Model', 'Model_Child'] as $modelName) {
+            foreach ($this->getModelPipeline() as $modelName) {
                 if(property_exists($this, $modelName)) {
                     list($params, $idData) = $this->setModData($dto, $this->{$modelName});
                     // 메인 Model은 요청 본문이 아니라 checkIdentifierExist()가 URL·쿼리로 확인한 식별자로 수정 대상을 정함
@@ -860,7 +871,10 @@ class MY_Builder_API extends MY_Controller_API
     protected function beforeResponse($data, $isFetch = false)
     {
         if($this->mode === 'option') {
-            $data['list'] = $this->getOptionsFromDBList($data['list'], $data['render']);
+            // 옵션 변환은 목록에만 적용 (상세·등록·수정·삭제 응답에는 list 가 없음)
+            if(is_array($data) && array_key_exists('list', $data)) {
+                $data['list'] = $this->getOptionsFromDBList($data['list'], $data['render'] ?? []);
+            }
         }else{
             $this->loggingUserlog();
         }
@@ -876,6 +890,8 @@ class MY_Builder_API extends MY_Controller_API
 
         $result = $model->addData($dto, $bool);
 
+        if ($result === false) $this->responseDbWriteError(__METHOD__, $model);
+
         if ($model->isAutoIncrement && $model->identifier) {
             $dto[$model->identifier] = $result;
             $this->idData[$model->identifier] = $result;
@@ -888,9 +904,26 @@ class MY_Builder_API extends MY_Controller_API
     {
         if(is_null($model)) $model = $this->Model;
 
-        $model->modData($dto, $idData, $bool);
+        if ($model->modData($dto, $idData, $bool) === false) $this->responseDbWriteError(__METHOD__, $model);
 
         return $dto;
+    }
+
+    /**
+     * MY_Model::addDataPDO/modDataPDO 가 실패(rollback 후 false)했을 때 500으로 응답한다.
+     */
+    protected function responseDbWriteError(string $location, $model): void
+    {
+        $this->responseError([
+            'location' => $location,
+            'param' => [
+                'table' => $model->table,
+            ],
+            'type' => 'db error',
+            'msg' => 'Database write failed',
+        ], [
+            'code' => INTERNAL_SERVER_ERROR,
+        ]);
     }
 
     /* --------------------------------------------------------------- */
@@ -1131,8 +1164,9 @@ class MY_Builder_API extends MY_Controller_API
                 }else{
                     $lang = $model->table ? lang($model->table.'.'.$key) : $key;
 
-                    if($this->request === 'post' && count($model->fileList) > 0 && in_array($key, $model->fileList)){
-                        if(!is_file_posted($key)) {
+                    // 파일 컬럼은 업로드 여부로 검사 (수정은 기존 파일이 유지되므로, 값이 이미 있으면 통과)
+                    if(count($model->fileList) > 0 && in_array($key, $model->fileList)){
+                        if(!is_file_posted($key) && is_empty($data, $key) && !count($this->idData)) {
                             $errorMsg = "File Data {$key} Is Missing.";
                             $data = $_FILES;
                             $msg = $this->josa->__conv("$lang{을} 업로드하세요.");
@@ -1437,7 +1471,13 @@ class MY_Builder_API extends MY_Controller_API
                 }
             }
 
-            $whereNot = is_empty($dto)?[]:[$model->identifier => $dto[$model->identifier]];
+            // 수정 중인 자기 행은 제외. 메인 Model은 URL·쿼리로 확인한 idData, 그 외에는 dto의 식별자 값
+            $whereNot = [];
+            if(!is_empty($dto) && $model->identifier) {
+                $isMainModel = property_exists($this, 'Model') && $model === $this->Model;
+                $selfId = ($isMainModel ? ($this->idData[$model->identifier] ?? null) : null) ?? ($dto[$model->identifier] ?? null);
+                if($selfId !== null && $selfId !== '') $whereNot = [$model->identifier => $selfId];
+            }
             return $model->checkDuplicate($unique, $whereNot, $isIncludeDeleted);
         }
     }
@@ -2166,7 +2206,8 @@ class MY_Builder_API extends MY_Controller_API
     protected function getDeleteBaseRow()
     {
         if (!count($this->idData)) {
-            show_error('getDeleteBaseRow : idData is empty');
+            // 식별자 없이 DELETE 하면 HTML 500(show_error) 대신 JSON 400
+            $this->keyNotExist();
         }
 
         $row = $this->Model->getDataWhere([], $this->idData);

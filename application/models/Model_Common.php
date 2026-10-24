@@ -112,9 +112,16 @@ class Model_Common extends MY_Model
         if(empty($where)) throw new Exception("checkDuplicate : where parameter empty");
 
         if(count($this->uniqueKeyList) > 0) {
+            // where() 의 기본 조건(del_yn='N', use_yn='Y')을 끄고 직접 정한다.
+            // 미사용(use_yn='N') 행도 고유값을 차지하므로 use_yn 은 거르지 않고, 삭제 행은 $isIncludeDeleted 일 때만 포함
+            $useDelYnAsBase = $this->useDelYnAsBase;
+            $useUseYnAsBase = $this->useUseYnAsBase;
+            $this->useDelYnAsBase = false;
+            $this->useUseYnAsBase = false;
             $this->where($this->table, $where);
+            $this->useDelYnAsBase = $useDelYnAsBase;
+            $this->useUseYnAsBase = $useUseYnAsBase;
             if($this->isDelYn && $isIncludeDeleted === false) $this->db->where($this->table.".".DEL_YN_COLUMN_NAME, 'N');
-            if($this->isUseYn && $isIncludeDeleted === false) $this->db->where($this->table.".".USE_YN_COLUMN_NAME, 'N');
             foreach ($whereNot as $key=>$val) $this->db->where_not_in($key, [$val]);
             return parent::getCntPDO($this->table);
         }else{
@@ -424,6 +431,11 @@ class Model_Common extends MY_Model
 
             if(in_array($key, ['limit'])) {
                 $this->{$key}($val);
+            }else if($key === 'orLike') {
+                // 'orLike' => ['fields' => [컬럼, ...], 'value' => 검색어]  (fields 생략 시 strList 전체)
+                if(is_array($val) && !is_empty($val, 'value')) {
+                    $this->orLike($table, $val['fields'] ?? $this->strList, $val['value']);
+                }
             }else if($key === 'filter') {
                 $this->setFilter($table, $val);
             }else{

@@ -102,7 +102,7 @@ class Companies extends Common   // admin/Common → MY_Builder_WEB
 | `isCreatedDt` / `isCreatedId` | bool `false` | insert 시 `created_dt` / `created_id`(세션 `user_id`, 없으면 1) 자동 기록 | `Model_Common::getValidSetData()` |
 | `isUpdatedDt` | bool `false` | update 시 `updated_dt` 자동 기록. **`isUpdatedId`는 없다** — `updated_id`는 `isCreatedId`를 따른다 | 같음 |
 | `filteringDateColumn` | string | 날짜 필터 대상. `isCreatedDt`면 기본 `created_dt` | `setFilterDate()` |
-| `defaultOrderBy` | array | 선언만 있고 **읽히지 않는다**(6장 주의) | - |
+| `defaultOrderBy` | array | `['col' => 'ASC']`. 조회에 `orderBy`가 없을 때 기본 정렬(없으면 AI identifier DESC → `created_dt` DESC) | `MY_Model::orderBy()` |
 
 `validateModelDefinition()` 규칙: `notNullList ∩ nullList = ∅`, (notNull+null+del_yn/use_yn) 컬럼 집합 = (str+int+file+del_yn/use_yn) 집합, identifier/PK/unique/FK 컬럼이 모두 컬럼 목록에 있을 것, AI면 PK 1개이고 identifier가 그 안에 있을 것. `created_*`, `updated_*`, `del_yn`, `use_yn`은 플래그로 처리하므로 목록에 넣지 않아도 된다(`Model_User`처럼 `del_yn`을 notNull에 넣으면 strList에도 넣어야 한다).
 
@@ -173,7 +173,7 @@ index_get($key=0) → handleGet($key)
        │    $data['list'] = ★transformList($list)  → 행마다 ★transformView($row)   (3-7)
        └ afterList($data, $isResponse)
             $isResponse=false 이면 $data 반환(응답 없음)
-            ★beforeResponse($data, true)   _mode=option 이면 list → 옵션 맵, 아니면 loggingUserlog()
+            ★beforeResponse($data, true)   _mode=option 이면 list → 옵션 맵(list 가 있을 때만), 아니면 loggingUserlog()
             response(DATA_RETRIEVED, data=$data['list'], extra=$data['extraFields']) → exit
 ```
 
@@ -239,7 +239,7 @@ modify($key, $dto, $bool=true)
 
 ```
 PUT    index_put → handlePut
-        ★beforePut($key)   beforePost와 같다. 단 바디는 input->put()(urlencoded만 파싱), 업로드 없음
+        ★beforePut($key)   beforePost와 같다. 단 바디는 input->put()(urlencoded 또는 JSON), 업로드 없음
         afterPut           idData 있으면 modify(), 없으면 add()
 
 PATCH  index_patch → handlePatch
@@ -247,13 +247,13 @@ PATCH  index_patch → handlePatch
         afterPatch         modify($key, $data, true)  (목록 인라인 토글 등)
 
 DELETE index_delete → handleDelete
-        ★beforeDelete($key) checkIdentifierExist($key). $data = input->put() → DELETE에서는 항상 []
+        ★beforeDelete($key) checkIdentifierExist($key). $data = DELETE 바디(urlencoded 또는 JSON, 보통 [])
         afterDelete         remove($key, $data, true)
 
 remove($key, $data, $bool=true)
  ├ ★beforeRemove($key, $data)     기본 동작 없음
  ├ ★executeRemove($key, $data, $bool)
- │    $base = getDeleteBaseRow()   idData 비면 show_error(500 HTML), 행 없으면 DATA_NOT_EXIST → exit
+ │    $base = getDeleteBaseRow()   idData 비면 EMPTY_REQUIRED_KEY(400), 행 없으면 DATA_NOT_EXIST → exit
  │                                 = Model->getDataWhere([], idData) (모델의 join 포함)
  │    getModelPipeline() 역순(Model_Child → Model → Model_Parent)마다:
  │       where = makeDeleteIdData($m, $base)   AI면 [identifier => base->identifier], 아니면 PK 값들
@@ -283,7 +283,7 @@ remove($key, $data, $bool=true)
 > - `beforePost()`에서 parent 이후에 바꾼 값은 검증·중복검사를 거치지 않는다. 검증 대상이 되어야 하면 parent 호출 전에 `$_POST`를 바꾸거나 `beforeAdd/beforeModify`에서 직접 검사한다.
 > - 기본 `executeModify()`는 메인 `Model`의 수정 대상을 `$this->idData`(URL·쿼리로 확인한 식별자)로 정한다. 부모·자식 모델은 바디의 식별자/PK를 쓰므로 폼에 해당 hidden 필드가 있어야 한다. 식별자가 하나라도 빠지면 `checkModifyIdData()`가 400으로 멈추고, 모델 단에서도 `Model_Common::validateWhereCondition()`이 빈 WHERE의 수정·삭제를 거부한다.
 > - `afterAdd/afterModify/afterRemove`가 부르는 `beforeResponse()`의 반환값은 버려진다. 응답 data는 `idData`로 고정이다.
-> - JSON 바디는 읽히지 않는다(`input->post()`가 빈 배열을 돌려 `?? json()`이 동작하지 않음). DELETE의 `$data`는 항상 `[]`이다.
+> - 바디는 `getRequestBody()`가 읽는다. `Content-Type: application/json`이면 JSON 바디, 아니면 form 값(POST는 `$_POST`, PUT/PATCH/DELETE는 urlencoded)이다. DELETE의 `$data`는 바디를 보낼 때만 채워진다.
 > - 각 INSERT/UPDATE는 개별 커밋된다. `afterAdd/afterModify`에서 오류 응답을 보내도 앞서 저장된 행은 남는다.
 
 ---
@@ -323,7 +323,7 @@ remove($key, $data, $bool=true)
 | `beforeModify($key, $dto)` | `modify()` 첫 단계 | URL key, 바디 dto | 수정된 `$dto` | 선택(기본 동작 없음). 관례상 `return parent::beforeModify($key, $dto);` | 2 / 3 |
 | `executeModify($key, $dto, $bool, $model = null)` | beforeModify 다음 | `$bool=true` | `$dto` | 선택. 오버라이드할 때도 `checkModifyIdData()`로 식별자를 확인한다(3-4) | 4 / 4 |
 | `afterModify($key, $dto)` | executeModify 다음 | 입력 dto | 응답 후 exit | **마지막** | 4 / 6 |
-| `beforeRemove($key, $data = [])` | `remove()` 첫 단계 | `$data`는 항상 `[]` | `$data` | 선택. 삭제 거부는 여기서 `response()` | 1 / 3 |
+| `beforeRemove($key, $data = [])` | `remove()` 첫 단계 | `$data`는 DELETE 바디(보통 `[]`). 대상 행은 `getDeleteBaseRow()` | `$data` | 선택. 삭제 거부는 여기서 `response()` | 1 / 3 |
 | `executeRemove($key, $data, $bool)` | beforeRemove 다음 | | `$data` | 선택. 보통 parent 후 정렬 재계산 등 | 2 / 2 |
 | `afterRemove($key, $data = [])` | executeRemove 다음 | | 응답 후 exit | **마지막** | 0 / 3 |
 
@@ -373,9 +373,9 @@ remove($key, $data, $bool=true)
 > **주의**
 > - `beforeList()`에서 parent **이후**에 넣은 where는 `recordsTotal/recordsFiltered` count에 반영되지 않는다(`orderBy`는 상관없음).
 > - `beforeResponse()`를 오버라이드하고 parent를 부르지 않으면 사용자 로그가 남지 않는다(`MenuList`).
-> - `executeAdd/executeModify`는 모델 순서를 하드코딩하므로 `getModelPipeline()`만 바꾸면 검증·삭제 순서와 저장 순서가 어긋난다.
+> - 저장·검증·삭제 모두 `getModelPipeline()` 순서를 따른다(삭제는 역순).
 > - API 인증은 세션 로그인 여부뿐이다. `flag`(URL 첫 세그먼트) 검사나 메뉴 권한은 API에서 확인하지 않으므로 민감한 엔드포인트는 hook에서 `session->userdata('user_cd')` 등을 직접 확인한다.
-> - `Comments::afterAddData()`처럼 존재하지 않는 hook 이름은 호출되지 않는다. 이름과 시그니처를 이 표와 맞춘다.
+> - 존재하지 않는 hook 이름(예: `afterAddData`)은 호출되지 않는다. 이름과 시그니처를 이 표와 맞춘다.
 
 ---
 
@@ -586,7 +586,7 @@ if ($this->Model->getCntWhere(['big_cd' => $this->bigCd]) > 1) {
 
 HTTP 상태와 응답 형태(`MY_Controller_API::response()` → `MY_Controller::setResponseData()`):
 
-- `$http_code`를 생략하면 `floor(code / 10)`이 HTTP 상태다. 코드는 `config/extra/custom_status_constants.php`에 있다: `DATA_RETRIEVED 2001→200`, `DATA_CREATED 2010→201`, `DATA_EDITED 2005`, `DATA_DELETED 2006`, `BAD_REQUEST 4000→400`, `EMPTY_REQUIRED_DATA 4002→400`, `NO_PERMISSION 4031→403`, `DATA_NOT_EXIST 4041→404`, `DATA_ALREADY_EXIST 4090→409`, `INTERNAL_SERVER_ERROR 5000→500`.
+- `$http_code`를 생략하면 `floor(code / 10)`이 HTTP 상태다(`code`도 없으면 500). 코드는 `config/extra/custom_status_constants.php`에 있다: `DATA_RETRIEVED 2001→200`, `DATA_CREATED 2010→201`, `DATA_EDITED 2005`, `DATA_DELETED 2006`, `BAD_REQUEST 4000→400`, `EMPTY_REQUIRED_DATA 4002→400`, `NO_PERMISSION 4031→403`, `DATA_NOT_EXIST 4041→404`, `DATA_ALREADY_EXIST 4090→409`, `INTERNAL_SERVER_ERROR 5000→500`.
 - 본문: `{status, code, msg, data: [], errors: []}`. `msg`를 생략하면 `status_code_lang.php`의 문구. `data`가 리스트가 아니면 배열로 감싼다. 4xx/5xx에서 `errors`를 안 주면 기본 오류 1건이 들어간다. `extra`의 키는 최상위로 펼쳐진다.
 - 필드 단위 오류는 `responseError($error, $response, $http_code)`를 쓴다. `$error`는 `['location','param','value','type','msg']` 한 건 또는 그 리스트. `$response['code']`가 있으면 HTTP 상태는 코드에서 계산되고, 없으면 `$http_code`(기본 500)를 쓴다.
 
@@ -640,7 +640,7 @@ $this->responseError(
 | `whereIn` | `['col' => [v1, v2]]` | `where_in` (스칼라는 `[v]`로) |
 | `whereNot` | `['col' => v 또는 [..]]` | `where_not_in` |
 | `like` | `['col' => v]`, 값이 배열이면 OR 그룹 | `%v%` |
-| `orLike` | - | 현재 setCondition 경유로는 쓸 수 없음(주의) |
+| `orLike` | - | `['fields' => [col, …], 'value' => v]` → `(col1 LIKE '%v%' OR col2 …)`. `fields` 생략 시 `strList` |
 | `limit` | `['limit' => n, 'offset' => m]` 또는 `[n, m]` | 목록만 |
 | `orderBy` | `['col' => 'asc']` 또는 그 리스트 | 목록만. 없으면 기본 정렬 |
 | `groupBy` | `'col'` 또는 `['a','b']` | 목록만 |
@@ -664,10 +664,8 @@ $this->responseError(
 GET 요청이 조건으로 바뀌는 규칙(`reformat_get_data()` → `sanitizeRequestConditions()`): `exceptValidateKeys`(`_mode, _submode, _event, _, select, format, draw, pageNo, limit, searchWord, searchCategory, filters`)를 뺀 파라미터 중 **빈 값(null·''·[])이 아닌 것**은 `where[key] = value`(`'0'`도 조건으로 씀), `filters`는 `filter`, `render`는 그대로 전달된다. `select`는 `reformat_request_select()`가 단순 컬럼명만 남긴다. 그다음 `sanitizeRequestConditions()`가 허용 목록에 없는 `where`·`filters[where|whereIn|whereNot|like]` 키를 버리고, `filters[date]`는 `start_date`·`end_date`·`on_date`만 남긴다. 허용 목록은 `getAllowedRequestFields()`: 메인 `Model` 컬럼(`col`, `{table}.col`) + `Model_Parent`·`Model_Child` 컬럼(`{table}.col`만, 조건이 메인 테이블에 붙기 때문) + form/list/view 설정 필드(테이블 접두어가 있거나 메인 컬럼일 때) + filter 설정 필드(`filter_{class}_{method}_config` 등) + 컨트롤러의 `$allowedRequestFields`. `$deniedRequestFields`(`password`, `user_api_key`, `api_key`, `token`, `secret`, `salt`)와 form `type => 'password'` 필드는 접두어가 붙어도 항상 뺀다. hook에서 직접 넣는 조건은 거르지 않는다.
 
 > **주의**
-> - `MY_Model::orderBy()`가 `$this->defaultOrderBy`가 아닌 미정의 지역변수를 읽어 `defaultOrderBy`는 효과가 없다. 정렬은 `executeList/beforeList`에서 지정한다.
-> - `orLike` 키는 `setCondition()`에서 인자가 모자라 오류가 난다. OR 검색은 `like`에 배열 값을 쓰거나 `filter.like`(field 빈 값)를 쓴다.
 > - `getData()`/`getList()`의 두 번째 인자에 `['col' => v]`를 바로 넣으면 조건이 무시되고 첫 행이 나온다. 반드시 `['where' => …]` 또는 `*Where()` 메서드를 쓴다.
-> - `isUseYn` 모델에서 `checkDuplicate()`는 `use_yn='Y'`와 `use_yn='N'`이 동시에 걸려 항상 0을 돌려준다. `check_delete`(isIncludeDeleted)도 기본 `del_yn='N'` 조건 때문에 효과가 없다.
+> - `checkDuplicate()`는 `where()` 기본 조건을 끄고 센다. 미사용(`use_yn='N'`) 행도 포함하고, 삭제 행(`del_yn='Y'`)은 `isIncludeDeleted`(form `check_delete`)일 때만 포함한다.
 > - GET의 `'0'` 값은 truthy가 아니어서 where 조건이 되지 않는다.
 
 ---
@@ -700,7 +698,7 @@ hook 안에서 읽을 수 있는 프로퍼티. "설정 시점"이 생성자보�
 
 > **주의**
 > - 생성자에서 `$this->mode`로 분기하면 항상 `''`이다. 모드 분기는 hook 안에서 한다.
-> - `noIndexMethod`를 생성자에서 parent 이후에 `true`로 바꾸면 이미 검사가 끝난 뒤라 무시된다(`Logs`, `Auth`가 이 상태).
+> - `noIndexMethod`를 생성자에서 parent 이후에 `true`로 바꾸면 이미 검사가 끝난 뒤라 무시된다. `protected bool $noIndexMethod = true;`로 선언한다(`Logs`, `Auth`).
 > - `validateMessages`, `validateCallback`, `transTargetKeys`, `exceptValidateKeys`를 프로퍼티 기본값으로 선언하면 부모 생성자가 덮어쓴다.
 > - `MY_Builder_API`의 `table`, `notNullList`, `nullList`, `strList`, `intList` 프로퍼티는 선언만 있고 채워지지 않는다. 모델 값은 `$this->Model->…`로 읽는다.
 

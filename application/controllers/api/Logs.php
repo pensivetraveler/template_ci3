@@ -5,13 +5,14 @@ require_once __DIR__.'/Common.php';
 
 class Logs extends Common
 {
+    // index 차단 여부는 MY_Builder_API::__construct() 안에서 검사하므로 기본값으로 선언 (생성자 이후 대입은 무효)
+    protected bool $noIndexMethod = true;
+
     function __construct()
     {
         parent::__construct();
 
         log_message("info", "Informational Message");
-
-        $this->noIndexMethod = true;
     }
 
     public function userAccess_get()

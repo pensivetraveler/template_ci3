@@ -60,12 +60,13 @@ class Common extends MY_Builder_API
             }
         }
 
-        if(property_exists($data, 'created_id') && !empty($data->created_id)) {
-            $data->created_id = $this->Model_User->getDataWhere([], ['user_id' => $data->created_id])->id;
-        }
-
-        if(property_exists($data, 'updated_id') && !empty($data->updated_id)) {
-            $data->updated_id = $this->Model_User->getDataWhere([], ['user_id' => $data->updated_id])->id;
+        // created_id·updated_id 는 user_id 대신 로그인 id 문자열로 바뀐다 (원래 user_id가 필요하면 parent 호출 전에 읽을 것)
+        // 사용자가 soft delete 되어 조회되지 않으면 '' 로 둔다
+        foreach (['created_id', 'updated_id'] as $field) {
+            if(property_exists($data, $field) && !empty($data->{$field})) {
+                $user = $this->Model_User->getDataWhere([], ['user_id' => $data->{$field}]);
+                $data->{$field} = $user ? $user->id : '';
+            }
         }
 
         return $this->transformViewByMode($data);
