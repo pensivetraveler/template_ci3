@@ -85,7 +85,7 @@ $(function () {
 		var element = event.elements[0];  // The field element
 		element.addEventListener('change', function() {
 			// Revalidate field when flatpickr
-			if(element.classList.contains('.form-input_date-flatpickr')) fv.revalidateField(field);
+			if(element.classList.contains('form-input_date-flatpickr')) fv.revalidateField(field);
 			// Revalidate field whenever input changes
 			// e.fv.revalidateField(field);
 		});
@@ -154,8 +154,8 @@ $(function () {
 				console.warn(jqXHR.responseJSON)
 				if(jqXHR.status === 422) {
 					jqXHR.responseJSON.errors.forEach((error) => {
-						const field = error.param;
-						if (!fv.fields[field]) return;
+						const field = getFvFieldKey(fv, error.param);
+						if (!field) return;
 						// 서버 메시지 i18n(선택)
 						const msg = getLocale ? getLocale(error.msg, common.LOCALE) : error.msg;
 						// 서버 type → FV validator 매핑 (있으면 사용)

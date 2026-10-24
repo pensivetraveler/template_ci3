@@ -728,6 +728,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             );
 
             $label = is_empty($attributes, 'label')?$item['label']:$attributes['label'];
+            if(!is_string($label) || $label === '') $label = $this->router->class.'.'.$field;
 
             if(sscanf($label, 'lang:%s', $line) === 1) $label = $line;
 

@@ -6,8 +6,8 @@
 				echo form_input(
 					[
 						'type' => 'hidden',
-						'name' => get_group_field_name($fieldData['attr'], $fieldData['group'], $fieldData['field']),
-						'id' => get_group_field_id($fieldData['attr'], $fieldData['group'], $fieldData['field']),
+						'name' => $fieldData['name'],
+						'id' => $fieldData['id'],
 					],
 					set_admin_form_value($fieldData['field'], $fieldData['default'], null),
 					$fieldData['attributes'],

@@ -923,10 +923,12 @@ class MY_Builder_API extends MY_Controller_API
         }, array_filter($config, function ($item) {
             return $item['type'] !== 'common';
         }));
-        $groups = array_flip(array_unique(array_column($config, 'group')));
-
-        foreach ($groups as $group=>$idx) {
-            if($group !== 'base') $groups[$group] = array_merge($this->config->get('builder_form_base_group_attributes'), $config[$idx]['group_attributes']);
+        // MY_Builder_WEB::setFormData 와 같이 그룹 항목의 group_attributes 를 순서대로 누적 병합
+        $groups = [];
+        foreach ($config as $item) {
+            $group = $item['group'];
+            if(!array_key_exists($group, $groups)) $groups[$group] = $group === 'base' ? [] : $this->config->get('builder_form_base_group_attributes');
+            if($group !== 'base') $groups[$group] = array_merge($groups[$group], $item['group_attributes'] ?? []);
         }
         foreach ($groups as $group => $attr) {
             $groupConfig = array_filter($config, function($item) use ($group) {
@@ -993,7 +995,7 @@ class MY_Builder_API extends MY_Controller_API
                             $cnt = min($cnt, count($value));
                         }
 
-                        for($i = 0; $i <= $cnt; $i++) {
+                        for($i = 0; $i < $cnt; $i++) {
                             $item = [];
                             foreach ($targetData as $k => $v) $item[$k] = $v[$i];
                             $this->form_validation->set_data($item);

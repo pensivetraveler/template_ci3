@@ -81,7 +81,7 @@ const customValidatorsPreset = {
 			options : function(form, item, matches) {
 				return {
 					compare: function() {
-						return form.querySelector(`[name="${password_matches[1]}"]`).value;
+						return form.querySelector(`[name="${matches[1]}"]`).value;
 					},
 				};
 			},
@@ -125,7 +125,7 @@ const customValidatorsPreset = {
 			validatorName : 'requiredIfEmpty',
 		},
 		required_mod : {
-			regex : '^required_mod\\[(\\w+)\\]$',
+			regex : '^required_mod\\[(.*?)\\]$',
 			options : function(form, item, matches) {
 				return {
 					mod: matches[1],
@@ -290,6 +290,28 @@ const customValidatorsPreset = {
 				}
 			}
 		},
+		server : function () {
+			// 서버 422 메시지 표시용. 값이 바뀌어 재검증되면 통과시켜 메시지를 지움
+			return {
+				validate: function(input) {
+					return { valid: true };
+				}
+			}
+		},
+		regexpMulti : function () {
+			return {
+				validate: function(input) {
+					const value = input.value;
+					if(value === '' || value === null || value === undefined) return { valid: true };
+					const failed = (input.options.list || []).find((item) => !item.regexp.test(value));
+					if(!failed) return { valid: true };
+					return {
+						valid: false,
+						...(failed.message && { message: failed.message }),
+					};
+				}
+			}
+		},
 		isUnique : function () {
 			return {
 				validate: function(input) {
@@ -303,7 +325,7 @@ const customValidatorsPreset = {
 					}else{
 						const mode = form['_mode'].value;
 						if(input.options.hiddenId) valid = form.querySelector(`#${input.options.hiddenId}`).value === '1';
-						if(!valid && mode === 'edit' && input.getAttribute('data-original-value') === input.value) valid = true;
+						if(!valid && mode === 'edit' && node.getAttribute('data-original-value') === node.value) valid = true;
 						if(!valid) message = '중복 검사를 실행해주세요.';
 					}
 

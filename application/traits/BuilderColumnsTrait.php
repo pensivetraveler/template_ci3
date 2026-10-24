@@ -52,7 +52,8 @@ trait BuilderColumnsTrait
 
         if(isset($item['type']) && $item['type'] === 'common') return $item;
 
-        if(!array_key_exists('label', $item)) {
+        // builder_form_base 의 label 기본값('')이 병합되므로 빈 값도 자동 라벨로 처리
+        if(!is_string($item['label'] ?? null) || $item['label'] === '') {
             $item['label'] = 'lang:'.$this->router->class.'.'.$item['field'];
         }
 

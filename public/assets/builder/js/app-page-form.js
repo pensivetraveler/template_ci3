@@ -19,7 +19,7 @@ common.DYNAMIC_FIELDS = [];
 
 function updateFormLifeCycle(state, form = null, detail = {}) {
     if(common.FORM_LIFECYCLE[form.getAttribute('name')] === undefined) {
-        common.FORM_LIFECYCLE[form.getAttribute('name')] = FORM_LIFECYCLE;
+        common.FORM_LIFECYCLE[form.getAttribute('name')] = Object.assign({}, FORM_LIFECYCLE);
     }
 
     common.FORM_LIFECYCLE[form.getAttribute('name')][state] = true;
@@ -141,7 +141,7 @@ function preparePlugins(form) {
                     if(withList) $(this).find('.form-list-item-wrap').addClass('d-none').empty();
 
                     const cbName = camelize(`after_${groupName}_repeater_show`);
-                    if(typeof cbName === 'function') window[cbName](this);
+                    if(typeof window[cbName] === 'function') window[cbName](this);
 
                     $(this).slideDown();
                 },
@@ -390,7 +390,12 @@ function resetFrmInputs(form, fields = []) {
  */
 function readyFrmInputs(form, mode = null, fields = []) {
     form.querySelectorAll('[data-view-mod]').forEach((node) => {
-        const modList = node.getAttribute('data-view-mod').split('|');
+        // '' 이면 전체 노출, 배열 설정은 PHP 에서 "['add','edit']" 형태의 문자열로 출력됨
+        const viewMod = node.getAttribute('data-view-mod').trim();
+        if(!viewMod) return;
+        const modList = viewMod.startsWith('[')
+            ? viewMod.replace(/[\[\]'"\s]/g, '').split(',')
+            : viewMod.split('|');
         if(modList.includes(mode)){
             node.closest('.form-validation-unit').classList.remove('d-none');
         }else{
@@ -620,9 +625,9 @@ function getFrmInputDto(groupAttrs, field, dataIndex = 0) {
                 field.name = field.name.replace(regexName, `$1${dataIndex}$2`);
             }else{
                 regexId = new RegExp(`(-${field.field}-)\\d+`);
-                field.id = field.id.replace(regex, `$1${dataIndex}`);
+                field.id = field.id.replace(regexId, `$1${dataIndex}`);
 
-                regexName = new RegExp(`(${listName}\\[)\\d+(\\])`);
+                regexName = new RegExp(`(${field.field}\\[)\\d+(\\])`);
                 field.name = field.name.replace(regexName, `$1${dataIndex}$2`);
             }
             return field;
@@ -674,7 +679,7 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
                 case 'onoff' :
                     if(!data[fieldName]) return;
                     form.querySelectorAll(`[name="${name}"]`).forEach((input) => {
-                        input.checked = true;
+                        input.checked = input.value == data[fieldName];
                     });
                     break;
                 default:
@@ -715,7 +720,8 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
                 default :
                     if(data[fieldName] === undefined) console.warn(`applyFrmValues : data doesn't have '${name}'.`);
                     if(form[name] === undefined) console.warn(`applyFrmValues : form doesn't have '${name}'.`);
-                    if(data[fieldName] !== undefined && form[name] !== undefined)
+                    // file input 에 문자열을 넣으면 InvalidStateError
+                    if(data[fieldName] !== undefined && form[name] !== undefined && form[name].type !== 'file')
                         form[name].value = data[fieldName];
                     break;
             }
