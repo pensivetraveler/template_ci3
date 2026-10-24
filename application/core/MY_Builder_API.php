@@ -51,6 +51,11 @@ class MY_Builder_API extends MY_Controller_API
      */
     protected array $allowedRequestFields = [];
 
+    /**
+     * 요청 조건으로 절대 받지 않는 컬럼 (값 추측·노출 방지). 테이블 접두어가 붙어도 막는다.
+     */
+    protected array $deniedRequestFields = ['password', 'user_api_key', 'api_key', 'token', 'secret', 'salt'];
+
     public function __construct()
     {
         parent::__construct();
@@ -94,30 +99,52 @@ class MY_Builder_API extends MY_Controller_API
 
     /**
      * 요청 조건(where·filters)에 쓸 수 있는 필드 목록.
-     * 모델(Model_Parent·Model·Model_Child) 컬럼 + form/list/view/filter 설정 필드 + $allowedRequestFields
+     * - 메인 Model 컬럼: 'col', '{table}.col'
+     * - Model_Parent·Model_Child 컬럼: '{table}.col' 만 (조건은 메인 테이블에 붙으므로 'col'로 받으면 SQL 오류)
+     * - form/list/view 설정 필드: 테이블 접두어가 있거나 메인 Model 컬럼일 때만
+     * - filter 설정 필드(메서드별 이름 포함), $allowedRequestFields: 그대로
+     * - 민감 필드($deniedRequestFields, form type password)는 항상 제외
      */
     protected function getAllowedRequestFields(): array
     {
         $fields = $this->allowedRequestFields;
+        $mainColumns = [];
 
         foreach ($this->getModelPipeline() as $modelName) {
-            if(property_exists($this, $modelName) && method_exists($this->{$modelName}, 'getRequestColumnList')) {
-                $fields = array_merge($fields, $this->{$modelName}->getRequestColumnList());
+            if(!property_exists($this, $modelName) || !method_exists($this->{$modelName}, 'getRequestColumnList')) continue;
+            $model = $this->{$modelName};
+            $columns = $model->getRequestColumnList();
+            if($modelName === 'Model') {
+                $mainColumns = $columns;
+                $fields = array_merge($fields, $columns);
+            }
+            foreach ($columns as $column) $fields[] = $model->table.'.'.$column;
+        }
+
+        foreach ([$this->formConfig, $this->listConfig, $this->viewConfig] as $config) {
+            if(!is_array($config)) continue;
+            foreach (array_column($config, 'field') as $field) {
+                if(is_string($field) && (strpos($field, '.') !== false || in_array($field, $mainColumns, true))) $fields[] = $field;
             }
         }
 
         // filter 설정은 WEB(setConfigList)처럼 메서드별 이름도 본다 (예: logs/errors → filter_logs_errors_config)
         $class = builder_config_name($this->router->class);
         $method = builder_config_name($this->router->method);
-        $configs = [$this->formConfig, $this->listConfig, $this->viewConfig];
         foreach (array_unique(["filter_{$class}_{$method}_config", "filter_{$class}_config", "filter_{$method}_config"]) as $name) {
-            $configs[] = $this->config->get($name, [], false);
-        }
-        foreach ($configs as $config) {
+            $config = $this->config->get($name, [], false);
             if(is_array($config)) $fields = array_merge($fields, array_column($config, 'field'));
         }
 
-        return array_values(array_unique(array_filter($fields, 'is_string')));
+        $denied = array_merge($this->deniedRequestFields, array_column(array_filter($this->formConfig ?: [], function ($item) {
+            return ($item['type'] ?? '') === 'password';
+        }), 'field'));
+
+        return array_values(array_unique(array_filter($fields, function ($field) use ($denied) {
+            if(!is_string($field) || $field === '') return false;
+            $column = strpos($field, '.') !== false ? substr($field, strrpos($field, '.') + 1) : $field;
+            return !in_array($column, $denied, true);
+        })));
     }
 
     /**
