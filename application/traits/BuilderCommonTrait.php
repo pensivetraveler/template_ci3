@@ -47,6 +47,8 @@ trait BuilderCommonTrait
 
         // 엔티티(route·form·list·filter·view·excel) 설정은 모두 Resource_loader 로 찾는다
         $this->load->library('resource_loader', null, 'resourceLoader');
+        // 엔티티당 파일 하나인 통합형(config/extra/{flag}/resources/*.php)을 분할형과 같은 키로 넣는다
+        $this->resourceLoader->loadMergedResources($this->flag);
     }
 
     protected function fillRouteConfigProperties($className, $config = [], $base = []): array

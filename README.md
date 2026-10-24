@@ -181,5 +181,6 @@ app-page-list.js (DataTable)
 | [list-filter.md](docs/builder/list-filter.md) | list 컬럼과 셀 렌더링, onclick/onchange/render, DataTable 요청·응답, 버튼·행 액션·내보내기, filter 설정 |
 | [view-excel.md](docs/builder/view-excel.md) | 상세 보기(view) 설정과 화면, 엑셀 가져오기 설정 |
 | [api-hooks.md](docs/builder/api-hooks.md) | API 컨트롤러에서 오버라이드하는 공통 메서드(hook): 요청별 호출 순서, hook 레퍼런스, 자주 쓰는 패턴, 공통 모델 메서드 |
+| [resources.md](docs/builder/resources.md) | 리소스 설정 형식: 분할형(종류별 파일)과 통합형(엔티티당 파일 하나), 통합형 키 대응, 메뉴 연결, `resource_dump`·`resource_check` 명령 |
 
 문서는 코드 동작 기준으로 썼다. 동작하지 않거나 구현되지 않은 항목은 문서에 `**미구현**`, `**주의**`로 짧게 표시했고, 전체 목록은 [`TODO.md` 6장 "빌더 설정 조사"](TODO.md#6-빌더-설정-조사-2026-10-23)에 있다.
