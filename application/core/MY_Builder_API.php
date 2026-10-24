@@ -344,7 +344,7 @@ class MY_Builder_API extends MY_Controller_API
                     $item = $targetConfig[$idx];
                     if(!isset($item['option_attributes'])) continue;
                     $options = $this->getOptions($key, $item['option_attributes']);
-                    $data->{$key} = $options[$data->{$key}];
+                    $data->{$key} = $options[$data->{$key}] ?? $data->{$key};
                 }
             }
         }

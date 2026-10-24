@@ -66,7 +66,7 @@
 ## 5. 코드 검토에서 나온 남은 항목
 
 ### 보안
-- [ ] XSS: 목록 셀 렌더링(`app-page-list.js` `innerHTML`, inline `onclick`), 뷰 출력 `html_escape` 미사용 (추가: `renderColumn` text 셀, 반응형 `responsive.details.renderer`, `getColumnOnclick` redirect/download/view의 `location.href`/`window.open` 문자열(`javascript:` URL 포함), checkbox·select 셀 inline `onchange`의 식별자 값, `app-page-view.js::applyViewData` `SPAN.innerHTML`)
+- [ ] XSS: 목록 셀 렌더링(`app-page-list.js` `innerHTML`, inline `onclick`), 뷰 출력 `html_escape` 미사용 (추가: `renderColumn` text 셀, 반응형 `responsive.details.renderer`, `getColumnOnclick` redirect/download/view의 `location.href`/`window.open` 문자열(`javascript:` URL 포함), checkbox·select 셀 inline `onchange`의 식별자 값, `app-page-view.js::applyViewData` `SPAN.innerHTML`) (추가 2026-10-25: 상세 보기 `app-page-view.js`는 textContent로 넣도록 수정됨)
 - [ ] XSS: `views/module/player.php`의 `$poster`, `$source` → `json_encode(..., JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT)`
 - [ ] 인증 토큰이 JS 전역(`common.HOOK_PHPTOJS_VAR_TOKEN`)에 노출, 32곳 이상에서 개별 주입
 - [ ] `module/File.php`: `basePath`를 템플릿 디렉토리로 제한, svg 업로드 제외·MIME 검사, 백업 폴더를 웹 루트 밖으로
@@ -194,14 +194,14 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 
 **view·excel import**
 - [x] `MY_Builder_WEB::getExcelHeaders` 설정을 `$this->filterConfig`에 넣고 정의되지 않은 `$config`를 검사해 항상 `show_error`, 대체 경로의 `$this->formColumns`도 excel category에서는 채워지지 않음 (excel 화면이 열리지 않음, 고쳐도 빈 배열)
-- [ ] `MY_Builder_WEB::view`/`setJSVariables` view 데이터 준비 조건이 `subtype === 'view'`인데 `method_view_base_config` 기본 subtype은 `'base'`이고 그런 subtype config도 없음, 맞추면 `view_view.php`가 없어 `builder_view(".../view_view")` 실패 (`VIEW_COLUMNS`·`prepareViewData`·`app-page-view.js` 사실상 미사용 — `category === 'view'` 조건 검토)
-- [ ] `MY_Builder_WEB::viewApp` subtype base view와 dashboard(`view/dashboard/base`)가 method `view` 기준으로 `builder/layout/view.php`를 잡고 이 파일이 정의되지 않은 `$viewType`·`$viewData` 참조 (notice, `builder/dashboard/index.php`는 매칭 안 됨)
-- [ ] `MY_Builder_WEB::prepareViewData` `reformat_form_data_by_type($cols, $viewType)`로 viewType을 form_type 자리에 넘김 (grid여도 행 배열이 안 만들어져 `view_grid.php` `foreach ($row …)` 깨짐, `common` 항목도 걸러짐)
-- [ ] `MY_Builder_WEB::prepareViewData` hidden 컬럼도 `type !== 'view'`에 걸려 `addFormScripts()` 로드 (불필요한 form 자산)
-- [ ] `views/builder/layout/view_article.php` 평평한 리스트를 기대하는 `trans_formdata_dit_type()`에 `{hiddens, fields}`를 넘기고 `default`·`group` 키도 `builder_view_base`에 없음 (article subtype 렌더 실패)
-- [ ] `views/builder/layout/view_comments.php` `$identifier['field']`(단건)를 쓰지만 `prepareViewData()`의 `identifier`는 배열 목록 (댓글 identifier 값 오류)
-- [ ] `MY_Builder_WEB::setViewColumns` resourceConfig가 없을 때 `jsVars['FORM_DATA']`를 쓰지만 view category에서는 설정 안 됨 (undefined index), `config->get()`을 `triggerError` 기본값 true로 호출 (설정 없으면 에러 로그)
-- [ ] `MY_Builder_API::transformView` 매칭 옵션이 없으면 `$options[$data->{$key}]` undefined index (option_attributes 라벨 변환 시 notice)
+- [x] `MY_Builder_WEB::view`/`setJSVariables` view 데이터 준비 조건이 `subtype === 'view'`인데 `method_view_base_config` 기본 subtype은 `'base'`이고 그런 subtype config도 없음, 맞추면 `view_view.php`가 없어 `builder_view(".../view_view")` 실패 (`VIEW_COLUMNS`·`prepareViewData`·`app-page-view.js` 사실상 미사용 — `category === 'view'` 조건 검토) → `isDetailView()`(category view + type base)로 판단, subtype은 화면 틀(base·grid·modal) (2026-10-25)
+- [x] `MY_Builder_WEB::viewApp` subtype base view와 dashboard(`view/dashboard/base`)가 method `view` 기준으로 `builder/layout/view.php`를 잡고 이 파일이 정의되지 않은 `$viewType`·`$viewData` 참조 (notice, `builder/dashboard/index.php`는 매칭 안 됨) → dashboard(type dashboard)는 상세 경로를 타지 않고, viewApp이 route 기본 메서드면 `{class}/index.php`도 전용 뷰로 찾음 (2026-10-25)
+- [x] `MY_Builder_WEB::prepareViewData` `reformat_form_data_by_type($cols, $viewType)`로 viewType을 form_type 자리에 넘김 (grid여도 행 배열이 안 만들어져 `view_grid.php` `foreach ($row …)` 깨짐, `common` 항목도 걸러짐) → `reformat_form_data_by_type($cols, 'page', $viewType)` (2026-10-25)
+- [x] `MY_Builder_WEB::prepareViewData` hidden 컬럼도 `type !== 'view'`에 걸려 `addFormScripts()` 로드 (불필요한 form 자산) → view·hidden·common 외 입력 요소가 있을 때만 폼 자산 (2026-10-25)
+- [ ] `views/builder/layout/view_article.php` 평평한 리스트를 기대하는 `trans_formdata_dit_type()`에 `{hiddens, fields}`를 넘기고 `default`·`group` 키도 `builder_view_base`에 없음 (article subtype 렌더 실패) (보류: 게시판형 상세는 게시판 기능 정리 때)
+- [ ] `views/builder/layout/view_comments.php` `$identifier['field']`(단건)를 쓰지만 `prepareViewData()`의 `identifier`는 배열 목록 (댓글 identifier 값 오류) (보류: 게시판형 상세는 게시판 기능 정리 때)
+- [x] `MY_Builder_WEB::setViewColumns` resourceConfig가 없을 때 `jsVars['FORM_DATA']`를 쓰지만 view category에서는 설정 안 됨 (undefined index), `config->get()`을 `triggerError` 기본값 true로 호출 (설정 없으면 에러 로그) → view 설정(`setConfigList('view')`)이 없으면 form 설정 필드를 읽기 전용으로, `lang:` 라벨 정리 (2026-10-25)
+- [x] `MY_Builder_API::transformView` 매칭 옵션이 없으면 `$options[$data->{$key}]` undefined index (option_attributes 라벨 변환 시 notice) → 매칭 옵션이 없으면 원래 값 (2026-10-25)
 - [ ] `app-page-excel.js` `#excelFormSubmit` 열 매핑이 위치 기반(`excelHeaders[k-1].field`)이고 헤더는 허용 목록 포함 여부만 검사 (열 순서가 다르거나 일부만 있으면 값이 엉뚱한 컬럼에 저장)
 - [ ] `app-page-excel.js::submitData` `tr.id`로 완료 행을 표시하지만 `#excelFile` 핸들러가 행에 id를 넣지 않음 (`submit-completed` 미표시, 중간 청크 실패 후 재저장 시 중복 INSERT)
 - [ ] `app-page-excel.js` `#resetExcelForm` `colspan = th개수 + 2`로 이미 #·삭제 열이 포함된 수에 2를 더함 (빈 행 colspan 과다)
@@ -287,7 +287,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Builder_WEB::setListColumns` base 키는 item top-level 값이 `list_attributes`를 덮어써 `list_attributes`의 onclick/render/type 등이 무시됨 (merge 순서 변경 검토)
 - [ ] `MY_Builder_WEB::getListColumns` WEB은 form config `list => true` fallback이 없고 list config가 없으면 `show_error` (API와 동작 다름)
 - [ ] `app-page-list.js::getColumnOnclick` `popup` kind 미구현(빈 onclick) (구 README의 iframe 모달 동작 없음)
-- [ ] `app-page-list.js::openViewModal` `getData()` 후 `console.log`만 하는 스텁이고 `view_modal.php`를 포함하는 곳 없음 (onclick view에 `attrs`가 없거나 `PAGE_VIEW_URI`가 없으면 상세 보기 불가)
+- [ ] `app-page-list.js::openViewModal` `getData()` 후 `console.log`만 하는 스텁이고 `view_modal.php`를 포함하는 곳 없음 (onclick view에 `attrs`가 없거나 `PAGE_VIEW_URI`가 없으면 상세 보기 불가) (보류: 모달 상세는 페이지형 상세 확인 후 다음 단계)
 - [ ] `app-page-list.js::renderColumnHTML` `bs` kind는 `attrs` 1단계 키만 `data-bs-{key}`로 부여 (구 README의 중첩 `attrs.attrs` 미지원)
 - [ ] `app-page-list.js::renderSelectColumn` `onchange`는 함수명 문자열만 동작, `{kind, attrs, params}` dict는 `[object Object]`
 - [ ] `app-page-list.js` DataTable `columnDefs` `render.params`가 없으면 `null` 전달 (구 README의 "this 전달" 설명과 다름)
@@ -299,7 +299,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Builder_API::transformView` 옵션 텍스트 치환용 `transTargetKeys`를 채우는 API 컨트롤러 없음 (list/view config의 `option_attributes` 라벨 변환 사실상 미동작)
 
 **view·excel import**
-- [ ] `builder-common.js` `appPlugins.view` 훅이 `app-page-view.js::applyViewData`에서 `console.log`만 함 (필드별 커스텀 렌더 불가)
+- [x] `builder-common.js` `appPlugins.view` 훅이 `app-page-view.js::applyViewData`에서 `console.log`만 함 (필드별 커스텀 렌더 불가) → `appPlugins.view[필드](element, value, data, column)` 호출 (2026-10-25)
 - [ ] `builder_method_config.php` `method_excel_base_config.properties`(templateDownload, preview, validateBeforeImport) 읽는 코드 없음
 - [ ] `builder_method_config.php` `method_view_base_config` `properties.formConfig/formType`을 view에서 읽는 코드 없음
 - [ ] `builder_view_config.php` `builder_view_config` 템플릿(`hiddens/fields/actions/buttons`, `actions[].onclick`)을 어디서도 읽지 않음 (예시로만 존재, 실제 구조와 다름)

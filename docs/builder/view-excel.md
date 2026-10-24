@@ -1,13 +1,13 @@
 # View · Excel 가져오기 설정 (view_config, excel_config)
 
 엔티티의 상세보기(view) 화면과 엑셀 가져오기(import) 화면을 설정하는 방법을 정리한 참고 문서이다.
-설정 이름을 찾는 순서, 항목 병합 규칙, 메소드 설정, 요청 흐름을 코드 기준으로 설명한다. 지금 동작하지 않는 부분도 함께 적었다.
+설정 이름을 찾는 순서, 메서드 설정, 요청 흐름을 코드 기준으로 설명한다. 아직 정리되지 않은 부분도 함께 적었다.
 경로는 저장소 루트 기준이다. 버그와 미구현 항목의 전체 목록은 [TODO.md](../../TODO.md#6-빌더-설정-조사-2026-10-23)에 있다.
 
 **목차**
 
 - [Part 1. View 설정과 상세보기 화면](#part-1-view-설정과-상세보기-화면)
-  - [1. 관련 파일](#1-관련-파일) · [2. 설정 이름 해석](#2-설정-이름-해석) · [3. 항목 병합 규칙](#3-항목-병합-규칙) · [4. builder_view_base 키](#4-builder_view_base-키) · [5. 메소드 설정](#5-메소드-설정-method_view_base_config) · [6. 요청 흐름](#6-요청-흐름) · [7. 설정 예시](#7-설정-예시-가상-예시)
+  - [1. 관련 파일](#1-관련-파일) · [2. 켜는 방법](#2-켜는-방법) · [3. 상세 화면 판단과 화면 틀](#3-상세-화면-판단과-화면-틀) · [4. 표시할 컬럼](#4-표시할-컬럼-setviewcolumns) · [5. 메서드 설정](#5-메서드-설정-method_view_base_config) · [6. 값 표시](#6-값-표시-app-page-viewjs)
 - [Part 2. Excel 가져오기 설정](#part-2-excel-가져오기-설정)
   - [1. 메소드 설정](#1-메소드-설정-method_excel_base_config) · [2. 헤더 설정](#2-헤더-설정-excel_name_config) · [3. 샘플 파일 생성](#3-샘플-파일-생성) · [4. 화면과 업로드 흐름](#4-화면과-업로드-흐름) · [5. form 규칙과의 관계](#5-form-규칙과의-관계)
 
@@ -17,190 +17,84 @@
 
 ## Part 1. View 설정과 상세보기 화면
 
-> **현재 상태** — WEB의 view 페이지는 데이터 준비 조건(`subtype === 'view'`)과 기본 subtype(`'base'`)이 맞지 않고, `view_view.php`도 없어서 그대로는 동작하지 않는다. 자세한 항목은 [TODO.md](../../TODO.md#6-빌더-설정-조사-2026-10-23)를 참고한다.
+목록에서 행을 눌러 들어가는 **상세 보기 페이지**를 설정만으로 만든다. 모달형 상세(`openViewModal()`)와 게시판형 상세(`view_article`, `view_comments`)는 아직 정리되지 않았다([TODO.md](../../TODO.md#6-빌더-설정-조사-2026-10-23)).
 
 ### 1. 관련 파일
 
 | 구분 | 파일 | 역할 |
 |---|---|---|
-| 기본값 | `application/config/extra/builder/builder_view_config.php` | `builder_view_base`, `builder_view_hidden_config`, 설명용 템플릿 `builder_view_config` |
-| 플랫폼 설정 | `application/config/extra/admin/admin_view_config.php`, `application/config/extra/web/web_view_config.php` | `view_{name}_config`를 정의하는 곳. 현재 두 파일 모두 비어 있음(`*_view_config_loaded` 플래그만 있음) |
-| 메소드 기본값 | `application/config/extra/builder/builder_method_config.php` | `method_view_base_config` |
-| WEB 컨트롤러 | `application/core/MY_Builder_WEB.php` | `view()`, `prepareViewData()`, `setJSVariables()`, `setViewColumns()` |
-| API 컨트롤러 | `application/core/MY_Builder_API.php` | `__construct()`(설정 이름), `setProperties()`(viewConfig 로드), `view()`, `transformView()` |
-| API 공통 | `application/controllers/api/Common.php` | `transformView()` 오버라이드, `transformViewByMode()` |
-| 뷰 | `application/views/builder/layout/view.php`, `view_base.php`, `view_grid.php`, `view_modal.php`, `view_article.php`, `view_comments.php` | 레이아웃 껍데기와 subtype별 본문 |
-| JS | `public/assets/builder/js/app-page-view.js` | 데이터 조회와 채우기, 목록/수정/삭제 버튼 |
-| JS 공통 | `public/assets/builder/js/app-page-common.js` | `getData()`, `deleteData()`, `isMyData()`, `getUrlWithIdentifiers()` |
+| WEB | `MY_Builder_WEB::view()`, `isDetailView()`, `prepareViewData()`, `setViewColumns()`, `setJSVariables()` | 상세 화면 여부 판단, 표시할 컬럼(`VIEW_COLUMNS`) 준비, 버튼 권한 |
+| 뷰 | `views/builder/layout/view.php` + `view_{subtype}.php` (`base`, `grid`, `modal`) | 화면 틀. 값 자리는 `<span id="{필드}">` |
+| JS | `public/assets/builder/js/app-page-view.js` | API에서 단건을 받아 값 채우기, 목록·수정·삭제 버튼 |
+| API | `MY_Builder_API::view()`, `transformView()`, `api/Common::transformView()` | `GET {API_URI}/{식별자}?_mode=view` 응답 |
 
-### 2. 설정 이름 해석
+### 2. 켜는 방법
 
-view 설정 이름은 WEB과 API가 찾는 경로가 다르다. 둘 다 list, filter, form, excel 설정이 쓰는 후보 목록(`Resource_loader::entityConfigNames()`)을 쓰지 않는다. 키 이름 자체는 둘 다 `Resource_loader::entityConfigName()`(snake 규칙)으로 만든다.
-
-| 측 | 위치 | 규칙 |
-|---|---|---|
-| WEB | `MY_Builder_WEB::setViewColumns()` | ① 인자 `$name`이 있으면 그 이름 그대로 → ② 메소드 설정의 `resourceConfig`가 있으면 `view_{resourceConfig}_config` → ③ 둘 다 없으면 `jsVars['FORM_DATA']`(form 설정)를 복사하고, hidden이 아닌 항목은 `type='view'`, `subtype='base'`로 바꿈 |
-| API | `MY_Builder_API::__construct()`, `MY_Builder_API::setProperties()` | `'view_' . builder_config_name(클래스명) . '_config'` 하나만 사용(`menuList` → `view_menu_list_config`). 하위 클래스에서 `$viewConfigName` 속성으로 덮어쓸 수 있음 |
-
-> **주의** — WEB은 `resourceConfig`, API는 클래스명으로 찾으므로, `resourceConfig`를 클래스명과 다르게 쓰면 API의 `$viewConfigName`도 맞춰야 한다.
-
-참고: `setConfigList()`는 `{flag}_{resourceConfig}_config` → `{flag}_{class}_{method}_config` → `{flag}_{class}_config` → `{flag}_{method}_config` 순서로 후보를 만든다. view에는 이 순서가 적용되지 않는다.
-
-설정 파일 로드: `BuilderCommonTrait::loadConfigs()`가 `config/extra/{flag}/*_config.php`를 모두 읽는다. 그래서 `view_*_config`를 `admin_view_config.php`가 아닌 다른 `*_config.php`에 두어도 읽힌다.
-
-### 3. 항목 병합 규칙
-
-**WEB (`MY_Builder_WEB::setViewColumns()`)** — 항목마다 아래 순서로 처리한다.
-
-1. `subtype === 'identifier'`이면 `type`을 `'hidden'`으로 바꾼다.
-2. 비어 있는 키에 기본값을 넣는다: `category='base'`, `type='view'`, `subtype='base'`. 이 값을 base 병합보다 먼저 넣으므로 **실제 기본 type은 `builder_view_base`의 `'text'`가 아니라 `'view'`** 이다.
-3. `type === 'common'`이면 여기서 그대로 반환한다.
-4. `id = field`로 설정한다. 이 id가 JS 바인딩 키가 된다.
-5. `type === 'hidden'`이면 `array_merge(builder_view_hidden_config, item)`.
-6. 그 밖에 `type !== 'view'`(form 입력형)이면 `setFormColumn()`(form 기본값 병합, rules 해석, 옵션 처리)과 `get_admin_form_attributes($item, 'page')`를 거친다. 마지막으로 `array_merge(builder_view_base, item)`.
-
-**API (`MY_Builder_API::setProperties()`)** — 단순히 `array_merge(builder_view_base, item)`만 한다. GET/POST 요청에서만 로드된다.
-
-### 4. builder_view_base 키
-
-`builder_view_config.php`의 `$config['builder_view_base']`.
-
-| 키 | 타입 | 기본값 | 설명 | 사용 위치 |
-|---|---|---|---|---|
-| `field` | string | `''` | DB 컬럼명. 응답 JSON 키이자 DOM id(`id=field`) | `setViewColumns()`, `view_base.php`, `app-page-view.js` `applyViewData()`, API `transformView()` |
-| `label` | string | `''` | 라벨. `lang()`으로 번역(`lang:` 접두사 허용) | `view_base.php`, `view_grid.php`, `view_modal.php` |
-| `category` | string | `'base'` | 입력형일 때 `get_admin_form_attributes()`가 CSS 클래스 `form-input_{category}`에 사용 | `setViewColumns()`, `builder_form_helper.php` `get_admin_form_attributes()` |
-| `type` | string | base는 `'text'`, **실제 기본값은 `'view'`** | `view`: 읽기 전용 `<span id>` / `hidden`: hidden input / `common`: grid의 빈 칸 / 그 밖(text, select 등): form 입력 위젯 | `view_base.php`, `view_grid.php` |
-| `subtype` | string | `'base'` | `'identifier'`이면 hidden으로 바뀌고 IDENTIFIER로 쓰임. 입력형이면 form subtype | `setViewColumns()`, `setIdentifier()` |
-| `attributes` | array | `[]` | hidden input 속성. 입력형이면 `get_admin_form_attributes()` 결과로 덮어씀 | `view_base.php`, `setViewColumns()` |
-| `help_block` | array | `[]` | `{tag, text, attr}`. 비어 있지 않으면 필드 아래에 출력 | `view_base.php`, `MY_html_helper.php` `get_help_block_html()` |
-| `colspan` | int | `6` | grid에서 `col-md-{colspan}`. base, modal에서는 쓰이지 않음 | `view_grid.php`, `builder_form_helper.php` `set_form_rows()` |
-
-base에는 없지만 코드가 읽는 키:
-
-| 키 | 타입 | 설명 | 사용 위치 |
-|---|---|---|---|
-| `option_attributes` | array | `_mode=view`이고 그 필드가 `transTargetKeys['view']`에 있으면 `getOptions()`로 코드값을 라벨로 바꿈. **주의** — `transTargetKeys`를 채우는 컨트롤러가 없어 사실상 동작 안 함 | `MY_Builder_API::transformView()` |
-| `id` | string | 자동으로 `field`가 들어감(사용자 값은 덮어씀) | `setViewColumns()` |
-| `default` | mixed | `view_article.php`의 identifier hidden 값 | `view_article.php` |
-| `group` | string | `trans_formdata_dit_type()`가 읽음 | `builder_form_helper.php` `trans_formdata_dit_type()` |
-| form 계열 키(`rules`, `form_attributes`, `option_attributes`, `icon` 등) | – | 입력형 항목은 `setFormColumn()`을 거치므로 form 설정과 같은 의미. [form.md](form.md) 참고 | `BuilderColumnsTrait::setFormColumn()` |
-
-- `builder_view_hidden_config`는 `builder_view_base`에서 `type='hidden'`만 바꾼 값이다.
-- `builder_view_config`(`hiddens`/`fields`/`actions`/`buttons` 구조)는 **어디서도 읽지 않는다**. 설정 예시로만 남아 있다.
-
-### 5. 메소드 설정 (`method_view_base_config`)
-
-`builder_method_config.php`에 정의된다. route의 `methods.{name}`에 `category => 'view'`를 주면 `BuilderCommonTrait::fillMethodConfigProperties()`가 `method_base_config` → `method_view_base_config` → `method_view_{type}_config` → `method_view_{type}_{subtype}_config` 순서로 병합한다. 현재 `method_view_*` 변형은 base 하나뿐이다. 변형 규칙은 [route-method-nav.md](route-method-nav.md)를 참고한다.
-
-| 키 | 기본값 | 설명 | 사용 위치 |
-|---|---|---|---|
-| `category` | `'view'` | `setJSVariables()`의 view 분기 | `MY_Builder_WEB::setJSVariables()` |
-| `type` | `'base'` | WEB에서 읽지 않음(admin `dashboard`는 `type=>'dashboard'`) | – |
-| `subtype` | `'base'` | `$viewType`이 되어 `view_{subtype}.php`를 고름. **주의** — 데이터 준비는 `subtype === 'view'`일 때만 함 | `view()`, `prepareViewData()`, `setJSVariables()`, `view.php` |
-| `mode` | `'read'` | baseMethod가 list인 클래스에서 메뉴 권한(CRUDEI) 검사 키 | `MY_Builder_WEB::setupPlatformPage()` |
-| `resourceConfig` | `''` | `view_{resourceConfig}_config` 이름 | `setViewColumns()` |
-| `actions.list/edit/delete` | `true` | 하단 버튼과 드롭다운 표시. `delete` 외의 action은 route `allows`(=methods 키)에 있어야 표시. 각 action마다 `PAGE_{ACTION}_URI` 생성 | `prepareViewData()`, `setJSVariables()` |
-| `buttons` | `[]`(method_base) | `{key => ['text'=>...]}`. `btn-view-{key}` 버튼을 출력(클릭 핸들러는 직접 구현) | `view_base.php` |
-| `properties.isComments` | `false` | `app-page-comment.js` 로드, `view_article.php`에서 댓글 영역 출력 | `prepareViewData()`, `view_article.php` |
-| `properties.formConfig`, `properties.formType` | `''` | **미구현** — view에서 읽는 코드 없음 | – |
-| `properties.noIdentifier`, `properties.identifier` | `false`, `[]` | 키 존재 검사와 IDENTIFIER 구성 | `checkIdentifierExist()`, `setIdentifier()` |
-
-subtype별 본문 파일 — `view.php`가 `builder_view("{$platformName}/layout/view_{$viewType}")`를 호출한다. 플랫폼 경로에 파일이 없으면 `builder/`로 대체한다(`builder_base_helper.php` `builder_view()`).
-
-| subtype | 파일 | 형태 | 기대하는 `$viewData` 구조 |
-|---|---|---|---|
-| `base` | `view_base.php` | 라벨 2칸 + 값 10칸 가로형 행, 우상단 드롭다운, 하단 버튼 | `{hiddens:[], fields:[item, …]}` |
-| `grid` | `view_grid.php` | `colspan` 기반 12칸 그리드, `common`은 빈 칸 | `{hiddens:[], fields:[[item, …], …]}`(행 배열) |
-| `modal` | `view_modal.php` | base에서 헤더/드롭다운을 뺀 형태 | base와 같음 |
-| `article` | `view_article.php` | 게시글(subject, created_id, created_dt, view_count, thumbnail, content, uploads) + 선택적 댓글 | `trans_formdata_dit_type()`용 평평한 리스트, `$identifier` |
-| `view` | `view_view.php` | **미구현** — 파일 없음 | – |
-
-> **주의**
-> - `subtype`을 `'base'`로 두면 VIEW_COLUMNS·`prepareViewData()`가 실행되지 않고, `'view'`로 두면 `view_view.php`가 없음.
-> - `prepareViewData()`가 viewType을 `reformat_form_data_by_type()`의 2번째 인자(form_type)로 넘겨 grid 행 배열이 만들어지지 않음.
-> - `view_article.php`, `view_comments.php`는 `prepareViewData()`가 넘기는 데이터 구조와 맞지 않음.
-> - `VIEW_COLUMNS`, `VIEW_TYPE`은 JS에서 쓰지 않음(응답 키와 DOM id로만 바인딩).
-
-### 6. 요청 흐름
-
-**WEB** (`GET /{flag}/{class}/view/{key}`)
-
-```
-MY_Builder_WEB::_remap() → setupPlatform() → setJSVariables()
-  └ category=='view' && subtype=='view' 일 때만 VIEW_COLUMNS = setViewColumns(), VIEW_TYPE
-  └ IDENTIFIER = setIdentifier(), PAGE_LIST/ADD/EDIT/VIEW/EXCEL_URI
-MY_Builder_WEB::view($key)
-  └ checkIdentifierExist() → jsVars.KEY
-  └ subtype=='view' 일 때만 prepareViewData() + app-page-view.js 추가
-      viewType   = subtype
-      viewData   = reformat_form_data_by_type(VIEW_COLUMNS, viewType)
-      identifier / actions / buttons / isComments
-      입력형 컬럼(type!=='view')이 하나라도 있으면 addFormScripts()
-      subPage    = builder/layout/view
-  └ viewApp() → afterViewApp(): {class}_view_preset.js / _onload.js 자동 생성·로드
-```
-
-**브라우저** (`app-page-view.js`)
-
-1. `applyViewData(common.KEY)` → `getData(KEY, {_mode:'view'})`. 동기 AJAX로 `GET {API_URI}/{key}?_mode=view`를 보낸다. 키가 숫자 하나면 경로에, 복합키면 쿼리스트링에 붙는다(`getUrlWithIdentifiers()`).
-   - `API_URI`는 각 WEB 컨트롤러가 `addJsVars(['API_URI' => …])`로 직접 지정해야 한다(예: `controllers/admin/Partners.php`의 `__construct()`). 기본값은 `''`이다.
-2. 응답 객체의 키마다 `#${key}` 요소를 찾아 채운다.
-   - `appPlugins.view[key]`가 있으면 `console.log`만 하고 끝(**미구현** 훅, `builder-common.js`의 `appPlugins`)
-   - `thumbnail`: 배경 이미지 / `uploads`: `{CURRENT_URI}/downloader/{file_id}` 다운로드 링크 목록
-   - `SPAN`: `innerHTML = 값`(없으면 `-`) / 그 밖(input 등): `.value = 값`. **주의** — innerHTML이라 저장형 XSS 위험
-3. `.view-form`이 있으면 `preparePlugins` → `fetchViewData` 커스텀 이벤트 → `refreshPlugins`를 실행하고 `body[data-onload]=true`로 설정한다.
-4. `setButtonsDisplay()`: `isMyData()`로 `GET {API_URI}/isMyData/{key}`. 관리자가 아니고 `created_id`가 본인이 아니면 `.btn-view-edit`, `.btn-view-delete`를 제거한다(`MY_Builder_API::isMyData_get()`).
-5. 버튼 핸들러(문서 ready 블록)
-   - `.btn-view-list` → `PAGE_LIST_URI`로 이동
-   - `.btn-view-edit` → `PAGE_EDIT_URI`가 있으면 `getUrlWithIdentifiers(PAGE_EDIT_URI, KEY)`로 이동
-   - `.btn-view-delete` → `deleteData(KEY)`: SweetAlert 확인 → `DELETE {API_URI}/{key}` → `PAGE_LIST_URI`로 이동
-
-**API** (`GET {API_URI}/{key}?_mode=view`)
-
-| 단계 | 위치 | 내용 |
-|---|---|---|
-| 분기 | `MY_Builder_API::beforeGet()` → `afterGet()` | `idData`가 있으면 `view()`, 없으면 `list()` |
-| 존재 확인 | `beforeView()` | 데이터가 없으면 `DATA_NOT_EXIST` |
-| 조회 | `executeView()` | `Model->getDataWhere([], idData)` → `transformView()` |
-| 변환(core) | `MY_Builder_API::transformView()` | `_mode=view`이면 `transTargetKeys['view']`의 필드 중 viewConfig에 `option_attributes`가 있는 것을 옵션 라벨로 바꿈. 이어서 `fileList` 필드를 파일 DTO 배열로 바꿈(`'0'`이면 null) |
-| 변환(공통) | `api/Common::transformView()` | `'0000-00-00'` → `''`, `recent_dt = updated_dt ?: created_dt`, `created_id`/`updated_id`를 `Model_User`의 `id`(로그인 아이디)로 바꿈 |
-| 모드별 | `api/Common::transformViewByMode()` | `form` 모드에서만 select2 multiple 값을 `explode(',')`. `view`는 아무것도 안 함(확장 지점) |
-| 응답 | `afterView()`, `MY_Controller::setResponseData()` | 단건 객체를 `data:[obj]`로 감싸 반환. JS는 `response.data[0]` 사용 |
-
-**목록에서 상세로 이동** (`app-page-list.js`)
-
-- 행 action `view`(`.view-record` 클릭 핸들러) → `PAGE_VIEW_URI`가 있으면 그 페이지로, 없으면 `openViewModal()` 호출.
-- 컬럼 `onclick.kind='view'`(`getColumnOnclick()`) → `attrs.href` 또는 `PAGE_VIEW_URI` + identifier. `attrs.target`이 `_blank`/`_self`가 아니면 `openViewModal(id, target)`.
-- `openViewModal()`은 **미구현** — `getData()` 후 `console.log`만 한다. `view_modal.php`를 포함하는 곳도 없다.
-- `PAGE_VIEW_URI`는 route `methods`에 `view` 키가 있고(`allows`) list 메소드의 `actions.view`가 true일 때 만들어진다(`method_list_base_config`의 기본값은 `false`). list `properties.viewConfig`가 있으면 만들지 않는다(이 키는 `method_list_base_config`에 정의되어 있지 않음). 자세한 것은 [list-filter.md](list-filter.md).
-
-### 7. 설정 예시 (가상 예시)
-
-저장소에는 실제 `view_*_config`가 없고, `category => 'view'`를 쓰는 route는 admin `dashboard`(`type=>'dashboard'`) 하나뿐이다. 아래는 코드가 읽는 키만으로 만든 **가상 예시**이다.
+1. route `methods`에 `view` 메서드를 추가한다. `category => 'view'`만 적으면 `method_view_base_config`(type `base`, subtype `base`)가 채워진다.
+2. 목록 메서드에서 행 action `view`를 켠다(`'actions' => ['view' => true]`). `PAGE_VIEW_URI`가 만들어져 행의 보기 아이콘이 `/{flag}/{class}/view/{식별자}`로 이동한다.
+3. (선택) `view_{class}_config`로 표시할 필드를 따로 정한다. 없으면 form 설정의 필드를 읽기 전용으로 보여 준다.
 
 ```php
-// application/config/extra/admin/admin_view_config.php
-$config['view_partners_config'] = [
-    ['field' => 'id', 'subtype' => 'identifier'],                 // → hidden + IDENTIFIER
-    ['field' => 'name', 'label' => 'lang:partners.name'],         // type 기본 'view' → <span id="name">
-    ['field' => 'status', 'label' => 'lang:partners.status',
-     'option_attributes' => ['option_type' => 'yn']],             // API transTargetKeys['view'] 지정 시 라벨 변환
-    ['field' => 'memo', 'type' => 'textarea', 'colspan' => 12,    // 입력형 → setFormColumn() 경유, form 위젯 출력
-     'help_block' => ['tag' => 'span', 'text' => '메모', 'attr' => ['class' => 'text-muted']]],
-];
-
-// application/config/extra/admin/admin_route_config.php (partners)
-'methods' => [
-    'list' => ['category' => 'list', 'type' => 'table', 'subtype' => 'datatable',
-               'actions' => ['view' => true]],
-    'view' => ['category' => 'view', 'subtype' => 'base', 'resourceConfig' => 'partners'],
+// admin_route_config.php
+'partners' => [
+    'properties' => ['baseMethod' => 'list'],
+    'methods' => [
+        'list' => ['category' => 'list', 'type' => 'table', 'subtype' => 'datatable',
+                   'actions' => ['view' => true]],
+        'view' => ['category' => 'view'],                        // type·subtype 기본 base
+    ],
 ],
 ```
 
-> **주의** — 현재 코드에서는 `subtype => 'base'`라서 VIEW_COLUMNS가 만들어지지 않는다. API는 `resourceConfig`와 상관없이 `view_partners_config`(소문자 클래스명)를 읽는다.
+### 3. 상세 화면 판단과 화면 틀
 
----
+| 조건 | 동작 |
+|---|---|
+| `category => 'view'`, `type => 'base'` | 설정 기반 상세 화면 (`isDetailView()`). `VIEW_COLUMNS`를 만들고 `app-page-view.js`를 붙인다 |
+| `category => 'view'`, 그 밖의 type (`dashboard`, `statistics` 등) | 전용 화면. 컨트롤러와 전용 뷰(`{flag}/{class}/{method}.php` 또는 route 기본 메서드면 `{class}/index.php`)가 그린다 |
+
+- `subtype`은 화면 틀이다: `base`(라벨·값 한 줄씩), `grid`(12칸 행, 항목 `colspan`), `modal`(헤더 없는 틀).
+- `{flag}/{class}/view.php` 같은 전용 뷰 파일이 있으면 공통 틀(`builder/layout/view.php`)보다 먼저 쓴다.
+
+### 4. 표시할 컬럼 (`setViewColumns()`)
+
+찾는 순서:
+1. `view_{resourceConfig}_config` → `view_{class}_view_config` → `view_{class}_config` → `view_view_config` (`Resource_loader::entityConfigNames('view', …)`)
+2. 없으면 form 설정(`properties.formConfig`가 있으면 그 이름, 없으면 form 찾는 순서)에서 `form => false`가 아닌 필드를 가져와, hidden·common이 아닌 필드를 `type => 'view'`로 바꾼다.
+
+항목 처리:
+- `subtype => 'identifier'`는 hidden(식별자)으로 바뀐다.
+- `type`이 `view`가 아니면(예: `textarea`) `setFormColumn()`을 거쳐 입력 위젯으로 그린다. 이때만 폼 자산을 붙인다.
+- `label`의 `lang:` 접두어는 떼고 뷰에서 `lang()`으로 번역한다.
+- 키 기본값은 `builder_view_base`: `field`, `label`, `category`(`base`), `type`(`text` → 위 규칙으로 `view`), `subtype`(`base`), `attributes`, `help_block`, `colspan`(6).
+
+### 5. 메서드 설정 (`method_view_base_config`)
+
+| 키 | 기본값 | 의미 |
+|---|---|---|
+| `type` | `base` | `base`면 설정 기반 상세 화면(3장) |
+| `subtype` | `base` | 화면 틀 `view_{subtype}.php` |
+| `mode` | `read` | 메뉴 권한 검사에 쓰는 자리 |
+| `resourceConfig` | `''` | view 설정을 다른 이름에서 빌려 올 때 |
+| `actions` | `list`·`edit`·`delete` true | 화면 아래 버튼. `edit`은 route에 `edit` 메서드가 있고 수정 권한이 있을 때, `delete`는 삭제 권한이 있을 때만 표시 |
+| `properties.formConfig` | `''` | view 설정이 없을 때 필드를 가져올 form 설정 이름 |
+| `properties.checkOwner` | (없음, false) | true면 작성자(`isMyData`)일 때만 수정·삭제 버튼 표시 — 게시판처럼 본인 글만 고치는 화면용 |
+| `properties.isComments` | `false` | 댓글 영역(`view_comments`)과 `app-page-comment.js` |
+
+### 6. 값 표시 (`app-page-view.js`)
+
+1. `GET {API_URI}/{식별자}?_mode=view`로 단건을 받는다. 응답에서 `password`는 항상 빠진다([api-hooks.md](api-hooks.md)).
+2. `VIEW_COLUMNS`의 필드마다 `#{필드}` 요소에 값을 넣는다. 그다음 `VIEW_COLUMNS`에 없지만 같은 id 요소가 있는 응답 값도 넣는다(전용 뷰 호환).
+   - 값은 `textContent`로 넣는다(HTML로 해석하지 않음). 빈 값은 `-`.
+   - 컬럼에 `options`(form의 `option_attributes`로 만든 선택지)가 있으면 값 대신 라벨을 보여 준다. 다중 값은 `option_attributes.seperator`(기본 `,`)로 나눠 각각 바꾼다.
+   - 값이 파일 목록(`file_id`가 있는 객체)이면 `{CURRENT_URI}/downloader/{file_id}` 링크 목록으로 보여 준다. `thumbnail` 필드는 배경 이미지.
+   - 입력 위젯(span이 아닌 요소)은 `.value`에 넣는다.
+3. 필드별로 표시 방식을 바꾸려면 `appPlugins.view[필드] = function (element, value, data, column) { … }`를 화면별 `_preset.js`에 둔다.
+4. 버튼: 목록 → `PAGE_LIST_URI`, 수정 → `PAGE_EDIT_URI`(없으면 버튼 숨김), 삭제 → 확인 후 `DELETE {API_URI}/{식별자}` → 목록.
+
+> **주의**
+> - 수정을 목록의 사이드 폼으로 하는 화면은 수정 페이지(`edit` 메서드)가 없으므로 상세 화면의 수정 버튼이 나오지 않는다.
+> - 모달형 상세(`openViewModal()`)는 아직 미구현이다. 목록 `properties.viewConfig`를 쓰면 `PAGE_VIEW_URI`가 만들어지지 않고 모달 스텁이 불린다.
 
 ## Part 2. Excel 가져오기 설정
 

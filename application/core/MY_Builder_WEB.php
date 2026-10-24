@@ -137,7 +137,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $this->titleList[] = 'View';
 
         $data['mode'] = 'view';
-        if($this->methodConfig['subtype'] === 'view') {
+        if($this->isDetailView()) {
             $data['backLink'] = WEB_HISTORY_BACK;
             $data = $this->prepareViewData($data);
 
@@ -255,23 +255,41 @@ class MY_Builder_WEB extends MY_Controller_WEB
         return $data;
     }
 
+    /**
+     * 설정만으로 그리는 상세 보기 화면인지: category view + type base.
+     * type 이 dashboard·statistics 처럼 다르면 컨트롤러·전용 뷰가 그리는 화면이라 이 경로를 타지 않는다.
+     * subtype 은 화면 틀(view_{subtype}.php: base·grid·modal·article·comments)
+     */
+    protected function isDetailView(): bool
+    {
+        return ($this->methodConfig['category'] ?? '') === 'view' && ($this->methodConfig['type'] ?? '') === 'base';
+    }
+
     protected function prepareViewData($data): array
     {
         $data['viewType'] = $this->methodConfig['subtype'];
 
-        $data['viewData'] = reformat_form_data_by_type($this->jsVars['VIEW_COLUMNS'], $data['viewType']);
+        // 2번째 인자는 폼 형태(page), 3번째가 subtype(grid 면 12칸 행으로 나눔)
+        $data['viewData'] = reformat_form_data_by_type($this->jsVars['VIEW_COLUMNS'], 'page', $data['viewType']);
 
         $data['identifier'] = array_filter($this->viewColumns, function ($item) {
             return array_key_exists('field', $item)&&in_array($item['field'], $this->jsVars['IDENTIFIER']);
         });
 
+        // 목록은 항상, 수정은 수정 화면(edit 메서드)과 수정 권한이 있을 때, 삭제는 삭제 권한이 있을 때
         $data['actions'] = array_values(array_filter(reformat_bool_type_list($this->methodConfig['actions']), function ($action) {
-            return $action === 'delete' || in_array($action, $this->routeConfig['properties']['allows']);
+            switch ($action) {
+                case 'list' : return true;
+                case 'edit' : return in_array('edit', $this->routeConfig['properties']['allows']) && is_auth_avaliable('update', $this->pageAuth);
+                case 'delete' : return is_auth_avaliable('delete', $this->pageAuth);
+                default : return in_array($action, $this->routeConfig['properties']['allows']);
+            }
         }));
         $data['buttons'] = $this->methodConfig['buttons']??[];
 
+        // 입력 요소가 있을 때만 폼 자산을 붙임 (hidden·common 은 입력 요소가 아님)
         if(count(array_filter($this->viewColumns, function($item) {
-            return $item['type'] !== 'view';
+            return !in_array($item['type'], ['view', 'hidden', 'common'], true);
         }))) {
             $this->addFormScripts();
         }
@@ -283,8 +301,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             ];
         }
 
-        if(!array_key_exists('subPage', $data))
-            $data['subPage'] = 'builder/layout/view';
+        // subPage 를 정하지 않으면 viewApp() 이 {flag}/{class}/view → … → builder/layout/view 순으로 찾는다 (전용 뷰 우선)
 
         return $data;
     }
@@ -407,7 +424,12 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 if(!file_exists(VIEWPATH.$firstPath)) continue;
                 foreach ([$this->router->class, 'layout'] as $secondPath) {
                     $path = $firstPath.DIRECTORY_SEPARATOR.$secondPath.DIRECTORY_SEPARATOR;
-                    if(file_exists(VIEWPATH.$path.$method.'.php')) $view = $path.$method;
+                    // route 기본 메서드 화면이면 클래스 폴더의 index.php 도 전용 뷰로 본다 (예: builder/dashboard/index.php)
+                    $names = [$method];
+                    if($secondPath === $this->router->class && $method === snakeize($this->routeConfig['properties']['baseMethod'] ?? '')) $names[] = 'index';
+                    foreach ($names as $name) {
+                        if(!$view && file_exists(VIEWPATH.$path.$name.'.php')) $view = $path.$name;
+                    }
                     if($view) break;
                 }
             }
@@ -540,10 +562,12 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 }
                 break;
             case 'view' :
-                if($this->methodConfig['subtype'] === 'view') {
+                if($this->isDetailView()) {
                     $this->addJsVars([
                         'VIEW_COLUMNS' => $this->setViewColumns(),
                         'VIEW_TYPE' => $methodConfig['subtype'],
+                        // true 면 내가 만든 데이터일 때만 수정·삭제 버튼 표시 (게시판 등)
+                        'VIEW_CHECK_OWNER' => (bool)($methodConfig['properties']['checkOwner'] ?? false),
                     ]);
                 }
                 break;
@@ -864,16 +888,19 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if(isset($name)) {
             $config = $this->config->get($name, []);
         }else{
-            if($name = $this->methodConfig['resourceConfig']) {
-                $config = $this->resourceLoader->entityConfig($this->resourceLoader->entityConfigName('view', $name), [], true);
-            }else{
-                $config = array_map(function($item) {
-                    if($item['type'] !== 'hidden') {
+            // view 설정: resourceConfig → view_{class}_view_config → view_{class}_config 순
+            $config = $this->resourceLoader->entityConfig($this->setConfigList('view', $this->methodConfig['resourceConfig'] ?: null), [], false);
+            if(empty($config)) {
+                // view 설정이 없으면 form 설정의 필드를 읽기 전용(view)으로 보여 준다
+                $config = array_values(array_map(function($item) {
+                    if(!in_array($item['type'], ['hidden', 'common'], true)) {
                         $item['type'] = 'view';
                         $item['subtype'] = 'base';
                     }
                     return $item;
-                }, $this->jsVars['FORM_DATA']);
+                }, array_filter($this->setFormColumns($this->methodConfig['properties']['formConfig'] ?: null), function ($item) {
+                    return !array_key_exists('form', $item) || $item['form'];
+                })));
             }
         }
 
@@ -887,6 +914,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 if($item['type'] === 'common') return $item;
 
                 $item['id'] = $item['field'];
+                // 뷰 템플릿은 lang($item['label']) 로 출력하므로 'lang:' 접두어를 뗀다 (form 설정은 setFormColumn 이 이미 뗌)
+                if(isset($item['label']) && is_string($item['label']) && sscanf($item['label'], 'lang:%s', $line) === 1) $item['label'] = $line;
                 if($item['type'] === 'hidden'){
                     $item = array_merge($this->config->get('builder_view_hidden_config'), $item);
                 }else{
