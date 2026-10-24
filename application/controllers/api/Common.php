@@ -118,9 +118,10 @@ class Common extends MY_Builder_API
             'charset'   => 'utf-8',
             'newline'   => "\r\n",
         ]);
-        $this->email->from(getenv('MAIL_USERNAME'), '이광우');
+        // 발신자·숨은참조는 .env 로 정한다 (MAIL_FROM_ADDRESS, MAIL_FROM_NAME, MAIL_BCC)
+        $this->email->from(getenv('MAIL_FROM_ADDRESS') ?: getenv('MAIL_USERNAME'), getenv('MAIL_FROM_NAME') ?: (getenv('APP_NAME_KR') ?: ''));
         $this->email->to($dto['to']);
-        $this->email->bcc('pensive_lee@naver.com');
+        if(getenv('MAIL_BCC')) $this->email->bcc(getenv('MAIL_BCC'));
 
         $this->email->subject($dto['subject']);
         $this->email->message($this->load->view("email/{$dto['template']}", $dto, true));

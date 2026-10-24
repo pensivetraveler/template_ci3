@@ -343,23 +343,28 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function afterViewApp($data = []): array
     {
-        if(!file_exists(PLATFORM_ASSET_CSS_PATH.'style.css')){
-            $file = fopen(PLATFORM_ASSET_CSS_PATH.'style.css',"w");
+        // 플랫폼·화면별 빈 asset 파일은 개발 환경에서만 자동으로 만든다.
+        // 그 밖에서는 웹 요청이 공개 디렉터리에 파일을 만들지 않고, 있는 파일만 붙인다.
+        $useAsset = function (string $path): bool {
+            if(file_exists($path)) return true;
+            if(ENVIRONMENT !== 'development') return false;
+            $file = fopen($path, "w");
             if(!$file) show_error("viewApp : Unable to open file!", E_USER_ERROR);
             fclose($file);
-        }
-        $this->addCSS[] = [
-            base_url(PLATFORM_ASSET_CSS_URI.'style.css'),
-        ];
+            return true;
+        };
 
-        if(!file_exists(PLATFORM_ASSET_JS_PATH.'common.js')){
-            $file = fopen(PLATFORM_ASSET_JS_PATH.'common.js',"w");
-            if(!$file) show_error("viewApp : Unable to open file!", E_USER_ERROR);
-            fclose($file);
+        if($useAsset(PLATFORM_ASSET_CSS_PATH.'style.css')) {
+            $this->addCSS[] = [
+                base_url(PLATFORM_ASSET_CSS_URI.'style.css'),
+            ];
         }
-        $this->addJS['tail'][] = [
-            base_url(PLATFORM_ASSET_JS_URI.'common.js'),
-        ];
+
+        if($useAsset(PLATFORM_ASSET_JS_PATH.'common.js')) {
+            $this->addJS['tail'][] = [
+                base_url(PLATFORM_ASSET_JS_URI.'common.js'),
+            ];
+        }
 
         foreach (['_preset', '_onload'] as $subfix) {
             $filename = snakeize($this->router->class);
@@ -368,11 +373,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             }
             $filename .= $subfix.'.js';
 
-            if(!file_exists(PLATFORM_ASSET_JS_PATH.$filename)){
-                $file = fopen(PLATFORM_ASSET_JS_PATH.$filename,"w");
-                if(!$file) show_error("viewApp : Unable to open file!", E_USER_ERROR);
-                fclose($file);
-            }
+            if(!$useAsset(PLATFORM_ASSET_JS_PATH.$filename)) continue;
 
             if($subfix === '_preset') {
                 $this->addJS['head'][] = [
@@ -788,6 +789,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }
         if(array_key_exists('delete', $actions) && $actions['delete']) {
             $actions['delete'] = is_auth_avaliable('delete', $this->pageAuth);
+        }
+        // 복제는 새 행을 만드는 동작이므로 등록 권한이 필요
+        if(array_key_exists('duplicate', $actions) && $actions['duplicate']) {
+            $actions['duplicate'] = is_auth_avaliable('create', $this->pageAuth);
         }
         return reformat_bool_type_list($actions);
     }

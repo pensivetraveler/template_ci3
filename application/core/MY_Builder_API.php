@@ -56,6 +56,16 @@ class MY_Builder_API extends MY_Controller_API
      */
     protected array $deniedRequestFields = ['password', 'user_api_key', 'api_key', 'token', 'secret', 'salt'];
 
+    /**
+     * 응답에서 항상 빼는 컬럼 (목록·상세 모두). 비밀번호 해시 등.
+     */
+    protected array $hiddenResponseFields = ['password'];
+
+    /**
+     * 목록 응답·내보내기에서 빼는 컬럼. 상세(수정 폼)에서는 보여 줘야 하는 값(API 키 등).
+     */
+    protected array $hiddenListFields = ['user_api_key', 'api_key', 'token', 'secret', 'salt'];
+
     public function __construct()
     {
         parent::__construct();
@@ -264,6 +274,9 @@ class MY_Builder_API extends MY_Controller_API
     {
         foreach ($list as $key=>$item) {
             $list[$key] = $this->transformView($item);
+            if(is_object($list[$key])) {
+                foreach ($this->hiddenListFields as $field) unset($list[$key]->{$field});
+            }
         }
         return $list;
     }
@@ -335,6 +348,8 @@ class MY_Builder_API extends MY_Controller_API
                 }
             }
         }
+
+        foreach ($this->hiddenResponseFields as $field) unset($data->{$field});
 
         if(count($this->fileList) > 0) {
             foreach ($this->fileList as $key) {
@@ -1451,10 +1466,10 @@ class MY_Builder_API extends MY_Controller_API
     protected function getExportsConfig(): array
     {
         $className = builder_config_name($this->router->class);
-        if($this->config->get('form_'.$className.'_config', [], false)) {
-            $columns = $this->setFormColumns(builder_config_name($this->router->class));
+        if($this->resourceLoader->entityConfig($this->resourceLoader->entityConfigName('form', $className), [], false)) {
+            $columns = $this->setFormColumns($className);
         }else{
-            $config = $this->config->get('list_'.$className.'_config', [], false);
+            $config = $this->resourceLoader->entityConfig($this->resourceLoader->entityConfigName('list', $className), [], false);
             $columns = array_reduce($config, function($carry, $item) {
                 if(isset($item['field']) || $item['type'] === 'common') {
                     $carry[] = $this->setFormColumn($item);
@@ -1467,11 +1482,15 @@ class MY_Builder_API extends MY_Controller_API
             return [];
         }
 
-        return array_values(array_filter($columns, function ($item) {
+        // 비밀번호·API 키 등은 내보내지 않는다
+        $hidden = array_merge($this->hiddenResponseFields, $this->hiddenListFields);
+        return array_values(array_filter($columns, function ($item) use ($hidden) {
             return !(
                 $item['type'] === 'common' ||
                 $item['type'] === 'file' ||
-                $item['subtype'] === 'identifier'
+                $item['type'] === 'password' ||
+                $item['subtype'] === 'identifier' ||
+                in_array($item['field'] ?? '', $hidden, true)
             );
         }));
     }
@@ -1987,6 +2006,8 @@ class MY_Builder_API extends MY_Controller_API
     {
         $class = $this->input->patch('class') ?? null;
         if(!$class) $this->response(['code' => EMPTY_REQUIRED_DATA]);
+        // 경로 조작 방지: 클래스 이름 형식만 허용
+        if(!is_string($class) || !preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $class)) $this->response(['code' => BAD_REQUEST]);
 
         $filename = $class.'_upload_sample.xlsx';
         $filepath = 'public'.DIRECTORY_SEPARATOR.'sample'.DIRECTORY_SEPARATOR;

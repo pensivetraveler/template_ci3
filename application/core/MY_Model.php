@@ -68,9 +68,10 @@ class MY_Model extends CI_Model
 
     public function addSqlSet($dto)
     {
+        // 값은 escape, 컬럼명은 identifier 보호 (문자열 보간 금지)
         $sql = " SET ";
         foreach ($dto as $key=>$value){
-            $sql .= " {$key} = '{$value}',";
+            $sql .= " ".$this->db->protect_identifiers($key)." = ".$this->db->escape($value).",";
         }
         return substr($sql, 0, -1);
     }
@@ -79,7 +80,7 @@ class MY_Model extends CI_Model
     {
         $sql = " WHERE 1=1 ";
         foreach ($dto as $key=>$value){
-            $sql .= " AND {$key} = '{$value}' ";
+            $sql .= " AND ".$this->db->protect_identifiers($key)." = ".$this->db->escape($value)." ";
         }
         return $sql;
     }

@@ -101,25 +101,25 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `builder_api_helper.php::reformat_get_data` + `MY_Model::select` GET `select[]` 값이 그대로 `getList()` select로 들어가고, `parse_select_column()`의 `alias_expr` 분기가 `db->select("{expr} as {alias}", false)`(escape 없음)로 실행된다. `?select[]=(SELECT password FROM user LIMIT 1) as x` 같은 서브쿼리 주입 가능 (모든 builder GET 목록·`prepareExports_get`, 로그인 사용자 누구나) → `reformat_request_select()`로 요청 select는 단순 컬럼명만 허용 (식·별칭·테이블 접두어 제거)
 - [x] `MY_Builder_API::executeModify`/`setModData` 기본 흐름이 where를 `$this->idData`가 아니라 바디에서 계산한다. non-AI 모델은 바디에 PK가 없으면 where `[]` → `UPDATE` 테이블 전체 (PATCH 인라인 수정, query string으로만 PK를 준 PUT/POST). AI 모델은 identifier가 없으면 Notice + `IS NULL`로 무변경 (MenuAuth/PartnerAuth가 우회 오버라이드 중) → 메인 Model은 `$this->idData`로 수정, `checkModifyIdData()`가 식별자 누락 시 400, `Model_Common::validateWhereCondition()`이 빈 WHERE의 수정·삭제를 거부
 - [ ] `MY_Builder_API` 전반 API 인가가 rest_config `session`(user_id 존재)뿐이다. admin WEB의 `user_cd`/`IS_ADMIN` 검사가 API엔 없고, `flag !== 'admin'` 검사(SysCode, MenuAuth, MenuList, PartnerAuth, SysCfg)는 URL 첫 세그먼트라 `/admin/api/...`로 호출하면 통과 (일반 로그인 사용자가 관리자·권한·코드 CRUD 가능)
-- [ ] `Model_Common::getSelectList` / `Model_Administrator::getList`·`Model_Partner::getList`(join select `'*'`) 기본 select에 `password` 해시, `user_api_key`가 포함되어 Users/Administrators/Partners 목록·상세 응답으로 그대로 나간다 (자격증명 노출)
+- [x] `Model_Common::getSelectList` / `Model_Administrator::getList`·`Model_Partner::getList`(join select `'*'`) 기본 select에 `password` 해시, `user_api_key`가 포함되어 Users/Administrators/Partners 목록·상세 응답으로 그대로 나간다 (자격증명 노출) → `MY_Builder_API::$hiddenResponseFields`(password)는 모든 응답, `$hiddenListFields`(user_api_key 등)는 목록 응답에서 제거 (2026-10-25)
 - [ ] `MY_Builder_API::deleteFile_patch` body `file_id`만으로 `delFileData()` 실행, 엔티티 소속·작성자 확인 없음 (임의 파일 삭제). `type` 파라미터는 필수인데 쓰이지 않음
 - [ ] `MY_Builder_API::duplicate_get` 권한 확인 없이 모든 엔티티에서 GET 한 번으로 INSERT 실행 (아래 버그와 결합)
-- [ ] `api/Common::sendEmail` bcc `pensive_lee@naver.com`, 발신자명 `'이광우'` 하드코딩 → 파생 프로젝트의 모든 발송 메일이 개인 주소로 복사됨
-- [ ] `MY_Model::addSqlSet`, `MY_Model::addSqlWhere` 값을 문자열 보간해 SQL 생성 (현재 호출부 없음, 사용 시 주입)
+- [x] `api/Common::sendEmail` bcc `pensive_lee@naver.com`, 발신자명 `'이광우'` 하드코딩 → 파생 프로젝트의 모든 발송 메일이 개인 주소로 복사됨 → 발신자·숨은참조를 `.env`(`MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`, `MAIL_BCC`)로 (2026-10-25)
+- [x] `MY_Model::addSqlSet`, `MY_Model::addSqlWhere` 값을 문자열 보간해 SQL 생성 (현재 호출부 없음, 사용 시 주입) → 값 escape·컬럼 protect_identifiers (2026-10-25)
 - [ ] `api/MenuList::reset_get` GET 요청 하나로 `menu`, `menu_auth`, `partner_auth`를 truncate하고 캐시 삭제 (CSRF·링크 프리페치로 전체 메뉴/권한 유실 가능 — POST/DELETE + 확인 절차 필요) (추가: `MenuAuth::reset_get`, `PartnerAuth::reset_get`, `MenuList::generateMenuCode_get`도 GET으로 truncate/일괄 수정)
-- [ ] `MY_Builder_WEB::afterViewApp` 요청 class/method 이름으로 `public/assets/{platform}/js/*_preset.js`·`_onload.js`, `style.css`, `common.js`를 없으면 자동 생성, view 메서드도 제외 안 됨 (운영 웹 요청이 공개 디렉터리에 파일 생성 — devMode 한정 필요)
+- [x] `MY_Builder_WEB::afterViewApp` 요청 class/method 이름으로 `public/assets/{platform}/js/*_preset.js`·`_onload.js`, `style.css`, `common.js`를 없으면 자동 생성, view 메서드도 제외 안 됨 (운영 웹 요청이 공개 디렉터리에 파일 생성 — devMode 한정 필요) → 빈 asset 자동 생성은 development에서만, 그 밖에는 있는 파일만 붙임 (2026-10-25)
 - [x] `MY_Builder_API::setProperties` GET/POST 외(PUT/PATCH/DELETE)는 설정을 읽기 전에 return → `beforePut`의 `validateFormRules`가 빈 설정으로 돌고 `setData`의 체크박스/onoff 처리도 빠짐 (API 직접 호출로 rules 검증 우회) → PUT·PATCH도 설정을 읽고, PATCH는 본문에 있는 필드만 검증 (`validatePatchFormRules()`). bizsoft-mig에서 재현 확인(2026-10-24)
 - [ ] `MY_Builder_API::checkUniqueExist` `$this->mode`를 GET `_mode`로만 읽어 폼 POST의 add를 add로 인식 못함 → `editable=true`가 아닌 고유키는 add에서 중복검사 생략 (중복 데이터 저장)
 - [ ] `MY_Form_validation::required_mod` 등 CI3는 빈 값에 `required/isset/matches` 외 규칙을 실행하지 않아 `required_mod`/`required_if_value`/`required_if_empty_data`/`password_matches`가 서버에서 무력 (클라이언트 우회 시 필수값 누락 저장)
-- [ ] `app-page-edit.js` FormValidation `core.validator.validating` 핸들러가 `event.element.value`를 마스킹 없이 console.log (edit 화면 비밀번호 평문 노출, add/list는 `32f07d5`에서 마스킹)
-- [ ] `MY_Builder_API::getExportsConfig` form config 전체로 컬럼을 정해 `password`, `user_api_key`, hidden 필드까지 CSV/XLSX로 내보냄 (비밀번호 해시·API 키 유출)
+- [x] `app-page-edit.js` FormValidation `core.validator.validating` 핸들러가 `event.element.value`를 마스킹 없이 console.log (edit 화면 비밀번호 평문 노출, add/list는 `32f07d5`에서 마스킹) → password 타입은 `********`로 출력 (2026-10-25)
+- [x] `MY_Builder_API::getExportsConfig` form config 전체로 컬럼을 정해 `password`, `user_api_key`, hidden 필드까지 CSV/XLSX로 내보냄 (비밀번호 해시·API 키 유출) → password 타입·`$hiddenResponseFields`·`$hiddenListFields` 컬럼 제외 (2026-10-25)
 - [ ] `MY_Builder_API::prepareExportsPath` 임시 파일을 웹 공개 경로 `public/temps/`에 저장하고 다운로드 안 된 파일은 남음 (파일명 유출 시 직접 접근, 잔존 파일 누적)
 - [x] `builder_api_helper.php::reformat_get_data` 필터·top-level 파라미터의 필드명 화이트리스트 없음 → `filters[where|like][임의컬럼]`이 그대로 조건 (password LIKE로 해시 탐색 가능) (추가: `exceptValidateKeys` 외 모든 top-level GET 키도 where가 되어 `?password=...`로 값 추측(불리언 오라클) 가능) (추가: 모르는 top-level 파라미터(`?foo=1`)도 where 컬럼이 돼 500, 개발(db_debug)에서는 SQL 오류문·전체 SELECT가 응답에 노출 — bizsoft-mig 확인 2026-10-24. 운영은 db_debug=false라 문구는 숨지만 500) → `MY_Builder_API::sanitizeRequestConditions()`: 모델(부모·자식 포함) 컬럼 + form/list/view/filter 설정 필드 + `$allowedRequestFields`에 없는 where·filters 키를 조용히 버림. date는 start_date·end_date·on_date만
-- [ ] `MY_Builder_WEB::setListActions` `actions.duplicate`는 권한 필터 대상이 아님 (create 권한 없이 복제 아이콘 노출)
+- [x] `MY_Builder_WEB::setListActions` `actions.duplicate`는 권한 필터 대상이 아님 (create 권한 없이 복제 아이콘 노출) → 등록(create) 권한으로 필터 (2026-10-25)
 - [ ] `MY_Builder_API::uploadExcel_post` 기본 `validateExcelData`가 데이터를 그대로 반환하고 form rules·`checkUniqueExist`·`defaultList`·`fileList`를 거치지 않고 `Model->addList()`로 INSERT (검증 없는 대량 INSERT, POST 경로와 규칙 이원화 — form rules 재사용 검토)
 - [ ] `app-page-excel.js::validateData`/`submitData` `validateExcel`·`uploadExcel` AJAX에 `Authorization` 헤더 없음 (다른 호출과 인증 방식 불일치, 서버 측 우회 여부 확인 필요)
 - [ ] `MY_Builder_WEB::setupPlatformPage` mode 검사를 원본 `routeConfig['methods'][baseMethod]['category']`가 list일 때만 수행 (category 없는 baseMethod면 notice, list가 아닌 baseMethod route는 add/edit/excel 등 mode 권한 검사 전무)
-- [ ] `MY_Builder_API::deleteExcelFile_patch` `class` 입력을 검증 없이 파일 경로에 붙여 `unlink` (경로 조작으로 임의 `*_upload_sample.xlsx` 삭제 가능) (추가: admin 확인도 없음, `public/sample` 밖 경로 삭제 가능)
+- [x] `MY_Builder_API::deleteExcelFile_patch` `class` 입력을 검증 없이 파일 경로에 붙여 `unlink` (경로 조작으로 임의 `*_upload_sample.xlsx` 삭제 가능) (추가: admin 확인도 없음, `public/sample` 밖 경로 삭제 가능) → class 형식(`^[A-Za-z][A-Za-z0-9_]*$`) 검사. admin 확인은 API 권한 검사(2장)에서 (2026-10-25)
 
 ### 버그
 
