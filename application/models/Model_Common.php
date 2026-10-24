@@ -223,8 +223,14 @@ class Model_Common extends MY_Model
      */
     public function getRequestColumnList(): array
     {
+        // getSelectList()는 '{table}.col' 형태라 접두어를 떼고 컬럼명만 돌려준다
+        $prefix = $this->table.'.';
+        $columns = array_map(function ($column) use ($prefix) {
+            return strpos($column, $prefix) === 0 ? substr($column, strlen($prefix)) : $column;
+        }, $this->getSelectList());
+
         return array_values(array_unique(array_filter(array_merge(
-            $this->getSelectList(),
+            $columns,
             [$this->identifier],
             $this->primaryKeyList
         ))));
