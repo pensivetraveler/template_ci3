@@ -23,8 +23,8 @@ class Common extends MY_Builder_API
 
         if($this->input->get('format') === 'datatable' || $this->input->get('format') === 'log') {
             $extraFields['draw'] = (int)$this->input->get('draw');
-            // 전체 레코드 수
-            $extraFields['recordsTotal'] = $this->Model->getCnt($data);
+            // 전체 레코드 수 (검색필터 제외)
+            $extraFields['recordsTotal'] = $this->Model->getCnt(array_diff_key($data, ['filter' => true]));
             // 검색필터가 적용된 레코드 수
             if( isset($data['filter']) ) {
                 $extraFields['recordsFiltered'] = $this->Model->getCnt($data);

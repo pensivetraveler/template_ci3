@@ -695,9 +695,10 @@ function get_help_block($data): string
     $defaults = array_merge(array(
         'tag' => 'span',
         'text' => '',
+        'attr' => [],
     ), $data);
 
-    return "<{$defaults['tag']} "._attributes_to_string($data['attr']).">".$defaults['text']."</{$defaults['tag']}>";
+    return "<{$defaults['tag']} "._attributes_to_string($defaults['attr']).">".$defaults['text']."</{$defaults['tag']}>";
 }
 
 function trans_formdata_dit_type($form_data): array
