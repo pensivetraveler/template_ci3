@@ -1181,7 +1181,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
         $menuList = $this->setMenuList();
 
         if($this->isLoggedIn){
-            if(!env('CACHING_MENU')) return $menuList;
+            // 메뉴 DB·권한을 쓰지 않는 모드: 현재 메뉴만 정하고 권한은 전체 허용(setupPlatformPage가 INIT_AUTH_CHAR 사용)
+            if(!env('CACHING_MENU')) return $this->setupPlatformMenuWithoutAuth($menuList);
 
             if(!$this->isSystemAdmin) {
                 $authList = $this->Model_Menu_Auth->getList([], [
@@ -1196,6 +1197,27 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }
 
         return $menuList;
+    }
+
+    /**
+     * CACHING_MENU=false 일 때 메뉴 처리.
+     * 메뉴 권한 데이터(menu_auth)가 없으므로 시스템 관리자가 아니면 isSuper 메뉴만 빼고,
+     * 현재 메뉴(currentMenu)를 정해 setupPlatformPage()가 로그인 사용자를 계속 리다이렉트하지 않게 한다.
+     */
+    protected function setupPlatformMenuWithoutAuth($menuList): array
+    {
+        return array_values(array_reduce($menuList ?: [], function($acc, $item) {
+            if(!$this->isSystemAdmin && !empty($item['isSuper'])) return $acc;
+
+            if($item['isSubMenu'] && !empty($item['subMenu'])) {
+                $item['subMenu'] = $this->setupPlatformMenuWithoutAuth($item['subMenu']);
+            }
+
+            $this->setCurrentMenu($item);
+            $acc[] = $item;
+
+            return $acc;
+        }, []));
     }
 
     protected function setupPlatformMenuAuth($menuList, $authList = [])

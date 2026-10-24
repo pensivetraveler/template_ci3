@@ -379,6 +379,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
    - 결과를 `menu_done`(TTL 0)으로 저장하고 다시 읽는다.
 3. `setMenuAttributes()`로 href, class, active를 계산한다.
 4. 로그인 상태 + `CACHING_MENU` + 시스템 관리자 아님이면, `menu_auth`에서 `grade_cd = session.user_cd`, `is_show = 1`인 행을 읽어 `setupPlatformMenuAuth()` 적용.
+   - `CACHING_MENU=false`면 대신 `setupPlatformMenuWithoutAuth()`: `isSuper` 메뉴 제외(시스템 관리자 아닐 때) + `setCurrentMenu()`.
    - `isAuth=true` 항목은 `menuId`가 권한 목록에 있어야 남고, 남으면 `menuAuth`(6자리)·`scopeCd`를 붙이고 하위 메뉴도 재귀로 거른다. `isAuth=false`는 무조건 남는다.
    - 남은 항목마다 `setCurrentMenu()`: `router->class === class`이고, method가 같거나 / 현재 method가 baseMethod거나 / 현재 method가 route `methods`에 있으면 `currentMenu`가 된다.
 5. `currentMenu.menuAuth` → `pageAuth`, `scopeCd` → `scope`(`setupPlatformPage()`). 렌더링: `$data['menus']` → `includes/header.php` → `includes/header_nav_left.php`.

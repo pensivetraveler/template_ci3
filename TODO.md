@@ -123,7 +123,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 ### 버그
 
 **공통·route/method/nav**
-- [ ] `MY_Builder_WEB::setupPlatformMenu` `CACHING_MENU=false`이고 비시스템 관리자(USR001/USR002) 로그인 시 권한 필터 전에 return해 `setCurrentMenu()` 미호출 → `setupPlatformPage()`가 매번 `loggedInRedirect`로 보냄 (무한 redirect, `.env.example` 기본값이 false)
+- [x] `MY_Builder_WEB::setupPlatformMenu` `CACHING_MENU=false`이고 비시스템 관리자(USR001/USR002) 로그인 시 권한 필터 전에 return해 `setCurrentMenu()` 미호출 → `setupPlatformPage()`가 매번 `loggedInRedirect`로 보냄 (무한 redirect, `.env.example` 기본값이 false) → `setupPlatformMenuWithoutAuth()`: false 모드에서 isSuper 메뉴만 빼고 현재 메뉴를 정함, 권한은 전체 허용
 - [ ] `BuilderCommonTrait::saveMenuList` 기존 DB 행을 지우지 않고 `addData()`만 함 (`menu_done` 캐시 유실 + `CACHING_MENU=true`면 메뉴 중복 insert)
 - [ ] `BuilderCommonTrait::saveMenuList` `route_config` 전체에 `fillRouteConfigProperties()` 적용 (`methods` 없는 route 하나만 있어도 E_USER_ERROR로 메뉴 저장 전체 실패)
 - [ ] `BuilderCommonTrait::getMenuBaseAuth` 메뉴 `method`가 route `methods`에 없으면 undefined index, `class`를 대소문자 구분 매칭 (`myInfo` 메뉴 ↔ `myinfo` route → base_auth `000000`)
