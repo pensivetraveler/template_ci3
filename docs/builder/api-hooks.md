@@ -13,6 +13,7 @@ builder API 컨트롤러(`application/controllers/api/*.php`)는 설정(form/lis
 5. [자주 쓰는 패턴](#5-자주-쓰는-패턴)
 6. [공통 모델 메서드](#6-공통-모델-메서드)
 7. [상태 변수](#7-상태-변수)
+8. [엔드포인트 기능 설정 (api_method_config)](#8-엔드포인트-기능-설정-api_method_config)
 
 ---
 
@@ -702,3 +703,37 @@ hook 안에서 읽을 수 있는 프로퍼티. "설정 시점"이 생성자보�
 > - `noIndexMethod`를 생성자에서 parent 이후에 `true`로 바꾸면 이미 검사가 끝난 뒤라 무시된다(`Logs`, `Auth`가 이 상태).
 > - `validateMessages`, `validateCallback`, `transTargetKeys`, `exceptValidateKeys`를 프로퍼티 기본값으로 선언하면 부모 생성자가 덮어쓴다.
 > - `MY_Builder_API`의 `table`, `notNullList`, `nullList`, `strList`, `intList` 프로퍼티는 선언만 있고 채워지지 않는다. 모델 값은 `$this->Model->…`로 읽는다.
+
+## 8. 엔드포인트 기능 설정 (api_method_config)
+
+RestController가 요청마다 제어하는 기능(인증 방식, API 키, 로그, 요청 제한)은 `config/extra/api_method_config.php` 한 곳에서 엔드포인트별로 정한다. 컨트롤러 생성자에 `$this->methods`를 쓰거나 `rest_config.php`에 `auth_override_class_method_http`를 추가하지 않는다.
+
+```php
+$config['api_method_config'] = [
+    'auth' => [                                   // API 클래스: URL 세그먼트 그대로
+        'login'  => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
+        'logout' => ['post' => ['key' => false, 'log' => false]],   // auth 생략 → rest_auth(session)
+    ],
+    'sysCfg' => [
+        '*' => ['*' => ['log' => false]],         // 클래스 전체·모든 HTTP 메서드
+    ],
+];
+```
+
+키 구조: API 클래스 → 메서드(URL 세그먼트 그대로, 기본 메서드는 `index`, 전체는 `*`) → HTTP 메서드(`get`·`post`·`put`·`patch`·`delete`, 전체는 `*`). 한 요청에 여러 항목이 맞으면 `[*][*]` → `[*][http]` → `[메서드][*]` → `[메서드][http]` 순으로 덮어쓴다.
+
+| 키 | 값 | 효과 | 적용 위치 |
+|---|---|---|---|
+| `auth` | `none`·`session`·`basic`·`digest`·`whitelist` | 인증 방식 덮어쓰기. 생략하면 `rest_auth` | 부모 생성자 전에 `auth_override_class_method_http`로 넣음 → `RestController::_auth_override_check()` |
+| `key` | bool | API 키 검사 여부(`rest_enable_keys`가 켜져 있을 때) | `$this->methods['{메서드}_{http}']` → `RestController::_remap()` |
+| `log` | bool | `rest_logs` 기록 여부 | 〃 |
+| `limit` / `time` | int / 초(기본 3600) | `time` 초 동안 허용할 요청 수(`rest_enable_limits`) | 〃 → `_check_limit()` |
+| `level` | int | 필요한 API 키 레벨 | 〃 |
+| `permission` | `menu`·`mode`·`super`·`check` | **예정** — API 권한 검사(TODO.md 2장). 지금은 `$this->apiMethodFeature['permission']`에 담기기만 한다 | — |
+
+- 읽는 곳: `MY_Controller_API::applyApiMethodAuth()`(부모 생성자 전), `applyApiMethodFeatures()`(부모 생성자 후). 현재 요청에 적용된 값은 `$this->apiMethodFeature`에 있다.
+- 없는 메서드로 들어온 요청(`/api/companies/6` 같은 식별자 경로)은 RestController가 `index_{http}`로 처리하므로 설정도 `index` 기준으로 찾는다.
+
+> **주의**
+> - 우선순위: 컨트롤러가 `$this->methods`를 직접 지정하면 그 값 > `api_method_config` > `rest_config`.
+> - `auth`는 HTTP 메서드를 `$this->input->method()`(실제 요청 메서드)로 판단한다. `X-HTTP-Method-Override`로 메서드를 바꾸는 요청은 RestController와 판단이 다를 수 있다.

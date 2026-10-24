@@ -5,9 +5,20 @@ require_once APPPATH . "libraries/RestController.php"; // ⭐ 추가
 
 class MY_Controller_API extends RestController
 {
+    /**
+     * 현재 요청에 적용된 api_method_config 값 (auth, key, log, limit, time, level, permission)
+     * permission 은 API 권한 검사(TODO.md 2장)를 넣을 때 여기서 읽는다.
+     */
+    protected array $apiMethodFeature = [];
+
     public function __construct()
     {
+        // RestController 생성자 안에서 인증을 검사하므로, 엔드포인트별 auth 설정은 부모 생성자 전에 넣는다
+        $this->applyApiMethodAuth();
+
         parent::__construct('extra/rest_config');
+
+        $this->applyApiMethodFeatures();
 
         if($this->router->class === 'common') redirect('/welcome');
 
@@ -19,6 +30,71 @@ class MY_Controller_API extends RestController
     public function __destruct()
     {
         parent::__destruct();
+    }
+
+    /* --------------------------------------------------------------- */
+    /* api_method_config: 엔드포인트별 REST 기능 설정                    */
+    /* --------------------------------------------------------------- */
+
+    /**
+     * 현재 요청(클래스·메서드·HTTP)에 맞는 api_method_config 항목을 합친다.
+     * [*][*] → [*][http] → [메서드][*] → [메서드][http] 순으로 덮어쓴다.
+     */
+    protected function resolveApiMethodFeature(array $classConfig, string $method, string $http): array
+    {
+        $feature = [];
+        foreach ([['*', '*'], ['*', $http], [$method, '*'], [$method, $http]] as [$methodKey, $httpKey]) {
+            if(isset($classConfig[$methodKey][$httpKey]) && is_array($classConfig[$methodKey][$httpKey])) {
+                $feature = array_replace_recursive($feature, $classConfig[$methodKey][$httpKey]);
+            }
+        }
+        return $feature;
+    }
+
+    /**
+     * 부모 생성자 전에 실행: api_method_config 를 읽어 현재 요청의 기능 설정을 정하고,
+     * auth 값은 rest_config 의 auth_override_class_method_http 에 넣는다.
+     * rest_config 를 먼저 읽어 두므로 RestController 가 다시 읽어 덮어쓰지 않는다 (CI_Config::load 는 같은 파일을 한 번만 읽음).
+     */
+    protected function applyApiMethodAuth(): void
+    {
+        $config =& load_class('Config', 'core');
+        $router =& load_class('Router', 'core');
+        $input =& load_class('Input', 'core');
+
+        $config->load('extra/rest_config');
+        $config->load('extra/api_method_config', false, true);
+
+        $class = $router->class;
+        $method = $router->method;
+        $http = strtolower($input->method());
+
+        // 없는 메서드는 RestController 가 index_{http} 로 처리하므로 설정도 index 기준으로 찾는다
+        $featureMethod = method_exists($this, "{$method}_{$http}") ? $method : 'index';
+
+        $classConfig = ($config->item('api_method_config') ?: [])[$class] ?? [];
+        $this->apiMethodFeature = $this->resolveApiMethodFeature($classConfig, $featureMethod, $http);
+        $this->apiMethodFeature['_method'] = $featureMethod;
+
+        if(isset($this->apiMethodFeature['auth'])) {
+            $overrides = $config->item('auth_override_class_method_http') ?: [];
+            // RestController::_auth_override_check() 는 router 의 class·method 원본 값으로 찾는다
+            $overrides[$class][$method][$http] = $this->apiMethodFeature['auth'];
+            $config->set_item('auth_override_class_method_http', $overrides);
+        }
+    }
+
+    /**
+     * 부모 생성자 후에 실행: key·log·limit·time·level 을 $this->methods['{메서드}_{HTTP}'] 로 넣는다.
+     * 컨트롤러가 $this->methods 를 직접 지정한 값이 있으면 그 값이 우선한다.
+     */
+    protected function applyApiMethodFeatures(): void
+    {
+        $features = array_intersect_key($this->apiMethodFeature, array_flip(['key', 'log', 'limit', 'time', 'level']));
+        if(!count($features)) return;
+
+        $controllerMethod = $this->apiMethodFeature['_method'].'_'.strtolower($this->input->method());
+        $this->methods[$controllerMethod] = array_merge($features, $this->methods[$controllerMethod] ?? []);
     }
 
     /* --------------------------------------------------------------- */

@@ -95,6 +95,7 @@ app-page-list.js (DataTable)
 | filter | `builder_filter_config.php` | `filter_{class}_config` | [list-filter.md](docs/builder/list-filter.md) |
 | view | `builder_view_config.php` | `view_{class}_config` | [view-excel.md](docs/builder/view-excel.md) |
 | excel (가져오기) | — | `excel_{class}_config` | [view-excel.md](docs/builder/view-excel.md) |
+| API 엔드포인트 기능 | `extra/api_method_config.php` | `api_method_config['{API 클래스}']['{메서드}']['{http}']` | [api-hooks.md](docs/builder/api-hooks.md#8-엔드포인트-기능-설정-api_method_config) |
 
 `builder_page_config.php`와 각 플랫폼의 `*_page_config.php`는 어느 쪽에서도 읽지 않는다.
 

@@ -22,11 +22,6 @@ class Categories extends Common
         $this->fileList = [
             'category_icon'
         ];
-
-        $this->methods['list_post'] = [
-            'key' => false,
-            'log' => false,
-        ];
     }
 
     protected function beforeList($data): array

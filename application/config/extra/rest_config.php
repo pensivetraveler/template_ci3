@@ -198,14 +198,8 @@ $config['auth_library_function'] = '';
 // ---Uncomment list line for the wildcard unit test
 // $config['auth_override_class_method_http']['wildcard_test_cases']['*']['options'] = 'basic';
 
-$config['auth_override_class_method_http']['auth']['dupCheck']['get'] = 'none';
-$config['auth_override_class_method_http']['auth']['idCheck']['get'] = 'none';
-$config['auth_override_class_method_http']['auth']['emailCheck']['get'] = 'none';
-$config['auth_override_class_method_http']['auth']['login']['post'] = 'none';
-$config['auth_override_class_method_http']['auth']['signup']['post'] = 'none';
-$config['auth_override_class_method_http']['auth']['findId']['post'] = 'none';
-$config['auth_override_class_method_http']['auth']['findPassword']['post'] = 'none';
-$config['auth_override_class_method_http']['auth']['passwordCheck']['post'] = 'none';
+// 엔드포인트별 인증 덮어쓰기는 config/extra/api_method_config.php 의 'auth' 키로 관리한다.
+// (MY_Controller_API::applyApiMethodConfig()가 이 항목으로 넣어 준다)
 
 /*
 |--------------------------------------------------------------------------

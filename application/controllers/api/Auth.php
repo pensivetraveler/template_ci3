@@ -15,47 +15,7 @@ class Auth extends Common
 
         $this->noIndexMethod = true;
 
-        // 공개 API: key 필요 없음, 로그도 생략
-        $this->methods['dupCheck_get'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['idCheck_get'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['emailCheck_get'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['login_post'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['signup_post'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['findId_post'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['findPassword_post'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['withdraw_post'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['passwordCheck_post'] = [
-            'key' => false,
-            'log' => false,
-        ];
-        $this->methods['logout_post'] = [
-            'key' => false,
-            'log' => false,
-        ];
+        // 엔드포인트별 인증·키·로그 설정은 config/extra/api_method_config.php 의 'auth' 항목
     }
 
     public function dupCheck_get()
