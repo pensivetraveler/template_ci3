@@ -207,6 +207,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `views/builder/layout/excel.php` `JSON.parse('<?=json_encode(...)?>')` 작은따옴표 안에 JSON 출력 (라벨에 `'`나 `\`가 있으면 스크립트 오류)
 
 **API hooks·모델**
+- [ ] `MY_Model::getListPDO` select가 컬럼 1개면 객체 대신 값 배열을 반환 → 요청 `select[]=col` 하나(또는 식이 걸러져 하나만 남은 경우) 목록·내보내기에서 `transformView()` TypeError 500 (bizsoft 개발 서버에서 확인, 2026-10-24)
 - [ ] `Model_Common::checkDuplicate` `MY_Model::where()`가 `use_yn='Y'`를 붙인 뒤 `isIncludeDeleted=false`면 `use_yn='N'`을 추가 → isUseYn 모델은 항상 0, 고유값 중복검사 무력화. `isIncludeDeleted=true`여도 `where()`의 `del_yn='N'` 기본 조건 때문에 삭제 행이 포함되지 않아 form `check_delete` 무효
 - [ ] `MY_Builder_API::validateManually` `$this->request === 'post'` — RestController의 `$this->request`는 stdClass라 항상 false → 파일 컬럼의 `$_FILES` 검사 분기가 죽고, notNullList에 든 파일 컬럼은 POST 데이터에 없어 항상 `Required`로 실패
 - [ ] `MY_Controller_API::beforePost/beforePut/beforePatch/beforeDelete` `input->post() ?? input->json()` — `MY_Input::post()/put()/patch()`는 빈 배열을 반환하므로 json 폴백이 동작하지 않음 (JSON 바디 API 클라이언트 사용 불가). `beforeDelete`는 `put()`을 읽어 DELETE에서 `$data`가 항상 `[]`
