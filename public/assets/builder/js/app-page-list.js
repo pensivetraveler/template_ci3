@@ -345,6 +345,7 @@ $(function () {
 			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 			executeAjax({
 				url: getUrlWithIdentifiers(common.API_URI + '/' + 'duplicate', getRedirectActionData(this, common.IDENTIFIER)),
+				method: 'post',
                 headers: {
                     'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
                 },

@@ -388,6 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleResetMenu() {
         executeAjax({
             url: common.API_URI + '/' + 'reset',
+            method: 'post',
             headers: {
                 'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
             },

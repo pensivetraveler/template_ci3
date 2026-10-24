@@ -19,7 +19,8 @@ class MenuList extends Common
         if($this->flag !== 'admin') show_404();
     }
 
-    public function reset_get()
+    // 메뉴·권한 테이블을 비우는 동작이라 GET(링크·프리페치로 실행될 수 있음)이 아닌 POST로만 받음
+    public function reset_post()
     {
         $this->Model->truncate();
         $this->Model_Menu_Auth->truncate();

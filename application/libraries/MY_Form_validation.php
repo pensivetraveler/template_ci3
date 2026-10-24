@@ -81,9 +81,16 @@ class MY_Form_validation extends CI_Form_validation
     // CI_Form_validation Override
     // --------------------------------------------------------------------
 
+    /**
+     * 값이 비어 있어도 실행해야 하는 규칙. CI3 는 빈 값에 required·isset·matches 외 규칙을 건너뛰어
+     * 조건부 필수 규칙이 서버에서 동작하지 않았다.
+     */
+    protected array $emptyAwareRules = ['required_mod', 'required_if_value', 'required_if_empty_data', 'password_matches'];
+
     protected function _execute($row, $rules, $postdata = NULL, $cycles = 0)
     {
         $result = parent::_execute($row, $rules, $postdata, $cycles);
+        $this->executeEmptyAwareRules($row, $rules, $postdata);
         foreach ($rules as $rule) {
             if(!method_exists($this, $rule) && !in_array($rule, $this->_excepted_rules) ) {
                 log_message('debug', "Try Custom Method: {$rule} ");
@@ -98,6 +105,31 @@ class MY_Form_validation extends CI_Form_validation
             }
         }
         return $result;
+    }
+
+    protected function executeEmptyAwareRules($row, $rules, $postdata): void
+    {
+        if(!($postdata === null || $postdata === '')) return;
+        if(isset($this->_error_array[$row['field']])) return;
+
+        foreach ((array)$rules as $rule) {
+            if(!is_string($rule)) continue;
+            $param = null;
+            if(preg_match('/(.*?)\[(.*)\]/', $rule, $match)) {
+                $rule = $match[1];
+                $param = $match[2];
+            }
+            if(!in_array($rule, $this->emptyAwareRules, true) || !method_exists($this, $rule)) continue;
+
+            if($this->$rule($postdata ?? '', $param) === false) {
+                $message = $this->get_error_msg($rule, $row['label'] ?? $row['field'], $param ?? '', $row['errors'] ?? []);
+                if($message === '') $message = $this->_build_error_msg($this->_get_error_message($rule, $row['field']), $row['label'] ?? $row['field'], $param);
+                $this->_field_data[$row['field']]['error'] = $message;
+                $this->_error_array[$row['field']] = $message;
+                if(property_exists($this, '_failed_rules')) $this->_failed_rules[$row['field']] = $rule;
+                return;
+            }
+        }
     }
 
     protected function _get_error_message($rule, $field)

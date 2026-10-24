@@ -1394,12 +1394,13 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function checkUniqueExist($dto, $model = null)
     {
-        $modeAdd = $this->mode === 'add';
+        // 등록 여부: _mode=add 이거나, 수정 대상 식별자가 없을 때(afterPost/afterPut 이 add 로 처리)
+        $modeAdd = $this->mode === 'add' || !count($this->idData);
 
         if(is_null($model)) $model = $this->Model;
         if(count($model->uniqueKeyList) > 0){
             foreach ($model->uniqueKeyList as $key) {
-                if(!array_search($key, array_column($this->formConfig, 'field'))) continue;
+                if(array_search($key, array_column($this->formConfig, 'field')) === false) continue;
                 if(!$modeAdd && !array_key_exists($key, $dto)) continue;
 
                 $idx = array_search($key, array_column($this->formConfig, 'field'));
@@ -1625,16 +1626,28 @@ class MY_Builder_API extends MY_Controller_API
         return $dataset;
     }
 
+    /**
+     * 내보내기 임시 파일 위치. 웹에서 직접 열 수 없는 application/cache/exports/ (downloadExports_get 으로만 내려받음)
+     */
+    protected function getExportsDir(): string
+    {
+        return APPPATH.'cache'.DIRECTORY_SEPARATOR.'exports'.DIRECTORY_SEPARATOR;
+    }
+
     protected function prepareExportsPath($exportType): string
     {
-        $uploadPath = 'public/temps/';
-        if (!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
+        $dir = $this->getExportsDir();
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true)) throw new Exception('Unable to create exports directory', CREATE_FOLDER_FAIL);
+        // 내려받지 않고 남은 파일은 하루 뒤 정리
+        foreach (glob($dir.'*') ?: [] as $old) {
+            if(is_file($old) && filemtime($old) < time() - 86400) @unlink($old);
+        }
         $filename = APP_NAME.'_'.strtolower($this->router->class).'_'.date('YmdHis').'.'.$exportType;
         $encrypted = strtr($this->encryption->encrypt($filename), [
             '+' => '-',
             '/' => '_',
         ]);
-        return FCPATH . $uploadPath . $encrypted;
+        return $dir . $encrypted;
     }
 
     public function prepareExports_get(): void
@@ -1864,8 +1877,10 @@ class MY_Builder_API extends MY_Controller_API
         $encrypted = $this->input->get('filename');
         if(empty($encrypted)) $message = $this->lang->status(EMPTY_REQUIRED_DATA);
 
-        $fullPath = FCPATH . 'public/temps/' . $encrypted;
-        if(!file_exists($fullPath)) $message = $this->lang->status(FILE_NOT_EXIST);
+        // 암호화된 파일명만 허용 (경로 조작 방지)
+        if(!$message && !preg_match('/^[A-Za-z0-9_=-]+$/', (string)$encrypted)) $message = $this->lang->status(WRONG_TOKEN);
+        $fullPath = $this->getExportsDir() . $encrypted;
+        if(!$message && !file_exists($fullPath)) $message = $this->lang->status(FILE_NOT_EXIST);
 
         $encrypted = strtr($encrypted, [
             '-' => '+',
@@ -2036,10 +2051,13 @@ class MY_Builder_API extends MY_Controller_API
         $this->response(['code' => DATA_RETRIEVED, 'data' => $result]);
     }
 
-    public function duplicate_get($key = 0)
+    // 새 행을 만드는 동작이라 POST로만 받음
+    public function duplicate_post($key = 0)
     {
+        // URL·쿼리로 받은 식별자로 원본 행을 찾음 (조건 없이 조회해 첫 행이 복제되던 문제 수정)
+        $idData = $this->checkIdentifierExist($key, true);
         $data = $this->Model->getData([], [
-            $this->identifier => $key,
+            'where' => $idData,
         ]);
 
         if(!$data) {
