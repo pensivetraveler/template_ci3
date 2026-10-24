@@ -1536,8 +1536,10 @@ class MY_Builder_API extends MY_Controller_API
                 $modelColumns = array_merge($modelColumns, $this->{$modelName}->getRequestColumnList());
             }
         }
-        return array_values(array_filter($columns, function ($item) use ($hidden, $modelColumns) {
-            if(count($modelColumns) && !in_array($item['field'] ?? '', $modelColumns, true)) return false;
+        $listColumns = array_merge(array_column($this->listConfig ?: [], 'field'), [RECENT_DT_COLUMN_NAME]);
+        return array_values(array_filter($columns, function ($item) use ($hidden, $modelColumns, $listColumns) {
+            // 목록 설정에 있는 열(recent_dt 처럼 select 에서 계산하는 값 포함)은 내보낸다
+            if(count($modelColumns) && !in_array($item['field'] ?? '', $modelColumns, true) && !in_array($item['field'] ?? '', $listColumns, true)) return false;
             return !(
                 $item['type'] === 'common' ||
                 $item['type'] === 'file' ||
@@ -1943,8 +1945,8 @@ class MY_Builder_API extends MY_Controller_API
             '-' => '+',
             '_' => '/',
         ]);
-        $filename = $this->encryption->decrypt($encrypted);
-        if($filename === false) $message = $this->lang->status(WRONG_TOKEN);
+        $filename = $message ? false : $this->encryption->decrypt($encrypted);
+        if(!$message && $filename === false) $message = $this->lang->status(WRONG_TOKEN);
 
         if($message) show_alert('error', $message, true);
 

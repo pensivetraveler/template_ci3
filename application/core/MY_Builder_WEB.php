@@ -441,7 +441,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         if($className === '') {
             // routeConfig를 비운 채 두면 checkLoggedIn()이 'Incorrect Access'로 처리
-            trigger_error(__METHOD__." : Class '{$this->router->class}' does not exist in route config.");
+            // trigger_error 는 개발 환경에서 화면에 먼저 출력돼 이후 redirect 가 막히므로 로그로만 남김
+            log_message('error', __METHOD__." : Class '{$this->router->class}' does not exist in route config.");
             return;
         }
 
@@ -465,7 +466,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             if($method === 'index') {
                 show_404();
             }else{
-                trigger_error(__METHOD__." : Method '$method' does not exist in route config.");
+                log_message('error', __METHOD__." : Method '$method' does not exist in route config.");
             }
             // 생성자 안에서는 로그인 여부를 아직 모름 → _remap()이 로그인 검사 후 index로 보냄
             $this->methodNotInRoute = true;
