@@ -233,6 +233,13 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `MY_Builder_API::beforeDelete` 식별자 없이 DELETE하면 `getDeleteBaseRow()`의 `show_error()`로 HTML 500 (JSON 아님) → `getDeleteBaseRow()`의 `show_error()`를 `keyNotExist()`(JSON 400 EMPTY_REQUIRED_KEY)로 교체 (2026-10-25)
 - [x] `MY_Controller_API::response` `code` 없이 호출하면 `floor(0/10)=0` → RestController가 200으로 바꿔 HTTP 200 + `status:false, code:0` 응답 → `code`·`$http_code` 모두 없으면 500으로 응답 (2026-10-25)
 
+**bizsoft-mig 확인에서 나온 후속 (2026-10-25)**
+- [x] 비밀번호 불일치 메시지가 번역 키 `form_validation_password_matches` 그대로 노출 → 한국어·영어 `form_validation_lang.php`에 문구 추가
+- [x] 관리자 등록 422 응답에 같은 오류가 두 번 → `MY_Builder_API::validateFormRules` 그룹마다 `reset_validation()` 후 검증
+- [x] `GET /admin/api/menuAuth/reset` 이 `index_get`의 식별자로 해석돼 500 → `MY_Builder_API::_remap`이 다른 HTTP 메서드로만 있는 엔드포인트(`reset_post`, `duplicate_post` 등)를 405로 응답
+- [x] `downloadExports_get` 파일명 형식 오류에 "올바른 TOKEN 값이 아닙니다" 문구 → `FILE_NOT_EXIST` 문구
+- [x] frames 전체 CSV 500 `Undefined property: $font_family` → `getExportsConfig`가 모델(부모·자식 포함) 컬럼만 내보내고, `getExportsDataset`은 없는 속성을 빈 값으로
+
 ### 미구현·문서 불일치
 
 **공통·route/method/nav**

@@ -51,4 +51,4 @@ $lang['form_validation_max_files']                      = '{field}{은} 최대 {
 $lang['form_validation_strong_password_space']          = '{field}{은} 공백이 포함되어서는 안됩니다.';
 $lang['form_validation_strong_password_eng']            = '{field}{은} 영문이 최소 1자 이상 포함되어야 합니다.';
 $lang['form_validation_strong_password_num']            = '{field}{은} 숫자가 최소 1자 이상 포함되어야 합니다.';
-
+$lang['form_validation_password_matches']            = '{field}{이} 비밀번호와 일치하지 않습니다.';

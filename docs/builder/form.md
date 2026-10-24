@@ -257,7 +257,7 @@ JS 가 직접 읽는 attributes:
 | `form_sync` | `data-form-sync` | `true` | 읽는 코드 없음 | **미구현** |
 | `reset_value` | `data-reset-value` | `true` | 0 이면 `resetFrmInputs()` 가 해당 노드를 건너뜀(값·input-changed·original-value 모두 유지) | 구현 |
 | `detect_changed` | `data-detect-changed` | `true` | 0 이면 변경 여부와 무관하게 항상 제출(`checkInputSubmittable()`), reset 시 `data-input-changed=false`(`resetFrmInputs()`) | 구현 |
-| `view_mod` | `data-view-mod` | (없음) | `\|` 로 나눈 목록에 현재 mode 가 있으면 `.form-validation-unit` 표시, 없으면 `d-none` (`readyFrmInputs()`) | **부분 구현** — `''` 이면 항상 숨김, 배열은 매칭 불가(문자열 `'add\|edit'` 사용) |
+| `view_mod` | `data-view-mod` | (없음) | `\|` 로 나눈 목록에 현재 mode 가 있으면 `.form-validation-unit` 표시, 없으면 `d-none` (`readyFrmInputs()`) | `''`이거나 생략하면 모든 mode 에서 표시, 배열(`['add','edit']`)도 지원 |
 | `writable` | `data-writable` | (없음) | 0 이면 항상 readonly (`readyFrmInputs()`) | 구현 |
 | `editable` | `data-editable` | (없음) | 0 이면 edit 모드에서 readonly, 그 외 모드에선 **readonly 제거**(subtype readonly 여도). selectpicker 는 edit 시 disabled(`refreshPlugins()`). API 고유값 중복검사 대상 여부(`checkUniqueExist()`) | 구현 |
 | `text_type` | `data-text-type` | (없음) | input 이벤트에서 `eng`/`num`/`eng\|num` 외 문자 제거 (`app-page-form-event.js` input 핸들러) | **부분 구현** — `email` 등 다른 값은 무시 |
@@ -693,7 +693,7 @@ $config['form_administrators_config'] = [
 | `textarea: quill` | `type=textarea, subtype=quill` 은 동작하지 않음. `type=custom, subtype=quill` (페이지 base 전용) |
 | `custom` 은 `form_side_{custom}` 호출 | `form_{formType 또는 formSubType}_custom_{subtype}` |
 | `group` 이 있으면 `form_side_{group}` 호출 | `form_{...}_group_{group_attributes.type}` (group 이름이 아님) |
-| `view_mod: ''` = 전체 노출 | 항상 숨김. 키를 생략해야 전체 노출 |
+| `view_mod: ''` = 전체 노출 | 2026-10-25 수정으로 문서대로 전체 노출 (배열 값도 지원) |
 | `list_type` 값 dup_check/addr_daum | 실제 값은 thumbnail/youtube/reply_list/그 외(파일) |
 | `repeater_type: manual` | 대응 뷰가 없음 (`base` / `jquery` 만) |
 

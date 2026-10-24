@@ -969,6 +969,8 @@ class MY_Builder_API extends MY_Controller_API
             });
             // CI3 set_rules()는 POST가 아니고 검증 데이터가 비어 있으면 규칙을 등록하지 않는다.
             // PUT·PATCH에서도 규칙이 등록되도록 요청 데이터를 먼저 넣고, 아래 분기에서 그룹별 데이터로 바꾼다.
+            // 그룹마다 새로 검증한다. 앞 그룹 규칙이 남아 있으면 다음 그룹 run() 에서 다시 검사돼 같은 오류가 두 번 들어간다
+            $this->form_validation->reset_validation();
             $this->form_validation->set_data(count($data) ? $data : ['_' => '']);
             $this->form_validation->set_rules($groupConfig);
 
@@ -1527,7 +1529,15 @@ class MY_Builder_API extends MY_Controller_API
 
         // 비밀번호·API 키 등은 내보내지 않는다
         $hidden = array_merge($this->hiddenResponseFields, $this->hiddenListFields);
-        return array_values(array_filter($columns, function ($item) use ($hidden) {
+        // 조회 결과에 있는 컬럼(Model·부모·자식 모델)만 내보낸다. form 의 다른 테이블 필드(스타일 등)는 행에 값이 없다
+        $modelColumns = [];
+        foreach ($this->getModelPipeline() as $modelName) {
+            if(property_exists($this, $modelName) && method_exists($this->{$modelName}, 'getRequestColumnList')) {
+                $modelColumns = array_merge($modelColumns, $this->{$modelName}->getRequestColumnList());
+            }
+        }
+        return array_values(array_filter($columns, function ($item) use ($hidden, $modelColumns) {
+            if(count($modelColumns) && !in_array($item['field'] ?? '', $modelColumns, true)) return false;
             return !(
                 $item['type'] === 'common' ||
                 $item['type'] === 'file' ||
@@ -1637,7 +1647,8 @@ class MY_Builder_API extends MY_Controller_API
             foreach(array_keys($header) as $field) {
                 if($field === 'num') continue;
 
-                $value = $item->{$field};
+                // form 에는 있지만 조회 결과에 없는 필드(다른 테이블에 저장하는 값 등)는 빈 값
+                $value = property_exists($item, $field) ? $item->{$field} : '';
                 if(in_array($field, $formats['option']['fields'])) {
                     $optionConfig = $formats['option']['config'][$field];
                     $options = $this->getOptions($field, $optionConfig);
@@ -1924,7 +1935,7 @@ class MY_Builder_API extends MY_Controller_API
         if(empty($encrypted)) $message = $this->lang->status(EMPTY_REQUIRED_DATA);
 
         // 암호화된 파일명만 허용 (경로 조작 방지)
-        if(!$message && !preg_match('/^[A-Za-z0-9_=-]+$/', (string)$encrypted)) $message = $this->lang->status(WRONG_TOKEN);
+        if(!$message && !preg_match('/^[A-Za-z0-9_=-]+$/', (string)$encrypted)) $message = $this->lang->status(FILE_NOT_EXIST);
         $fullPath = $this->getExportsDir() . $encrypted;
         if(!$message && !file_exists($fullPath)) $message = $this->lang->status(FILE_NOT_EXIST);
 
@@ -2254,6 +2265,21 @@ class MY_Builder_API extends MY_Controller_API
 
     public function _remap($object_called, $arguments = [])
     {
+        // /reset, /duplicate 처럼 다른 HTTP 메서드로만 있는 엔드포인트를 잘못된 메서드로 부르면,
+        // index_{http} 의 식별자로 해석되지 않도록 405 로 막는다
+        $http = strtolower($this->input->method());
+        if(is_string($object_called) && !method_exists($this, "{$object_called}_{$http}")) {
+            foreach (['get', 'post', 'put', 'patch', 'delete'] as $other) {
+                if($other !== $http && method_exists($this, "{$object_called}_{$other}")) {
+                    $this->responseError([
+                        'location' => __METHOD__,
+                        'param' => ['method' => $object_called],
+                        'msg' => 'Method Not Allowed',
+                    ], [], RestController::HTTP_METHOD_NOT_ALLOWED);
+                }
+            }
+        }
+
         $this->mode = $this->input->get('_mode') ?? '';
         $this->submode = $this->input->get('_submode') ?? '';
         $this->apiBaseUri = base_url($this->flag . '/' . $this->apiRoute);

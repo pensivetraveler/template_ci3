@@ -12,3 +12,4 @@ $lang['form_validation_max_files']                      = 'The {field} field lim
 $lang['form_validation_strong_password_space']          = 'Please remove space in {field}.';
 $lang['form_validation_strong_password_eng']            = 'Please enter at least one letter in the {field}.';
 $lang['form_validation_strong_password_num']            = 'Please enter at least one number in the {field}.';
+$lang['form_validation_password_matches']            = 'The {field} field does not match the password.';
