@@ -294,6 +294,26 @@ $(function () {
 		});
 	});
 
+	$('.dataTables_wrapper').on('click', '.duplicate-record', function(e) {
+		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
+		executeAjax({
+			url: getUrlWithIdentifiers(common.API_URI + '/' + 'duplicate', getRedirectActionData(this, common.IDENTIFIER)),
+			method: 'post',
+			headers: {
+				'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+			},
+			success: function(response) {
+				showAlert({
+					type: 'success',
+					title: 'Complete',
+					text: response.msg,
+					callback: dt.ajax.reload,
+					params: [null, false]
+				});
+			},
+		});
+	});
+
 	$('#filter-search_word').on('keydown', function(e) {
 		if (e.key === 'Enter') {
 			e.preventDefault();
@@ -339,25 +359,6 @@ $(function () {
 			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 			readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
 			fetchFrmValues(document.querySelector(formSelector), getRedirectActionData(this, common.IDENTIFIER));
-		});
-
-		$('.dataTables_wrapper').on('click', '.duplicate-record', function(e) {
-			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
-			executeAjax({
-				url: getUrlWithIdentifiers(common.API_URI + '/' + 'duplicate', getRedirectActionData(this, common.IDENTIFIER)),
-				method: 'post',
-                headers: {
-                    'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-                },
-				success: function(response) {
-					showAlert({
-						type: 'success',
-						title: 'Complete',
-						text: response.msg,
-						callback: reload,
-					});
-				},
-			});
 		});
 
 		formRecord.addEventListener('readyFrmInputs', (e) => {
@@ -610,12 +611,14 @@ function renderColumn(data, type, full, meta, column) {
 							<input
 								type="checkbox"
 								value="1"
-								${data===1?'checked':''}
+								${Number(data)===1?'checked':''}
 								onchange="afterCheckboxColumnChange(${idData}, '${column.field}', this.checked?1:0)"
 								class="form-check-input"
 							>
 						`;
 						break;
+					default :
+						inner = (data === null || data === undefined || data === '') ? '-' : data;
 				}
 				break;
 			default :
@@ -626,7 +629,14 @@ function renderColumn(data, type, full, meta, column) {
 	// return
 	if(isArray(full[column.field])) {
 		const html = full[column.field].reduce((acc, curr) => {
-			return acc += renderColumnHTML(curr, full, column, wrap, inner);
+			let currInner = inner;
+			if(column.type === 'img') {
+				// 파일 배열이면 원소마다 이미지를 만든다
+				if(curr === null || typeof curr !== 'object' || !Object.hasOwn(curr, 'file_link')) return acc;
+				currInner = `<img class="img-thumbnail d-inline rounded-2 overflow-hidden" src="${curr.file_link}">`;
+				wrap.setAttribute('data-bs-content', currInner);
+			}
+			return acc += renderColumnHTML(curr, full, column, wrap, currInner);
 		}, '');
 		return `<div>${html}</div>`;
 	}else{
@@ -696,7 +706,7 @@ function renderSelectColumn(data, type, full, meta, column) {
 			const option = document.createElement('option');
 			option.value = value;
 			option.innerText = column.options[value];
-			if(data === value) option.setAttribute('selected', 'selected')
+			if(data !== null && data !== undefined && String(data) === value) option.setAttribute('selected', 'selected')
 			select.appendChild(option);
 		}
 	}
@@ -778,8 +788,7 @@ function getColumnOnclick(data, full, column) {
 			case 'popup' :
 				break;
 			case 'redirect' :
-				if(Object.hasOwn(column[key], 'params') && Object.hasOwn(column[key].attrs, 'target'))
-					if(column[key].attrs.target === '_blank') return `window.open('${data}', "_blank")`;
+				if(column[key].attrs && column[key].attrs.target === '_blank') return `window.open('${data}', "_blank")`;
 				return `location.href="${data}"`;
 			case 'download' :
 				if(data === null || !data.file_id) return '';
@@ -819,7 +828,7 @@ function getListButtons() {
 		data.push(
 			{
 				text: '<span class="d-none d-sm-inline-block">' + getLocale(btnObj.text, common.LOCALE) + '</span>',
-				className: btnObj.classes.length?btnObj.classes:'btn btn-primary waves-effect waves-light me-4',
+				className: (Array.isArray(btnObj.classes) ? btnObj.classes.join(' ') : btnObj.classes) || 'btn btn-primary waves-effect waves-light me-4',
 				action: function () {
 					if(btnObj.action !== undefined && btnObj.action.length) {
 						window[btnObj.action](this, btnObj.params??null);
@@ -853,10 +862,12 @@ function getListButtons() {
 				text: '<i class="ri-add-line ri-16px me-0 me-sm-2 align-baseline"></i><span class="d-none d-sm-inline-block">'+getLocale('Add New Record', common.LOCALE)+'</span>',
 				className: 'btn btn-primary waves-effect waves-light',
 				action: function () {
-					if(!common.FORM_EXIST && common.PAGE_ADD_URI.length) {
+					if(common.FORM_EXIST) {
+						readyFrmInputs(document.querySelector('#formRecord'), 'add', common.FORM_DATA);
+					}else if(common.PAGE_ADD_URI && common.PAGE_ADD_URI.length) {
 						location.href = common.PAGE_ADD_URI;
 					}else{
-						readyFrmInputs(formRecord, 'add', common.FORM_DATA);
+						console.warn('PAGE_ADD_URI is not defined');
 					}
 				}
 			}
@@ -868,6 +879,10 @@ function getListButtons() {
 
 function getListExports() {
 	const btns = [];
+	// control·checkbox·actions 열을 뺀 LIST_COLUMNS 열 인덱스
+	const exportColumns = common.LIST_COLUMNS
+		.map((column, index) => column.type === 'actions' ? null : 1 + common.LIST_CHEKBOX + index)
+		.filter((index) => index !== null);
 	for(const kind in common.LIST_EXPORTS) {
 		if(common.LIST_EXPORTS[kind] === false) continue;
 
@@ -878,7 +893,7 @@ function getListExports() {
 					text: `<i class="ri-printer-line me-1" ></i>${getLocale('Print', common.LOCALE)}`,
 					className: 'dropdown-item',
 					exportOptions: {
-						columns: [3, 4, 5, 6, 7],
+						columns: exportColumns,
 						// prevent avatar to be display
 						format: {
 							body: function (inner, coldex, rowdex) {
@@ -930,7 +945,7 @@ function getListExports() {
 					text: `<i class="ri-file-pdf-line me-1"></i>${getLocale('Pdf', common.LOCALE)}`,
 					className: 'dropdown-item',
 					exportOptions: {
-						columns: [1, 2, 3, 4, 5],
+						columns: exportColumns,
 						// prevent avatar to be display
 						format: {
 							body: function (inner, coldex, rowdex) {
@@ -956,7 +971,7 @@ function getListExports() {
 					text: `<i class="ri-file-copy-line me-1"></i>${getLocale('Copy', common.LOCALE)}`,
 					className: 'dropdown-item',
 					exportOptions: {
-						columns: [1, 2, 3, 4, 5],
+						columns: exportColumns,
 						// prevent avatar to be display
 						format: {
 							body: function (inner, coldex, rowdex) {
@@ -1045,7 +1060,7 @@ function afterSelectColumnChange(idData, field, value) {
 				type: 'success',
 				title: 'Complete',
 				text: 'Your Data Is Updated',
-				callback: $('.datatables-records').DataTable().ajax.reload(),
+				callback: $('.datatables-records').DataTable().ajax.reload,
 				params: [null, false]
 			});
 		},

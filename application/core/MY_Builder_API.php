@@ -1603,10 +1603,11 @@ class MY_Builder_API extends MY_Controller_API
                         $seperator = $optionConfig['seperator'] ?? ',';
                         $exploded = explode($seperator, $value);
                         $value = '';
-                        foreach ($exploded as $i=>$v) {
+                        // $i 는 행 번호(by-reference)이므로 다른 변수명 사용
+                        foreach ($exploded as $idx=>$v) {
                             if(!isset($options[$v])) continue;
                             $value .= $options[$v];
-                            if($i !== count($exploded) -1) $value .= $seperator.' ';
+                            if($idx !== count($exploded) -1) $value .= $seperator.' ';
                         }
                     }else{
                         $value = $options[$value] ?? '';
@@ -1860,6 +1861,9 @@ class MY_Builder_API extends MY_Controller_API
                 'code' => PERMISSION_OR_DISK_ERROR,
             ]);
         }
+
+        // UTF-8 BOM (Excel 에서 한글 깨짐 방지)
+        fwrite($fp, "\xEF\xBB\xBF");
 
         // fputcsv 로 한 줄씩 쓰기
         foreach ($dataset as $row) {

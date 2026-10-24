@@ -1302,7 +1302,22 @@ function getFilterData(selector, isFirstDraw = null) {
                 const group = match[1]; // where
                 const key = match[2];   // partner_id
 
-                if(Object.hasOwn(filters, group)) {
+                if(group === 'like') {
+                    // like 는 {field, value} 목록 (배열에 문자열 키를 넣으면 직렬화에서 사라짐)
+                    if(key === 'value') {
+                        filters.like.push({
+                            field: $(selector).find('[name="like[field]"]').val() ?? null,
+                            value: value,
+                        });
+                    }else if(key !== 'field') {
+                        filters.like.push({
+                            field: key,
+                            value: value,
+                        });
+                    }
+                }else if(group === 'where' && $(node).is('select[multiple]')) {
+                    filters.whereIn[key] = [value].filter(v => !isEmpty(v));
+                }else if(Object.hasOwn(filters, group)) {
                     filters[group][key] = isNumeric(value)?parseInt(value):value;
                 }
             }

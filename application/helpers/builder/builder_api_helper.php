@@ -47,7 +47,8 @@ if ( ! function_exists('reformat_get_data'))
                             break;
                         case 'date' :
                             if(isset($filter['date_range'])) {
-                                if(!is_empty($filter, 'start_date') && !is_empty($filter, 'end_date') && !is_empty($filter, 'on_date')) {
+                                // 날짜를 직접 입력하지 않았을 때만 프리셋 적용
+                                if(is_empty($filter, 'start_date') && is_empty($filter, 'end_date') && is_empty($filter, 'on_date')) {
                                     switch ($filter['date_range']) {
                                         case 'today' :
                                             $filter['on_date'] = date('Y-m-d');
@@ -98,8 +99,12 @@ if ( ! function_exists('reformat_get_data'))
 
         if(array_key_exists('format', $data)) {
             if($data['format'] === 'datatable') {
-                if($data['searchWord'] && $data['searchCategory']) {
-                    $return['filter']['like'][$data['searchCategory']] = $data['searchWord'];
+                if(!empty($data['searchWord']) && !empty($data['searchCategory'])) {
+                    // setFilterLike() 는 {field, value} 목록을 기대함
+                    $return['filter']['like'][] = [
+                        'field' => $data['searchCategory'],
+                        'value' => $data['searchWord'],
+                    ];
                 }
             }
         }
