@@ -125,7 +125,7 @@ class MY_Builder_API extends MY_Controller_API
         }
 
         $list = $model->getList(
-            $data['select'] ?? [],
+            $this->getListSelect($data['select'] ?? [], $model),
             $data,
         );
 
@@ -1406,9 +1406,31 @@ class MY_Builder_API extends MY_Controller_API
     protected function getExportsDataSource($params): array
     {
         return $this->transformList($this->Model->getList(
-            $params['select'] ?? [],
+            $this->getListSelect($params['select'] ?? [], $this->Model),
             $params,
         ));
+    }
+
+    /**
+     * 목록 조회용 select 를 정리한다.
+     * MY_Model::getListPDO() 는 select 컬럼이 1개면 행 객체 대신 값 배열을 돌려주는데,
+     * 목록·내보내기는 transformList()/transformView() 가 행 객체를 받아야 하므로 식별자 컬럼을 함께 조회한다.
+     */
+    protected function getListSelect($select, $model): array
+    {
+        if(is_string($select)) $select = explode(',', $select);
+        if(!is_array($select) || count($select) !== 1) return is_array($select) ? $select : [];
+
+        $keys = array_values(array_filter(array_unique(array_merge(
+            [$model->identifier ?? ''],
+            $model->primaryKeyList ?? []
+        ))));
+        foreach ($keys as $key) {
+            if(trim($select[0]) !== $key) return [$select[0], $key];
+        }
+
+        // 식별자 하나만 요청했고 함께 붙일 다른 키가 없으면 기본 select(모델 컬럼 전체)로 조회
+        return [];
     }
 
     protected function getExportsDataset($data, $header, $formats): array
