@@ -204,7 +204,7 @@ $config['view_partners_config'] = [
 
 ## Part 2. Excel 가져오기 설정
 
-> **현재 상태** — `MY_Builder_WEB::getExcelHeaders()`가 정의되지 않은 `$config`를 검사해 항상 `show_error`로 끝나므로, excel 화면은 그대로는 열리지 않는다. 자세한 항목은 [TODO.md](../../TODO.md#6-빌더-설정-조사-2026-10-23)를 참고한다.
+> **현재 상태** — 화면 진입 오류(`getExcelHeaders()`)는 고쳤다. excel 설정이 없으면 form 컬럼으로 헤더를 만든다. 다만 업로드 단계는 서버 검증·권한 검사가 없고 열을 순서로 매핑하므로 그대로 운영에 쓰기는 어렵다. 자세한 항목은 [TODO.md](../../TODO.md#6-빌더-설정-조사-2026-10-23)를 참고한다.
 
 이 부분은 **가져오기(업로드)** 화면만 다룬다. Excel/CSV **내보내기(export)**(`exports.csv/excel`, `MY_Builder_API::getExportsConfig()`, `prepareExcel()`, `setExcelValue()`)는 [list-filter.md](list-filter.md)를 참고한다.
 

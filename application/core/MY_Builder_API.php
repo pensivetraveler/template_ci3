@@ -315,7 +315,29 @@ class MY_Builder_API extends MY_Controller_API
     {
         $this->checkIdentifierExist($key);
 
-        return parent::beforePatch($key);
+        list($key, $data) = parent::beforePatch($key);
+
+        if(is_array($data) && count($data)) $this->validatePatchFormRules($data);
+
+        return [$key, $data];
+    }
+
+    /**
+     * PATCH는 일부 필드만 보내므로(목록 인라인 수정 등) 본문에 있는 필드의 form rules만 검증한다.
+     */
+    protected function validatePatchFormRules(array $data): void
+    {
+        if(is_empty($this->formConfig)) return;
+
+        $formConfig = $this->formConfig;
+        $this->formConfig = array_values(array_filter($formConfig, function ($item) use ($data) {
+            $group = $item['group'] ?? '';
+            return array_key_exists($item['field'] ?? '', $data) || ($group && $group !== 'base' && array_key_exists($group, $data));
+        }));
+
+        if(count($this->formConfig)) $this->validateFormRules('', $data);
+
+        $this->formConfig = $formConfig;
     }
 
     protected function afterPatch($key, $data = [])
@@ -388,8 +410,9 @@ class MY_Builder_API extends MY_Controller_API
                 if($config['subtype'] === 'onoff') {
                     $data[$field] = $value;
                 }else{
-                    $seperator = $checkboxes['option_attributes']['seperator'] ?? ',';
-                    $data[$field] = join($seperator, $value);
+                    $seperator = $config['option_attributes']['seperator'] ?? ',';
+                    // 체크박스가 하나면 문자열로 올 수 있어 join 전에 배열로 맞춤 (PHP 8 TypeError 방지)
+                    $data[$field] = join($seperator, (array)$value);
                 }
             }
         }
@@ -1085,7 +1108,8 @@ class MY_Builder_API extends MY_Controller_API
         $this->primaryKeyList = $model->primaryKeyList;
         $this->uniqueKeyList = $model->uniqueKeyList;
 
-        if(!in_array($this->input->method(), ['get', 'post'])) return;
+        // PUT·PATCH도 form 설정을 읽어야 수정 요청이 검증된다 (DELETE는 검증할 본문이 없음)
+        if(!in_array($this->input->method(), ['get', 'post', 'put', 'patch'])) return;
 
         if(is_null($setConfig)) $setConfig = $this->setConfig;
 
@@ -1100,7 +1124,7 @@ class MY_Builder_API extends MY_Controller_API
                 return array_merge($this->config->get('builder_view_base'), $item);
             }, $this->config->get($this->viewConfigName, [], false));
 
-            if($this->input->method === 'get') {
+            if($this->input->method() === 'get') {
                 if(is_empty($this->listConfig)) {
                     $this->listConfig = array_map(
                         function($item) {
@@ -1125,15 +1149,9 @@ class MY_Builder_API extends MY_Controller_API
                 }
             }
 
-            if($this->input->method === 'post') {
-                if(is_empty($this->formConfig)) {
-                    $this->responseError([
-                        'location' => __METHOD__,
-                        'msg' => "Validation Rules Config For $this->formConfigName Is Empty",
-                    ], [
-                        'data' => $this->input->request(),
-                    ]);
-                }
+            // form 설정이 없는 엔티티(MenuAuth 등)도 POST를 받으므로 막지 않고 기록만 한다
+            if(in_array($this->input->method(), ['post', 'put']) && is_empty($this->formConfig)) {
+                log_message('debug', __METHOD__." : Validation Rules Config For $this->formConfigName Is Empty");
             }
         }
     }

@@ -511,7 +511,7 @@ JS 가 직접 읽는 attributes:
 
 > **주의**
 > - 그룹 param(`group[field]`)의 서버 에러는 FV 필드 키(`field`)와 달라 화면에 표시되지 않는다. `server` validator 도 `reformatFormData()` 에서 등록되지 않는다.
-> - PUT 요청은 `setProperties()` 가 설정을 읽지 않아 `validateFormRules()` 가 사실상 규칙 없이 통과한다. 프론트는 add/edit 모두 POST 로 보낸다(11-3).
+> - PUT 은 POST 와 같이 전체 form rules 로 검증한다. PATCH 는 본문에 있는 필드의 rules 만 검증한다(`validatePatchFormRules()`). 프론트는 add/edit 모두 POST 로 보낸다(11-3).
 > - `checkUniqueExist()` 는 `_mode` 를 GET 에서만 읽어, 폼 POST(add)에서도 add 로 인식하지 않는다 → `editable=true` 가 아닌 고유키는 중복검사가 생략된다.
 > - CI3 는 빈 값에 `required/isset/matches` 외 규칙을 실행하지 않는다. 서버의 `required_mod`, `required_if_value`, `required_if_empty_data`, `password_matches` 는 빈 값에서 동작하지 않으므로 필수 검사는 클라이언트와 `validateManually()`(notNullList)에 의존한다.
 

@@ -107,7 +107,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Model::addSqlSet`, `MY_Model::addSqlWhere` 값을 문자열 보간해 SQL 생성 (현재 호출부 없음, 사용 시 주입)
 - [ ] `api/MenuList::reset_get` GET 요청 하나로 `menu`, `menu_auth`, `partner_auth`를 truncate하고 캐시 삭제 (CSRF·링크 프리페치로 전체 메뉴/권한 유실 가능 — POST/DELETE + 확인 절차 필요) (추가: `MenuAuth::reset_get`, `PartnerAuth::reset_get`, `MenuList::generateMenuCode_get`도 GET으로 truncate/일괄 수정)
 - [ ] `MY_Builder_WEB::afterViewApp` 요청 class/method 이름으로 `public/assets/{platform}/js/*_preset.js`·`_onload.js`, `style.css`, `common.js`를 없으면 자동 생성, view 메서드도 제외 안 됨 (운영 웹 요청이 공개 디렉터리에 파일 생성 — devMode 한정 필요)
-- [ ] `MY_Builder_API::setProperties` GET/POST 외(PUT/PATCH/DELETE)는 설정을 읽기 전에 return → `beforePut`의 `validateFormRules`가 빈 설정으로 돌고 `setData`의 체크박스/onoff 처리도 빠짐 (API 직접 호출로 rules 검증 우회)
+- [x] `MY_Builder_API::setProperties` GET/POST 외(PUT/PATCH/DELETE)는 설정을 읽기 전에 return → `beforePut`의 `validateFormRules`가 빈 설정으로 돌고 `setData`의 체크박스/onoff 처리도 빠짐 (API 직접 호출로 rules 검증 우회) → PUT·PATCH도 설정을 읽고, PATCH는 본문에 있는 필드만 검증 (`validatePatchFormRules()`). bizsoft-mig에서 재현 확인(2026-10-24)
 - [ ] `MY_Builder_API::checkUniqueExist` `$this->mode`를 GET `_mode`로만 읽어 폼 POST의 add를 add로 인식 못함 → `editable=true`가 아닌 고유키는 add에서 중복검사 생략 (중복 데이터 저장)
 - [ ] `MY_Form_validation::required_mod` 등 CI3는 빈 값에 `required/isset/matches` 외 규칙을 실행하지 않아 `required_mod`/`required_if_value`/`required_if_empty_data`/`password_matches`가 서버에서 무력 (클라이언트 우회 시 필수값 누락 저장)
 - [ ] `app-page-edit.js` FormValidation `core.validator.validating` 핸들러가 `event.element.value`를 마스킹 없이 console.log (edit 화면 비밀번호 평문 노출, add/list는 `32f07d5`에서 마스킹)
@@ -132,18 +132,18 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Builder_WEB::setupPlatformPage` `pageAuth === '000000'`이면 mode 검사를 건너뜀 (list 버튼/액션은 전부 false인데 add/edit 직접 URL 접근은 허용)
 - [ ] `MY_Builder_WEB::setRouteConfig` route가 없는 클래스면 `trigger_error` 후 `$config['']`로 계속 진행 (에러 연쇄 — `EmailLogs`, `Company` 컨트롤러가 해당)
 - [ ] `MY_Builder_WEB::setMethodConfig` methods에 없는 method면 생성자 안에서 `$this->index()` 호출, 이 시점 `isLoggedIn`은 항상 false (로그인 상태여도 `noLoginRedirect`, allowNoLogin route면 `_remap` 전에 baseMethod 렌더링)
-- [ ] `MY_Builder_WEB::viewApp` 뷰를 못 찾으면 `$view['subPage']`에 blank 지정 (`$data['subPage']` 미설정으로 빈 페이지 + notice, `builder/layout/blank` 미사용)
+- [x] `MY_Builder_WEB::viewApp` 뷰를 못 찾으면 `$view['subPage']`에 blank 지정 (`$data['subPage']` 미설정으로 빈 페이지 + notice, `builder/layout/blank` 미사용)
 - [ ] `builder_method_config.php` `method_list_log_config`의 `actions=[]`/`buttons=[]`가 `fill_config_properties()`에서 list_base 값으로 다시 채워짐 (logs.errors에 add/excel 버튼·edit/delete 액션 노출, base_auth `101101`)
 - [ ] `builder_method_config.php` `method_form_auth_config` `actions=[]`가 `array_replace_recursive`로 `{list, delete}`를 못 지움 (auth form에 불필요한 액션 잔존)
 - [ ] `BuilderCommonTrait::getMethodList`, `api/MenuList::options_get` noIndex route에서 원본 `properties.baseMethod`를 `??` 없이 읽음 (`visitors`, `logs`에서 undefined index)
 - [ ] `builder_route_helper.php::fill_config_properties` `$base`는 연관배열인데 `$config` 같은 키가 스칼라(예: `'includes' => false`)면 TypeError (설정 실수가 fatal)
 - [ ] `BuilderCommonTrait::fillMenuConf` `array_merge($item['params'], navDefaultParams)` 순서로 플랫폼 값이 항목 값을 덮어씀 (항목별 `layout` 변경 불가)
 - [ ] `MY_html_helper.php::is_current_uri` params 전부 일치를 요구 (`?layout=side-menu` 없이 진입하면 메뉴 active 미표시)
-- [ ] `MY_Builder_API::setProperties` `$this->input->method === 'get'/'post'`를 메서드 호출이 아닌 없는 프로퍼티로 비교해 항상 false (form `list => true` listConfig fallback과 "form config 비어있음" 에러 블록 미실행, PHP 8 undefined property 경고)
+- [x] `MY_Builder_API::setProperties` `$this->input->method === 'get'/'post'`를 메서드 호출이 아닌 없는 프로퍼티로 비교해 항상 false (form `list => true` listConfig fallback과 "form config 비어있음" 에러 블록 미실행, PHP 8 undefined property 경고) → `method()` 호출로 수정. POST 빈 설정 차단은 form 설정 없는 엔티티(MenuAuth 등)를 깨므로 로그만 남김
 
 **form**
-- [ ] `MY_Builder_API::setData` `checkbox/single`의 스칼라 값에 `join($seperator, $value)` 호출 → PHP 8 TypeError (single 체크박스 저장 시 500)
-- [ ] `MY_Builder_API::setData` `$checkboxes['option_attributes']['seperator']`를 목록 배열에서 찾아 항상 `,` (구분자 설정 불가)
+- [x] `MY_Builder_API::setData` `checkbox/single`의 스칼라 값에 `join($seperator, $value)` 호출 → PHP 8 TypeError (single 체크박스 저장 시 500)
+- [x] `MY_Builder_API::setData` `$checkboxes['option_attributes']['seperator']`를 목록 배열에서 찾아 항상 `,` (구분자 설정 불가)
 - [ ] `MY_Controller::getOptions` `model` 분기에서 `call_user_func_array`에 문자열 키(`select`,`data`) 배열 전달 → PHP 8 named argument로 해석돼 `Model_Sys_Code::getBigCodeList()`/`Model_Menu::getParentList()` 등에서 `Unknown named parameter` (option_type model 폼 렌더링 실패)
 - [ ] `builder_form_helper.php::get_form_input_by_type` 사이드 폼 radio에서 `get_admin_form_radio($item, $formType)` 인자 부족 호출 → ArgumentCountError (사이드 폼 radio 렌더링 중단)
 - [ ] `MY_Builder_API::checkUniqueExist` `if(!array_search(...))`가 index 0을 false로 취급 (폼 설정 첫 필드가 고유키면 중복검사 생략)
@@ -192,7 +192,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `builder_form_helper.php::get_help_block` `$data['attr']`를 기본값 없이 접근 (help_block에 attr 없으면 Notice)
 
 **view·excel import**
-- [ ] `MY_Builder_WEB::getExcelHeaders` 설정을 `$this->filterConfig`에 넣고 정의되지 않은 `$config`를 검사해 항상 `show_error`, 대체 경로의 `$this->formColumns`도 excel category에서는 채워지지 않음 (excel 화면이 열리지 않음, 고쳐도 빈 배열)
+- [x] `MY_Builder_WEB::getExcelHeaders` 설정을 `$this->filterConfig`에 넣고 정의되지 않은 `$config`를 검사해 항상 `show_error`, 대체 경로의 `$this->formColumns`도 excel category에서는 채워지지 않음 (excel 화면이 열리지 않음, 고쳐도 빈 배열)
 - [ ] `MY_Builder_WEB::view`/`setJSVariables` view 데이터 준비 조건이 `subtype === 'view'`인데 `method_view_base_config` 기본 subtype은 `'base'`이고 그런 subtype config도 없음, 맞추면 `view_view.php`가 없어 `builder_view(".../view_view")` 실패 (`VIEW_COLUMNS`·`prepareViewData`·`app-page-view.js` 사실상 미사용 — `category === 'view'` 조건 검토)
 - [ ] `MY_Builder_WEB::viewApp` subtype base view와 dashboard(`view/dashboard/base`)가 method `view` 기준으로 `builder/layout/view.php`를 잡고 이 파일이 정의되지 않은 `$viewType`·`$viewData` 참조 (notice, `builder/dashboard/index.php`는 매칭 안 됨)
 - [ ] `MY_Builder_WEB::prepareViewData` `reformat_form_data_by_type($cols, $viewType)`로 viewType을 form_type 자리에 넘김 (grid여도 행 배열이 안 만들어져 `view_grid.php` `foreach ($row …)` 깨짐, `common` 항목도 걸러짐)

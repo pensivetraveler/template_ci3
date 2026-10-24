@@ -416,7 +416,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                     'code' => E_USER_ERROR,
                 ]);
 //                trigger_error("viewApp : View file for {$this->router->class}:{$method} does not exist.", E_USER_ERROR);
-                $view['subPage'] = BUILDER_FLAGNAME.DIRECTORY_SEPARATOR.'layout'.DIRECTORY_SEPARATOR.'blank';
+                $data['subPage'] = BUILDER_FLAGNAME.DIRECTORY_SEPARATOR.'layout'.DIRECTORY_SEPARATOR.'blank';
             }else{
                 $data['subPage'] = $view;
             }
@@ -900,10 +900,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function getExcelHeaders()
     {
-        $this->filterConfig = $this->config->get($this->setConfigList(
+        // excel 설정이 없으면 아래 else에서 form 컬럼으로 헤더를 만든다
+        $config = $this->config->get($this->setConfigList(
             'excel', $this->methodConfig['resourceConfig'] ?? null
         ), [], false);
-        if(empty($config)) show_error(__METHOD__." : Excel Config is Empty For ".$this->router->location);
 
         if($config) {
             return array_reduce($config, function($carry, $item) {

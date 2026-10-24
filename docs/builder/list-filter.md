@@ -499,7 +499,7 @@ filter 밖의 top-level 파라미터(`API_PARAMS` 등)는 `where`로 들어간�
 ## 6. API 쪽 list config
 
 - 이름: `MY_Builder_API::__construct()`에서 `listConfigName = 'list_' . strtolower(class) . '_config'`. **주의** — WEB은 `snakeize`를 쓰므로 camelCase 클래스(`partnerAuth`)에서 이름이 달라진다(`list_partnerauth_config` vs `list_partner_auth_config`). resourceConfig/method 후보 탐색도 없다.
-- `MY_Builder_API::setProperties()`: GET/POST일 때 list/form/view config를 base와 merge한다. form config 중 `list => true` 항목으로 listConfig를 만드는 fallback 코드가 있으나 `$this->input->method === 'get'`(메소드 호출이 아닌 프로퍼티 접근) 조건 때문에 실행되지 않는다(**미구현**).
+- `MY_Builder_API::setProperties()`: GET/POST/PUT/PATCH일 때 list/form/view config를 base와 merge한다. GET에서 list config가 없으면 form config 중 `list => true` 항목으로 listConfig를 만든다.
 - API의 `listConfig`는 `MY_Builder_API::transformView()`에서 `_mode=list`이고 `transTargetKeys['list']`에 있는 필드 값을 옵션 텍스트로 바꾸는 데만 쓰인다. 현재 `transTargetKeys`를 설정하는 컨트롤러는 없다.
 - 결론: **화면 컬럼은 WEB의 list config만으로 결정**되고, API는 모델 select 결과 전체를 반환한다.
 

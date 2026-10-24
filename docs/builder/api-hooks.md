@@ -109,7 +109,7 @@ class Companies extends Common   // admin/Common → MY_Builder_WEB
 
 > **주의**
 > - 주 모델 별칭은 반드시 `'Model'`이다. 부모·자식 모델은 `'Model_Parent'`, `'Model_Child'`(5-7).
-> - `setProperties()`는 모델을 로드한 **뒤**에 부른다. GET/POST가 아니면 config를 읽지 않는다(PUT/PATCH/DELETE에서 `formConfig`는 빈 배열).
+> - `setProperties()`는 모델을 로드한 **뒤**에 부른다. GET/POST/PUT/PATCH에서 config를 읽는다(DELETE에서는 `formConfig`가 빈 배열). PATCH는 본문에 있는 필드의 rules만 검증한다(`validatePatchFormRules()`).
 > - non-AI 모델(복합 PK)은 URL의 key를 쓰지 않고 **PK 컬럼을 GET 파라미터로만** 식별한다(3-6).
 > - join select `'*'`나 기본 select에는 `password`, `user_api_key`도 포함되어 그대로 응답된다. 응답에서 빼려면 `transformView()`에서 `unset`한다.
 
@@ -685,7 +685,7 @@ hook 안에서 읽을 수 있는 프로퍼티. "설정 시점"이 생성자보�
 | `$this->idData` | `checkIdentifierExist()`(before*), `beforeAdd()`(non-AI), `addData()`(AI insert id) | 현재 대상 행의 식별 조건. 등록·수정 응답의 `data` |
 | `$this->identifier`, `primaryKeyList`, `uniqueKeyList`, `fileList` | `setProperties()` | 주 모델에서 복사. `fileList`를 바꾸면 `transformView()`와 업로드 실행 여부에만 영향(실제 업로드 대상은 `model->fileList`) |
 | `$this->defaultList` | 엔티티 생성자 | POST/PUT 기본값 |
-| `$this->listConfig`, `formConfig`, `viewConfig` | `setProperties()`, GET/POST에서만 | `builder_*_base`와 병합된 config. PUT/PATCH/DELETE에서는 `[]` |
+| `$this->listConfig`, `formConfig`, `viewConfig` | `setProperties()`, GET/POST/PUT/PATCH | `builder_*_base`와 병합된 config. DELETE에서는 `[]` |
 | `$this->listConfigName`, `formConfigName`, `viewConfigName` | 부모 생성자가 `''`일 때만 `list_{strtolower(class)}_config` 등으로 채움 | 다른 config를 쓰려면 프로퍼티 기본값으로 선언하거나 `setProperties()` 전에 대입 |
 | `$this->setConfig` | 프로퍼티 기본값 `true` | `false`면 `setProperties()`가 config를 읽지 않음(`Auth`는 인자로 `false`) |
 | `$this->exceptValidateKeys` | 부모 생성자에서 대입 | GET에서 where로 바꾸지 않을 키. 추가하려면 parent 생성자 **이후**에 `[] =` |
