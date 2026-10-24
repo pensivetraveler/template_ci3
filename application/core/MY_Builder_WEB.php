@@ -40,6 +40,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
     public string $scope = '';
     public bool $isSystemAdmin = false;
     public array $errors = [];
+    public bool $methodNotInRoute = false;
 
 
     public function __construct()
@@ -438,9 +439,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $className = $this->resourceLoader->routeKey($this->router->class);
 
-        if($className === '')
-            trigger_error(__METHOD__." : Class '{$className}' does not exist in route config.");
-
+        if($className === '') {
+            // routeConfig를 비운 채 두면 checkLoggedIn()이 'Incorrect Access'로 처리
+            trigger_error(__METHOD__." : Class '{$this->router->class}' does not exist in route config.");
+            return;
+        }
 
         $this->routeConfig = $this->fillRouteConfigProperties($className, $config[$className]);
     }
@@ -464,7 +467,9 @@ class MY_Builder_WEB extends MY_Controller_WEB
             }else{
                 trigger_error(__METHOD__." : Method '$method' does not exist in route config.");
             }
-            $this->index();
+            // 생성자 안에서는 로그인 여부를 아직 모름 → _remap()이 로그인 검사 후 index로 보냄
+            $this->methodNotInRoute = true;
+            $method = $this->routeConfig['properties']['baseMethod'];
         }
 
         $methodConfig = [];
@@ -1114,6 +1119,9 @@ class MY_Builder_WEB extends MY_Controller_WEB
     {
         $this->checkLoggedIn();
 
+        // route methods에 없는 method (setMethodConfig 참고): 로그인 검사 후 route index로
+        if($this->methodNotInRoute) redirect($this->href);
+
         if($this->isBuilderAvailable()){
             $this->setupPlatform();
 
@@ -1245,7 +1253,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             }
 
             return $acc;
-        });
+        }, []);
     }
 
     protected function setCurrentMenu($menuData)
@@ -1292,10 +1300,21 @@ class MY_Builder_WEB extends MY_Controller_WEB
     protected function setupPlatformRedirect()
     {
         if($this->isLoggedIn) {
-            $firstMenu = $this->menuList[0];
-            $class = $firstMenu['class'];
-            $method = $firstMenu['method'] === 'index' ? '' : $firstMenu['method'];
-            $this->loggedInRedirect = $this->baseUri . DIRECTORY_SEPARATOR . $class . ($method ? DIRECTORY_SEPARATOR . $method : '');
+            // menuList는 isUse 필터로 키가 비어 있을 수 있고 첫 항목이 하위 메뉴 묶음일 수 있음 → class 있는 첫 메뉴, 없으면 설정값 유지
+            $firstMenu = null;
+            foreach ($this->menuList as $menu) {
+                foreach ($menu['isSubMenu'] ? ($menu['subMenu'] ?? []) : [$menu] as $candidate) {
+                    if(!empty($candidate['class'])) {
+                        $firstMenu = $candidate;
+                        break 2;
+                    }
+                }
+            }
+            if($firstMenu) {
+                $class = $firstMenu['class'];
+                $method = $firstMenu['method'] === 'index' ? '' : $firstMenu['method'];
+                $this->loggedInRedirect = $this->baseUri . DIRECTORY_SEPARATOR . $class . ($method ? DIRECTORY_SEPARATOR . $method : '');
+            }
 
 //            switch ($this->sessionData['user_cd']) {
 //                case 'USR001':

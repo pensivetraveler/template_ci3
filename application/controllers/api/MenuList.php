@@ -219,8 +219,9 @@ class MenuList extends Common
                 ];
             }
 
-            $baseMethod = $conf['properties']['baseMethod'];
-            foreach (array_keys($conf['methods']) as $method) {
+            // baseMethod 생략 시 fillRouteConfigProperties와 같이 첫 method
+            $baseMethod = ($conf['properties']['baseMethod'] ?? '') ?: array_key_first($conf['methods'] ?? []);
+            foreach (array_keys($conf['methods'] ?? []) as $method) {
                 if(!$noIndex && $method === $baseMethod) continue;
                 $data[] = [
                     'id' => $method,

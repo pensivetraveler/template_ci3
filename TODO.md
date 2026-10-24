@@ -125,21 +125,21 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 
 **공통·route/method/nav**
 - [x] `MY_Builder_WEB::setupPlatformMenu` `CACHING_MENU=false`이고 비시스템 관리자(USR001/USR002) 로그인 시 권한 필터 전에 return해 `setCurrentMenu()` 미호출 → `setupPlatformPage()`가 매번 `loggedInRedirect`로 보냄 (무한 redirect, `.env.example` 기본값이 false) → `setupPlatformMenuWithoutAuth()`: false 모드에서 isSuper 메뉴만 빼고 현재 메뉴를 정함, 권한은 전체 허용
-- [ ] `BuilderCommonTrait::saveMenuList` 기존 DB 행을 지우지 않고 `addData()`만 함 (`menu_done` 캐시 유실 + `CACHING_MENU=true`면 메뉴 중복 insert)
-- [ ] `BuilderCommonTrait::saveMenuList` `route_config` 전체에 `fillRouteConfigProperties()` 적용 (`methods` 없는 route 하나만 있어도 E_USER_ERROR로 메뉴 저장 전체 실패)
-- [ ] `BuilderCommonTrait::getMenuBaseAuth` 메뉴 `method`가 route `methods`에 없으면 undefined index, `class`를 대소문자 구분 매칭 (`myInfo` 메뉴 ↔ `myinfo` route → base_auth `000000`)
-- [ ] `MY_Builder_WEB::setupPlatformMenuAuth` `array_reduce` 초기값 없음 (허용 메뉴 0개면 `null` → `array` 타입 속성 대입 오류)
-- [ ] `MY_Builder_WEB::setupPlatformRedirect` `menuList[0]` 직접 접근 (`isUse=false`로 첫 항목이 빠지면 `array_filter`가 키를 유지해 notice, 잘못된 redirect)
-- [ ] `MY_Builder_WEB::setupPlatformPage` `pageAuth === '000000'`이면 mode 검사를 건너뜀 (list 버튼/액션은 전부 false인데 add/edit 직접 URL 접근은 허용)
-- [ ] `MY_Builder_WEB::setRouteConfig` route가 없는 클래스면 `trigger_error` 후 `$config['']`로 계속 진행 (에러 연쇄 — `EmailLogs`, `Company` 컨트롤러가 해당)
-- [ ] `MY_Builder_WEB::setMethodConfig` methods에 없는 method면 생성자 안에서 `$this->index()` 호출, 이 시점 `isLoggedIn`은 항상 false (로그인 상태여도 `noLoginRedirect`, allowNoLogin route면 `_remap` 전에 baseMethod 렌더링)
+- [x] `BuilderCommonTrait::saveMenuList` 기존 DB 행을 지우지 않고 `addData()`만 함 (`menu_done` 캐시 유실 + `CACHING_MENU=true`면 메뉴 중복 insert) → DB에 메뉴가 있으면 insert 없이 DB 내용으로 `menu_done` 캐시 재생성(`getSavedMenuList()`, menu_id·권한 유지), 빈 DB일 때만 insert (2026-10-25)
+- [x] `BuilderCommonTrait::saveMenuList` `route_config` 전체에 `fillRouteConfigProperties()` 적용 (`methods` 없는 route 하나만 있어도 E_USER_ERROR로 메뉴 저장 전체 실패) → `methods` 없는 route는 권한 계산 대상에서 제외(해당 메뉴는 `000000`) (2026-10-25)
+- [x] `BuilderCommonTrait::getMenuBaseAuth` 메뉴 `method`가 route `methods`에 없으면 undefined index, `class`를 대소문자 구분 매칭 (`myInfo` 메뉴 ↔ `myinfo` route → base_auth `000000`) → `resourceLoader->routeKey()`로 대소문자 무관 route 매칭, methods에 없는 메뉴 method는 baseMethod 설정으로 계산 (2026-10-25)
+- [x] `MY_Builder_WEB::setupPlatformMenuAuth` `array_reduce` 초기값 없음 (허용 메뉴 0개면 `null` → `array` 타입 속성 대입 오류) → `array_reduce` 초기값 `[]` 지정 (2026-10-25)
+- [x] `MY_Builder_WEB::setupPlatformRedirect` `menuList[0]` 직접 접근 (`isUse=false`로 첫 항목이 빠지면 `array_filter`가 키를 유지해 notice, 잘못된 redirect) → `menuList`를 순회해 class 있는 첫 메뉴(하위 메뉴 포함)로 정하고, 없으면 `platform_config.loggedInRedirect` 유지 (2026-10-25)
+- [ ] `MY_Builder_WEB::setupPlatformPage` `pageAuth === '000000'`이면 mode 검사를 건너뜀 (list 버튼/액션은 전부 false인데 add/edit 직접 URL 접근은 허용) (보류: 비관리자 권한 의미 변경이고 mode 검사 재설계는 TODO 2장 범위)
+- [x] `MY_Builder_WEB::setRouteConfig` route가 없는 클래스면 `trigger_error` 후 `$config['']`로 계속 진행 (에러 연쇄 — `EmailLogs`, `Company` 컨트롤러가 해당) → route 없으면 `trigger_error` 후 return (routeConfig 비움 → `checkLoggedIn()`의 'Incorrect Access'), 메시지에 실제 클래스명 (2026-10-25)
+- [x] `MY_Builder_WEB::setMethodConfig` methods에 없는 method면 생성자 안에서 `$this->index()` 호출, 이 시점 `isLoggedIn`은 항상 false (로그인 상태여도 `noLoginRedirect`, allowNoLogin route면 `_remap` 전에 baseMethod 렌더링) → 생성자에서 `index()` 호출 대신 `methodNotInRoute` 표시 + baseMethod 설정 사용, `_remap()`이 `checkLoggedIn()` 뒤 `$this->href`(route index)로 redirect (2026-10-25)
 - [x] `MY_Builder_WEB::viewApp` 뷰를 못 찾으면 `$view['subPage']`에 blank 지정 (`$data['subPage']` 미설정으로 빈 페이지 + notice, `builder/layout/blank` 미사용)
-- [ ] `builder_method_config.php` `method_list_log_config`의 `actions=[]`/`buttons=[]`가 `fill_config_properties()`에서 list_base 값으로 다시 채워짐 (logs.errors에 add/excel 버튼·edit/delete 액션 노출, base_auth `101101`)
-- [ ] `builder_method_config.php` `method_form_auth_config` `actions=[]`가 `array_replace_recursive`로 `{list, delete}`를 못 지움 (auth form에 불필요한 액션 잔존)
-- [ ] `BuilderCommonTrait::getMethodList`, `api/MenuList::options_get` noIndex route에서 원본 `properties.baseMethod`를 `??` 없이 읽음 (`visitors`, `logs`에서 undefined index)
-- [ ] `builder_route_helper.php::fill_config_properties` `$base`는 연관배열인데 `$config` 같은 키가 스칼라(예: `'includes' => false`)면 TypeError (설정 실수가 fatal)
-- [ ] `BuilderCommonTrait::fillMenuConf` `array_merge($item['params'], navDefaultParams)` 순서로 플랫폼 값이 항목 값을 덮어씀 (항목별 `layout` 변경 불가)
-- [ ] `MY_html_helper.php::is_current_uri` params 전부 일치를 요구 (`?layout=side-menu` 없이 진입하면 메뉴 active 미표시)
+- [x] `builder_method_config.php` `method_list_log_config`의 `actions=[]`/`buttons=[]`가 `fill_config_properties()`에서 list_base 값으로 다시 채워짐 (logs.errors에 add/excel 버튼·edit/delete 액션 노출, base_auth `101101`) → actions(duplicate/edit/view/delete)·buttons(add/excel)를 false로 명시 (logs.errors 켜진 액션·버튼 0개 확인) (2026-10-25)
+- [x] `builder_method_config.php` `method_form_auth_config` `actions=[]`가 `array_replace_recursive`로 `{list, delete}`를 못 지움 (auth form에 불필요한 액션 잔존) → actions `list`/`delete`를 false로 명시 (auth.login 켜진 액션 0개 확인) (2026-10-25)
+- [x] `BuilderCommonTrait::getMethodList`, `api/MenuList::options_get` noIndex route에서 원본 `properties.baseMethod`를 `??` 없이 읽음 (`visitors`, `logs`에서 undefined index) → `baseMethod ?? ''`, 생략 시 첫 method(fillRouteConfigProperties와 같은 규칙), options_get은 `methods ?? []` (2026-10-25)
+- [x] `builder_route_helper.php::fill_config_properties` `$base`는 연관배열인데 `$config` 같은 키가 스칼라(예: `'includes' => false`)면 TypeError (설정 실수가 fatal) → 설정값이 스칼라면 재귀하지 않고 설정값 유지 + error 로그 (2026-10-25)
+- [x] `BuilderCommonTrait::fillMenuConf` `array_merge($item['params'], navDefaultParams)` 순서로 플랫폼 값이 항목 값을 덮어씀 (항목별 `layout` 변경 불가) → `array_merge(navDefaultParams, $item['params'])`로 순서 변경 (항목 값 우선) (2026-10-25)
+- [x] `MY_html_helper.php::is_current_uri` params 전부 일치를 요구 (`?layout=side-menu` 없이 진입하면 메뉴 active 미표시) → 쿼리에 있는 params 키만 비교(값이 다르면 비활성), `=` 없는 쿼리·QUERY_STRING 미설정 notice 방지 (2026-10-25)
 - [x] `MY_Builder_API::setProperties` `$this->input->method === 'get'/'post'`를 메서드 호출이 아닌 없는 프로퍼티로 비교해 항상 false (form `list => true` listConfig fallback과 "form config 비어있음" 에러 블록 미실행, PHP 8 undefined property 경고) → `method()` 호출로 수정. POST 빈 설정 차단은 form 설정 없는 엔티티(MenuAuth 등)를 깨므로 로그만 남김
 
 **form**

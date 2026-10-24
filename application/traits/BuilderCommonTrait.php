@@ -138,7 +138,8 @@ trait BuilderCommonTrait
 
         return array_map(function ($item) use ($conf, $depth) {
             $item = fill_config_properties($item, $conf);
-            $item['params'] = array_merge($item['params'], $this->config->get('platform_config.navDefaultParams', [], false));
+            // 플랫폼 기본값 위에 항목 값을 덮어씀 (항목별 layout 등 변경 가능)
+            $item['params'] = array_merge($this->config->get('platform_config.navDefaultParams', [], false), $item['params']);
             $item['depth'] = $depth;
             $item['method'] = !$item['method']&&$item['class']?'index':$item['method'];
             $item['isSubMenu'] = count($item['subMenu']) > 0 ? 1 : 0;
@@ -185,7 +186,16 @@ trait BuilderCommonTrait
     {
         $this->load->model('Model_Menu');
 
-        $routeConfigs = $this->config->item("route_config");
+        // 메뉴가 이미 DB에 있으면(캐시만 사라진 경우) 다시 insert하지 않고 DB 내용으로 캐시를 만든다 (menu_id·메뉴 권한 유지)
+        if($this->Model_Menu->getCnt()) {
+            $this->cache->file->save('menu_done', $this->getSavedMenuList(), 0);
+            return;
+        }
+
+        // methods 없는 route는 메뉴 권한 계산 대상에서 뺀다 (fillRouteConfigProperties의 E_USER_ERROR로 저장 전체가 실패하지 않게)
+        $routeConfigs = array_filter($this->config->item("route_config") ?: [], function ($item) {
+            return !empty($item['methods']);
+        });
         $config = array_combine(
             array_keys($routeConfigs),
             array_map(function ($className, $item) {
@@ -217,6 +227,29 @@ trait BuilderCommonTrait
         $this->cache->file->save('menu_done', $menuList, 0);
     }
 
+    /**
+     * DB(tbl_menu)에 저장된 메뉴를 menu_done 캐시와 같은 형태로 읽는다. (api/MenuList::cachingMenu와 같은 구조)
+     */
+    protected function getSavedMenuList(): array
+    {
+        $list = $this->Model_Menu->getList([], [
+            'where' => ['depth' => 1],
+            'orderBy' => ['srt' => 'asc'],
+        ]);
+
+        foreach ($list as $item) {
+            $item->sub_menu = !$item->is_sub_menu ? [] : $this->Model_Menu->getList([], [
+                'where' => [
+                    'depth' => 2,
+                    'parent_id' => $item->menu_id,
+                ],
+                'orderBy' => ['srt' => 'asc'],
+            ]);
+        }
+
+        return $this->deformMenuList($list);
+    }
+
     protected function setMenuData($data, $config, $srt = 1, $parentId = 0)
     {
         $data = array_map(function ($value) {
@@ -232,11 +265,14 @@ trait BuilderCommonTrait
 
     function getMenuBaseAuth($item, $config): string
     {
-        if(!$item['isSubMenu'] && array_key_exists($item['class'], $config)) {
-            $routeConfig = $config[$item['class']];
+        // 메뉴 class는 route 키와 대소문자가 다를 수 있음 (myInfo 메뉴 ↔ myinfo route) → setRouteConfig와 같은 규칙으로 찾음
+        $routeKey = $item['isSubMenu'] ? '' : $this->resourceLoader->routeKey((string)$item['class']);
+        if($routeKey !== '' && array_key_exists($routeKey, $config)) {
+            $routeConfig = $config[$routeKey];
             $method = $item['method'] === 'index' ? $routeConfig['properties']['baseMethod'] : $item['method'];
 
-            $methodConfig = $routeConfig['methods'][$method];
+            // route methods에 없는 메뉴 method는 setMethodConfig처럼 baseMethod 기준으로 계산
+            $methodConfig = $routeConfig['methods'][$method] ?? $routeConfig['methods'][$routeConfig['properties']['baseMethod']];
 
             $baseAuth = make_base_auth_from_method($methodConfig);
 
@@ -318,8 +354,10 @@ trait BuilderCommonTrait
         if(!$config['properties']['noIndex']) {
             $methodList['index'] = 'index';
         }else{
-            if($config['properties']['baseMethod'])
-                $methodList[$config['properties']['baseMethod']] = $config['properties']['baseMethod'];
+            // baseMethod 생략 시 fillRouteConfigProperties와 같이 첫 method
+            $baseMethod = ($config['properties']['baseMethod'] ?? '') ?: array_key_first($config['methods']);
+            if($baseMethod)
+                $methodList[$baseMethod] = $baseMethod;
         }
 
         foreach (array_keys($config['methods']) as $method) {
