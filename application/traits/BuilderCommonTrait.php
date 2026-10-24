@@ -35,13 +35,13 @@ trait BuilderCommonTrait
 
         if(!$this->flag) show_error("Platform flag is not set.");
 
-        foreach (glob(APPPATH . "config/extra/{$this->flag}/*_config.php") as $file) {
+        foreach (glob(APPPATH . "config/extra/{$this->flag}/[!.]*_config.php") as $file) {
             $this->config->load("extra/{$this->flag}/" . substr(basename($file),0,strpos(basename($file),'.')));
         }
-        foreach (glob(APPPATH . "config/extra/{$this->flag}/*_constants.php") as $file) {
+        foreach (glob(APPPATH . "config/extra/{$this->flag}/[!.]*_constants.php") as $file) {
             require_once $file;
         }
-        foreach (glob(APPPATH.'language'.DIRECTORY_SEPARATOR.$this->config->item('language').DIRECTORY_SEPARATOR.$this->flag.DIRECTORY_SEPARATOR.'*_lang.php') as $file) {
+        foreach (glob(APPPATH.'language'.DIRECTORY_SEPARATOR.$this->config->item('language').DIRECTORY_SEPARATOR.$this->flag.DIRECTORY_SEPARATOR.'[!.]*_lang.php') as $file) {
             $this->lang->load($this->flag.DIRECTORY_SEPARATOR.str_replace('_lang.php', '', basename($file)), $this->config->item('language'));
         }
 
@@ -294,7 +294,7 @@ trait BuilderCommonTrait
     public function getClassList(): array
     {
         $classes = [];
-        foreach (glob(APPPATH . 'controllers/' . $this->flag . '/*.php') as $filePath)
+        foreach (glob(APPPATH . 'controllers/' . $this->flag . '/[!.]*.php') as $filePath)
         {
             $className = basename($filePath, '.php');
             if($className === 'Common') continue;

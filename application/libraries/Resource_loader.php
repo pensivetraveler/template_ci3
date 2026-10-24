@@ -123,7 +123,7 @@ class Resource_loader
      */
     public function loadMergedResources(string $flag): void
     {
-        foreach (glob(APPPATH."config/extra/{$flag}/resources/*.php") ?: [] as $file) {
+        foreach (glob(APPPATH."config/extra/{$flag}/resources/[!.]*.php") ?: [] as $file) {
             $class = basename($file, '.php');
             $data = $this->readMergedFile($file);
 

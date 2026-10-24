@@ -37,7 +37,7 @@ class Cli extends Common
         }
         require_once APPPATH . 'config/extra/builder/builder_base_constants.php';
         $this->load->helper(['inflector', 'builder/builder_base', 'builder/builder_route']);
-        foreach (glob(APPPATH . "config/extra/{$flag}/*_config.php") as $file) {
+        foreach (glob(APPPATH . "config/extra/{$flag}/[!.]*_config.php") as $file) {
             $this->config->load("extra/{$flag}/" . basename($file, '.php'));
         }
         $this->load->library('resource_loader', null, 'resourceLoader');
@@ -93,7 +93,7 @@ class Cli extends Common
         $loader = $this->resourceLoader;
         $problems = [];
 
-        foreach (glob(APPPATH."config/extra/{$flag}/resources/*.php") ?: [] as $file) {
+        foreach (glob(APPPATH."config/extra/{$flag}/resources/[!.]*.php") ?: [] as $file) {
             $class = basename($file, '.php');
             try {
                 $data = $loader->readMergedFile($file);
@@ -114,7 +114,7 @@ class Cli extends Common
         // route 키는 소문자로 적기도 하므로(myinfo ↔ MyInfo.php) 컨트롤러 파일명은 대소문자 없이 비교
         $controllers = array_map(function ($file) {
             return strtolower(basename($file, '.php'));
-        }, glob(APPPATH."controllers/{$flag}/*.php") ?: []);
+        }, glob(APPPATH."controllers/{$flag}/[!.]*.php") ?: []);
         foreach (array_keys($this->config->item('route_config') ?: []) as $class) {
             if(!in_array(strtolower($class), $controllers, true)) $problems[] = "route {$class}: controllers/{$flag}/".ucfirst($class).".php not found";
         }
@@ -167,7 +167,7 @@ class Cli extends Common
         // 2. 분할형 파일에서 지울 위치 찾기
         $changes = [];
         $located = [];
-        foreach (glob(APPPATH."config/extra/{$flag}/*_config.php") as $file) {
+        foreach (glob(APPPATH."config/extra/{$flag}/[!.]*_config.php") as $file) {
             $code = file_get_contents($file);
             [$newCode, $removed] = $converter->removeEntity($code, $configKeys, $routeKey);
             if(count($removed)) {
