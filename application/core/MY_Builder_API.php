@@ -148,14 +148,13 @@ class MY_Builder_API extends MY_Controller_API
     }
 
     /**
-     * 요청에서 온 조건 중 허용 목록에 없는 필드를 뺀다.
+     * 요청에서 온 조건 중 허용 목록에 없는 필드를 조용히 뺀다 (오류 로그 화면에 쌓이지 않도록 기록하지 않음).
      * 모르는 키가 그대로 WHERE 컬럼이 되면 SQL 오류(500, 개발 환경에서는 쿼리 노출)가 나고,
      * 임의 컬럼(password 등)으로 조회·검색할 수 있게 되기 때문이다. hook에서 직접 넣는 조건은 영향 없음.
      */
     protected function sanitizeRequestConditions(array $data): array
     {
         $allowed = array_flip($this->getAllowedRequestFields());
-        $dropped = [];
         $isAllowed = function ($field) use ($allowed) {
             return is_string($field) && isset($allowed[$field]);
         };
@@ -163,7 +162,6 @@ class MY_Builder_API extends MY_Controller_API
         foreach (array_keys($data['where'] ?? []) as $field) {
             if(!$isAllowed($field)) {
                 unset($data['where'][$field]);
-                $dropped[] = $field;
             }
         }
 
@@ -171,7 +169,6 @@ class MY_Builder_API extends MY_Controller_API
             foreach (array_keys($data['filter'][$type] ?? []) as $field) {
                 if(!$isAllowed($field)) {
                     unset($data['filter'][$type][$field]);
-                    $dropped[] = "filters[$type][$field]";
                 }
             }
         }
@@ -182,7 +179,6 @@ class MY_Builder_API extends MY_Controller_API
                 $field = is_array($item) ? ($item['field'] ?? '') : $key;
                 if($field !== '' && !$isAllowed($field)) {
                     unset($data['filter']['like'][$key]);
-                    $dropped[] = "filters[like][$field]";
                 }
             }
             // {field, value} 목록이면 번호를 다시 매김
@@ -194,8 +190,6 @@ class MY_Builder_API extends MY_Controller_API
         if(isset($data['filter']['date']) && is_array($data['filter']['date'])) {
             $data['filter']['date'] = array_intersect_key($data['filter']['date'], array_flip(['start_date', 'end_date', 'on_date']));
         }
-
-        if(count($dropped)) log_message('debug', __METHOD__.' : dropped request fields - '.implode(', ', $dropped));
 
         return $data;
     }
@@ -1270,10 +1264,7 @@ class MY_Builder_API extends MY_Controller_API
                 }
             }
 
-            // form 설정이 없는 엔티티(MenuAuth 등)도 POST를 받으므로 막지 않고 기록만 한다
-            if(in_array($this->input->method(), ['post', 'put']) && is_empty($this->formConfig)) {
-                log_message('debug', __METHOD__." : Validation Rules Config For $this->formConfigName Is Empty");
-            }
+            // form 설정이 없는 엔티티(MenuAuth 등)도 POST를 받으므로 막지 않는다 (서버 form rules 검증만 생략됨)
         }
     }
 
