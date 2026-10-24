@@ -71,8 +71,17 @@ $config['method_list_log_config'] = [
     'type' => 'log',
     'subtype' => 'base',
     'mode' => 'read',
-    'actions' => [],
-    'buttons' => [],
+    // fill_config_properties()는 빈 배열을 기본값으로 다시 채우므로 끌 항목은 false로 명시
+    'actions' => [
+        'duplicate' => false,
+        'edit' => false,
+        'view' => false,
+        'delete' => false,
+    ],
+    'buttons' => [
+        'add' => false,
+        'excel' => false,
+    ],
     'properties' => [
         'plugin' => '',
         'isCheckbox' => false,
@@ -126,7 +135,11 @@ $config['method_form_auth_config'] = array_replace_recursive($config['method_for
     'category' => 'form',
     'type' => 'auth',
     'mode' => 'authenticate',
-    'actions' => []
+    // array_replace_recursive·fill_config_properties 모두 빈 배열로는 지울 수 없으므로 false로 명시
+    'actions' => [
+        'list' => false,
+        'delete' => false,
+    ],
 ]);
 
 $config['method_form_auth_login_config'] = array_replace_recursive($config['method_form_auth_config'], [

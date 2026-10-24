@@ -12,15 +12,16 @@ function is_current_uri($nav_link, $params = [], $current_uri = '')
 {
     if(!$current_uri) $current_uri = $_SERVER['PATH_INFO'] ?? '/';
     if(count($params) > 0) {
-        $queries = array_reduce(explode('&', $_SERVER['QUERY_STRING']),
+        $queries = array_reduce(explode('&', $_SERVER['QUERY_STRING'] ?? ''),
             function($carry, $item) {
                 if(!is_empty($item)) {
-                    $data = explode('=', $item);
-                    $carry[$data[0]] = $data[1];
+                    $data = explode('=', $item, 2);
+                    $carry[$data[0]] = $data[1] ?? '';
                 }
                 return $carry;
             }, []);
-        return $current_uri === $nav_link && empty(array_diff_assoc($params, $queries));
+        // 쿼리에 없는 params(예: ?layout=side-menu 없이 진입)는 비교하지 않고, 있는 값만 일치해야 함
+        return $current_uri === $nav_link && empty(array_diff_assoc(array_intersect_key($params, $queries), $queries));
     }else{
         return $current_uri === $nav_link;
     }

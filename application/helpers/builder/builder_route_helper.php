@@ -80,6 +80,11 @@ if (!function_exists('fill_config_properties')) {
         if(empty($base)) return $config;
         foreach ($base as $key=>$val) {
             if(is_array($val) && !is_list_type($val)) {
+                // 기본값은 연관배열인데 설정값이 스칼라(예: 'includes' => false)면 TypeError 대신 설정값을 그대로 두고 로그
+                if(isset($config[$key]) && !is_array($config[$key])) {
+                    log_message('error', __FUNCTION__." : '{$key}' should be an array, ".gettype($config[$key])." given.");
+                    continue;
+                }
                 $config[$key] = fill_config_properties($config[$key]??[], $val);
             }else{
                 if(!array_key_exists($key, $config)) $config[$key] = $val;
