@@ -281,6 +281,12 @@ $(function () {
 	bindListCellEvents();
 
 	// 행 버튼은 document 에 위임한다: 반응형 상세 모달은 .dataTables_wrapper 밖에 그려진다
+	// 모달 안의 버튼을 누르면 모달을 먼저 닫는다 (사이드 폼을 가리거나 지운 행이 남지 않도록)
+	$(document).on('click', '.dtr-bs-modal .view-record, .dtr-bs-modal .edit-record, .dtr-bs-modal .delete-record, .dtr-bs-modal .duplicate-record', function() {
+		const modalEl = this.closest('.modal');
+		if(modalEl && window.bootstrap && bootstrap.Modal.getInstance(modalEl)) bootstrap.Modal.getInstance(modalEl).hide();
+		else if(modalEl) $(modalEl).modal('hide');
+	});
 
 	$(document).on('click', '.view-record', function() {
 		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
