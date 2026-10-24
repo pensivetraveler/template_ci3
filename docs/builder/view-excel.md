@@ -35,14 +35,14 @@
 
 ### 2. 설정 이름 해석
 
-설정 이름은 **WEB과 API가 서로 다른 규칙**으로 찾는다. 둘 다 list, filter, form, excel 설정이 쓰는 `BuilderColumnsTrait::setConfigList()`를 쓰지 않는다.
+view 설정 이름은 WEB과 API가 찾는 경로가 다르다. 둘 다 list, filter, form, excel 설정이 쓰는 후보 목록(`Resource_loader::entityConfigNames()`)을 쓰지 않는다. 키 이름 자체는 둘 다 `Resource_loader::entityConfigName()`(snake 규칙)으로 만든다.
 
 | 측 | 위치 | 규칙 |
 |---|---|---|
 | WEB | `MY_Builder_WEB::setViewColumns()` | ① 인자 `$name`이 있으면 그 이름 그대로 → ② 메소드 설정의 `resourceConfig`가 있으면 `view_{resourceConfig}_config` → ③ 둘 다 없으면 `jsVars['FORM_DATA']`(form 설정)를 복사하고, hidden이 아닌 항목은 `type='view'`, `subtype='base'`로 바꿈 |
 | API | `MY_Builder_API::__construct()`, `MY_Builder_API::setProperties()` | `'view_' . builder_config_name(클래스명) . '_config'` 하나만 사용(`menuList` → `view_menu_list_config`). 하위 클래스에서 `$viewConfigName` 속성으로 덮어쓸 수 있음 |
 
-> **주의** — WEB은 `resourceConfig`, API는 소문자 클래스명을 쓰므로 두 쪽 이름이 같아지도록 맞춰야 한다.
+> **주의** — WEB은 `resourceConfig`, API는 클래스명으로 찾으므로, `resourceConfig`를 클래스명과 다르게 쓰면 API의 `$viewConfigName`도 맞춰야 한다.
 
 참고: `setConfigList()`는 `{flag}_{resourceConfig}_config` → `{flag}_{class}_{method}_config` → `{flag}_{class}_config` → `{flag}_{method}_config` 순서로 후보를 만든다. view에는 이 순서가 적용되지 않는다.
 

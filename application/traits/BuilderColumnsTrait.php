@@ -3,20 +3,12 @@ defined('BASEPATH') OR exit('No direct script access 1wed');
 
 trait BuilderColumnsTrait
 {
+    /**
+     * 현재 요청(클래스·메서드)의 엔티티 설정 후보 키 목록. 규칙은 Resource_loader::entityConfigNames()
+     */
     protected function setConfigList($flag, $add = null)
     {
-        $class = builder_config_name($this->router->class);
-        $method = builder_config_name($this->router->method);
-        if($method === 'index' && $flag !== 'filter') $method = $flag;
-
-        $configs = [];
-        if(!empty($add)) $configs[] = "{$flag}_{$add}_config";
-
-        return array_merge($configs, [
-            "{$flag}_{$class}_{$method}_config",
-            "{$flag}_{$class}_config",
-            "{$flag}_{$method}_config",
-        ]);
+        return $this->resourceLoader->entityConfigNames($flag, $this->router->class, $this->router->method, $add);
     }
 
     protected function setFormColumns($configData = null): array
@@ -25,7 +17,7 @@ trait BuilderColumnsTrait
         if(is_array($configData) && count($configData)) {
             $config = $configData;
         }elseif(is_string($configData) && strlen($configData)){
-            $config = $this->config->get('form_'.$configData.'_config', []);
+            $config = $this->resourceLoader->entityConfig($this->resourceLoader->entityConfigName('form', $configData), [], true);
         }
 
         if(empty($config)){
@@ -33,7 +25,7 @@ trait BuilderColumnsTrait
             if($this->router->method === 'index' && $this->routeConfig['properties']['baseMethod']) {
                 $method = $this->routeConfig['properties']['baseMethod'];
             }
-            $config = $this->config->get($this->setConfigList(
+            $config = $this->resourceLoader->entityConfig($this->setConfigList(
                 'form', $method ?? null
             ), [], false);
 

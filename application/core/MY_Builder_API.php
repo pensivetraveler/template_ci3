@@ -76,11 +76,10 @@ class MY_Builder_API extends MY_Controller_API
 
         $this->loadConfigs(['builder_base_config', 'builder_route_config', 'builder_form_config', 'builder_list_config', 'builder_view_config']);
 
-        // 설정 이름은 WEB(BuilderColumnsTrait::setConfigList)과 같은 규칙: builder_config_name()
-        $configClass = builder_config_name($this->router->class);
-        if($this->listConfigName === '') $this->listConfigName = 'list_'.$configClass.'_config';
-        if($this->formConfigName === '') $this->formConfigName = 'form_'.$configClass.'_config';
-        if($this->viewConfigName === '') $this->viewConfigName = 'view_'.$configClass.'_config';
+        // 설정 이름은 WEB과 같은 규칙(Resource_loader, builder_config_name())
+        if($this->listConfigName === '') $this->listConfigName = $this->resourceLoader->entityConfigName('list', $this->router->class);
+        if($this->formConfigName === '') $this->formConfigName = $this->resourceLoader->entityConfigName('form', $this->router->class);
+        if($this->viewConfigName === '') $this->viewConfigName = $this->resourceLoader->entityConfigName('view', $this->router->class);
 
         if($this->router->method === 'index') {
             if($this->noIndexMethod) show_404();
@@ -1231,13 +1230,13 @@ class MY_Builder_API extends MY_Controller_API
         if($setConfig) {
             $this->listConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_list_base'), $item);
-            }, $this->config->get($this->listConfigName, [], false));
+            }, $this->resourceLoader->entityConfig($this->listConfigName, [], false));
             $this->formConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_form_base'), $item);
-            }, $this->config->get($this->formConfigName, [], false));
+            }, $this->resourceLoader->entityConfig($this->formConfigName, [], false));
             $this->viewConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_view_base'), $item);
-            }, $this->config->get($this->viewConfigName, [], false));
+            }, $this->resourceLoader->entityConfig($this->viewConfigName, [], false));
 
             if($this->input->method() === 'get') {
                 if(is_empty($this->listConfig)) {

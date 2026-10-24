@@ -135,7 +135,7 @@ app-page-list.js (DataTable)
 
 ### 설정 이름 찾기
 
-WEB은 form·list·filter 설정을 다음 순서로 찾고 처음 존재하는 키를 쓴다 (`BuilderColumnsTrait::setConfigList()`).
+엔티티 설정(route·form·list·filter·view·excel)은 WEB·API 모두 `libraries/Resource_loader.php`로 찾는다(`$this->resourceLoader`). WEB은 form·list·filter·excel 설정을 다음 순서로 찾고 처음 존재하는 키를 쓴다 (`Resource_loader::entityConfigNames()`, `BuilderColumnsTrait::setConfigList()`가 호출).
 
 1. `{kind}_{resourceConfig}_config`: method `properties`의 `resourceConfig`로 다른 엔티티 설정을 빌려 쓸 때
 2. `{kind}_{class}_{method}_config`

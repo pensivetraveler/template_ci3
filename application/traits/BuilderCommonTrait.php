@@ -44,6 +44,9 @@ trait BuilderCommonTrait
         foreach (glob(APPPATH.'language'.DIRECTORY_SEPARATOR.$this->config->item('language').DIRECTORY_SEPARATOR.$this->flag.DIRECTORY_SEPARATOR.'*_lang.php') as $file) {
             $this->lang->load($this->flag.DIRECTORY_SEPARATOR.str_replace('_lang.php', '', basename($file)), $this->config->item('language'));
         }
+
+        // 엔티티(route·form·list·filter·view·excel) 설정은 모두 Resource_loader 로 찾는다
+        $this->load->library('resource_loader', null, 'resourceLoader');
     }
 
     protected function fillRouteConfigProperties($className, $config = [], $base = []): array
@@ -302,7 +305,7 @@ trait BuilderCommonTrait
 
     public function getMethodList($className): array
     {
-        $config = $this->config->get("route_config")[$className]??$this->config->get("route_config")[strtolower($className)];
+        $config = $this->resourceLoader->routeEntry($className);
 
         if(is_empty($config, 'properties')) $config['properties'] = [];
         if(is_empty($config['properties'], 'noIndex')) $config['properties']['noIndex'] = false;

@@ -435,13 +435,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         if($this->router->class === 'common') return;
 
-        $className = '';
-        if(!is_empty($config, $this->router->class)) {
-            $className = $this->router->class;
-        }
-        if(!is_empty($config, strtolower($this->router->class))) {
-            $className = strtolower($this->router->class);
-        }
+        $className = $this->resourceLoader->routeKey($this->router->class);
 
         if($className === '')
             trigger_error(__METHOD__." : Class '{$className}' does not exist in route config.");
@@ -693,7 +687,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if(isset($name)) {
             $config = $this->config->get($name, []);
         }else{
-            $config = $this->config->get($this->setConfigList(
+            $config = $this->resourceLoader->entityConfig($this->setConfigList(
                 'list', $this->methodConfig['resourceConfig'] ?? null
             ), [], false);
         }
@@ -809,7 +803,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function setFilterColumns(): array
     {
-        $filterConfig = $this->config->get($this->setConfigList(
+        $filterConfig = $this->resourceLoader->entityConfig($this->setConfigList(
             'filter', $this->methodConfig['properties']['filterConfig'] ?? null
         ), [], false);
         if(empty($filterConfig)) return [];
@@ -859,7 +853,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $config = $this->config->get($name, []);
         }else{
             if($name = $this->methodConfig['resourceConfig']) {
-                $config = $this->config->get('view_'.$name.'_config', []);
+                $config = $this->resourceLoader->entityConfig($this->resourceLoader->entityConfigName('view', $name), [], true);
             }else{
                 $config = array_map(function($item) {
                     if($item['type'] !== 'hidden') {
@@ -901,7 +895,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
     protected function getExcelHeaders()
     {
         // excel 설정이 없으면 아래 else에서 form 컬럼으로 헤더를 만든다
-        $config = $this->config->get($this->setConfigList(
+        $config = $this->resourceLoader->entityConfig($this->setConfigList(
             'excel', $this->methodConfig['resourceConfig'] ?? null
         ), [], false);
 
