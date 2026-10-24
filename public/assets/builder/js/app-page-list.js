@@ -499,8 +499,8 @@ $(function () {
 					console.warn(jqXHR.responseJSON)
 					if(jqXHR.status === 422) {
 						jqXHR.responseJSON.errors.forEach((error) => {
-							const field = error.param;
-							if (!fv.fields[field]) return;
+							const field = getFvFieldKey(fv, error.param);
+							if (!field) return;
 							// 서버 메시지 i18n(선택)
 							const msg = getLocale ? getLocale(error.msg, common.LOCALE) : error.msg;
 							// 서버 type → FV validator 매핑 (있으면 사용)

@@ -11,8 +11,8 @@ function getFormData(form = null) {
                     if(fileCnt === 1) {
                         formData.append(node.name, node.files[0]);
                     }else{
-                        if(node.hasAttribute('max') && !isNaN(node.getAttribute('max'))) {
-                            fileCnt = parseInt(node.hasAttribute('max'));
+                        if(node.hasAttribute('max') && !isNaN(parseInt(node.getAttribute('max')))) {
+                            fileCnt = Math.min(fileCnt, parseInt(node.getAttribute('max')));
                         }
                         for(let i = 0; i < fileCnt; i++) {
                             formData.append(node.name+'[]', node.files[i]);
@@ -24,6 +24,18 @@ function getFormData(form = null) {
                 // formData.append(node.name, node.value);
                 formData.append(node.name, $(node).val());
             }
+        }
+    });
+
+    // 다중 체크박스를 모두 해제하면 전송할 값이 없으므로, 변경됐거나 항상 전송 대상이면 빈 값을 보내 해제를 저장
+    const checkboxNames = new Set();
+    form.querySelectorAll('input[type="checkbox"][name$="[]"]').forEach((node) => checkboxNames.add(node.name));
+    checkboxNames.forEach((name) => {
+        const nodes = [...form.querySelectorAll('input[type="checkbox"]')].filter((node) => node.name === name);
+        if(nodes.some((node) => node.checked)) return;
+        if(nodes.some((node) => isAttributeValueTrue(node, 'data-input-changed')
+            || (node.hasAttribute('data-detect-changed') && !isAttributeValueTrue(node, 'data-detect-changed')))) {
+            formData.append(name, '');
         }
     });
 

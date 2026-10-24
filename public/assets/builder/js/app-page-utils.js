@@ -348,10 +348,17 @@ function reformatFormData(form, data, regexp = {}, side = false) {
                     }
                 }else{
                     if(Object.keys(regexp).includes(rule)) {
-                        item.validators['regexp'] = {
+                        const regexpOption = {
                             regexp: new RegExp(regexp[rule].exp, regexp[rule].flags)
                         };
-                        if(Object.hasOwn(curr.errors, rule)) item.validators['regexp'].message = curr.errors[rule];
+                        if(Object.hasOwn(curr.errors, rule)) regexpOption.message = curr.errors[rule];
+                        // FV 는 validator 키당 하나라 두 번째 regexp 규칙부터는 regexpMulti 로 모아 검증
+                        if(!item.validators['regexp'] || !(typeof FormValidation !== 'undefined' && FormValidation.validators?.regexpMulti)) {
+                            item.validators['regexp'] = regexpOption;
+                        }else{
+                            if(!item.validators['regexpMulti']) item.validators['regexpMulti'] = { list: [] };
+                            item.validators['regexpMulti'].list.push(regexpOption);
+                        }
                     }else{
                         console.warn(`reformatFormData : ${rule} validator is not set.`);
                     }
@@ -361,9 +368,31 @@ function reformatFormData(form, data, regexp = {}, side = false) {
 
         if (Object.keys(item.validators).length === 0) return acc;
 
+        // submitAjax 422 응답의 서버 메시지 표시용 (customValidatorsPreset.validators.server)
+        if(typeof FormValidation !== 'undefined' && FormValidation.validators?.server) {
+            item.validators.server = { enabled: false, message: '' };
+        }
+
         acc[curr.field] = item;
         return acc;
     }, {});
+}
+
+/**
+ * 서버 검증 에러 param(group[field], group[0][field], field[0])을 FV 필드 키로 변환
+ */
+function getFvFieldKey(fv, param) {
+    if(!fv || !fv.fields) return null;
+    param = String(param);
+    if(fv.fields[param]) return param;
+
+    const last = param.match(/\[([^\[\]]+)\]$/);
+    if(last && isNaN(last[1]) && fv.fields[last[1]]) return last[1];
+
+    const base = param.split('[')[0];
+    if(fv.fields[base]) return base;
+
+    return null;
 }
 
 function setFlatpickr(node) {

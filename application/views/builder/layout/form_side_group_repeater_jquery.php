@@ -28,8 +28,8 @@
 									echo form_input(
 										[
 											'type' => 'hidden',
-											'name' => get_group_field_name($fieldData['attr'], $fieldData['group'], $fieldData['field']),
-											'id' => get_group_field_id($fieldData['attr'], $fieldData['group'], $fieldData['field']),
+											'name' => $fieldData['field'],
+											'id' => $fieldData['id'],
 										],
 										'',
 										$fieldData['attributes'],

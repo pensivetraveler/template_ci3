@@ -385,9 +385,10 @@ class MY_Controller extends CI_Controller
                             if (!method_exists($this->{$data['model']}, $data['method']))
                                 show_error("getOptions : Method {$data['method']} not exist.", E_USER_ERROR);
 
+                            // PHP 8에서 문자열 키는 named argument로 해석되므로 순서 배열로 전달
                             $list = call_user_func_array([$this->{$data['model']}, $data['method']], [
-                                'select' => array_values($render),
-                                'data' => $data['params'] ?? [],
+                                array_values($render),
+                                $data['params'] ?? [],
                             ]);
                             $options = $this->getOptionsFromDBList($list, $render);
                             break;

@@ -583,7 +583,8 @@ function get_admin_form_attributes($item, $form_type = 'side', $form_sub_type = 
     }
     if(strlen($item['default'])) $attributes['data-default-value'] = $item['default'];
 
-    // class
+    // class (설정의 attributes.class 는 자동 클래스 뒤에 덧붙임)
+    if(!is_empty($item['attributes'], 'class')) $classList[] = $item['attributes']['class'];
     $attributes['class'] = implode(' ', $classList);
 
     //attributes
@@ -734,11 +735,7 @@ function get_form_input_by_type($item, $formType): string
                 return get_admin_form_choice($item, $formType);
             }
         case 'radio' :
-            if($formType === 'side') {
-                return get_admin_form_radio($item, $formType);
-            }else{
-                return get_admin_form_choice($item, $formType);
-            }
+            return get_admin_form_choice($item, $formType);
         case 'select' :
             return form_dropdown(
                 $item['name'],
@@ -883,10 +880,7 @@ function reformat_form_data_by_type($form_data, $form_type = 'side', $form_sub_t
         $tab_indexes = array_column($fields, 'tab_index');
         for($i = min($tab_indexes); $i <= max($tab_indexes); $i++) {
             $tab_fields = array_values(array_filter($fields, function($item) use ($i) {
-                if(!array_key_exists('tab_index', $item)) {
-                    print_data($item);
-                }
-                return $item['tab_index'] === $i;
+                return ($item['tab_index'] ?? null) === $i;
             }));
             $data['fields'][$i] = set_form_field_data($tab_fields, $form_sub_type);
         }
