@@ -111,8 +111,12 @@ class Cli extends Common
             if($loader->routeKey($class) === '') $problems[] = "nav {$class}: no route_config entry";
         }
 
+        // route 키는 소문자로 적기도 하므로(myinfo ↔ MyInfo.php) 컨트롤러 파일명은 대소문자 없이 비교
+        $controllers = array_map(function ($file) {
+            return strtolower(basename($file, '.php'));
+        }, glob(APPPATH."controllers/{$flag}/*.php") ?: []);
         foreach (array_keys($this->config->item('route_config') ?: []) as $class) {
-            if(!file_exists(APPPATH."controllers/{$flag}/".ucfirst($class).'.php')) $problems[] = "route {$class}: controllers/{$flag}/".ucfirst($class).".php not found";
+            if(!in_array(strtolower($class), $controllers, true)) $problems[] = "route {$class}: controllers/{$flag}/".ucfirst($class).".php not found";
         }
 
         echo count($problems) ? implode(PHP_EOL, $problems).PHP_EOL : "OK".PHP_EOL;
