@@ -10,6 +10,7 @@
 4. [메뉴(nav)](#4-메뉴nav)
 5. [규칙](#5-규칙)
 6. [확인 명령](#6-확인-명령)
+7. [형식 변환 명령](#7-형식-변환-명령)
 
 ---
 
@@ -110,4 +111,35 @@ php index.php module/cli resource_check admin
 
 통합형 파일의 키·중복, 메뉴 class가 route에 없는 항목, admin 컨트롤러 파일이 없는 route를 검사한다. 문제가 있으면 목록을 출력하고 종료 코드 1로 끝난다.
 
-> **예정** — 분할형 ↔ 통합형 변환 명령(양방향)은 다음 단계에서 추가한다.
+## 7. 형식 변환 명령
+
+엔티티 하나를 한 형식에서 다른 형식으로 옮긴다. 마지막 인자에 `apply`가 없으면 바꿀 내용만 출력한다(dry run).
+
+```bash
+php index.php module/cli resource_to_merged admin administrators
+```
+
+```bash
+php index.php module/cli resource_to_merged admin administrators apply
+```
+
+**분할형 → 통합형 (`resource_to_merged`)**
+- 실행 중인 설정 값으로 `route`, `form`·`list`·`filter`·`view`·`excel`, 메서드별 설정(`{종류}_{클래스}_{메서드}_config`)을 모아 `resources/{클래스}.php`를 만든다.
+- 분할형 파일(`config/extra/{flag}/*_config.php`)에서 해당 `$config['키'] = …;` 문장과 `route_config` 안의 클래스 항목을 지운다. PHP 토큰 단위로 찾으므로 다른 엔티티와 주석·들여쓰기는 그대로다.
+- 설정이 `builder/builder_*_config.php`(기본값 파일)에 있거나 찾을 수 없는 형태면 아무것도 바꾸지 않고 멈춘다.
+- 메뉴 트리는 옮기지 않는다(트리 값이 우선하므로 화면은 같다).
+
+**통합형 → 분할형 (`resource_to_split`)**
+
+```bash
+php index.php module/cli resource_to_split admin administrators apply
+```
+
+- 통합형 섹션을 `{flag}_{종류}_config.php` 끝에 설정 문장(`$config['route_config']['{클래스}'] = …;`, `$config['form_{클래스}_config'] = …;`)으로 붙인다. 종류 파일이 없으면 만든다.
+- 붙인 문장 위에 `// {클래스}: resource_to_split 로 통합형에서 옮김` 주석을 단다. 다시 통합형으로 옮길 때 이 주석도 함께 지운다.
+- `nav`는 분할형에 자리가 없으므로 통합형 파일에 `nav`(와 `model`)만 남긴다. 둘 다 없으면 통합형 파일을 지운다.
+- 이미 같은 키가 분할형에 있으면 멈춘다.
+
+**안전장치**
+- 쓴 파일마다 `php -l`로 문법을 확인하고, 하나라도 실패하면 이번에 바꾼 파일을 모두 원래대로 되돌린다.
+- 변환 결과는 git diff로 확인한 뒤 커밋한다.
