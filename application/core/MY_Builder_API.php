@@ -56,7 +56,8 @@ class MY_Builder_API extends MY_Controller_API
         $this->exceptValidateKeys = ['_mode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
         $this->transTargetKeys = [];
 
-        if($this->uri->segment(1) === 'api'){
+        // /{API 폴더}/... 로 직접 들어오면 web 플랫폼, /{플랫폼}/{API 폴더}/... 면 그 플랫폼
+        if(in_array($this->uri->segment(1), $this->router->routes['api_folders'] ?? ['api'], true)){
             $this->flag = 'web';
         }else{
             $this->flag = $this->uri->segment(1);

@@ -15,7 +15,7 @@ class Auth extends Common
 
         $this->noIndexMethod = true;
 
-        // 엔드포인트별 인증·키·로그 설정은 config/extra/api_method_config.php 의 'auth' 항목
+        // 엔드포인트별 인증·키·로그 설정은 config/extra/api/api_method_config.php 의 'auth' 항목
     }
 
     public function dupCheck_get()

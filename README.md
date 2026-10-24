@@ -69,7 +69,7 @@ app-page-list.js (DataTable)
   → MY_Builder_API::beforeGet → list() → Model 조회 → JSON 응답
 ```
 
-- 라우팅: `config/extra/custom_routes.php`가 `admin/api/(:any)`를 `api/$1`로 보낸다. `core/MY_Router.php`는 없는 컨트롤러를 `controllers/web/`에서 다시 찾는다.
+- 라우팅: `config/extra/custom_routes.php`가 `admin/api/(:any)`를 `api/$1`로 보낸다. `api_folders`(기본 `['api']`)에 있는 폴더가 API로 동작하며, 그 폴더의 컨트롤러는 모두 `MY_Controller_API`를 상속한다. 빌더 CRUD가 필요한 컨트롤러만 `MY_Builder_API`(← `api/Common`)를 상속한다. `core/MY_Router.php`는 없는 컨트롤러를 `controllers/web/`에서 다시 찾는다.
 - `controllers/web/` 컨트롤러는 `MY_Controller_WEB`를 상속하므로 빌더를 거치지 않는다. 빌더 화면은 현재 `admin` 플랫폼만 쓴다.
 
 ---
@@ -95,7 +95,7 @@ app-page-list.js (DataTable)
 | filter | `builder_filter_config.php` | `filter_{class}_config` | [list-filter.md](docs/builder/list-filter.md) |
 | view | `builder_view_config.php` | `view_{class}_config` | [view-excel.md](docs/builder/view-excel.md) |
 | excel (가져오기) | — | `excel_{class}_config` | [view-excel.md](docs/builder/view-excel.md) |
-| API 엔드포인트 기능 | `extra/api_method_config.php` | `api_method_config['{API 클래스}']['{메서드}']['{http}']` | [api-hooks.md](docs/builder/api-hooks.md#8-엔드포인트-기능-설정-api_method_config) |
+| API 엔드포인트 기능 | `extra/api/api_method_config.php` | `api_method_config['{API 클래스}']['{메서드}']['{http}']` | [api-hooks.md](docs/builder/api-hooks.md#8-엔드포인트-기능-설정-api_method_config) |
 
 `builder_page_config.php`와 각 플랫폼의 `*_page_config.php`는 어느 쪽에서도 읽지 않는다.
 

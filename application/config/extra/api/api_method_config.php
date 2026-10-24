@@ -3,8 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
-| API 엔드포인트별 기능 설정
+| API 엔드포인트별 기능 설정 (api 폴더: application/controllers/api)
 | -------------------------------------------------------------------------
+| custom_routes.php 의 api_folders 에 있는 폴더마다 config/extra/{폴더}/{폴더}_method_config.php 를 둔다.
+| 그 폴더의 컨트롤러는 모두 MY_Controller_API 를 상속하므로(MY_Builder_API 는 선택) 빌더 여부와 상관없이 적용된다.
 | RestController(REST 라이브러리)가 요청마다 제어하는 기능을 엔드포인트 단위로 정한다.
 | MY_Controller_API::applyApiMethodConfig()가 읽어서
 |   - auth  → rest_config 의 auth_override_class_method_http 로 넣고 (RestController 생성자 안에서 인증 검사)

@@ -31,7 +31,7 @@
 로그인만 하면 일반 계정도 관리자 API(`api/administrators`, `api/sysCfg` 등)를 직접 호출할 수 있다.
 웹 화면의 메뉴 권한(`menu_auth`)은 메뉴 표시에만 쓰이고 API에는 적용되지 않는다.
 
-- [ ] 설정 자리: `config/extra/api_method_config.php`의 `permission` 키(`menu`·`mode`·`super`·`check`)를 만들어 둠. 현재 요청 값은 `MY_Controller_API::$apiMethodFeature['permission']` (2026-10-24, 읽는 코드는 아직 없음)
+- [ ] 설정 자리: `config/extra/api/api_method_config.php`의 `permission` 키(`menu`·`mode`·`super`·`check`)를 만들어 둠. 현재 요청 값은 `MY_Controller_API::$apiMethodFeature['permission']` (2026-10-24, 읽는 코드는 아직 없음)
 - [ ] 검사 위치: `api/Common::auth()` (현재 빈 메서드), `/admin/api/*` 요청에만 적용, `is_sys_admin`은 통과 (추가: `MY_Builder_API::prepareExports_get` 내보내기, `uploadExcel_post` 가져오기 권한도 서버에서 검사 안 함 — 버튼 노출만 제어)
 - [ ] API → 메뉴 대응표를 config로 명시 (예: `sysCfg` → `system/sysCfg`), 이름이 같으면 자동 매칭
 - [ ] 결정 필요

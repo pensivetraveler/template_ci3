@@ -706,7 +706,7 @@ hook 안에서 읽을 수 있는 프로퍼티. "설정 시점"이 생성자보�
 
 ## 8. 엔드포인트 기능 설정 (api_method_config)
 
-RestController가 요청마다 제어하는 기능(인증 방식, API 키, 로그, 요청 제한)은 `config/extra/api_method_config.php` 한 곳에서 엔드포인트별로 정한다. 컨트롤러 생성자에 `$this->methods`를 쓰거나 `rest_config.php`에 `auth_override_class_method_http`를 추가하지 않는다.
+RestController가 요청마다 제어하는 기능(인증 방식, API 키, 로그, 요청 제한)은 `config/extra/api/api_method_config.php` 한 곳에서 엔드포인트별로 정한다. 컨트롤러 생성자에 `$this->methods`를 쓰거나 `rest_config.php`에 `auth_override_class_method_http`를 추가하지 않는다.
 
 ```php
 $config['api_method_config'] = [
@@ -731,6 +731,7 @@ $config['api_method_config'] = [
 | `level` | int | 필요한 API 키 레벨 | 〃 |
 | `permission` | `menu`·`mode`·`super`·`check` | **예정** — API 권한 검사(TODO.md 2장). 지금은 `$this->apiMethodFeature['permission']`에 담기기만 한다 | — |
 
+- 파일 위치: `custom_routes.php`의 `api_folders`에 있는 폴더마다 `config/extra/{폴더}/{폴더}_method_config.php`(`$config['{폴더}_method_config']`)를 둔다. 기본 `api` 폴더는 `config/extra/api/api_method_config.php`. API 폴더의 컨트롤러는 모두 `MY_Controller_API`를 상속하므로(빌더 기능이 필요하면 `MY_Builder_API`) 빌더를 쓰지 않는 API에도 적용된다.
 - 읽는 곳: `MY_Controller_API::applyApiMethodAuth()`(부모 생성자 전), `applyApiMethodFeatures()`(부모 생성자 후). 현재 요청에 적용된 값은 `$this->apiMethodFeature`에 있다.
 - 없는 메서드로 들어온 요청(`/api/companies/6` 같은 식별자 경로)은 RestController가 `index_{http}`로 처리하므로 설정도 `index` 기준으로 찾는다.
 

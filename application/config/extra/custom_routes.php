@@ -18,12 +18,13 @@ foreach ($route['except_folders'] as $name) {
             $route[$name] = $name.DIRECTORY_SEPARATOR.$route['default_controller'];
 
             foreach ($route['api_folders'] as $api) {
+                // {플랫폼}/{API 폴더}/... 요청을 그 API 폴더 컨트롤러로 보냄
                 // 컨트롤러/메서드/파라미터 (숫자) 지원
-                $route["$name/$api/(:any)/(:any)/(:num)"] = "api/$1/$2/$3";
-                $route["$name/$api/(:any)/(:num)"] = "api/$1/index/$2";
+                $route["$name/$api/(:any)/(:any)/(:num)"] = "$api/$1/$2/$3";
+                $route["$name/$api/(:any)/(:num)"] = "$api/$1/index/$2";
                 // 컨트롤러/메서드 구조 지원
-                $route["$name/$api/(:any)/(:any)"] = "api/$1/$2";
-                $route["$name/$api/(:any)"] = "api/$1";
+                $route["$name/$api/(:any)/(:any)"] = "$api/$1/$2";
+                $route["$name/$api/(:any)"] = "$api/$1";
             }
 
             if($name !== $route['default_platform']) {

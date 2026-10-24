@@ -11,6 +11,12 @@ class MY_Controller_API extends RestController
      */
     protected array $apiMethodFeature = [];
 
+    /**
+     * 이 컨트롤러가 속한 API 폴더 (custom_routes.php 의 api_folders 중 하나, 예: 'api')
+     * 엔드포인트 기능 설정은 config/extra/{폴더}/{폴더}_method_config.php 의 $config['{폴더}_method_config']
+     */
+    protected string $apiFolder = '';
+
     public function __construct()
     {
         // RestController 생성자 안에서 인증을 검사하므로, 엔드포인트별 auth 설정은 부모 생성자 전에 넣는다
@@ -52,7 +58,7 @@ class MY_Controller_API extends RestController
     }
 
     /**
-     * 부모 생성자 전에 실행: api_method_config 를 읽어 현재 요청의 기능 설정을 정하고,
+     * 부모 생성자 전에 실행: {API 폴더}_method_config 를 읽어 현재 요청의 기능 설정을 정하고,
      * auth 값은 rest_config 의 auth_override_class_method_http 에 넣는다.
      * rest_config 를 먼저 읽어 두므로 RestController 가 다시 읽어 덮어쓰지 않는다 (CI_Config::load 는 같은 파일을 한 번만 읽음).
      */
@@ -62,8 +68,11 @@ class MY_Controller_API extends RestController
         $router =& load_class('Router', 'core');
         $input =& load_class('Input', 'core');
 
+        $this->apiFolder = trim((string)$router->directory, '/');
+        $methodConfigName = $this->apiFolder.'_method_config';
+
         $config->load('extra/rest_config');
-        $config->load('extra/api_method_config', false, true);
+        if($this->apiFolder !== '') $config->load("extra/{$this->apiFolder}/{$methodConfigName}", false, true);
 
         $class = $router->class;
         $method = $router->method;
@@ -72,7 +81,7 @@ class MY_Controller_API extends RestController
         // 없는 메서드는 RestController 가 index_{http} 로 처리하므로 설정도 index 기준으로 찾는다
         $featureMethod = method_exists($this, "{$method}_{$http}") ? $method : 'index';
 
-        $classConfig = ($config->item('api_method_config') ?: [])[$class] ?? [];
+        $classConfig = ($config->item($methodConfigName) ?: [])[$class] ?? [];
         $this->apiMethodFeature = $this->resolveApiMethodFeature($classConfig, $featureMethod, $http);
         $this->apiMethodFeature['_method'] = $featureMethod;
 
