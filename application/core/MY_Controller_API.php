@@ -188,7 +188,7 @@ class MY_Controller_API extends RestController
 
     protected function beforePost($key = 0, $model = null)
     {
-        return [$key, $this->input->post()??$this->input->json()];
+        return [$key, $this->getRequestBody('post')];
     }
 
     protected function afterPost($key, $data = [])
@@ -202,7 +202,7 @@ class MY_Controller_API extends RestController
 
     protected function beforePut($key = 0, $model = null)
     {
-        return [$key, $this->input->put()??$this->input->json()];
+        return [$key, $this->getRequestBody('put')];
     }
 
     protected function afterPut($key, $data = [])
@@ -216,7 +216,7 @@ class MY_Controller_API extends RestController
 
     protected function beforePatch($key = 0, $model = null)
     {
-        return [$key, $this->input->patch()??$this->input->json()];
+        return [$key, $this->getRequestBody('patch')];
     }
 
     protected function afterPatch($key, $data = [])
@@ -230,7 +230,7 @@ class MY_Controller_API extends RestController
 
     protected function beforeDelete($key = 0)
     {
-        return [$key, $this->input->put()??$this->input->json()];
+        return [$key, $this->getRequestBody('delete')];
     }
 
     protected function afterDelete($key, $data = [])
@@ -242,9 +242,26 @@ class MY_Controller_API extends RestController
         ]);
     }
 
+    /**
+     * 요청 바디를 읽는다. Content-Type 이 application/json 이면 JSON 바디를, 아니면 form(urlencoded·multipart) 값을 쓴다.
+     * MY_Input::post()/put()/patch()/delete() 는 값이 없어도 빈 배열을 돌려주므로 `?? json()` 폴백은 동작하지 않는다.
+     */
+    protected function getRequestBody(string $method): array
+    {
+        $contentType = strtolower((string)$this->input->server('CONTENT_TYPE'));
+        if(strpos($contentType, 'application/json') === 0) {
+            $json = $this->input->json();
+            if(is_array($json)) return $json;
+        }
+
+        $data = $this->input->{$method}();
+        return is_array($data) ? $data : [];
+    }
+
     public function response($data = null, $http_code = null, $exit = true)
     {
-        if($http_code === null) $http_code = floor((int)$data['code']/10);
+        // code 없이 부르면 floor(0/10)=0 → RestController 가 200으로 바꾸므로 500으로 응답한다
+        if($http_code === null) $http_code = empty($data['code']) ? RestController::HTTP_INTERNAL_SERVER_ERROR : floor((int)$data['code']/10);
         $response = $this->setResponseData($data, $http_code);
         RestController::response($response, $http_code);
 

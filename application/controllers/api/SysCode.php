@@ -67,10 +67,12 @@ class SysCode extends Common
 
     protected function beforeRemove($key = 0, $data = []): array
     {
-        $this->smlCd = substr($key, 3);
+        // 삭제 대상은 checkIdentifierExist() 가 정한 idData(cmb_cd) 기준. bigCd 는 일반 코드 삭제 후 재정렬에도 쓰므로 항상 채운다
+        $cmbCd = (string)($this->idData['cmb_cd'] ?? $key);
+        $this->smlCd = substr($cmbCd, 3);
+        $this->bigCd = substr($cmbCd, 0, 3);
 
         if($this->smlCd === '000') {
-            $this->bigCd = substr($key, 0, 3);
             if ($this->Model->getCntWhere(['big_cd' => $this->bigCd,]) > 1) {
                 $this->response(['code' => BAD_REQUEST, 'msg' => 'You Should Delete Codes In The Category']);
             }

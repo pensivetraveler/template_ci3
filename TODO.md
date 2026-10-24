@@ -74,10 +74,10 @@
 
 ### 버그
 - [x] `api/SysCode.php:53` `category_srt` → `cd_srt` (추가: `SysCode::executeModify`의 `$original->category_srt` 비교 때문에 정렬 변경 여부와 무관하게 reorder 실행) → `$original->cd_srt`로 수정, 수정 대상을 `$this->idData`로 조회해 부분 PATCH(sml_cd·cmb_cd 없음)도 처리 (bizsoft-mig에서 500 재현, 2026-10-24)
-- [ ] `api/Comments.php` `in_array($id, $adminList)` 객체 배열 비교로 `is_admin` 항상 false, 댓글 N+1 쿼리
+- [x] `api/Comments.php` `in_array($id, $adminList)` 객체 배열 비교로 `is_admin` 항상 false, 댓글 N+1 쿼리 → 원래 created_id(user_id)로 비교(관리자 목록은 값 배열), 답글·작성자를 각각 한 번에 조회해 N+1 제거 (2026-10-25)
 - [ ] `app-page-common.js:166` 선언되지 않은 `identifier` (추가: `deleteRepeater`에서 ReferenceError → 리피터 행 삭제 요청 실패)
 - [ ] `app-page-utils.js` `replaceValidationMessage` 중복 정의
-- [ ] `MY_Model::orderBy` 정의되지 않은 `$defaultOrderBy`, `querySql`의 `strpos(...) !== -1` (추가: orderBy는 재귀 호출 인자(`$table`) 누락으로 `defaultOrderBy` 프로퍼티가 전혀 적용되지 않음, querySql은 UPDATE/DELETE도 `insert_id()` 반환)
+- [x] `MY_Model::orderBy` 정의되지 않은 `$defaultOrderBy`, `querySql`의 `strpos(...) !== -1` (추가: orderBy는 재귀 호출 인자(`$table`) 누락으로 `defaultOrderBy` 프로퍼티가 전혀 적용되지 않음, querySql은 UPDATE/DELETE도 `insert_id()` 반환) → `$this->orderBy($table, $this->defaultOrderBy)`로 수정, querySql은 SQL이 INSERT로 시작할 때만 `insert_id()` (2026-10-25)
 
 ### 구조
 - [ ] `MY_Builder_API`(약 2000줄), `MY_Builder_WEB`(약 1300줄) 기능별 분리 (Validator, Exporter, 권한 서비스)
@@ -209,29 +209,29 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 
 **API hooks·모델**
 - [x] `MY_Model::getListPDO` select가 컬럼 1개면 객체 대신 값 배열을 반환 → 요청 `select[]=col` 하나(또는 식이 걸러져 하나만 남은 경우) 목록·내보내기에서 `transformView()` TypeError 500 (bizsoft 개발 서버에서 확인, 2026-10-24) → `MY_Builder_API::getListSelect()`가 컬럼 1개면 식별자 컬럼을 함께 조회
-- [ ] `Model_Common::checkDuplicate` `MY_Model::where()`가 `use_yn='Y'`를 붙인 뒤 `isIncludeDeleted=false`면 `use_yn='N'`을 추가 → isUseYn 모델은 항상 0, 고유값 중복검사 무력화. `isIncludeDeleted=true`여도 `where()`의 `del_yn='N'` 기본 조건 때문에 삭제 행이 포함되지 않아 form `check_delete` 무효
-- [ ] `MY_Builder_API::validateManually` `$this->request === 'post'` — RestController의 `$this->request`는 stdClass라 항상 false → 파일 컬럼의 `$_FILES` 검사 분기가 죽고, notNullList에 든 파일 컬럼은 POST 데이터에 없어 항상 `Required`로 실패
-- [ ] `MY_Controller_API::beforePost/beforePut/beforePatch/beforeDelete` `input->post() ?? input->json()` — `MY_Input::post()/put()/patch()`는 빈 배열을 반환하므로 json 폴백이 동작하지 않음 (JSON 바디 API 클라이언트 사용 불가). `beforeDelete`는 `put()`을 읽어 DELETE에서 `$data`가 항상 `[]`
+- [x] `Model_Common::checkDuplicate` `MY_Model::where()`가 `use_yn='Y'`를 붙인 뒤 `isIncludeDeleted=false`면 `use_yn='N'`을 추가 → isUseYn 모델은 항상 0, 고유값 중복검사 무력화. `isIncludeDeleted=true`여도 `where()`의 `del_yn='N'` 기본 조건 때문에 삭제 행이 포함되지 않아 form `check_delete` 무효 → `where()` 기본 조건(del_yn·use_yn)을 끄고 조회, use_yn은 거르지 않고 삭제 행은 `isIncludeDeleted`일 때만 포함 (2026-10-25)
+- [x] `MY_Builder_API::validateManually` `$this->request === 'post'` — RestController의 `$this->request`는 stdClass라 항상 false → 파일 컬럼의 `$_FILES` 검사 분기가 죽고, notNullList에 든 파일 컬럼은 POST 데이터에 없어 항상 `Required`로 실패 → `$this->request` 비교 제거 → 파일 컬럼은 업로드됐거나 값이 있거나 수정(idData 있음)이면 통과 (2026-10-25)
+- [x] `MY_Controller_API::beforePost/beforePut/beforePatch/beforeDelete` `input->post() ?? input->json()` — `MY_Input::post()/put()/patch()`는 빈 배열을 반환하므로 json 폴백이 동작하지 않음 (JSON 바디 API 클라이언트 사용 불가). `beforeDelete`는 `put()`을 읽어 DELETE에서 `$data`가 항상 `[]` → `getRequestBody()` 추가: `Content-Type: application/json`이면 JSON 바디, 아니면 form 값. DELETE는 `input->delete()` (2026-10-25)
 - [x] `MY_Builder_API::duplicate_get` `Model->getData([], [identifier => key])` — getData는 `where` 등 조건 키만 읽으므로 조건 무시 → 요청한 행이 아니라 테이블 첫 행을 복제 → `duplicate_post`에서 `where => 식별자`로 조회 (2026-10-25)
-- [ ] `Model_Common::setCondition` `orLike` 키를 `$this->orLike($table, $val)`로 호출 → `orLike($table, $keys, $vals)` 인자 부족 ArgumentCountError
-- [ ] `MY_Model::addDataPDO/modDataPDO/addListPDO` 실패 시 rollback 없이 `db->error()` 배열(truthy)을 반환 → 호출부(`MY_Builder_API::addData`)가 성공으로 보고 insert id 자리에 배열 기록, 트랜잭션 미종료 (db_debug=FALSE 환경)
-- [ ] `api/Common::transformView` `created_id`/`updated_id`를 로그인 id 문자열로 덮어써 이후 user_id로 쓰는 코드가 깨짐: `Comments::transformList`가 parent 호출 뒤 `created_id`로 작성자 조회·`mine_yn`·`is_admin` 계산 → 최상위 댓글은 항상 실패. 사용자가 soft delete되면 `->id` on null Warning
-- [ ] `Comments::afterAddData` 존재하지 않는 hook 이름(실제는 `afterAdd`) → 댓글/답글 알림 메시지가 생성되지 않음
-- [ ] `Articles::transformView` 없는 메서드 `parent::viewAfter()` 호출 → Articles 목록·상세 Fatal
-- [ ] `Articles::afterModify`만 첨부 업로드 처리, `afterAdd` 없음 → 등록 시 `uploads` 첨부 유실
-- [ ] `ArticleRead::beforePut` parent 반환값 `[$key, $data]`를 dto로 사용 → where에 숫자 키 0/1이 들어가 SQL 오류, `$dto['article_id']` 미정의
-- [ ] `Auth::signup_post` 정의되지 않은 `$this->Model_Child` 사용 + `beforePost()` 반환값 `[$key, $data]`를 dto로 사용 → 회원가입 불가
-- [ ] `SysCode::beforeRemove/executeRemove` `$this->bigCd`는 `sml_cd === '000'`일 때만 대입 → 일반 코드 삭제 시 typed property 미초기화 Error (삭제는 이미 커밋된 뒤 500)
-- [ ] `Categories::executeRemove` `$data['parent_id']`(DELETE의 `$data`는 항상 `[]`) 미정의 + `whereNot ['sml_cd' => '000']`(category에 없는 컬럼, SysCode 복붙) → SQL 오류
-- [ ] `Logs::__construct`, `Auth::__construct` `noIndexMethod = true`를 parent 생성자 이후에 대입 → 검사는 `MY_Builder_API::__construct()` 안에서 이미 끝나 무효 (프로퍼티 기본값으로 선언해야 함)
-- [ ] `MY_Builder_API::beforeAdd` 존재 확인이 `del_yn='N'` 기본 조건을 타서 soft delete된 같은 PK가 있으면 409 대신 DB duplicate key 오류
-- [ ] `MY_Builder_API::checkDuplicate` `$dto[$model->identifier]` — 수정 시 바디에 identifier가 없거나 `checkDuplicate_get`에 다른 쿼리 키(`_mode` 등)가 있으면 Notice + `where_not_in(identifier, [null])`
+- [x] `Model_Common::setCondition` `orLike` 키를 `$this->orLike($table, $val)`로 호출 → `orLike($table, $keys, $vals)` 인자 부족 ArgumentCountError → `'orLike' => ['fields' => [...], 'value' => v]` 형태로 `orLike($table, $keys, $vals)` 호출 (fields 생략 시 strList) (2026-10-25)
+- [x] `MY_Model::addDataPDO/modDataPDO/addListPDO` 실패 시 rollback 없이 `db->error()` 배열(truthy)을 반환 → 호출부(`MY_Builder_API::addData`)가 성공으로 보고 insert id 자리에 배열 기록, 트랜잭션 미종료 (db_debug=FALSE 환경) → 실패 시 `failTrans()`로 로그·rollback 후 `false` 반환, `MY_Builder_API::addData/modData`는 `false`면 500 응답 (2026-10-25)
+- [x] `api/Common::transformView` `created_id`/`updated_id`를 로그인 id 문자열로 덮어써 이후 user_id로 쓰는 코드가 깨짐: `Comments::transformList`가 parent 호출 뒤 `created_id`로 작성자 조회·`mine_yn`·`is_admin` 계산 → 최상위 댓글은 항상 실패. 사용자가 soft delete되면 `->id` on null Warning → `Comments::transformList`는 parent 호출 전 원래 created_id를 보관해 사용, `Common::transformView`는 사용자 없으면 `''` (덮어쓰기 자체는 유지) (2026-10-25)
+- [x] `Comments::afterAddData` 존재하지 않는 hook 이름(실제는 `afterAdd`) → 댓글/답글 알림 메시지가 생성되지 않음 → `afterAdd($dto)`로 이름 변경 후 `parent::afterAdd()` 호출, 게시글·부모 댓글 null 가드와 `read_yn='N'` 추가 (2026-10-25)
+- [x] `Articles::transformView` 없는 메서드 `parent::viewAfter()` 호출 → Articles 목록·상세 Fatal → `parent::transformView()` 호출, 관리자 댓글 조회를 `getCntWhere(created_id => 관리자 목록)`으로 (관리자 없으면 false) (2026-10-25)
+- [x] `Articles::afterModify`만 첨부 업로드 처리, `afterAdd` 없음 → 등록 시 `uploads` 첨부 유실 → `afterAdd` 추가, 첨부 저장을 `saveAttachments()`로 묶어 등록·수정 공통 사용 (board 없을 때 가드) (2026-10-25)
+- [x] `ArticleRead::beforePut` parent 반환값 `[$key, $data]`를 dto로 사용 → where에 숫자 키 0/1이 들어가 SQL 오류, `$dto['article_id']` 미정의 → `list($key, $dto)`로 받고 (article_id, user_id)로 읽음 기록 조회, 기존 행이면 idData 지정해 read_dt 수정 (article_id 없으면 400) (2026-10-25)
+- [x] `Auth::signup_post` 정의되지 않은 `$this->Model_Child` 사용 + `beforePost()` 반환값 `[$key, $data]`를 dto로 사용 → 회원가입 불가 → `list(, $dto) = beforePost(0)` 후 `executeAdd()`로 저장(비밀번호 해시 적용), Model_Child·`user_id` 기본값 제거, 응답 data는 idData (2026-10-25)
+- [x] `SysCode::beforeRemove/executeRemove` `$this->bigCd`는 `sml_cd === '000'`일 때만 대입 → 일반 코드 삭제 시 typed property 미초기화 Error (삭제는 이미 커밋된 뒤 500) → `idData['cmb_cd']`(없으면 key)로 smlCd·bigCd를 항상 채움 (2026-10-25)
+- [x] `Categories::executeRemove` `$data['parent_id']`(DELETE의 `$data`는 항상 `[]`) 미정의 + `whereNot ['sml_cd' => '000']`(category에 없는 컬럼, SysCode 복붙) → SQL 오류 → 삭제 전 `getDeleteBaseRow()`로 parent_id를 읽어 재정렬, `sml_cd` whereNot 제거 (2026-10-25)
+- [x] `Logs::__construct`, `Auth::__construct` `noIndexMethod = true`를 parent 생성자 이후에 대입 → 검사는 `MY_Builder_API::__construct()` 안에서 이미 끝나 무효 (프로퍼티 기본값으로 선언해야 함) → 두 클래스에 `protected bool $noIndexMethod = true;` 기본값으로 선언 (2026-10-25)
+- [x] `MY_Builder_API::beforeAdd` 존재 확인이 `del_yn='N'` 기본 조건을 타서 soft delete된 같은 PK가 있으면 409 대신 DB duplicate key 오류 → PK 존재 확인 때 `useDelYnAsBase/useUseYnAsBase`를 잠시 꺼서 soft delete 행도 409 (idData 비면 검사 생략) (2026-10-25)
+- [x] `MY_Builder_API::checkDuplicate` `$dto[$model->identifier]` — 수정 시 바디에 identifier가 없거나 `checkDuplicate_get`에 다른 쿼리 키(`_mode` 등)가 있으면 Notice + `where_not_in(identifier, [null])` → 자기 행 제외 값은 메인 Model이면 idData, 아니면 dto의 식별자. 둘 다 없으면 whereNot 없음 (2026-10-25)
 - [x] `reformat_get_data` `exceptValidateKeys`에 `_submode`가 없음 → GET에 `_submode`를 붙이면 where `_submode` 컬럼 SQL 오류 (`_remap()`은 `_submode`를 읽도록 되어 있음)
 - [x] `reformat_get_data` `if(!$value) continue` → `'0'` 값으로 where 불가 (예: `?depth=0`, `?is_show=0`)
-- [ ] `MY_Builder_API::prepareExports_get` `is_null($this->Model)` — Model 미정의 컨트롤러에서는 undefined property Warning을 내고 나서야 `MODEL_IS_NOT_DEFINED` (property_exists 필요)
-- [ ] `MY_Builder_API::beforeResponse` `_mode=option`으로 상세(view) 조회 시 `$data['list']` 미정의
-- [ ] `MY_Builder_API::beforeDelete` 식별자 없이 DELETE하면 `getDeleteBaseRow()`의 `show_error()`로 HTML 500 (JSON 아님)
-- [ ] `MY_Controller_API::response` `code` 없이 호출하면 `floor(0/10)=0` → RestController가 200으로 바꿔 HTTP 200 + `status:false, code:0` 응답
+- [ ] `MY_Builder_API::prepareExports_get` `is_null($this->Model)` — Model 미정의 컨트롤러에서는 undefined property Warning을 내고 나서야 `MODEL_IS_NOT_DEFINED` (property_exists 필요) (보류: 내보내기 함수는 별도 작업 범위라 손대지 않음)
+- [x] `MY_Builder_API::beforeResponse` `_mode=option`으로 상세(view) 조회 시 `$data['list']` 미정의 → `list` 키가 있을 때만 옵션 변환, `render` 기본값 `[]` (2026-10-25)
+- [x] `MY_Builder_API::beforeDelete` 식별자 없이 DELETE하면 `getDeleteBaseRow()`의 `show_error()`로 HTML 500 (JSON 아님) → `getDeleteBaseRow()`의 `show_error()`를 `keyNotExist()`(JSON 400 EMPTY_REQUIRED_KEY)로 교체 (2026-10-25)
+- [x] `MY_Controller_API::response` `code` 없이 호출하면 `floor(0/10)=0` → RestController가 200으로 바꿔 HTTP 200 + `status:false, code:0` 응답 → `code`·`$http_code` 모두 없으면 500으로 응답 (2026-10-25)
 
 ### 미구현·문서 불일치
 
@@ -302,7 +302,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 **API hooks·모델**
 - [ ] `MY_Builder_API::beforePut` `uploadFileInList()` 호출 없음, `MY_Input::put()`은 urlencoded만 파싱 → PUT으로 파일·multipart 불가 (POST와 동작 차이)
 - [ ] `MY_Builder_API::beforePatch` 기본값·검증·고유값 검사·업로드 모두 없음 (인라인 수정 전용이라는 점이 코드/문서에 명시 안 됨)
-- [ ] `MY_Builder_API::afterAdd/afterModify/afterRemove` `beforeResponse()` 반환값을 버림 → 등록·수정·삭제 응답은 가공 불가(list/view만 반영)
+- [ ] `MY_Builder_API::afterAdd/afterModify/afterRemove` `beforeResponse()` 반환값을 버림 → 등록·수정·삭제 응답은 가공 불가(list/view만 반영) (보류: 응답 data를 무엇으로 바꿀지(idData 유지 vs 가공 dto, 민감 필드) 설계 결정 필요)
 - [ ] `MY_Builder_API` 프로퍼티 `table`, `notNullList`, `nullList`, `strList`, `intList` 선언만 있고 어디서도 채우지 않음. `MY_Model`에 `isUpdatedId` 없음 — `updated_id`는 `isCreatedId`를 따름
 - [ ] `MY_Builder_API::__construct` `validateMessages`, `validateCallback`, `transTargetKeys`를 `[]`로 덮어씀, 템플릿/bizsoft 어디서도 설정하지 않음. `validateCallback` 메서드는 인자 없이 호출되어 대상 값을 받지 못함
 - [ ] `Categories::__construct` `$this->fileList` 재지정은 업로드에 영향 없음(`uploadFileInList()`는 `model->fileList` 사용), `$this->methods['list_post']`는 존재하지 않는 메서드
@@ -324,7 +324,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Builder_WEB::prepareListData` formExist=false일 때 `allows`에 없는 action을 `$actions`에서 제거하지만 뷰/JS는 `LIST_ACTIONS`만 사용 (죽은 코드)
 - [ ] `app-page-common.js::prepareExports` `encodeURIComponent`한 `token`을 만들고 쓰지 않고 원본 filename을 URL에 사용 (인코딩 누락)
 - [ ] `app-page-list.js` DataTable 정보 문구, `views/builder/layout/filter.php` 필터 버튼 문구(`검색`/`초기화`) 하드코딩 (다국어 미지원)
-- [ ] `MY_Builder_API::executeAdd/executeModify` 모델 순서를 `['Model_Parent','Model','Model_Child']`로 하드코딩, `beforePost/beforePut/executeRemove/isForeignKeyGeneratedByPreviousModel`은 `getModelPipeline()` 사용 → 파이프라인 오버라이드 시 검증·삭제와 저장 순서 불일치
+- [x] `MY_Builder_API::executeAdd/executeModify` 모델 순서를 `['Model_Parent','Model','Model_Child']`로 하드코딩, `beforePost/beforePut/executeRemove/isForeignKeyGeneratedByPreviousModel`은 `getModelPipeline()` 사용 → 파이프라인 오버라이드 시 검증·삭제와 저장 순서 불일치 → `executeAdd/executeModify`도 `getModelPipeline()` 사용 (2026-10-25)
 - [ ] 파이프라인·hook 전반에 트랜잭션 경계 없음: 모델별 `addData/modData`가 각자 commit → `Model` INSERT 실패 시 `Model_Parent` 행 잔존, `afterAdd/afterModify`에서 오류 응답해도 저장은 유지 (bizsoft `Templates::afterAdd`, `Apis::beforeRemove`의 선삭제 패턴)
 - [ ] `MY_Builder_API::beforePost/beforePut` `validateFormRules()`가 파이프라인 모델 수만큼 같은 formConfig로 반복 실행
 - [ ] `api/Common::transformView` 행마다 사용자 2회 조회(N+1), `Comments::transformList`(행당 3회+), `Partners::transformView`(회사 수만큼) → 목록 크기에 비례한 쿼리 수

@@ -5,6 +5,9 @@ require_once __DIR__.'/Common.php';
 
 class Auth extends Common
 {
+    // index 차단 여부는 MY_Builder_API::__construct() 안에서 검사하므로 생성자 이후 대입이 아니라 기본값으로 선언
+    protected bool $noIndexMethod = true;
+
     function __construct()
     {
         parent::__construct();
@@ -12,8 +15,6 @@ class Auth extends Common
         $this->load->model('Model_User', 'Model');
 
         $this->setProperties($this->Model, false);
-
-        $this->noIndexMethod = true;
 
         // 엔드포인트별 인증·키·로그 설정은 config/extra/api/api_method_config.php 의 'auth' 항목
     }
@@ -156,27 +157,23 @@ class Auth extends Common
     {
         $this->validateFormRules('form_signup_config');
 
+        // user_id 는 AUTO_INCREMENT 라 기본값을 넣지 않는다
         $this->defaultList = [
-            'user_id' => '',
-            'student_id' => '',
             'approve_yn' => 'N',
             'withdraw_yn' => 'N',
             'del_yn' => 'N',
         ];
 
-        $dto = $this->beforePost(0, $this->Model);
-        $dtoChild = $this->beforePost(0, $this->Model_Child);
-        $dtoChild[$this->Model->identifier] = $this->Model->addData($dto, false);
-        $dtoChild[$this->Model_Child->identifier] = $this->Model_Child->addData($dtoChild, false);
-        $dto = array_merge($dto, $dtoChild);
+        // beforePost() 는 [$key, $data] 를 돌려준다. 저장은 파이프라인(executeAdd)을 거쳐 비밀번호 해시·FK 채우기를 적용
+        // (예전 코드는 정의되지 않은 Model_Child 를 사용해 회원가입이 동작하지 않았다)
+        list(, $dto) = $this->beforePost(0);
+        $this->executeAdd($dto, false);
 
         $this->loggingUserlog();
 
         $this->response([
             'code' => DATA_CREATED,
-            'data' => [
-                $this->Model_Child->identifier => $dto[$this->Model_Child->identifier],
-            ],
+            'data' => $this->idData,
         ], RestController::HTTP_CREATED);
     }
 

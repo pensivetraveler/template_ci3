@@ -87,7 +87,8 @@ class MY_Model extends CI_Model
 
     public function querySql($sql, $params, $returnBool = false)
     {
-        $insert = (strpos($sql, "INSERT INTO") !== -1);
+        // strpos 는 못 찾으면 false 를 돌려주므로 !== -1 은 항상 참이었다 (UPDATE/DELETE 도 insert_id 반환)
+        $insert = stripos(ltrim($sql), 'INSERT') === 0;
 
         $this->db->trans_begin();
 
@@ -161,7 +162,7 @@ class MY_Model extends CI_Model
         if($this->db->insert_batch($table, $set)){
             return $this->afterTrans(true, true);
         }else{
-            return $this->db->error();
+            return $this->failTrans();
         }
     }
 
@@ -175,7 +176,7 @@ class MY_Model extends CI_Model
         if($this->db->insert($table)){
             return $this->afterTrans(true, $returnBool);
         }else{
-            return $this->db->error();
+            return $this->failTrans();
         }
     }
 
@@ -190,7 +191,7 @@ class MY_Model extends CI_Model
         if($this->db->update($table)){
             return $this->afterTrans(false, $returnBool);
         }else{
-            return $this->db->error();
+            return $this->failTrans();
         }
     }
 
@@ -201,6 +202,20 @@ class MY_Model extends CI_Model
         $this->db->delete($table, $where);
 
         return $this->afterTrans(false, $returnBool);
+    }
+
+    /**
+     * 쿼리 실패(db_debug=FALSE) 시 트랜잭션을 되돌리고 false 를 돌려준다.
+     * 예전에는 db->error() 배열(truthy)을 돌려줘 호출부가 성공으로 처리했다.
+     */
+    protected function failTrans(): bool
+    {
+        $error = $this->db->error();
+        $query_log = $this->db->last_query();
+        log_message('error', " query failed : [".($error['code'] ?? '')."] ".($error['message'] ?? '')." '$query_log' ");
+        $this->db->trans_rollback();
+
+        return false;
     }
 
     public function afterTrans($insert = true, $returnBool = false)
@@ -455,8 +470,8 @@ class MY_Model extends CI_Model
                 }
             }
         }else{
-            if(!empty($defaultOrderBy)) {
-                $this->orderBy($defaultOrderBy);
+            if(!empty($this->defaultOrderBy)) {
+                $this->orderBy($table, $this->defaultOrderBy);
             }else if($this->identifier && $this->isAutoIncrement === true) {
                 $this->db->order_by("$table.$this->identifier", 'DESC');
             }else if($this->isCreatedDt) {
