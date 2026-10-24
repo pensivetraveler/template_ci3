@@ -277,6 +277,9 @@ $(function () {
             }
         });
 
+	// 셀 클릭·체크박스·select 변경 (data-* + 위임 이벤트)
+	bindListCellEvents();
+
 	$('.dataTables_wrapper').on('click', '.view-record', function() {
 		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 		if(common.PAGE_VIEW_URI) {
@@ -562,12 +565,12 @@ function renderColumn(data, type, full, meta, column) {
 	if(column.classes.length)
 		for(const className of column.classes) wrap.classList.add(className);
 
-	// inner
+	// inner: 서버 값은 텍스트 노드로만 넣는다 (HTML 로 해석되지 않도록)
 	let inner;
 	if(['recent_dt', 'created_dt', 'updated_dt'].includes(column.field)) {
 		if(!data) return '-';
 		const dateObj = new Date(data);
-		inner = dateObj.getFullYear().toString() + '-' + (dateObj.getMonth()+1).toString().padStart(2, '0') + '-' + dateObj.getDate().toString().padStart(2, '0');
+		inner = document.createTextNode(dateObj.getFullYear().toString() + '-' + (dateObj.getMonth()+1).toString().padStart(2, '0') + '-' + dateObj.getDate().toString().padStart(2, '0'));
 	}else{
 		if(Object.hasOwn(column.onclick, 'kind')
 			&& column.onclick.kind === 'download'
@@ -578,7 +581,7 @@ function renderColumn(data, type, full, meta, column) {
 
 		switch (column.type) {
 			case 'text':
-				inner = column.text?getLocale(column.text, common.LOCALE):data;
+				inner = document.createTextNode(column.text?getLocale(column.text, common.LOCALE):(data ?? ''));
 				break;
 			case 'button':
                 if(data === undefined) {
@@ -589,40 +592,31 @@ function renderColumn(data, type, full, meta, column) {
                     console.warn(`${column.field} onclick data is empty`, column)
                     return '-';
                 }
-				inner = column.text?getLocale(column.text, common.LOCALE):getLocale(column.field, common.LOCALE);
+				inner = document.createTextNode(column.text?getLocale(column.text, common.LOCALE):getLocale(column.field, common.LOCALE));
 				break;
 			case 'icon':
-				inner = `<i class="${column.icon}"></i>`;
+				inner = document.createElement('i');
+				inner.className = column.icon ?? '';
 				break;
 			case 'img':
 				if(data === null || !data.length || !Object.hasOwn(data[0], 'file_link')) return '-';
-				inner = `<img class="img-thumbnail d-inline rounded-2 overflow-hidden" src="${data[0].file_link}">`;
-				wrap.setAttribute('data-bs-content', inner);
+				inner = createListImage(data[0].file_link);
+				wrap.setAttribute('data-bs-content', inner.outerHTML);
 				break;
 			case 'select':
-				inner = `<select onchange="">`;
-				inner += `</select>`;
+				inner = document.createElement('select');
 				break;
 			case 'checkbox':
 				switch (column.subtype) {
 					case 'boolean' :
-						const idData = getIdentifiersData(full, common.IDENTIFIER, true).replace(/"/gi, "'");
-						inner = `
-							<input
-								type="checkbox"
-								value="1"
-								${Number(data)===1?'checked':''}
-								onchange="afterCheckboxColumnChange(${idData}, '${column.field}', this.checked?1:0)"
-								class="form-check-input"
-							>
-						`;
+						inner = createListCheckbox(full, column, Number(data) === 1);
 						break;
 					default :
-						inner = (data === null || data === undefined || data === '') ? '-' : data;
+						inner = document.createTextNode((data === null || data === undefined || data === '') ? '-' : data);
 				}
 				break;
 			default :
-				inner = '-';
+				inner = document.createTextNode('-');
 		}
 	}
 
@@ -633,8 +627,8 @@ function renderColumn(data, type, full, meta, column) {
 			if(column.type === 'img') {
 				// 파일 배열이면 원소마다 이미지를 만든다
 				if(curr === null || typeof curr !== 'object' || !Object.hasOwn(curr, 'file_link')) return acc;
-				currInner = `<img class="img-thumbnail d-inline rounded-2 overflow-hidden" src="${curr.file_link}">`;
-				wrap.setAttribute('data-bs-content', currInner);
+				currInner = createListImage(curr.file_link);
+				wrap.setAttribute('data-bs-content', currInner.outerHTML);
 			}
 			return acc += renderColumnHTML(curr, full, column, wrap, currInner);
 		}, '');
@@ -644,6 +638,34 @@ function renderColumn(data, type, full, meta, column) {
 	}
 }
 
+function createListImage(src) {
+	const img = document.createElement('img');
+	img.className = 'img-thumbnail d-inline rounded-2 overflow-hidden';
+	if(isSafeListUrl(src)) img.setAttribute('src', src);
+	return img;
+}
+
+/**
+ * 목록 셀 체크박스. 변경은 data-* 와 위임 이벤트(bindListCellEvents)로 처리한다 (inline onchange 금지)
+ *   data-identifiers : 식별자 JSON, data-field : 필드명, data-onchange : 호출할 함수명(기본 afterCheckboxColumnChange)
+ */
+function createListCheckbox(full, column, checked, disabled = false, funcName = 'afterCheckboxColumnChange') {
+	const input = document.createElement('input');
+	input.type = 'checkbox';
+	input.value = '1';
+	input.className = 'form-check-input list-cell-checkbox';
+	if(checked) input.setAttribute('checked', 'checked');
+	if(disabled) input.setAttribute('disabled', 'disabled');
+	input.setAttribute('data-identifiers', getIdentifiersData(full, common.IDENTIFIER, true));
+	input.setAttribute('data-field', column.field);
+	input.setAttribute('data-onchange', funcName);
+	return input;
+}
+
+/**
+ * inner 는 DOM 노드(빌더가 만드는 셀) 또는 HTML 문자열(화면별 커스텀 렌더러 호환용).
+ * 서버 값을 문자열로 넘기지 말고 노드로 만들어 넘길 것.
+ */
 function renderColumnHTML(data, full, column, wrap, inner) {
 	// attrs
 	let value;
@@ -664,7 +686,8 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 
 	if(Object.keys(column.onclick).length) {
 		wrap.classList.add('cursor-pointer');
-		attrs.onclick = getColumnOnclick(data, full, column);
+		const action = getColumnClickAction(data, full, column);
+		if(action) attrs['data-cell-click'] = JSON.stringify(action);
 
 		if(!Object.hasOwn(column.onclick, 'noValue')) column.onclick.noValue = false;
 		if(!column.onclick.noValue && value === '') inner = '';
@@ -691,7 +714,11 @@ function renderColumnHTML(data, full, column, wrap, inner) {
 	Object.entries(attrs).map(([key, value]) => wrap.setAttribute(key, value));
 
 	// return
-	wrap.innerHTML = inner;
+	if(inner instanceof Node) {
+		wrap.replaceChildren(inner.cloneNode(true));
+	}else{
+		wrap.innerHTML = inner ?? '';
+	}
 	return wrap.outerHTML;
 }
 
@@ -716,7 +743,10 @@ function renderSelectColumn(data, type, full, meta, column) {
 		const key = Object.hasOwn(column, 'onChange')?'onChange':'onchange';
 		funcName = column[key];
 	}
-	select.setAttribute('onchange', `${funcName}(${getIdentifiersData(full, common.IDENTIFIER, true)}, '${column.field}', this.value)`);
+	// 변경은 위임 이벤트(bindListCellEvents)로 처리 (inline onchange 금지)
+	select.setAttribute('data-identifiers', getIdentifiersData(full, common.IDENTIFIER, true));
+	select.setAttribute('data-field', column.field);
+	select.setAttribute('data-onchange', funcName);
 
 	wrap.appendChild(select)
 	return wrap.outerHTML;
@@ -728,7 +758,7 @@ function renderButtonColumn(data, type, full, meta, column) {
 
 	// class
 	if(column.classes.length)
-		for(const className of classed) wrap.classList.add(className);
+		for(const className of column.classes) wrap.classList.add(className);
 
 	if(Object.hasOwn(column.onclick, 'kind')
 		&& column.onclick.kind === 'download'
@@ -737,7 +767,7 @@ function renderButtonColumn(data, type, full, meta, column) {
 		column.text = 'Download';
 	}
 
-	const inner = column.text?getLocale(column.text, common.LOCALE):getLocale(column.field, common.LOCALE);
+	const inner = document.createTextNode(column.text?getLocale(column.text, common.LOCALE):getLocale(column.field, common.LOCALE));
 
 	// return
 	if(isArray(full[column.field])) {
@@ -750,72 +780,97 @@ function renderButtonColumn(data, type, full, meta, column) {
 	}
 }
 
-function getColumnOnclick(data, full, column) {
-	let onClick = '';
-	if(Object.hasOwn(column, 'onClick') || Object.hasOwn(column, 'onclick')) {
-		const key = Object.hasOwn(column, 'onClick')?'onClick':'onclick';
-		if(!column[key].kind) throw new Error(`getColumnOnclick : onclick kind is not defined. (${column.field})`);
+/**
+ * javascript:·data:·vbscript: 같은 스킴은 막는다 (상대 경로·http(s)·mailto·tel 허용)
+ */
+function isSafeListUrl(url) {
+	if(url === null || url === undefined) return false;
+	const value = String(url).trim().replace(/[\u0000-\u001F\u007F]/g, '');
+	return !/^(javascript|data|vbscript):/i.test(value);
+}
 
-		switch (column[key].kind) {
-			case 'view' :
-				let uri;
-				if(Object.hasOwn(column[key], 'attrs')) {
-					if(Object.keys(column[key].attrs).length && Object.hasOwn(column[key].attrs, 'href')) {
-						uri = column[key].attrs.href;
-					}else if(common.PAGE_VIEW_URI) {
-						uri = common.PAGE_VIEW_URI;
-					}
+/**
+ * 셀 클릭 동작을 data-cell-click(JSON)로 표현한다. bindListCellEvents 가 실행한다.
+ *   {type:'url', url, target} | {type:'modal', ids, target} | {type:'func', func, params}
+ */
+function getColumnClickAction(data, full, column) {
+	const key = Object.hasOwn(column, 'onClick')?'onClick':'onclick';
+	if(!Object.hasOwn(column, key)) return null;
+	const onclick = column[key];
+	if(!onclick.kind) throw new Error(`getColumnClickAction : onclick kind is not defined. (${column.field})`);
 
-					if(uri) {
-						let url = getUrlWithIdentifiers(uri, getIdentifiersData(full, column[key].params??common.IDENTIFIER));
-						if(Object.hasOwn(column[key], 'attrs')) {
-							let target = column[key].attrs.target??'_self';
-							switch (target) {
-								case '_blank' :
-									return `window.open('${url}', "_blank")`;
-								case '_self' :
-									return `location.href="${url}"`;
-								default :
-									return `openViewModal(${getIdentifiersData(full, column[key].params??common.IDENTIFIER, true)}, '${target}')`;
-							}
-						}else{
-							return `location.href="${url}"`;
-						}
-					}
-				}
+	const ids = () => getIdentifiersData(full, onclick.params??common.IDENTIFIER);
+	switch (onclick.kind) {
+		case 'view' : {
+			let uri;
+			if(onclick.attrs && Object.hasOwn(onclick.attrs, 'href')) uri = onclick.attrs.href;
+			else if(common.PAGE_VIEW_URI) uri = common.PAGE_VIEW_URI;
 
-				return `openViewModal(${getIdentifiersData(full, column[key].params??common.IDENTIFIER, true)})`;
-			case 'popup' :
-				break;
-			case 'redirect' :
-				if(column[key].attrs && column[key].attrs.target === '_blank') return `window.open('${data}', "_blank")`;
-				return `location.href="${data}"`;
-			case 'download' :
-				if(data === null || !data.file_id) return '';
-				return `location.href="${common.CURRENT_URI}/downloader/${data.file_id}"`;
-			case 'bs' :
-				break;
-			default :
-				if(window[column[key].kind] === undefined) return '';
-
-				let params = 'null';
-				if(column[key].params) {
-					if(typeof column[key].params === 'object') {
-						if(
-							(Array.isArray(column[key].params) && column[key].params.length)
-							||
-							(!Array.isArray(column[key].params) && Object.keys(column[key].params).length)
-						){
-							params = JSON.stringify(column[key].params);
-						}
-					}else{
-						params = typeof column[key].params != "string"?column[key].params:`'${column[key].params}'`;
-					}
-				}
-				return `${column[key].kind}(this, ${params})`;
+			const target = onclick.attrs?.target ?? '_self';
+			if(uri && ['_self', '_blank'].includes(target)) {
+				return {type: 'url', url: getUrlWithIdentifiers(uri, ids()), target: target};
+			}
+			return {type: 'modal', ids: ids(), target: ['_self', '_blank'].includes(target) ? '' : target};
+		}
+		case 'redirect' :
+			return {type: 'url', url: data, target: onclick.attrs?.target === '_blank' ? '_blank' : '_self'};
+		case 'download' :
+			if(data === null || data === undefined || !data.file_id) return null;
+			return {type: 'url', url: `${common.CURRENT_URI}/downloader/${encodeURIComponent(data.file_id)}`, target: '_self'};
+		case 'popup' :
+		case 'bs' :
+			return null;
+		default : {
+			if(typeof window[onclick.kind] !== 'function') return null;
+			let params = null;
+			if(onclick.params !== undefined && onclick.params !== null && onclick.params !== '') {
+				if(typeof onclick.params !== 'object' || Object.keys(onclick.params).length) params = onclick.params;
+			}
+			return {type: 'func', func: onclick.kind, params: params};
 		}
 	}
-	return onClick;
+}
+
+// 이전 이름 호환: 지금은 inline onclick 문자열을 만들지 않는다
+function getColumnOnclick(data, full, column) {
+	return '';
+}
+
+/**
+ * 목록 셀의 클릭·변경을 위임 이벤트로 처리한다. 반응형 상세 모달(본문 밖)도 포함하려고 document 에 건다.
+ */
+function bindListCellEvents() {
+	if(window.__listCellEventsBound) return;
+	window.__listCellEventsBound = true;
+
+	$(document).on('click', '[data-cell-click]', function(e) {
+		let action;
+		try { action = JSON.parse(this.getAttribute('data-cell-click')); } catch (error) { return; }
+		if(!action) return;
+
+		switch (action.type) {
+			case 'url' :
+				if(!isSafeListUrl(action.url)) return;
+				if(action.target === '_blank') window.open(action.url, '_blank', 'noopener');
+				else location.href = action.url;
+				break;
+			case 'modal' :
+				openViewModal(action.ids, action.target);
+				break;
+			case 'func' :
+				if(typeof window[action.func] === 'function') window[action.func](this, action.params);
+				break;
+		}
+	});
+
+	$(document).on('change', 'input.list-cell-checkbox[data-onchange], select.datatable-selectpicker[data-onchange]', function(e) {
+		const func = this.getAttribute('data-onchange');
+		if(typeof window[func] !== 'function') return;
+		let ids = {};
+		try { ids = JSON.parse(this.getAttribute('data-identifiers') || '{}'); } catch (error) { return; }
+		const value = this.type === 'checkbox' ? (this.checked ? 1 : 0) : this.value;
+		window[func](ids, this.getAttribute('data-field'), value);
+	});
 }
 
 function getListButtons() {

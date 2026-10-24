@@ -117,7 +117,7 @@
 | `icon` | string | `''` | `type=icon`일 때 `<i class="{icon}">` | `renderColumn()` |
 | `text` | string | `''` | `type=text/button`일 때 데이터 대신 표시할 고정 텍스트(locale 키). `onclick.kind=download`이고 비어 있으면 `'Download'` | `renderColumn()` |
 | `classes` | array | `[]` | 셀 wrapper에 추가할 class 목록 | `renderColumn()` |
-| `onclick` (`onClick`) | dict | `[]` | 셀 클릭 동작 (3장) | `renderColumnHTML()`, `getColumnOnclick()` |
+| `onclick` (`onClick`) | dict | `[]` | 셀 클릭 동작 (3장) | `renderColumnHTML()`, `getColumnClickAction()` |
 | `onchange` (`onChange`) | **string** | 없음 | `type=select` 전용. change 시 호출할 **전역 함수명**. 기본 `afterSelectColumnChange` | `renderSelectColumn()` |
 | `render` | dict | `[]` | `{callback: '함수명', params: mixed}` 커스텀 렌더러 (2-7) | DataTable `columnDefs` |
 | `option_attributes` | dict | `[]` | `type=select` 셀의 옵션 소스. form과 같은 규칙(`MY_Controller::getOptions()`), 단 `option_field`는 무시 | `getListColumns()` |
@@ -139,7 +139,7 @@ DataTable 컬럼 정의의 `width`, `orderable`, `searchable`, `visible`, `class
 | `row_num` | – | `recordsDisplay - (row + displayStart)` (내림차순 번호) | `searchable/orderable: false` |
 | `actions` | – | `getListActions(LIST_ACTIONS, full, IDENTIFIER)` | 마지막 컬럼 (4-4) |
 | `select` | `div.bootstrap-select > select.datatable-selectpicker` | `options`로 `<option>` 생성, `data === value`면 selected | `renderSelectColumn()`. change 시 `{onchange}(idData, field, this.value)`. `drawCallback`에서 selectpicker 초기화. **주의** — 엄격 비교라 숫자 값은 선택 안 됨 |
-| `text` (기본) | `span.d-inline-block` | `text`가 있으면 `getLocale(text)`, 없으면 `data` | **주의** — HTML 이스케이프 없음 |
+| `text` (기본) | `span.d-inline-block` | `text`가 있으면 `getLocale(text)`, 없으면 `data` | 값은 텍스트 노드로 넣는다(HTML로 해석하지 않음) |
 | `button` | `button.btn.btn-sm.btn-info…` | `text` 또는 `getLocale(field)` | `data === undefined`이거나, onclick이 popup/redirect/download인데 data가 비면 `'-'` |
 | `icon` | `span` | `<i class="{icon}"></i>` | 값은 `data-value` 속성에만 |
 | `img` | `span` | `<img class="img-thumbnail…" src="{data[0].file_link}">`, `data-bs-content`에도 동일 HTML | data가 `[{file_link…}]` 배열이어야 함(API `fileList` 변환 결과) |
@@ -175,9 +175,9 @@ function renderMenuAuthCheckbox(data, type, full, meta, column, params) {
 
 ## 3. onclick / onchange
 
-### 3-1. `onclick` (`getColumnOnclick()`)
+### 3-1. `onclick` (`getColumnClickAction()`)
 
-`onclick`(또는 `onClick`)이 비어 있지 않으면 `renderColumnHTML()`이 wrapper에 `cursor-pointer` class와 **inline `onclick` 속성 문자열**을 붙인다. `kind`가 없으면 예외.
+`onclick`(또는 `onClick`)이 비어 있지 않으면 `renderColumnHTML()`이 wrapper에 `cursor-pointer` class와 클릭 동작을 담은 `data-cell-click`(JSON) 속성을 붙인다. 실행은 `bindListCellEvents()`의 위임 이벤트가 한다(inline `onclick` 문자열을 만들지 않음). 이동 주소가 `javascript:`·`data:`·`vbscript:`면 실행하지 않는다. `kind`가 없으면 예외.
 
 | 키 | 타입 | 기본값 | 설명 |
 |---|---|---|---|
@@ -188,12 +188,12 @@ function renderMenuAuthCheckbox(data, type, full, meta, column, params) {
 
 | kind | 동작 |
 |---|---|
-| `view` | `attrs`가 **있을 때만** URL 이동: `attrs.href` → 없으면 `PAGE_VIEW_URI`. URL = `getUrlWithIdentifiers(uri, ids)` (ids = `params` 필드 목록 또는 `IDENTIFIER`). `attrs.target`: `_blank` → `window.open`, `_self`(기본) → `location.href`, 기타 값 → `openViewModal(ids, target)`. `attrs`가 없거나 URL이 없으면 `openViewModal(ids)`. `type ≠ button`이면 `text-primary text-decoration-underline` 추가 |
+| `view` | URL 이동: `attrs.href` → 없으면 `PAGE_VIEW_URI`. URL = `getUrlWithIdentifiers(uri, ids)` (ids = `params` 필드 목록 또는 `IDENTIFIER`). `attrs.target`: `_blank` → 새 창, `_self`(기본) → 현재 창, 그 밖의 값 → `openViewModal(ids, target)`. URL이 없으면 `openViewModal(ids)`. `type ≠ button`이면 `text-primary text-decoration-underline` 추가 |
 | `popup` | **미구현** — 빈 onclick만 붙는다 |
-| `redirect` | `location.href = "{셀 값}"`. **주의** — `_blank`(`window.open`)는 `params` 키와 `attrs.target === '_blank'`가 둘 다 있어야 동작 |
+| `redirect` | 셀 값 주소로 이동. `attrs.target === '_blank'`면 새 창 |
 | `download` | 값이 `{file_id}` 객체여야 함 → `location.href = "{CURRENT_URI}/downloader/{file_id}"` (`MY_Controller::downloader()`). 파일 배열이면 파일별 링크. `text` 미지정 시 `'Download'` |
 | `bs` | onclick 없음. `attrs`의 1단계 키를 `data-bs-{key}`로 부여 (`{toggle: 'modal', target: '#m'}` → `data-bs-toggle="modal" data-bs-target="#m"`). 값이 비면(noValue=false) 부여 안 함. 중첩 `attrs.attrs`는 지원 안 함 |
-| 그 외(custom) | `window[kind]`가 없으면 아무것도 안 함. 있으면 `kind(this, params)` 호출. `this` = 클릭된 셀 wrapper 요소. `params`: 객체/배열이면 `JSON.stringify`, 문자열이면 `'…'`, 숫자 등은 그대로, 없거나 비면 `null` |
+| 그 외(custom) | `window[kind]`가 함수가 아니면 아무것도 안 함. 함수면 `kind(element, params)` 호출. `element` = 클릭된 셀 wrapper 요소, `params` = 설정 값 그대로(없거나 빈 값이면 `null`) |
 
 `openViewModal(dataId, modalId)`는 **미구현** 스텁이다(`getData()`로 조회 후 `console.log`만 함).
 
@@ -201,21 +201,21 @@ function renderMenuAuthCheckbox(data, type, full, meta, column, params) {
 [
     'field' => 'subject',
     'label' => 'lang:article.subject',
-    'onclick' => ['kind' => 'view'],   // attrs 없음 → openViewModal() (현재 콘솔 출력만)
+    'onclick' => ['kind' => 'view'],   // PAGE_VIEW_URI 가 있으면 상세 페이지로, 없으면 openViewModal()
 ],
-// 상세 페이지로 이동하려면 attrs를 넣어야 PAGE_VIEW_URI로 이동한다.
-'onclick' => ['kind' => 'view', 'attrs' => ['target' => '_self']],
+// 새 창으로 열기
+'onclick' => ['kind' => 'view', 'attrs' => ['target' => '_blank']],
 ```
 
 ### 3-2. `onchange` (select 셀 전용)
 
 - `type => 'select'` 컬럼에서만 동작하며 값은 **함수명 문자열**이다: `'onchange' => 'myChangeHandler'`. dict(`{kind, attrs, params}`)를 넣으면 `[object Object](…)`가 되어 동작하지 않는다.
-- 호출 시그니처: `fn(idData, field, value)` — `idData`는 IDENTIFIER 객체 리터럴.
+- 호출 시그니처: `fn(idData, field, value)` — `idData`는 IDENTIFIER 객체. select에 `data-onchange`(함수명)·`data-identifiers`·`data-field`를 붙이고 위임 이벤트가 부른다(inline `onchange` 없음).
 - 기본 `afterSelectColumnChange()`: `PATCH {API_URI}/{id}`(복수 식별자면 query string)에 `{[field]: value}` 전송 후 성공 알림.
 - `type=checkbox, subtype=boolean`의 기본 핸들러 `afterCheckboxColumnChange(idData, field, 0|1)`도 같은 방식으로 PATCH한다.
 
 > **주의**
-> - text 셀은 `innerHTML`, redirect/download/select/checkbox는 inline 핸들러 문자열에 값을 그대로 넣는다(이스케이프 없음).
+> - 화면별 커스텀 렌더러가 `renderColumnHTML(data, full, column, wrap, inner)`에 `inner`를 HTML 문자열로 넘기면 그대로 HTML로 들어간다(호환용). 서버 값은 DOM 노드(`document.createTextNode` 등)로 만들어 넘긴다. 체크박스는 `createListCheckbox(full, column, checked, disabled, funcName)`를 쓴다.
 > - `afterSelectColumnChange()`는 성공 후 테이블 reload가 콜백이 아닌 즉시 실행된다.
 
 ---

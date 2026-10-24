@@ -67,6 +67,8 @@
 
 ### 보안
 - [ ] XSS: 목록 셀 렌더링(`app-page-list.js` `innerHTML`, inline `onclick`), 뷰 출력 `html_escape` 미사용 (추가: `renderColumn` text 셀, 반응형 `responsive.details.renderer`, `getColumnOnclick` redirect/download/view의 `location.href`/`window.open` 문자열(`javascript:` URL 포함), checkbox·select 셀 inline `onchange`의 식별자 값, `app-page-view.js::applyViewData` `SPAN.innerHTML`) (추가 2026-10-25: 상세 보기 `app-page-view.js`는 textContent로 넣도록 수정됨)
+    - [x] 목록 셀(`app-page-list.js`): 값은 텍스트 노드·`setAttribute`로, inline `onclick`/`onchange` 대신 `data-cell-click`·`data-onchange` + 위임 이벤트(`bindListCellEvents`), 이동 URL의 `javascript:`·`data:` 스킴 차단, 메뉴 권한 체크박스(`app-page-menu-auth.js`)도 같은 방식 (2026-10-25)
+    - [ ] 남은 것: PHP 뷰 출력 `html_escape` 미사용, 화면별 커스텀 렌더러가 `renderColumnHTML`에 HTML 문자열을 넘기는 경우(호환용으로 문자열도 받음)
 - [ ] XSS: `views/module/player.php`의 `$poster`, `$source` → `json_encode(..., JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT)`
 - [ ] 인증 토큰이 JS 전역(`common.HOOK_PHPTOJS_VAR_TOKEN`)에 노출, 32곳 이상에서 개별 주입
 - [ ] `module/File.php`: `basePath`를 템플릿 디렉토리로 제한, svg 업로드 제외·MIME 검사, 백업 폴더를 웹 루트 밖으로

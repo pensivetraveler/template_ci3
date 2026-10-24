@@ -26,17 +26,8 @@ function renderMenuAuthCheckbox(data, type, full, meta, column, param) {
     const wrap = document.createElement('label');
     wrap.classList.add('d-inline-block')
 
-    const idData = getIdentifiersData(full, common.IDENTIFIER, true).replace(/"/gi, "'");
-    const inner = `
-        <input
-            type="checkbox"
-            value="1"
-            ${data===1?'checked':''}
-            onchange="afterCheckboxColumnChange(${idData}, '${column.field}', this.checked?1:0)"
-            class="form-check-input"
-            ${isChangeable?'':'disabled'}
-        >
-    `;
+    // 서버 값을 HTML 문자열로 잇지 않고 노드로 만든다 (변경은 app-page-list.js 의 위임 이벤트)
+    const inner = createListCheckbox(full, column, data === 1, !isChangeable);
 
     return renderColumnHTML(data, full, column, wrap, inner);
 }
