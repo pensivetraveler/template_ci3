@@ -101,7 +101,8 @@ class MenuAuth extends Common
     {
         $data->title = lang('nav.'.$data->title);
         if($data->depth > 1) {
-            $data->title = str_repeat('&nbsp;', ($data->depth-1)*4).'- '.$data->title;
+            // 목록 셀은 값을 텍스트로 넣으므로 HTML 엔티티(&nbsp;) 대신 NBSP 문자로 들여쓰기
+            $data->title = str_repeat("\u{00A0}", ($data->depth-1)*4).'- '.$data->title;
         }
         $data->create = (int)substr($data->menu_auth, 0, 1);
         $data->read = (int)substr($data->menu_auth, 1, 1);

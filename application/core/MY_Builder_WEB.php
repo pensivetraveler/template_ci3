@@ -724,8 +724,17 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }
         if(empty($config)) show_error(__METHOD__." : List Config is Empty For ".$this->router->location);
 
-        $this->listColumns = array_reduce($config, function($carry, $item) {
+        // 목록 항목에 option_attributes 가 없으면 같은 필드의 form 설정 값을 쓴다 (셀에 코드 대신 라벨 표시)
+        $formOptions = [];
+        foreach ($this->resourceLoader->entityConfig($this->setConfigList('form', $this->methodConfig['properties']['formConfig'] ?? null), [], false) ?: [] as $formItem) {
+            if(isset($formItem['field']) && !is_empty($formItem, 'option_attributes')) $formOptions[$formItem['field']] = $formItem['option_attributes'];
+        }
+
+        $this->listColumns = array_reduce($config, function($carry, $item) use ($formOptions) {
             $item = array_merge($this->config->get("builder_list_base", []), $item);
+
+            if(is_empty($item, 'option_attributes') && isset($item['field'], $formOptions[$item['field']]))
+                $item['option_attributes'] = $formOptions[$item['field']];
 
             if(!is_empty($item, 'option_attributes'))
                 $item['options'] = $this->getOptions($item['field'], $item['option_attributes']);

@@ -280,7 +280,9 @@ $(function () {
 	// 셀 클릭·체크박스·select 변경 (data-* + 위임 이벤트)
 	bindListCellEvents();
 
-	$('.dataTables_wrapper').on('click', '.view-record', function() {
+	// 행 버튼은 document 에 위임한다: 반응형 상세 모달은 .dataTables_wrapper 밖에 그려진다
+
+	$(document).on('click', '.view-record', function() {
 		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 		if(common.PAGE_VIEW_URI) {
 			location.href = getRedirectActionUrl(this, common.PAGE_VIEW_URI, common.IDENTIFIER);
@@ -289,7 +291,7 @@ $(function () {
 		}
 	});
 
-	$('.dataTables_wrapper tbody').on('click', '.delete-record', function () {
+	$(document).on('click', '.delete-record', function () {
 		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 		deleteData(getRedirectActionData(this, common.IDENTIFIER), {
 			callback: dt.ajax.reload,
@@ -297,7 +299,7 @@ $(function () {
 		});
 	});
 
-	$('.dataTables_wrapper').on('click', '.duplicate-record', function(e) {
+	$(document).on('click', '.duplicate-record', function(e) {
 		if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 		executeAjax({
 			url: getUrlWithIdentifiers(common.API_URI + '/' + 'duplicate', getRedirectActionData(this, common.IDENTIFIER)),
@@ -358,7 +360,7 @@ $(function () {
 			resetFrmInputs(document.querySelector(formSelector), common.FORM_DATA);
 		});
 
-		$('.dataTables_wrapper').on('click', '.edit-record', function(e) {
+		$(document).on('click', '.edit-record', function(e) {
 			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 			readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
 			fetchFrmValues(document.querySelector(formSelector), getRedirectActionData(this, common.IDENTIFIER));
@@ -533,7 +535,7 @@ $(function () {
 			console.log('core.form.invalid')
 		});
 	}else{
-		$('.dataTables_wrapper').on('click', '.edit-record', function() {
+		$(document).on('click', '.edit-record', function() {
 			if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
 			if(!common.PAGE_EDIT_URI.length) throw new Error(`PAGE_EDIT_URI is not defined`);
 			location.href = getRedirectActionUrl(this, common.PAGE_EDIT_URI, common.IDENTIFIER);
@@ -581,7 +583,7 @@ function renderColumn(data, type, full, meta, column) {
 
 		switch (column.type) {
 			case 'text':
-				inner = document.createTextNode(column.text?getLocale(column.text, common.LOCALE):(data ?? ''));
+				inner = document.createTextNode(column.text?getLocale(column.text, common.LOCALE):getListOptionLabel(column, data));
 				break;
 			case 'button':
                 if(data === undefined) {
@@ -636,6 +638,17 @@ function renderColumn(data, type, full, meta, column) {
 	}else{
 		return renderColumnHTML(data, full, column, wrap, inner);
 	}
+}
+
+/**
+ * 선택형 컬럼(option_attributes → options)이면 값 대신 라벨. 다중 값은 seperator(기본 ,)로 나눠 바꾼다
+ */
+function getListOptionLabel(column, data) {
+	if(data === null || data === undefined) return '';
+	const options = column.options;
+	if(!options || typeof options !== 'object' || isArray(options) || !Object.keys(options).length) return data;
+	const seperator = column.option_attributes?.seperator ?? ',';
+	return String(data).split(seperator).map((value) => options[value.trim()] ?? value).join(`${seperator} `);
 }
 
 function createListImage(src) {
@@ -864,6 +877,7 @@ function bindListCellEvents() {
 	});
 
 	$(document).on('change', 'input.list-cell-checkbox[data-onchange], select.datatable-selectpicker[data-onchange]', function(e) {
+		if(this.disabled) return;
 		const func = this.getAttribute('data-onchange');
 		if(typeof window[func] !== 'function') return;
 		let ids = {};
