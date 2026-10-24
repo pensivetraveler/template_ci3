@@ -489,7 +489,7 @@ $config['form_myinfo_config'] = [
     ],
 ];
 
-$config['form_syscfg_config'] = [
+$config['form_sys_cfg_config'] = [
     [
         'field' => 'cmb_cfg',
         'label' => 'lang:system.cmb_cfg',
@@ -611,7 +611,7 @@ $config['form_big_code_config'] = [
     ],
 ];
 
-$config['form_syscode_config'] = [
+$config['form_sys_code_config'] = [
     [
         'field' => 'cmb_cd',
         'label' => 'lang:system.cmb_cd',

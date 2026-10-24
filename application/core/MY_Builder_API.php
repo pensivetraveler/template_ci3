@@ -51,9 +51,6 @@ class MY_Builder_API extends MY_Controller_API
 
         $this->validateModel('Model_User_Logs');
 
-        if($this->listConfigName === '') $this->listConfigName = 'list_'.strtolower($this->router->class).'_config';
-        if($this->formConfigName === '') $this->formConfigName = 'form_'.strtolower($this->router->class).'_config';
-        if($this->viewConfigName === '') $this->viewConfigName = 'view_'.strtolower($this->router->class).'_config';
         $this->validateMessages = [];
         $this->validateCallback = [];
         $this->exceptValidateKeys = ['_mode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
@@ -66,6 +63,12 @@ class MY_Builder_API extends MY_Controller_API
         }
 
         $this->loadConfigs(['builder_base_config', 'builder_route_config', 'builder_form_config', 'builder_list_config', 'builder_view_config']);
+
+        // 설정 이름은 WEB(BuilderColumnsTrait::setConfigList)과 같은 규칙: builder_config_name()
+        $configClass = builder_config_name($this->router->class);
+        if($this->listConfigName === '') $this->listConfigName = 'list_'.$configClass.'_config';
+        if($this->formConfigName === '') $this->formConfigName = 'form_'.$configClass.'_config';
+        if($this->viewConfigName === '') $this->viewConfigName = 'view_'.$configClass.'_config';
 
         if($this->router->method === 'index') {
             if($this->noIndexMethod) show_404();
@@ -1342,9 +1345,9 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function getExportsConfig(): array
     {
-        $className = snakeize($this->router->class);
+        $className = builder_config_name($this->router->class);
         if($this->config->get('form_'.$className.'_config', [], false)) {
-            $columns = $this->setFormColumns(snakeize($this->router->class));
+            $columns = $this->setFormColumns(builder_config_name($this->router->class));
         }else{
             $config = $this->config->get('list_'.$className.'_config', [], false);
             $columns = array_reduce($config, function($carry, $item) {

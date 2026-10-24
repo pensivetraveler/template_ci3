@@ -75,7 +75,7 @@ class Companies extends Common   // admin/Common → MY_Builder_WEB
 ```
 
 - 라우트·메서드·메뉴 등록은 [route-method-nav.md](route-method-nav.md).
-- config 이름: API는 `form_{strtolower(class)}_config`, WEB은 `snakeize(class)`를 쓴다. camelCase 클래스는 이름이 갈라지므로 소문자 한 단어 클래스명을 권장한다([form.md](form.md) 2-1).
+- config 이름: WEB·API 모두 `builder_config_name(class)`(snake 형태)를 쓴다. 예: `partnerAuth` → `form_partner_auth_config`. API는 `resourceConfig`를 모르므로 WEB에서 다른 이름을 빌려 쓰면 `$formConfigName` 등을 지정한다([form.md](form.md) 1-1).
 - URL: `custom_routes.php`가 `/{platform}/api/{class}/{num}` → `api/{class}/index/{num}`, `/{platform}/api/{class}/{seg}` → `api/{class}/{seg}`로 보낸다. `{seg}_get` 같은 메서드가 없으면 `RestController::_remap()`이 `index_get($seg)`로 넘기므로 문자열 키(`USR001`)도 key로 들어온다.
 
 ### 1-3. 모델 프로퍼티
@@ -686,7 +686,7 @@ hook 안에서 읽을 수 있는 프로퍼티. "설정 시점"이 생성자보�
 | `$this->identifier`, `primaryKeyList`, `uniqueKeyList`, `fileList` | `setProperties()` | 주 모델에서 복사. `fileList`를 바꾸면 `transformView()`와 업로드 실행 여부에만 영향(실제 업로드 대상은 `model->fileList`) |
 | `$this->defaultList` | 엔티티 생성자 | POST/PUT 기본값 |
 | `$this->listConfig`, `formConfig`, `viewConfig` | `setProperties()`, GET/POST/PUT/PATCH | `builder_*_base`와 병합된 config. DELETE에서는 `[]` |
-| `$this->listConfigName`, `formConfigName`, `viewConfigName` | 부모 생성자가 `''`일 때만 `list_{strtolower(class)}_config` 등으로 채움 | 다른 config를 쓰려면 프로퍼티 기본값으로 선언하거나 `setProperties()` 전에 대입 |
+| `$this->listConfigName`, `formConfigName`, `viewConfigName` | 부모 생성자가 `''`일 때만 `list_{builder_config_name(class)}_config` 등으로 채움 | 다른 config를 쓰려면 프로퍼티 기본값으로 선언하거나 `setProperties()` 전에 대입 |
 | `$this->setConfig` | 프로퍼티 기본값 `true` | `false`면 `setProperties()`가 config를 읽지 않음(`Auth`는 인자로 `false`) |
 | `$this->exceptValidateKeys` | 부모 생성자에서 대입 | GET에서 where로 바꾸지 않을 키. 추가하려면 parent 생성자 **이후**에 `[] =` |
 | `$this->validateMessages`, `validateCallback` | 부모 생성자에서 `[]`로 초기화 | 필수값 메시지 / 필수 검사를 대신할 메서드명(`[col => 'methodName']`, 인자 없이 호출). parent 이후에 설정 |

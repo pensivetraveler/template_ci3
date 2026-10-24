@@ -40,7 +40,7 @@
 | 측 | 위치 | 규칙 |
 |---|---|---|
 | WEB | `MY_Builder_WEB::setViewColumns()` | ① 인자 `$name`이 있으면 그 이름 그대로 → ② 메소드 설정의 `resourceConfig`가 있으면 `view_{resourceConfig}_config` → ③ 둘 다 없으면 `jsVars['FORM_DATA']`(form 설정)를 복사하고, hidden이 아닌 항목은 `type='view'`, `subtype='base'`로 바꿈 |
-| API | `MY_Builder_API::__construct()`, `MY_Builder_API::setProperties()` | `'view_' . strtolower(클래스명) . '_config'` 하나만 사용. 하위 클래스에서 `$viewConfigName` 속성으로 덮어쓸 수 있음. snakeize를 하지 않으므로 `MenuList`는 `view_menulist_config`가 됨 |
+| API | `MY_Builder_API::__construct()`, `MY_Builder_API::setProperties()` | `'view_' . builder_config_name(클래스명) . '_config'` 하나만 사용(`menuList` → `view_menu_list_config`). 하위 클래스에서 `$viewConfigName` 속성으로 덮어쓸 수 있음 |
 
 > **주의** — WEB은 `resourceConfig`, API는 소문자 클래스명을 쓰므로 두 쪽 이름이 같아지도록 맞춰야 한다.
 

@@ -66,7 +66,7 @@
 | 비어있음 | `setConfigList('form', $method)` 순서로 처음 존재하는 설정: `form_{method}_config`(index 면 `baseMethod`) → `form_{class}_{method}_config` → `form_{class}_config` → `form_{method}_config` |
 
 - `field` 가 있거나 `type === 'common'` 인 항목만 남는다.
-- API 는 별도로 `form_{strtolower(class)}_config` 를 쓴다(`MY_Builder_API::__construct()`, `setProperties()`). **WEB 과 API 가 같은 설정을 보도록 클래스명을 맞춰야 한다.**
+- API 는 `form_{builder_config_name(class)}_config` 하나만 쓴다(`MY_Builder_API::__construct()`, `setProperties()`). 이름 규칙은 WEB 과 같지만 `resourceConfig`·method 후보는 보지 않으므로, WEB 에서 다른 이름의 설정을 빌려 쓰면 API 컨트롤러의 `$formConfigName` 도 맞춰야 한다.
 
 ### 2-2. 기본값 (`application/config/extra/builder/builder_form_config.php`)
 

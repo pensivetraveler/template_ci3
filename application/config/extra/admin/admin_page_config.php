@@ -137,12 +137,12 @@ $config['page_config'] = [
             'sysCfg' => [
                 'type' => 'form',
                 'subType' => 'side',
-                'config' => 'syscfg',
+                'config' => 'sys_cfg',
             ],
             'sysCode' => [
                 'type' => 'list',
                 'subtype' => 'datatable',
-                'config' => 'syscode',
+                'config' => 'sys_code',
                 'actions' => [
                     'edit' => true,
                 ],
@@ -160,7 +160,7 @@ $config['page_config'] = [
                 ],
                 'properties' => [
                     'formExist' => true,
-                    'formConfig' => 'syscode'
+                    'formConfig' => 'sys_code'
                 ],
             ],
             'menuList' => [

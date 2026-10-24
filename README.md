@@ -141,7 +141,9 @@ WEB은 form·list·filter 설정을 다음 순서로 찾고 처음 존재하는 
 3. `{kind}_{class}_config`
 4. `{kind}_{method}_config`
 
-> **주의** — WEB은 클래스명을 `snakeize()`로, API는 `strtolower()`로 바꿔서 찾는다. `partnerAuth`처럼 대문자가 섞인 클래스는 WEB은 `partner_auth`, API는 `partnerauth`를 찾으므로 키가 어긋난다. 클래스명은 소문자 한 단어로 짓거나 양쪽 키를 모두 맞춰야 한다.
+`{class}` 자리에는 WEB·API 모두 `builder_config_name()`(`helpers/builder/builder_base_helper.php`)으로 바꾼 이름을 쓴다. 클래스명을 snake 형태로 바꾼 것이다(`partnerAuth` → `partner_auth`, `sysCfg` → `sys_cfg`).
+
+> **주의** — API는 route 설정을 읽지 않으므로 `resourceConfig`·`{class}_{method}` 후보를 모른다. WEB에서 `resourceConfig`로 클래스명과 다른 설정을 쓰면, API 컨트롤러에서 `$formConfigName` 등을 같은 키로 지정해야 한다.
 
 ---
 

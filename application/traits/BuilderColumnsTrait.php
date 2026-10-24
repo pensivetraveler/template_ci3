@@ -5,8 +5,8 @@ trait BuilderColumnsTrait
 {
     protected function setConfigList($flag, $add = null)
     {
-        $class = snakeize($this->router->class);
-        $method = snakeize($this->router->method);
+        $class = builder_config_name($this->router->class);
+        $method = builder_config_name($this->router->method);
         if($method === 'index' && $flag !== 'filter') $method = $flag;
 
         $configs = [];

@@ -123,3 +123,16 @@ function builder_misc_view($type)
 //    $CI->load->view('builder/misc/under_maintenance');
     exit;
 }
+
+if ( ! function_exists('builder_config_name'))
+{
+    /**
+     * 컨트롤러 클래스명·메서드명을 빌더 설정 키에 쓰는 이름으로 바꾼다 (WEB·API 공통 규칙).
+     * 예: partnerAuth → partner_auth, SysCfg → sys_cfg
+     * 설정 키는 "{종류}_{이 이름}_config" (form_partner_auth_config 등)로 짓는다.
+     */
+    function builder_config_name(string $name): string
+    {
+        return snakeize(lcfirst($name));
+    }
+}

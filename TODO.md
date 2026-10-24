@@ -313,7 +313,8 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Builder_WEB::setMethodConfig` `category` 없는 method 항목은 내용이 통째로 버려지고 `method_base_config`로 대체 (경고 없이 설정 무시)
 - [x] `MY_Builder_WEB::setMethodConfig` `category: 'action'`은 레이어링을 생략하는데 `setJSVariables()`가 `actions`/`buttons`/`properties.identifier`를 요구 (action 전용 기본값 config 필요) → `method_base_config`로 빈 키를 채우도록 수정
 - [ ] `MY_Builder_API::__construct` method/nav config를 로드하지 않아 `getMethodList()`·`MenuList::options_get()`이 원본 route를 별도 규칙으로 해석 (WEB 레이어링 결과와 불일치)
-- [ ] 설정 이름 규칙 이원화: WEB `BuilderColumnsTrait::setConfigList`는 `snakeize(class)`와 탐색 순서, `MY_Builder_API::__construct`는 `form_/list_/view_{strtolower(class)}_config`, `MY_Builder_WEB::setViewColumns`는 `view_{resourceConfig}_config`(둘 다 `setConfigList` 미적용) (camelCase 클래스·resourceConfig 사용 시 WEB/API가 다른 설정을 읽음)
+- [x] 설정 이름 규칙 이원화: WEB `BuilderColumnsTrait::setConfigList`는 `snakeize(class)`와 탐색 순서, `MY_Builder_API::__construct`는 `form_/list_/view_{strtolower(class)}_config`, `MY_Builder_WEB::setViewColumns`는 `view_{resourceConfig}_config`(둘 다 `setConfigList` 미적용) (camelCase 클래스·resourceConfig 사용 시 WEB/API가 다른 설정을 읽음) → `builder_config_name()`으로 WEB·API 이름 규칙 통일, `form_syscfg/syscode`·`list_syscode` 키를 snake로 변경 (2026-10-24)
+- [ ] API가 route 설정(`resourceConfig`·method 후보)을 읽지 않아 WEB이 `resourceConfig`로 다른 이름의 설정을 빌려 쓰면 API는 클래스명 설정만 봄 (`myInfo`↔`users` 등, ResourceLoader에서 해결 예정)
 - [ ] `MY_Builder_API::setProperties` API `formConfig`가 `builder_form_base`와만 얕게 병합되고 form/group_attributes 기본값 미병합 (WEB `BuilderColumnsTrait::setFormColumn`과 해석 다름)
 - [ ] `MY_Builder_WEB::setFormData`(group_attributes 첫 항목부터 누적) vs `MY_Builder_API::validateFormRules`(마지막 항목만) 그룹 속성 해석 불일치 (헬퍼 하나로 통일)
 - [ ] `views/builder/layout/form_base_custom_dropzone-full.php`, `app-page-form.js::applyFrmValuesByCategory` id `thumbnail-dropzone-wrapper`, data-field `thumbnail` 하드코딩 (field 기반으로 일반화)

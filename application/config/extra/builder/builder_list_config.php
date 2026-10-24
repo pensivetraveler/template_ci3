@@ -50,7 +50,7 @@ $config['list_visitors_config'] = [
     ],
 ];
 
-$config['list_syscode_config'] = [
+$config['list_sys_code_config'] = [
     [
         'field' => 'cmb_cd',
         'label' => 'lang:system.cmb_cd',

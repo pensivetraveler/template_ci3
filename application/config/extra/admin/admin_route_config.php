@@ -315,14 +315,14 @@ $config['route_config'] = [
                 'category' => 'form',
                 'type' => 'base',
                 'subtype' => 'side',
-                'resourceConfig' => 'syscfg',
+                'resourceConfig' => 'sys_cfg',
                 'mode' => 'update',
             ],
             'sysCode' => [
                 'category' => 'list',
                 'type' => 'table',
                 'subtype' => 'datatable',
-                'resourceConfig' => 'syscode',
+                'resourceConfig' => 'sys_code',
                 'actions' => [
                     'edit' => true,
                 ],
@@ -340,7 +340,7 @@ $config['route_config'] = [
                 ],
                 'properties' => [
                     'formExist' => true,
-                    'formConfig' => 'syscode'
+                    'formConfig' => 'sys_code'
                 ],
             ],
             'menuList' => [
