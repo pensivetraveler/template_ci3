@@ -806,6 +806,9 @@ class MY_Builder_API extends MY_Controller_API
             $groupConfig = array_filter($config, function($item) use ($group) {
                 return $item['group'] === $group;
             });
+            // CI3 set_rules()는 POST가 아니고 검증 데이터가 비어 있으면 규칙을 등록하지 않는다.
+            // PUT·PATCH에서도 규칙이 등록되도록 요청 데이터를 먼저 넣고, 아래 분기에서 그룹별 데이터로 바꾼다.
+            $this->form_validation->set_data(count($data) ? $data : ['_' => '']);
             $this->form_validation->set_rules($groupConfig);
 
             if($group === 'base') {
