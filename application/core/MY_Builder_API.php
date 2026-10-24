@@ -45,6 +45,12 @@ class MY_Builder_API extends MY_Controller_API
     protected array $transTargetKeys = [];
     protected bool $noIndexMethod = false;
 
+    /**
+     * 모델 컬럼·설정 필드가 아닌데 요청 조건으로 받아야 하는 키 (hook에서 읽는 값 등)
+     * 예: protected array $allowedRequestFields = ['company_id'];
+     */
+    protected array $allowedRequestFields = [];
+
     public function __construct()
     {
         parent::__construct();
@@ -53,7 +59,7 @@ class MY_Builder_API extends MY_Controller_API
 
         $this->validateMessages = [];
         $this->validateCallback = [];
-        $this->exceptValidateKeys = ['_mode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
+        $this->exceptValidateKeys = ['_mode', '_submode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
         $this->transTargetKeys = [];
 
         // /{API 폴더}/... 로 직접 들어오면 web 플랫폼, /{플랫폼}/{API 폴더}/... 면 그 플랫폼
@@ -82,8 +88,89 @@ class MY_Builder_API extends MY_Controller_API
 
         return [
             $this->checkIdentifierExist($key, $strict),
-            reformat_get_data($data, $this->exceptValidateKeys)
+            $this->sanitizeRequestConditions(reformat_get_data($data, $this->exceptValidateKeys))
         ];
+    }
+
+    /**
+     * 요청 조건(where·filters)에 쓸 수 있는 필드 목록.
+     * 모델(Model_Parent·Model·Model_Child) 컬럼 + form/list/view/filter 설정 필드 + $allowedRequestFields
+     */
+    protected function getAllowedRequestFields(): array
+    {
+        $fields = $this->allowedRequestFields;
+
+        foreach ($this->getModelPipeline() as $modelName) {
+            if(property_exists($this, $modelName) && method_exists($this->{$modelName}, 'getRequestColumnList')) {
+                $fields = array_merge($fields, $this->{$modelName}->getRequestColumnList());
+            }
+        }
+
+        // filter 설정은 WEB(setConfigList)처럼 메서드별 이름도 본다 (예: logs/errors → filter_logs_errors_config)
+        $class = builder_config_name($this->router->class);
+        $method = builder_config_name($this->router->method);
+        $configs = [$this->formConfig, $this->listConfig, $this->viewConfig];
+        foreach (array_unique(["filter_{$class}_{$method}_config", "filter_{$class}_config", "filter_{$method}_config"]) as $name) {
+            $configs[] = $this->config->get($name, [], false);
+        }
+        foreach ($configs as $config) {
+            if(is_array($config)) $fields = array_merge($fields, array_column($config, 'field'));
+        }
+
+        return array_values(array_unique(array_filter($fields, 'is_string')));
+    }
+
+    /**
+     * 요청에서 온 조건 중 허용 목록에 없는 필드를 뺀다.
+     * 모르는 키가 그대로 WHERE 컬럼이 되면 SQL 오류(500, 개발 환경에서는 쿼리 노출)가 나고,
+     * 임의 컬럼(password 등)으로 조회·검색할 수 있게 되기 때문이다. hook에서 직접 넣는 조건은 영향 없음.
+     */
+    protected function sanitizeRequestConditions(array $data): array
+    {
+        $allowed = array_flip($this->getAllowedRequestFields());
+        $dropped = [];
+        $isAllowed = function ($field) use ($allowed) {
+            return is_string($field) && isset($allowed[$field]);
+        };
+
+        foreach (array_keys($data['where'] ?? []) as $field) {
+            if(!$isAllowed($field)) {
+                unset($data['where'][$field]);
+                $dropped[] = $field;
+            }
+        }
+
+        foreach (['where', 'whereIn', 'whereNot'] as $type) {
+            foreach (array_keys($data['filter'][$type] ?? []) as $field) {
+                if(!$isAllowed($field)) {
+                    unset($data['filter'][$type][$field]);
+                    $dropped[] = "filters[$type][$field]";
+                }
+            }
+        }
+
+        if(isset($data['filter']['like']) && is_array($data['filter']['like'])) {
+            foreach ($data['filter']['like'] as $key => $item) {
+                // {field, value} 목록 형식: field 가 비면 문자열 컬럼 전체 검색(setFilterLike)이라 허용
+                $field = is_array($item) ? ($item['field'] ?? '') : $key;
+                if($field !== '' && !$isAllowed($field)) {
+                    unset($data['filter']['like'][$key]);
+                    $dropped[] = "filters[like][$field]";
+                }
+            }
+            // {field, value} 목록이면 번호를 다시 매김
+            if(count(array_filter(array_keys($data['filter']['like']), 'is_int')) === count($data['filter']['like'])) {
+                $data['filter']['like'] = array_values($data['filter']['like']);
+            }
+        }
+
+        if(isset($data['filter']['date']) && is_array($data['filter']['date'])) {
+            $data['filter']['date'] = array_intersect_key($data['filter']['date'], array_flip(['start_date', 'end_date', 'on_date']));
+        }
+
+        if(count($dropped)) log_message('debug', __METHOD__.' : dropped request fields - '.implode(', ', $dropped));
+
+        return $data;
     }
 
     protected function afterGet($key, $data = [])
@@ -1537,7 +1624,7 @@ class MY_Builder_API extends MY_Controller_API
         }
         unset($data['exportType']);
 
-        $data = reformat_get_data($data, $this->exceptValidateKeys);
+        $data = $this->sanitizeRequestConditions(reformat_get_data($data, $this->exceptValidateKeys));
 //        if($this->Model->getCnt($data) === 0) {
 //            $this->response([
 //                'code' => EMPTY_CONTENT,

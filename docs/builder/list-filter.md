@@ -492,7 +492,7 @@ filters = {
 filter 밖의 top-level 파라미터(`API_PARAMS` 등)는 `where`로 들어간다. `format=datatable`이고 `searchWord && searchCategory`면 `filter.like[searchCategory] = searchWord`를 넣는다(현재 JS는 항상 빈 값을 보냄).
 
 > **주의**
-> - 필터 필드명 화이트리스트가 없다. `filters[where|like][임의컬럼]`이 그대로 조건이 된다.
+> - 필터 필드는 허용 목록으로 거른다(`MY_Builder_API::sanitizeRequestConditions()`). 모델 컬럼·설정 필드가 아닌 키는 버려지므로, hook에서만 읽는 필터 키는 컨트롤러의 `$allowedRequestFields`에 추가한다.
 
 ---
 

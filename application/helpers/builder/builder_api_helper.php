@@ -12,7 +12,8 @@ if ( ! function_exists('reformat_get_data'))
 
         foreach ($data as $field=>$value) {
             if(in_array($field, $exceptValidateKeys)) continue;
-            if(!$value) continue;
+            // '0'은 유효한 조건값이므로 빈 값만 건너뜀 (예: ?depth=0)
+            if($value === null || $value === '' || $value === []) continue;
             $return['where'][$field] = $value;
         }
 

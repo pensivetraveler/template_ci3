@@ -217,6 +217,19 @@ class Model_Common extends MY_Model
         return $set;
     }
 
+    /**
+     * 요청 파라미터로 조건을 걸 수 있는 컬럼 (기본 select 컬럼 + 식별자·PK)
+     * MY_Builder_API::getAllowedRequestFields() 가 요청 조건 허용 목록을 만들 때 쓴다.
+     */
+    public function getRequestColumnList(): array
+    {
+        return array_values(array_unique(array_filter(array_merge(
+            $this->getSelectList(),
+            [$this->identifier],
+            $this->primaryKeyList
+        ))));
+    }
+
     public function getColumnList(): array
     {
         $list = array_values(array_unique(

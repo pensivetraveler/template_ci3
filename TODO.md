@@ -114,7 +114,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `app-page-edit.js` FormValidation `core.validator.validating` 핸들러가 `event.element.value`를 마스킹 없이 console.log (edit 화면 비밀번호 평문 노출, add/list는 `32f07d5`에서 마스킹)
 - [ ] `MY_Builder_API::getExportsConfig` form config 전체로 컬럼을 정해 `password`, `user_api_key`, hidden 필드까지 CSV/XLSX로 내보냄 (비밀번호 해시·API 키 유출)
 - [ ] `MY_Builder_API::prepareExportsPath` 임시 파일을 웹 공개 경로 `public/temps/`에 저장하고 다운로드 안 된 파일은 남음 (파일명 유출 시 직접 접근, 잔존 파일 누적)
-- [ ] `builder_api_helper.php::reformat_get_data` 필터·top-level 파라미터의 필드명 화이트리스트 없음 → `filters[where|like][임의컬럼]`이 그대로 조건 (password LIKE로 해시 탐색 가능) (추가: `exceptValidateKeys` 외 모든 top-level GET 키도 where가 되어 `?password=...`로 값 추측(불리언 오라클) 가능) (추가: 모르는 top-level 파라미터(`?foo=1`)도 where 컬럼이 돼 500, 개발(db_debug)에서는 SQL 오류문·전체 SELECT가 응답에 노출 — bizsoft-mig 확인 2026-10-24. 운영은 db_debug=false라 문구는 숨지만 500)
+- [x] `builder_api_helper.php::reformat_get_data` 필터·top-level 파라미터의 필드명 화이트리스트 없음 → `filters[where|like][임의컬럼]`이 그대로 조건 (password LIKE로 해시 탐색 가능) (추가: `exceptValidateKeys` 외 모든 top-level GET 키도 where가 되어 `?password=...`로 값 추측(불리언 오라클) 가능) (추가: 모르는 top-level 파라미터(`?foo=1`)도 where 컬럼이 돼 500, 개발(db_debug)에서는 SQL 오류문·전체 SELECT가 응답에 노출 — bizsoft-mig 확인 2026-10-24. 운영은 db_debug=false라 문구는 숨지만 500) → `MY_Builder_API::sanitizeRequestConditions()`: 모델(부모·자식 포함) 컬럼 + form/list/view/filter 설정 필드 + `$allowedRequestFields`에 없는 where·filters 키를 버림(debug 로그). date는 start_date·end_date·on_date만
 - [ ] `MY_Builder_WEB::setListActions` `actions.duplicate`는 권한 필터 대상이 아님 (create 권한 없이 복제 아이콘 노출)
 - [ ] `MY_Builder_API::uploadExcel_post` 기본 `validateExcelData`가 데이터를 그대로 반환하고 form rules·`checkUniqueExist`·`defaultList`·`fileList`를 거치지 않고 `Model->addList()`로 INSERT (검증 없는 대량 INSERT, POST 경로와 규칙 이원화 — form rules 재사용 검토)
 - [ ] `app-page-excel.js::validateData`/`submitData` `validateExcel`·`uploadExcel` AJAX에 `Authorization` 헤더 없음 (다른 호출과 인증 방식 불일치, 서버 측 우회 여부 확인 필요)
@@ -226,8 +226,8 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `Logs::__construct`, `Auth::__construct` `noIndexMethod = true`를 parent 생성자 이후에 대입 → 검사는 `MY_Builder_API::__construct()` 안에서 이미 끝나 무효 (프로퍼티 기본값으로 선언해야 함)
 - [ ] `MY_Builder_API::beforeAdd` 존재 확인이 `del_yn='N'` 기본 조건을 타서 soft delete된 같은 PK가 있으면 409 대신 DB duplicate key 오류
 - [ ] `MY_Builder_API::checkDuplicate` `$dto[$model->identifier]` — 수정 시 바디에 identifier가 없거나 `checkDuplicate_get`에 다른 쿼리 키(`_mode` 등)가 있으면 Notice + `where_not_in(identifier, [null])`
-- [ ] `reformat_get_data` `exceptValidateKeys`에 `_submode`가 없음 → GET에 `_submode`를 붙이면 where `_submode` 컬럼 SQL 오류 (`_remap()`은 `_submode`를 읽도록 되어 있음)
-- [ ] `reformat_get_data` `if(!$value) continue` → `'0'` 값으로 where 불가 (예: `?depth=0`, `?is_show=0`)
+- [x] `reformat_get_data` `exceptValidateKeys`에 `_submode`가 없음 → GET에 `_submode`를 붙이면 where `_submode` 컬럼 SQL 오류 (`_remap()`은 `_submode`를 읽도록 되어 있음)
+- [x] `reformat_get_data` `if(!$value) continue` → `'0'` 값으로 where 불가 (예: `?depth=0`, `?is_show=0`)
 - [ ] `MY_Builder_API::prepareExports_get` `is_null($this->Model)` — Model 미정의 컨트롤러에서는 undefined property Warning을 내고 나서야 `MODEL_IS_NOT_DEFINED` (property_exists 필요)
 - [ ] `MY_Builder_API::beforeResponse` `_mode=option`으로 상세(view) 조회 시 `$data['list']` 미정의
 - [ ] `MY_Builder_API::beforeDelete` 식별자 없이 DELETE하면 `getDeleteBaseRow()`의 `show_error()`로 HTML 500 (JSON 아님)
