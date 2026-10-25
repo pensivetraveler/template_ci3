@@ -1304,14 +1304,17 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if(
             $this->router->class === $menuData['class']
         ) {
+            $exact = $this->router->method === $menuData['method'];
             if(
-                $this->router->method === $menuData['method']
+                $exact
                 ||
                 $this->router->method === $this->routeConfig['properties']['baseMethod']
                 ||
                 in_array($this->router->method, array_keys($this->routeConfig['methods']))
             ) {
-                $this->currentMenu = $menuData;
+                // 같은 class 메뉴가 여럿이면(frameLogs/summary·traffics 등) method 가 같은 메뉴를 우선 (권한 행이 메뉴마다 다름)
+                $currentExact = !empty($this->currentMenu) && $this->router->method === ($this->currentMenu['method'] ?? null);
+                if($exact || !$currentExact) $this->currentMenu = $menuData;
             }
         }
     }
@@ -1326,18 +1329,49 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $this->pageAuth = $this->currentMenu['menuAuth'] ?? INIT_AUTH_CHAR;
             $this->scope = $this->currentMenu['scopeCd'] ?? '';
 
-            if($this->pageAuth === BASE_AUTH_CHAR) return;
-
             $baseMethod = $this->routeConfig['properties']['baseMethod'];
             $currMethod = $this->router->method === 'index' ? $baseMethod : $this->router->method;
-            if($this->routeConfig['methods'][$baseMethod]['category'] === 'list') {
-                if($currMethod !== $baseMethod) {
-                    if(!get_auth_value($this->methodConfig['mode'], $this->pageAuth)) {
-                        alert('Not Authorized', $this->href . DIRECTORY_SEPARATOR . $this->routeConfig['properties']['baseMethod']);
-                    }
-                }
+
+            // 메뉴가 가리키는 화면(메뉴의 method 또는 기준 화면)은 메뉴 표시만 확인 — 표시 = 첫 화면 열람
+            $menuMethod = $this->currentMenu['method'] ?? '';
+            if(in_array($menuMethod, ['', 'index'], true)) $menuMethod = $baseMethod;
+            if($currMethod === $baseMethod || $currMethod === $menuMethod) return;
+
+            // 그 안에서 여는 등록·수정·상세 등은 API 권한 검사(MY_Builder_API::checkApiPermission)와 같은 기준. 'a|b' 는 하나만 켜져 있어도 통과
+            $mode = $this->getPageAuthMode($currMethod);
+            if($mode === '') return;
+            foreach (explode('|', $mode) as $item) {
+                if(is_auth_avaliable($item, $this->pageAuth)) return;
             }
+
+            alert('Not Authorized', $this->href . DIRECTORY_SEPARATOR . $baseMethod);
         }
+    }
+
+    /**
+     * method 설정에 mode 가 없을 때 method 이름으로 정하는 권한 자리
+     */
+    protected array $pageAuthMethodModes = [
+        'add' => 'create', 'edit' => 'update', 'view' => 'read|update', 'excel' => 'import',
+    ];
+
+    /**
+     * 화면을 여는 데 필요한 권한 자리. '' 는 메뉴 표시만 확인 (메뉴가 가리키는 화면은 이 함수 전에 통과)
+     *  - 목록: '' (API 목록 GET 과 같음)
+     *  - 상세(category view): 'read|update' (API 단건 GET 과 같음)
+     *  - 그 밖: method 설정의 mode, 없으면 $pageAuthMethodModes. mode 'read' 는 상세 전용 자리라 '' 로 봄
+     */
+    protected function getPageAuthMode(string $method): string
+    {
+        $category = $this->methodConfig['category'] ?? '';
+        if($category === 'list') return '';
+
+        $mode = (string)($this->methodConfig['mode'] ?? '');
+        if($category === 'view' && in_array($mode, ['', 'read'], true)) return 'read|update';
+        if($mode === 'read') return '';
+        if($mode !== '') return $mode;
+
+        return $this->pageAuthMethodModes[$method] ?? '';
     }
 
     protected function setupPlatformRedirect()
