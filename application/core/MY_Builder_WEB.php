@@ -965,13 +965,16 @@ class MY_Builder_WEB extends MY_Controller_WEB
             }, []);
         }else{
             $config = [];
-            foreach ($this->formColumns as $column) {
-                if(!$column['form'] || !isset($column['field']) || $column['type'] === 'hidden') continue;
+            // excel 화면에서는 formColumns 를 미리 만들지 않으므로 여기서 form 설정을 읽는다 (form_{class}_excel → form_{class} 순)
+            $formColumns = $this->formColumns ?: $this->setFormColumns($this->methodConfig['properties']['formConfig'] ?? null);
+            foreach ($formColumns as $column) {
+                if(!$column['form'] || !isset($column['field']) || in_array($column['type'], ['hidden', 'common', 'file', 'password'], true)) continue;
                 if(in_array($column['field'], [CREATED_ID_COLUMN_NAME, CREATED_DT_COLUMN_NAME, UPDATED_ID_COLUMN_NAME, UPDATED_DT_COLUMN_NAME, DEL_YN_COLUMN_NAME, USE_YN_COLUMN_NAME, RECENT_DT_COLUMN_NAME])) continue;
                 if(preg_match('/matches\[(.*?)\]/', $column['rules'], $matches)) continue;
                 $config[] = [
                     'field' => $column['field'],
-                    'required' => strpos($column['rules'], 'required')!==false,
+                    // 등록 기준 필수: required 또는 required_mod[...add...] (서버 validateExcelData 와 같은 기준)
+                    'required' => (bool)preg_match('/(^|\|)required(\||$)|required_mod\[[^\]]*add/', $column['rules'] ?? ''),
                     'label' => lang($column['label']??$column['field']),
                 ];
             }

@@ -93,7 +93,7 @@
 					<tr>
 						<th>#</th>
 						<?php foreach ($excelHeaders as $item): ?>
-						<th data-field="<?=$item['field']?>" data-required="<?=$item['required']?>"><span><?=$item['label']?></span></th>
+						<th data-field="<?=html_escape($item['field'])?>" data-required="<?=$item['required']?'1':''?>"><span><?=html_escape($item['label'])?></span></th>
 						<?php endforeach; ?>
 						<th>삭제</th>
 					</tr>
@@ -109,5 +109,6 @@
 	</div>
 </div>
 <script>
-	const excelHeaders = JSON.parse('<?=json_encode($excelHeaders, JSON_UNESCAPED_UNICODE)?>');
+	// JSON 을 문자열로 감싸지 않고 바로 출력 (라벨의 따옴표·역슬래시가 스크립트를 깨뜨리지 않게, 태그 문자는 JSON_HEX_TAG 로 처리)
+	const excelHeaders = <?=json_encode($excelHeaders, JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP)?>;
 </script>

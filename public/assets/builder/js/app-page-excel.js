@@ -1,29 +1,59 @@
-function emitErrorMessage(response) {
-	let key = Object.keys(response.data)[0];
-	let targetData = response.data[key];
+/**
+ * 서버 검증 오류(422) 표시. errors: [{param: 필드, value: 엑셀 행 번호, msg}]
+ * 해당 셀에 edit-required 를 붙이고, 앞의 몇 건을 알림에 글자로 보여 준다
+ */
+function emitExcelErrors(errors) {
+	const list = Array.isArray(errors) ? errors : [];
+	list.forEach((error) => {
+		const tr = document.querySelector(`#inline-editable tbody tr[data-row="${CSS.escape(String(error.value ?? ''))}"]`);
+		if(!tr) return;
+		const index = getExcelColumnIndex(error.param);
+		const td = index === -1 ? null : tr.children[index];
+		(td ?? tr).classList.add('edit-required');
+	});
 
-	let errorCount = 0;
-	const index = getNodeIndexInParent(document.querySelector(`th[data-field="${key}"]`));
-	if(index !== -1) {
-		for(const td of document.querySelectorAll(`#inline-editable tbody tr:not(.submit-completed) td:nth-child(${index+1})`)) {
-			if(td.querySelector('span').innerHTML === targetData) {
-				td.classList.add('edit-required');
-				errorCount++;
-			}
-		}
+	document.getElementById('totalErrorCount').innerText = String(document.querySelectorAll('#inline-editable td.edit-required, #inline-editable tr.edit-required').length);
+	document.getElementById('btnErrorFind').removeAttribute('disabled');
+	document.getElementById('excelFormSubmit').setAttribute('disabled', 'disabled');
 
-		document.getElementById('totalErrorCount').innerText = errorCount.toString();
-		document.getElementById('btnErrorFind').removeAttribute('disabled');
-		document.getElementById('excelFormSubmit').setAttribute('disabled', 'disabled');
+	const wrap = document.createElement('div');
+	list.slice(0, 5).forEach((error) => {
+		const p = document.createElement('p');
+		p.className = 'mb-1 text-start';
+		const label = (excelHeaders.find(item => item.field === error.param) ?? {}).label ?? error.param ?? '';
+		p.textContent = `${error.value}행${label ? ' ' + label : ''} : ${error.msg ?? ''}`;
+		wrap.appendChild(p);
+	});
+	if(list.length > 5) {
+		const more = document.createElement('p');
+		more.className = 'mb-0 text-muted small';
+		more.textContent = `외 ${list.length - 5}건`;
+		wrap.appendChild(more);
 	}
-
-	let filtered = excelHeaders.filter(item => item.field === key);
-	if(filtered.length) key = filtered[0].label;
 
 	showAlert({
 		type : 'error',
-		html: `<p>${response.msg}</p><p class="text-danger mt-2 mb-0">(${key} : ${targetData})</p>`,
+		html: wrap.innerHTML,
 	});
+}
+
+/**
+ * 표에서 필드의 열 번호 (thead th[data-field])
+ */
+function getExcelColumnIndex(field) {
+	const ths = Array.from(document.querySelectorAll('#inline-editable thead th'));
+	return ths.findIndex(th => th.getAttribute('data-field') === field);
+}
+
+function handleExcelAjaxError(xhr) {
+	if(xhr.status === 422 && xhr.responseJSON && Array.isArray(xhr.responseJSON.errors)) {
+		emitExcelErrors(xhr.responseJSON.errors);
+	}else{
+		showAlert({
+			type: "error",
+			text: xhr.responseJSON ? xhr.responseJSON.msg : "Unknown Error",
+		});
+	}
 }
 
 function getEditableColumns(tableSelector, excludeIndices = [0]) {
@@ -67,95 +97,56 @@ function resetExcelFile() {
 }
 
 async function validateData(dataArray, chunkSize = 50) {
-	let index = 0;
-	let valid = true;
-
-	while (index < dataArray.length) {
-		if (!valid) break; // 에러 발생 시 중단
-
-		let chunk = dataArray.slice(index, index + chunkSize);
-		index += chunkSize;
-
+	for(let index = 0; index < dataArray.length; index += chunkSize) {
+		const chunk = dataArray.slice(index, index + chunkSize).map(item => item.data);
 		try {
-			const response = await $.ajax({
+			await $.ajax({
 				url: common.API_URI + '/validateExcel',
 				type: "POST",
+				headers: {
+					'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+				},
 				data: JSON.stringify(chunk),
 				contentType: "application/json",
 			});
-
-			console.log("Chunk sent successfully");
 		} catch (xhr) {
-			console.log(xhr.responseJSON?.data || "Unknown error response");
-
-			if (xhr.responseJSON && [404, 409].includes(Math.floor(xhr.responseJSON.code / 10))) {
-				emitErrorMessage(xhr.responseJSON);
-			} else {
-				showAlert({
-					type: "error",
-					text: xhr.responseJSON ? xhr.responseJSON.msg : "Unknown Error",
-				});
-			}
-
-			valid = false;
-			break; // 에러 발생 시 중단
+			handleExcelAjaxError(xhr);
+			return false;
 		}
 	}
-
-	return valid;
+	return true;
 }
 
+/**
+ * 50행씩 저장한다. 저장된 행은 submit-completed 로 표시해, 중간에 실패해도 다시 저장할 때 보내지 않는다.
+ */
 async function submitData(dataArray, chunkSize = 50) {
-	let index = 0;
-	let valid = true;
-
-	while (index < dataArray.length) {
-		if (!valid) break;
-
-		let chunk = dataArray.slice(index, index + chunkSize);
-		index += chunkSize;
-
+	for(let index = 0; index < dataArray.length; index += chunkSize) {
+		const items = dataArray.slice(index, index + chunkSize);
 		try {
-			const response = await $.ajax({
+			await $.ajax({
 				url: common.API_URI + '/uploadExcel',
 				type: 'POST',
 				dataType: 'json',
-				contentType: 'application/json', // content-type 지정
-				data: JSON.stringify(chunk),
+				headers: {
+					'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+				},
+				contentType: 'application/json',
+				data: JSON.stringify(items.map(item => item.data)),
 			});
-
-			console.log(response);
-
-			// 성공적으로 처리된 row에 class 추가
-			document.querySelectorAll('#inline-editable tbody tr').forEach(tr => {
-				if (parseInt(tr.id) > index - chunkSize && parseInt(tr.id) <= index) {
-					tr.classList.add('submit-completed');
-				}
-			});
-
+			items.forEach(item => item.tr.classList.add('submit-completed'));
 		} catch (xhr) {
-			valid = false; // 에러 발생 시 중단
-
-			if (xhr.responseJSON && [404, 409].includes(Math.floor(xhr.responseJSON.code / 10))) {
-				emitErrorMessage(xhr.responseJSON);
-			} else {
-				showAlert({
-					type: 'error',
-					text: xhr.responseJSON ? xhr.responseJSON.msg : 'Unknown Error',
-				});
-			}
+			handleExcelAjaxError(xhr);
+			return false;
 		}
 	}
 
-	if (valid) {
-		showAlert({
-			type: 'success',
-			text: 'Registered Successfully',
-			callback: reload,
-		});
-	}
-
-	return valid;
+	showAlert({
+		type: 'success',
+		text: 'Registered Successfully',
+		callback: reload,
+	});
+	return true;
 }
 
 $(function() {
@@ -199,26 +190,41 @@ $(function() {
 				return;
 			}
 
-			// header 검사
-			const notFields = [];
-			for(const item of json[0]) if(!fieldList.includes(item)) notFields.push(item);
+			// header 검사: 1행의 헤더 이름으로 열을 찾는다 (열 순서는 샘플과 달라도 됨)
+			const headerRow = (json[0] ?? []).map(item => String(item ?? '').trim());
+			const notFields = headerRow.filter(item => item !== '' && !fieldList.includes(item));
+			const missingRequired = requiredList.filter(label => !headerRow.includes(label));
 
-			if(notFields.length) {
+			if(notFields.length || missingRequired.length) {
+				const wrap = document.createElement('div');
+				if(notFields.length) {
+					const p = document.createElement('p');
+					p.textContent = '허용되지 않는 컬럼이 포함되어있습니다: ' + notFields.join(', ');
+					wrap.appendChild(p);
+				}
+				if(missingRequired.length) {
+					const p = document.createElement('p');
+					p.textContent = '필수 컬럼이 없습니다: ' + missingRequired.join(', ');
+					wrap.appendChild(p);
+				}
 				showAlert({
 					type: 'error',
-					html: "허용되지 않는 컬럼이 포함되어있습니다.<br><span class='small mt-2'>"+notFields.join(', ')+"</span>",
+					html: wrap.innerHTML,
 				})
 				return;
 			}
 
 			// table 초기화
 			const table = document.getElementById('inline-editable');
-			const colCount = json[0].length;
+			const colCount = fieldList.length;
+			// 표 열(thead 순서 = excelHeaders 순서) → 엑셀 열 번호
+			const sourceIndex = fieldList.map(label => headerRow.indexOf(label));
 
 			const itemList = [];
 			for(let i = 1; i < json.length; i++) {
-				if(json[i].length === 0) continue;
-				itemList.push(json[i]);
+				if(!json[i] || json[i].length === 0) continue;
+				// 엑셀 행 번호(1행이 헤더)를 함께 보관해 서버 오류를 행에 표시한다
+				itemList.push({row: i + 1, values: sourceIndex.map(idx => idx === -1 ? '' : (json[i][idx] ?? ''))});
 			}
 
 			// tbody
@@ -228,11 +234,12 @@ $(function() {
 			const tbody = table.querySelector('tbody');
 			for(let i = 0; i < itemList.length; i++) {
 				const row = document.createElement('tr');
+				row.setAttribute('data-row', itemList[i].row);
 				const init = document.createElement('td');
-				init.innerText = i+1;
+				init.innerText = itemList[i].row;
 				row.appendChild(init);
 				for(let j = 0; j < colCount; j++) {
-					const obj = itemList[i];
+					const obj = itemList[i].values;
 					const td = document.createElement('td');
 					td.innerText = obj[j]??'';
 
@@ -329,18 +336,20 @@ $(function() {
 	});
 
 	$('#excelFormSubmit').on('click', async function () {
-		let editedData = [];
+		const ths = Array.from(document.querySelectorAll('#inline-editable thead th'));
+		const editedData = [];
 
-		$('#inline-editable tbody tr:not(.submit-completed)').each(function () {
-			let row = $(this);
-			let rowData = {};
-			$(row).find('td').each(function (k, v) {
-				if (k === 0 || k === $(row).find('td').length - 1) return;
-				const columnName = excelHeaders[k - 1].field;
-				rowData[columnName] = $(v).text();
+		// 이미 저장된 행(submit-completed)은 다시 보내지 않는다
+		$('#inline-editable tbody tr[data-row]:not(.submit-completed)').each(function () {
+			const rowData = {_row: Number(this.getAttribute('data-row'))};
+			$(this).find('td').each(function (k, v) {
+				const field = ths[k] ? ths[k].getAttribute('data-field') : null;
+				if(!field) return;
+				rowData[field] = $(v).text().trim();
 			});
-			editedData.push(rowData);
+			editedData.push({tr: this, data: rowData});
 		});
+		if(!editedData.length) return;
 
 		const valid = await validateData(editedData, 50);
 		if(valid) await submitData(editedData, 50);
@@ -353,7 +362,7 @@ $(function() {
 		const tr = document.createElement('tr');
 		tr.classList.add('no-result');
 		const td = document.createElement('td');
-		td.setAttribute('colspan', $(table).find('thead tr th').length+2);
+		td.setAttribute('colspan', $(table).find('thead tr th').length);
 		td.classList.add('text-center');
 		td.innerHTML = '파일을 업로드하세요';
 		tr.appendChild(td);

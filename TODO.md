@@ -118,8 +118,8 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `MY_Builder_API::prepareExportsPath` 임시 파일을 웹 공개 경로 `public/temps/`에 저장하고 다운로드 안 된 파일은 남음 (파일명 유출 시 직접 접근, 잔존 파일 누적) → `application/cache/exports/`(웹 접근 차단)로 이동, 하루 지난 파일 정리, 다운로드 파일명 형식 검사 (2026-10-25)
 - [x] `builder_api_helper.php::reformat_get_data` 필터·top-level 파라미터의 필드명 화이트리스트 없음 → `filters[where|like][임의컬럼]`이 그대로 조건 (password LIKE로 해시 탐색 가능) (추가: `exceptValidateKeys` 외 모든 top-level GET 키도 where가 되어 `?password=...`로 값 추측(불리언 오라클) 가능) (추가: 모르는 top-level 파라미터(`?foo=1`)도 where 컬럼이 돼 500, 개발(db_debug)에서는 SQL 오류문·전체 SELECT가 응답에 노출 — bizsoft-mig 확인 2026-10-24. 운영은 db_debug=false라 문구는 숨지만 500) → `MY_Builder_API::sanitizeRequestConditions()`: 모델(부모·자식 포함) 컬럼 + form/list/view/filter 설정 필드 + `$allowedRequestFields`에 없는 where·filters 키를 조용히 버림. date는 start_date·end_date·on_date만
 - [x] `MY_Builder_WEB::setListActions` `actions.duplicate`는 권한 필터 대상이 아님 (create 권한 없이 복제 아이콘 노출) → 등록(create) 권한으로 필터 (2026-10-25)
-- [ ] `MY_Builder_API::uploadExcel_post` 기본 `validateExcelData`가 데이터를 그대로 반환하고 form rules·`checkUniqueExist`·`defaultList`·`fileList`를 거치지 않고 `Model->addList()`로 INSERT (검증 없는 대량 INSERT, POST 경로와 규칙 이원화 — form rules 재사용 검토)
-- [ ] `app-page-excel.js::validateData`/`submitData` `validateExcel`·`uploadExcel` AJAX에 `Authorization` 헤더 없음 (다른 호출과 인증 방식 불일치, 서버 측 우회 여부 확인 필요)
+- [x] `MY_Builder_API::uploadExcel_post` 기본 `validateExcelData`가 데이터를 그대로 반환하고 form rules·`checkUniqueExist`·`defaultList`·`fileList`를 거치지 않고 `Model->addList()`로 INSERT (검증 없는 대량 INSERT, POST 경로와 규칙 이원화 — form rules 재사용 검토) → `validateExcelData()`가 행마다 form rules(required_mod[add]→required)·notNullList·고유키(DB·요청 안 중복)·defaultList를 검사해 422(행·필드별 오류), 저장은 `setData()` 후 `addList()`(트랜잭션) (2026-10-25)
+- [x] `app-page-excel.js::validateData`/`submitData` `validateExcel`·`uploadExcel` AJAX에 `Authorization` 헤더 없음 (다른 호출과 인증 방식 불일치, 서버 측 우회 여부 확인 필요) → `Authorization` 헤더 추가 (2026-10-25)
 - [ ] `MY_Builder_WEB::setupPlatformPage` mode 검사를 원본 `routeConfig['methods'][baseMethod]['category']`가 list일 때만 수행 (category 없는 baseMethod면 notice, list가 아닌 baseMethod route는 add/edit/excel 등 mode 권한 검사 전무)
 - [x] `MY_Builder_API::deleteExcelFile_patch` `class` 입력을 검증 없이 파일 경로에 붙여 `unlink` (경로 조작으로 임의 `*_upload_sample.xlsx` 삭제 가능) (추가: admin 확인도 없음, `public/sample` 밖 경로 삭제 가능) → class 형식(`^[A-Za-z][A-Za-z0-9_]*$`) 검사. admin 확인은 API 권한 검사(2장)에서 (2026-10-25)
 
@@ -204,10 +204,10 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `views/builder/layout/view_comments.php` `$identifier['field']`(단건)를 쓰지만 `prepareViewData()`의 `identifier`는 배열 목록 (댓글 identifier 값 오류) (보류: 게시판형 상세는 게시판 기능 정리 때)
 - [x] `MY_Builder_WEB::setViewColumns` resourceConfig가 없을 때 `jsVars['FORM_DATA']`를 쓰지만 view category에서는 설정 안 됨 (undefined index), `config->get()`을 `triggerError` 기본값 true로 호출 (설정 없으면 에러 로그) → view 설정(`setConfigList('view')`)이 없으면 form 설정 필드를 읽기 전용으로, `lang:` 라벨 정리 (2026-10-25)
 - [x] `MY_Builder_API::transformView` 매칭 옵션이 없으면 `$options[$data->{$key}]` undefined index (option_attributes 라벨 변환 시 notice) → 매칭 옵션이 없으면 원래 값 (2026-10-25)
-- [ ] `app-page-excel.js` `#excelFormSubmit` 열 매핑이 위치 기반(`excelHeaders[k-1].field`)이고 헤더는 허용 목록 포함 여부만 검사 (열 순서가 다르거나 일부만 있으면 값이 엉뚱한 컬럼에 저장)
-- [ ] `app-page-excel.js::submitData` `tr.id`로 완료 행을 표시하지만 `#excelFile` 핸들러가 행에 id를 넣지 않음 (`submit-completed` 미표시, 중간 청크 실패 후 재저장 시 중복 INSERT)
-- [ ] `app-page-excel.js` `#resetExcelForm` `colspan = th개수 + 2`로 이미 #·삭제 열이 포함된 수에 2를 더함 (빈 행 colspan 과다)
-- [ ] `views/builder/layout/excel.php` `JSON.parse('<?=json_encode(...)?>')` 작은따옴표 안에 JSON 출력 (라벨에 `'`나 `\`가 있으면 스크립트 오류)
+- [x] `app-page-excel.js` `#excelFormSubmit` 열 매핑이 위치 기반(`excelHeaders[k-1].field`)이고 헤더는 허용 목록 포함 여부만 검사 (열 순서가 다르거나 일부만 있으면 값이 엉뚱한 컬럼에 저장) → 1행 헤더 이름으로 열을 찾고 표(thead data-field) 기준으로 보냄, 필수 열 누락·모르는 열은 업로드 전에 알림 (2026-10-25)
+- [x] `app-page-excel.js::submitData` `tr.id`로 완료 행을 표시하지만 `#excelFile` 핸들러가 행에 id를 넣지 않음 (`submit-completed` 미표시, 중간 청크 실패 후 재저장 시 중복 INSERT) → 행에 `data-row`(엑셀 행 번호), 저장된 청크의 행만 submit-completed, 다시 저장 시 제외 (2026-10-25)
+- [x] `app-page-excel.js` `#resetExcelForm` `colspan = th개수 + 2`로 이미 #·삭제 열이 포함된 수에 2를 더함 (빈 행 colspan 과다) → thead 열 수 (2026-10-25)
+- [x] `views/builder/layout/excel.php` `JSON.parse('<?=json_encode(...)?>')` 작은따옴표 안에 JSON 출력 (라벨에 `'`나 `\`가 있으면 스크립트 오류) → JSON 을 바로 출력(JSON_HEX_*), 헤더 라벨 html_escape (2026-10-25)
 
 **API hooks·모델**
 - [x] `MY_Model::getListPDO` select가 컬럼 1개면 객체 대신 값 배열을 반환 → 요청 `select[]=col` 하나(또는 식이 걸러져 하나만 남은 경우) 목록·내보내기에서 `transformView()` TypeError 500 (bizsoft 개발 서버에서 확인, 2026-10-24) → `MY_Builder_API::getListSelect()`가 컬럼 1개면 식별자 컬럼을 함께 조회
