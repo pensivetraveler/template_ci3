@@ -755,3 +755,21 @@ $config['api_method_config'] = [
 - 권한 행(`getApiMenuAuth()`): 기본은 `menu_auth`에서 `grade_cd = 세션 user_cd`. 파트너별 권한처럼 다른 기준이면 프로젝트의 `api/Common`에서 오버라이드한다.
 - 403 응답: `code = FORBIDDEN_ACCESS`, `errors[0].param.reason` = `super` | `menu` | 권한 자리.
 
+### 8-2. 데이터 범위 (`getDataScope()`)
+
+메뉴 권한이 "이 기능을 쓸 수 있나"라면, 데이터 범위는 "어느 행을 다룰 수 있나"다 (예: 파트너는 담당 회사 데이터만).
+
+- 엔티티 API: `protected array $scopeFields = ['company_id'];` — 이 엔티티를 거르는 필드
+- 프로젝트 `api/Common`: `getDataScope()`를 구현해 `[필드 => 허용 값 목록]`을 반환. 빈 배열이면 제한 없음(기본, 시스템 관리자 등)
+- 코어가 자동 적용:
+
+| 경로 | 동작 |
+|---|---|
+| 목록 GET, 내보내기 | `whereIn` 조건 추가 (`beforeList`가 같은 필드 조건을 넣었으면 교집합) |
+| 식별자로 지정한 행 (단건 GET, 수정 POST·PUT·PATCH, DELETE, `$scopeKeyEndpoints`) | 범위 밖이면 404 (`_remap`의 `checkDataScopeTarget()`) |
+| 등록·수정 값 (`add()`·`modify()`) | 범위 필드 값이 범위 밖이면 404, 등록에서 범위 필드가 빠져도 404 |
+| 엑셀 가져오기 | 행마다 등록과 같은 값 검사 |
+
+- 첫 인자가 식별자인 프로젝트 엔드포인트(예: `getDefaultStyle/{id}`)는 엔티티에서 `$scopeKeyEndpoints`에 추가한다.
+- 회사 컬럼이 없고 다른 키로 이어지는 엔티티(예: 로그 → `frame_id`)는 엔티티에서 `getDataScope()`를 오버라이드해 그 키의 허용 값을 반환한다.
+
