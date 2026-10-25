@@ -35,7 +35,7 @@
     - 결정: 요청별 6자리 권한 / 메뉴와 연결되지 않은 API는 로그인만 / `CACHING_MENU=false`는 화면처럼 생략(super는 적용) / `/admin/api/*`(`$permissionFlags = ['admin']`)만
     - 시스템 관리자·로그인 전 요청·`permission.check=false` 통과, `permission.super`·isSuper 메뉴는 시스템 관리자만
     - 메뉴 연결: `api_method_config`의 `permission.menu`, 없으면 API 클래스와 같은 이름의 nav 메뉴(같은 class가 여럿이면 method가 같은 메뉴). 시스템 설정 API 4개(sysCfg·sysCode·menuList·menuAuth)는 `system/{메서드}`로 연결
-    - 권한 자리: GET 조회, 식별자 없는 POST 등록, 식별자 있는 POST·PUT·PATCH 수정, DELETE 삭제, 내보내기 export, 엑셀 import, 복제 create (`$permissionEndpointModes`, `permission.mode`로 바꿀 수 있음)
+    - 권한 자리: 목록·이름 있는 GET은 메뉴 표시만(화면 목록과 같음), 단건 GET은 read 또는 update, 식별자 없는 POST 등록, 식별자 있는 POST·PUT·PATCH 수정, DELETE 삭제, 내보내기 export, 엑셀 import, 복제 create (`$permissionEndpointModes`, `permission.mode`로 바꿀 수 있음)
     - 권한 행: `getApiMenuAuth()` 기본은 `menu_auth`(회원 등급). 파트너별 권한 등은 프로젝트에서 오버라이드
 - [x] 내보내기·가져오기 권한도 같은 검사(export·import 자리)
 - [ ] 화면 쪽 `MY_Builder_WEB::setupPlatformPage`의 메서드별 mode 검사 정리(목록이 baseMethod가 아닌 route는 검사 안 함, `000000`이면 생략) — API 검사와 같은 기준으로 맞출지 결정 필요

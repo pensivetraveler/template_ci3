@@ -748,10 +748,10 @@ $config['api_method_config'] = [
 | 3 | 연결된 메뉴 없음 | 통과(로그인만) |
 | 4 | `CACHING_MENU=false`, 또는 메뉴 `isAuth=false` | 통과(화면과 같음) |
 | 5 | 메뉴 권한 행 없음·숨김 | 403 |
-| 6 | 요청 권한 자리가 꺼짐 | 403 |
+| 6 | 요청 권한 자리가 꺼짐(여럿이면 모두 꺼짐) | 403 |
 
 - 메뉴 연결: `permission.menu` → API 클래스와 같은 `class`의 nav 메뉴(여럿이면 API 메서드와 같은 `method`, 다음은 method 없는 메뉴).
-- 권한 자리(`getApiPermissionMode()`): GET `read`, 식별자 없는 POST `create`, 식별자 있는 POST·PUT·PATCH `update`, DELETE `delete`. 이름 있는 엔드포인트는 `$permissionEndpointModes`(내보내기 `export`, 엑셀 `import`, `duplicate` `create`), 그 밖에는 GET `read`·DELETE `delete`·나머지 `update`. `permission.mode`가 있으면 그 값.
+- 권한 자리(`getApiPermissionMode()`): 목록 GET은 자리 검사 없이 메뉴 표시만(화면 목록과 같음), 단건 GET은 `read` 또는 `update`(수정 화면도 단건 조회를 씀), 식별자 없는 POST `create`, 식별자 있는 POST·PUT·PATCH `update`, DELETE `delete`. 이름 있는 엔드포인트는 `$permissionEndpointModes`(내보내기 `export`, 엑셀 `import`, `duplicate` `create`), 그 밖에는 GET 메뉴 표시만·DELETE `delete`·나머지 `update`. `permission.mode`가 있으면 그 값(`'read|update'`처럼 여럿이면 하나만 켜져도 통과, `''`이면 메뉴 표시만).
 - 권한 행(`getApiMenuAuth()`): 기본은 `menu_auth`에서 `grade_cd = 세션 user_cd`. 파트너별 권한처럼 다른 기준이면 프로젝트의 `api/Common`에서 오버라이드한다.
 - 403 응답: `code = FORBIDDEN_ACCESS`, `errors[0].param.reason` = `super` | `menu` | 권한 자리.
 

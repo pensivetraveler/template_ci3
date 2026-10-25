@@ -2433,7 +2433,7 @@ class MY_Builder_API extends MY_Controller_API
     protected array $permissionFlags = ['admin'];
 
     /**
-     * 이름 있는 엔드포인트의 권한 자리. 없으면 HTTP 메서드로 판단 (GET 조회, POST·PUT·PATCH 수정, DELETE 삭제)
+     * 이름 있는 엔드포인트의 권한 자리. 없으면 HTTP 메서드로 판단 (GET 메뉴 표시만, POST·PUT·PATCH 수정, DELETE 삭제)
      */
     protected array $permissionEndpointModes = [
         'prepareExports' => 'export', 'downloadExports' => 'export',
@@ -2448,6 +2448,7 @@ class MY_Builder_API extends MY_Controller_API
      *  3. 메뉴와 연결되지 않은 API → 로그인만 (통과)
      *  4. CACHING_MENU=false(권한 데이터 없음) 또는 메뉴 isAuth=false → 통과 (화면과 같음)
      *  5. 메뉴 권한 행이 없거나 숨김 → 403, 요청 권한 자리(create·read·update·delete·export·import)가 꺼져 있으면 403
+     *     권한 자리가 'read|update' 처럼 여럿이면 하나만 켜져 있어도 통과, '' 이면 메뉴 표시(is_show)만 확인
      * 메뉴 연결: api_method_config 의 permission.menu ('class' 또는 'class/method'), 없으면 API 클래스와 같은 이름의 메뉴
      */
     protected function checkApiPermission(string $http, string $object, array $arguments): void
@@ -2471,21 +2472,30 @@ class MY_Builder_API extends MY_Controller_API
         if(!$auth || (int)($auth->is_show ?? 0) !== 1) $this->denyApiPermission('menu');
 
         $mode = $permission['mode'] ?? $this->getApiPermissionMode($http, $object, $arguments);
-        if($mode && !is_auth_avaliable($mode, (string)$auth->menu_auth)) $this->denyApiPermission($mode);
+        if($mode === '' || $mode === null) return;
+        $modes = is_array($mode) ? $mode : explode('|', (string)$mode);
+        foreach ($modes as $item) {
+            if(is_auth_avaliable($item, (string)$auth->menu_auth)) return;
+        }
+        $this->denyApiPermission(implode('|', $modes));
     }
 
     /**
-     * 요청이 쓰는 권한 자리
+     * 요청이 쓰는 권한 자리. '' 는 메뉴 표시만 확인
+     *  - 목록 GET·이름 있는 GET(선택 목록·중복 확인 등): '' (화면 목록이 권한 자리를 검사하지 않는 것과 같음)
+     *  - 단건 GET: 'read|update' (상세 화면은 read, 수정 화면도 단건 조회를 씀)
      */
     protected function getApiPermissionMode(string $http, string $object, array $arguments): string
     {
         if($object !== 'index' && method_exists($this, "{$object}_{$http}")) {
             if(array_key_exists($object, $this->permissionEndpointModes)) return $this->permissionEndpointModes[$object];
-            return $http === 'get' ? 'read' : ($http === 'delete' ? 'delete' : 'update');
+            return $http === 'get' ? '' : ($http === 'delete' ? 'delete' : 'update');
         }
 
         switch ($http) {
-            case 'get' : return 'read';
+            case 'get' :
+                $key = $object !== 'index' ? $object : ($arguments[0] ?? 0);
+                return count($this->checkIdentifierExist($key)) ? 'read|update' : '';
             case 'delete' : return 'delete';
             case 'put' :
             case 'patch' : return 'update';
