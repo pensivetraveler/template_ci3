@@ -1184,13 +1184,14 @@ function setDynamicSelectOptions(selector, params) {
     if(Object.hasOwn(params, 'url')) {
         url = params.url;
     }else if(Object.hasOwn(params, 'add_uri')){
-        url = common.BASE_URI + '/' + params.add_uri;
+        url = common.BASE_URI.replace(/\/+$/, '') + '/' + String(params.add_uri).replace(/^\/+/, '');
     }else{
         url = common.API_URI + '/options';
     }
 
     // 2) AJAX로 method 리스트를 가져온다
-    $.get(url, data)
+    // API 키 검사가 켜진 환경에서도 받도록 Authorization 헤더를 붙인다
+    $.ajax({url, data, dataType: 'json', headers: {'Authorization': common.HOOK_PHPTOJS_VAR_TOKEN}})
         .done(function(json) {
             if (!json || !Object.hasOwn(json, 'data'))
                 console.warn('data가 반환되지 않음', json);
@@ -1209,7 +1210,7 @@ function reloadSelect2(selector, url, preselectedIds = [], template = {id:'id',t
     $sel.val(null);
     $sel.empty(); // 옵션 싹 비움
 
-    $.getJSON(url).done(function (json) {
+    $.ajax({url, dataType: 'json', headers: {'Authorization': common.HOOK_PHPTOJS_VAR_TOKEN}}).done(function (json) {
         const rows = json.data || [];
         rows.forEach(function (row) {
             const id   = row[template.id];
