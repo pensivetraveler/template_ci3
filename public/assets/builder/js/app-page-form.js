@@ -959,7 +959,7 @@ function setFormListItemThumbnail(field, item, identifier = '') {
                         <span class="h6 mb-0 align-middle">${item.orig_name}</span>
                     </a>
                 </div>
-                <button class="btn btn-danger waves-effect p-1" type="button" onclick="deleteFile(this, 'thumbnail')">
+                <button class="btn btn-danger waves-effect p-1" type="button" onclick="deleteFile(this, '${field.form_attributes.list_delete || field.field}')">
                     <i class="ri-close-line ri-16px align-middle"></i>
                 </button>
             </div>

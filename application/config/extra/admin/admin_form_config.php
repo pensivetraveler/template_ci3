@@ -740,7 +740,7 @@ $config['form_categories_config'] = [
         ],
         'form_attributes' => [
             'with_list' => true,
-            'list_delete' => 'thumbnail',
+            'list_delete' => 'category_icon',
         ],
         'list' => true,
         'list_attributes' => [

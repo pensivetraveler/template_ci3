@@ -39,7 +39,8 @@
     - 권한 행: `getApiMenuAuth()` 기본은 `menu_auth`(회원 등급). 파트너별 권한 등은 프로젝트에서 오버라이드
 - [x] 내보내기·가져오기 권한도 같은 검사(export·import 자리)
 - [ ] 화면 쪽 `MY_Builder_WEB::setupPlatformPage`의 메서드별 mode 검사 정리(목록이 baseMethod가 아닌 route는 검사 안 함, `000000`이면 생략) — API 검사와 같은 기준으로 맞출지 결정 필요
-- [ ] 파일 삭제(`deleteFile_patch`)·첨부의 소유 엔티티 확인 — 지금은 update 권한만 확인
+- [x] 파일 삭제 소유 확인 (`deleteFile_patch`, 2026-10-25): `type`이 모델 파일 필드여야 하고(아니면 엔티티 `deleteOtherFile()`, 없으면 400), 그 행 컬럼에 file_id가 있어야 삭제(아니면 404), 삭제 후 행 컬럼에서 file_id 제거. 게시글 첨부는 `Articles::deleteOtherFile`. 카테고리 아이콘 `list_delete`가 `thumbnail`로 잘못 지정돼 있던 것 수정
+- [ ] 파일 다운로드(`downloader/{file_id}`)도 소속 확인 없음. 단 파일이 웹에서 바로 열리는 `public/uploads/`에 있어 다운로드만 막아도 주소로 열림 → 저장 위치를 웹 밖으로 옮기는 작업과 함께 결정
 - [x] `users` API 본인 제한 (`api/Users.php`, 2026-10-25): 시스템 관리자가 아니면 목록·이름 있는 GET 허용(목록이 필요하다는 결정), 단건 조회·수정은 본인만, 수정 때 등급·상태·아이디·API 키(`$selfProtectedFields`)는 저장 안 함, 등록·삭제·이름 있는 쓰기 403. 비밀번호 변경은 내 정보에서 계속 허용
 - [x] 데이터 범위 공통 장치 `getDataScope()`·`$scopeFields` (2026-10-25): 목록·내보내기 조건, 식별자 지정 행(단건·수정·삭제)·등록/수정 값·엑셀 행 검사, 범위 밖 404 (결정: 404 / bizsoft는 프레임 계열만 / 엔티티 속성으로 지정). 발견: 내보내기는 `beforeList`를 거치지 않아 목록 범위가 적용되지 않았음
 
@@ -78,6 +79,7 @@
 - [ ] `api/Setup.php`: 파일 캐시(`init_done`, TTL 1일)만으로 보호 → DB 상태로 판정, SQL 실행은 CLI 마이그레이션으로
 
 ### 버그
+- [ ] `MY_Builder_API::duplicate_post` 고유 컬럼(`uniqueKeyList`·PK)을 그대로 복사해 중복 키로 500 (bizsoft frames: frame_nick, 2026-10-25 확인) — 고유 컬럼 처리 규칙(접미사 추가·비우기·엔티티 hook) 결정 필요
 - [ ] 세션 토큰이 `user_token`에 없을 때(같은 계정 다른 곳 로그인 등) API는 모두 403 "API Key 값이 전달되지 않았습니다"인데 화면(`checkLoggedIn`·`isSessionTokenValid`)은 로그아웃시키지 않고 열림 — bizsoft 운영에서 관찰(2026-10-25), 원인 미확인
 - [x] `api/SysCode.php:53` `category_srt` → `cd_srt` (추가: `SysCode::executeModify`의 `$original->category_srt` 비교 때문에 정렬 변경 여부와 무관하게 reorder 실행) → `$original->cd_srt`로 수정, 수정 대상을 `$this->idData`로 조회해 부분 PATCH(sml_cd·cmb_cd 없음)도 처리 (bizsoft-mig에서 500 재현, 2026-10-24)
 - [x] `api/Comments.php` `in_array($id, $adminList)` 객체 배열 비교로 `is_admin` 항상 false, 댓글 N+1 쿼리 → 원래 created_id(user_id)로 비교(관리자 목록은 값 배열), 답글·작성자를 각각 한 번에 조회해 N+1 제거 (2026-10-25)
@@ -108,7 +110,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `MY_Builder_API::executeModify`/`setModData` 기본 흐름이 where를 `$this->idData`가 아니라 바디에서 계산한다. non-AI 모델은 바디에 PK가 없으면 where `[]` → `UPDATE` 테이블 전체 (PATCH 인라인 수정, query string으로만 PK를 준 PUT/POST). AI 모델은 identifier가 없으면 Notice + `IS NULL`로 무변경 (MenuAuth/PartnerAuth가 우회 오버라이드 중) → 메인 Model은 `$this->idData`로 수정, `checkModifyIdData()`가 식별자 누락 시 400, `Model_Common::validateWhereCondition()`이 빈 WHERE의 수정·삭제를 거부
 - [ ] `MY_Builder_API` 전반 API 인가가 rest_config `session`(user_id 존재)뿐이다. admin WEB의 `user_cd`/`IS_ADMIN` 검사가 API엔 없고, `flag !== 'admin'` 검사(SysCode, MenuAuth, MenuList, PartnerAuth, SysCfg)는 URL 첫 세그먼트라 `/admin/api/...`로 호출하면 통과 (일반 로그인 사용자가 관리자·권한·코드 CRUD 가능)
 - [x] `Model_Common::getSelectList` / `Model_Administrator::getList`·`Model_Partner::getList`(join select `'*'`) 기본 select에 `password` 해시, `user_api_key`가 포함되어 Users/Administrators/Partners 목록·상세 응답으로 그대로 나간다 (자격증명 노출) → `MY_Builder_API::$hiddenResponseFields`(password)는 모든 응답, `$hiddenListFields`(user_api_key 등)는 목록 응답에서 제거 (2026-10-25)
-- [ ] `MY_Builder_API::deleteFile_patch` body `file_id`만으로 `delFileData()` 실행, 엔티티 소속·작성자 확인 없음 (임의 파일 삭제). `type` 파라미터는 필수인데 쓰이지 않음
+- [x] `MY_Builder_API::deleteFile_patch` body `file_id`만으로 `delFileData()` 실행, 엔티티 소속·작성자 확인 없음 (임의 파일 삭제). `type` 파라미터는 필수인데 쓰이지 않음 (2026-10-25 TODO 2장에서 수정)
 - [x] `MY_Builder_API::duplicate_get` 권한 확인 없이 모든 엔티티에서 GET 한 번으로 INSERT 실행 (아래 버그와 결합) → `duplicate_post`로 변경, 원본은 URL 식별자(`checkIdentifierExist`)로 조회. 권한 검사는 2장 API 권한에서 (2026-10-25)
 - [x] `api/Common::sendEmail` bcc `pensive_lee@naver.com`, 발신자명 `'이광우'` 하드코딩 → 파생 프로젝트의 모든 발송 메일이 개인 주소로 복사됨 → 발신자·숨은참조를 `.env`(`MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`, `MAIL_BCC`)로 (2026-10-25)
 - [x] `MY_Model::addSqlSet`, `MY_Model::addSqlWhere` 값을 문자열 보간해 SQL 생성 (현재 호출부 없음, 사용 시 주입) → 값 escape·컬럼 protect_identifiers (2026-10-25)

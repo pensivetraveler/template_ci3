@@ -57,6 +57,27 @@ class Articles extends Common
 		parent::afterModify($key, $dto);
 	}
 
+	/**
+	 * 게시글 첨부(article_attachment) 삭제: deleteFile/{article_id}?type=attachment
+	 */
+	protected function deleteOtherFile($key, string $type, string $fileId): bool
+	{
+		if($type !== 'attachment') return false;
+
+		$idData = $this->checkIdentifierExist($key);
+		$articleId = $idData['article_id'] ?? 0;
+		if(!$articleId) $this->response(['code' => EMPTY_REQUIRED_DATA]);
+
+		$where = ['article_id' => $articleId, 'file_id' => $fileId];
+		if(!$this->Model_Article_Attachment->getCntWhere($where)) {
+			$this->response(['code' => DATA_NOT_EXIST], RestController::HTTP_NOT_FOUND);
+		}
+
+		$this->Model_Article_Attachment->delData($where);
+		$this->delFileData(['file_id' => $fileId]);
+		return true;
+	}
+
 	protected function saveAttachments($articleId, $boardId): void
 	{
 		if(!$articleId) return;

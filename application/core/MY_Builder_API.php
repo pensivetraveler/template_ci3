@@ -2228,17 +2228,84 @@ class MY_Builder_API extends MY_Controller_API
         ]);
     }
 
+    /**
+     * 첨부 파일 삭제: PATCH /{엔티티}/deleteFile/{행 id}?type={파일 필드}, 본문 file_id
+     * 그 행의 파일 필드에 있는 파일만 지우고, 행의 컬럼에서도 file_id 를 뺀다
+     */
     public function deleteFile_patch($key = 0)
     {
         $type = $this->input->get('type') ?? null;
         $file_id = $this->input->patch('file_id') ?? null;
         if(!$type || !$file_id) $this->response(['code' => EMPTY_REQUIRED_DATA]);
 
+        $model = null;
+        foreach ($this->getModelPipeline() as $modelName) {
+            if(property_exists($this, $modelName) && $this->{$modelName} && in_array($type, $this->{$modelName}->fileList, true)) {
+                $model = $this->{$modelName};
+                break;
+            }
+        }
+        if(!$model) {
+            // 파일 필드가 아닌 첨부(별도 테이블 등)는 엔티티의 deleteOtherFile() 이 처리
+            if(!$this->deleteOtherFile($key, $type, (string)$file_id)) {
+                $this->response(['code' => BAD_REQUEST], RestController::HTTP_BAD_REQUEST);
+            }
+            $this->response(['code' => DATA_DELETED]);
+        }
+
+        $idData = $this->checkIdentifierExist($key, false, $model);
+        if(!count($idData)) $this->response(['code' => EMPTY_REQUIRED_DATA]);
+
+        // 미사용(use_yn='N') 행도 관리 화면에서 수정하므로 use_yn 기본 조건 없이 조회·수정 (삭제된 행은 그대로 제외)
+        $useUseYnAsBase = $model->useUseYnAsBase;
+        $model->useUseYnAsBase = false;
+
+        $row = $model->getDataWhere([$type], $idData);
+        $current = is_object($row) ? ($row->{$type} ?? null) : $row;
+        $fileIds = $this->parseFileColumnValue($current);
+        if(!in_array((string)$file_id, $fileIds, true)) {
+            $model->useUseYnAsBase = $useUseYnAsBase;
+            $this->response(['code' => DATA_NOT_EXIST], RestController::HTTP_NOT_FOUND);
+        }
+
+        $remain = array_values(array_diff($fileIds, [(string)$file_id]));
+        $this->modData([$type => count($remain) ? implode(',', $remain) : 0], $idData, false, $model);
+        $model->useUseYnAsBase = $useUseYnAsBase;
+
         $this->delFileData(['file_id' => $file_id]);
 
         $this->response([
             'code' => DATA_DELETED,
         ]);
+    }
+
+    /**
+     * 모델 파일 필드가 아닌 첨부 삭제 (예: 게시글 첨부 테이블). 처리했으면 true, 모르는 type 이면 false(400).
+     * 그 행 소속 파일인지 확인한 뒤 delFileData() 로 지운다. 소속이 아니면 404 로 응답
+     */
+    protected function deleteOtherFile($key, string $type, string $fileId): bool
+    {
+        return false;
+    }
+
+    /**
+     * 파일 컬럼 값(file_id 하나, 'id,id', JSON 배열)을 file_id 문자열 목록으로
+     */
+    protected function parseFileColumnValue($value): array
+    {
+        if(is_array($value)) {
+            $list = $value;
+        }else{
+            $value = trim((string)$value);
+            if($value === '' || $value === '0') return [];
+            $decoded = json_decode($value, true);
+            $list = is_array($decoded) ? $decoded : explode(',', $value);
+        }
+        return array_values(array_filter(array_map(function ($v) {
+            return trim((string)$v);
+        }, $list), function ($v) {
+            return $v !== '' && $v !== '0';
+        }));
     }
 
     public function deleteExcelFile_patch()
