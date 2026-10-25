@@ -78,6 +78,7 @@
 - [ ] `api/Setup.php`: 파일 캐시(`init_done`, TTL 1일)만으로 보호 → DB 상태로 판정, SQL 실행은 CLI 마이그레이션으로
 
 ### 버그
+- [ ] 세션 토큰이 `user_token`에 없을 때(같은 계정 다른 곳 로그인 등) API는 모두 403 "API Key 값이 전달되지 않았습니다"인데 화면(`checkLoggedIn`·`isSessionTokenValid`)은 로그아웃시키지 않고 열림 — bizsoft 운영에서 관찰(2026-10-25), 원인 미확인
 - [x] `api/SysCode.php:53` `category_srt` → `cd_srt` (추가: `SysCode::executeModify`의 `$original->category_srt` 비교 때문에 정렬 변경 여부와 무관하게 reorder 실행) → `$original->cd_srt`로 수정, 수정 대상을 `$this->idData`로 조회해 부분 PATCH(sml_cd·cmb_cd 없음)도 처리 (bizsoft-mig에서 500 재현, 2026-10-24)
 - [x] `api/Comments.php` `in_array($id, $adminList)` 객체 배열 비교로 `is_admin` 항상 false, 댓글 N+1 쿼리 → 원래 created_id(user_id)로 비교(관리자 목록은 값 배열), 답글·작성자를 각각 한 번에 조회해 N+1 제거 (2026-10-25)
 - [ ] `app-page-common.js:166` 선언되지 않은 `identifier` (추가: `deleteRepeater`에서 ReferenceError → 리피터 행 삭제 요청 실패)

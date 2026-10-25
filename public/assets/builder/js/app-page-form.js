@@ -770,8 +770,10 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
             }
     }
 
-    if(field.form_attributes.with_btn) {
-        if(field.form_attributes.btn_type === 'dup_check') {
+    // 수정 화면에서 값이 그대로면 중복 검사를 통과하도록 원래 값을 기록 (중복 확인 버튼이 없는 is_unique 필드 포함)
+    const hasUniqueRule = typeof field.rules === 'string' && /(^|\|)is_unique\[/.test(field.rules);
+    if((field.form_attributes.with_btn && field.form_attributes.btn_type === 'dup_check') || hasUniqueRule) {
+        if(form[name] && data[fieldName] !== undefined && data[fieldName] !== null) {
             form[name].setAttribute('data-original-value', data[fieldName]);
         }
     }

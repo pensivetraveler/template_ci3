@@ -266,7 +266,9 @@ const customValidatorsPreset = {
 					}else{
 						const mode = form['_mode'].value;
 						if(input.options.hiddenId) valid = form.querySelector(`#${input.options.hiddenId}`).value === '1';
-						if(!valid && mode === 'edit' && input.getAttribute('data-original-value') === input.value) valid = true;
+						if(!valid && mode === 'edit' && node.getAttribute('data-original-value') === node.value) valid = true;
+						// 읽기 전용 칸은 사용자가 바꿀 수 없으므로 중복 검사 대상이 아님
+						if(!valid && (node.readOnly || node.disabled)) valid = true;
 						if(!valid) message = '중복 검사를 실행해주세요.';
 					}
 
