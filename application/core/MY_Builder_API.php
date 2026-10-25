@@ -2423,6 +2423,146 @@ class MY_Builder_API extends MY_Controller_API
         return $idData;
     }
 
+    /* --------------------------------------------------------------- */
+    /* API 권한 검사 (메뉴 권한)                                          */
+    /* --------------------------------------------------------------- */
+
+    /**
+     * 메뉴 권한을 검사할 플랫폼(flag). 기본은 관리자(/admin/api/*)만. 공개 /api/* 는 로그인·api_method_config 의 auth 만
+     */
+    protected array $permissionFlags = ['admin'];
+
+    /**
+     * 이름 있는 엔드포인트의 권한 자리. 없으면 HTTP 메서드로 판단 (GET 조회, POST·PUT·PATCH 수정, DELETE 삭제)
+     */
+    protected array $permissionEndpointModes = [
+        'prepareExports' => 'export', 'downloadExports' => 'export',
+        'validateExcel' => 'import', 'uploadExcel' => 'import', 'deleteExcelFile' => 'import',
+        'duplicate' => 'create',
+    ];
+
+    /**
+     * 요청이 메뉴 권한에 맞는지 검사한다. 맞지 않으면 403.
+     *  1. 시스템 관리자, 로그인 전 요청(auth none 엔드포인트), permission.check === false → 통과
+     *  2. permission.super 또는 연결된 메뉴가 isSuper → 시스템 관리자만
+     *  3. 메뉴와 연결되지 않은 API → 로그인만 (통과)
+     *  4. CACHING_MENU=false(권한 데이터 없음) 또는 메뉴 isAuth=false → 통과 (화면과 같음)
+     *  5. 메뉴 권한 행이 없거나 숨김 → 403, 요청 권한 자리(create·read·update·delete·export·import)가 꺼져 있으면 403
+     * 메뉴 연결: api_method_config 의 permission.menu ('class' 또는 'class/method'), 없으면 API 클래스와 같은 이름의 메뉴
+     */
+    protected function checkApiPermission(string $http, string $object, array $arguments): void
+    {
+        if(!in_array($this->flag, $this->permissionFlags, true)) return;
+
+        $permission = $this->apiMethodFeature['permission'] ?? [];
+        if(array_key_exists('check', $permission) && $permission['check'] === false) return;
+        if(!$this->session->userdata('user_id')) return;
+        if($this->session->userdata('is_sys_admin')) return;
+
+        if(!empty($permission['super'])) $this->denyApiPermission('super');
+
+        $menu = $this->findApiMenu($permission['menu'] ?? null, $object);
+        if(!count($menu)) return;
+        if(!empty($menu['isSuper'])) $this->denyApiPermission('super');
+        if(!env('CACHING_MENU')) return;
+        if(array_key_exists('isAuth', $menu) && !$menu['isAuth']) return;
+
+        $auth = $this->getApiMenuAuth($menu);
+        if(!$auth || (int)($auth->is_show ?? 0) !== 1) $this->denyApiPermission('menu');
+
+        $mode = $permission['mode'] ?? $this->getApiPermissionMode($http, $object, $arguments);
+        if($mode && !is_auth_avaliable($mode, (string)$auth->menu_auth)) $this->denyApiPermission($mode);
+    }
+
+    /**
+     * 요청이 쓰는 권한 자리
+     */
+    protected function getApiPermissionMode(string $http, string $object, array $arguments): string
+    {
+        if($object !== 'index' && method_exists($this, "{$object}_{$http}")) {
+            if(array_key_exists($object, $this->permissionEndpointModes)) return $this->permissionEndpointModes[$object];
+            return $http === 'get' ? 'read' : ($http === 'delete' ? 'delete' : 'update');
+        }
+
+        switch ($http) {
+            case 'get' : return 'read';
+            case 'delete' : return 'delete';
+            case 'put' :
+            case 'patch' : return 'update';
+            case 'post' :
+                // 식별자(URL 키 또는 쿼리)가 있으면 수정, 없으면 등록 (afterPost 와 같은 기준)
+                $key = $object !== 'index' ? $object : ($arguments[0] ?? 0);
+                return count($this->checkIdentifierExist($key)) ? 'update' : 'create';
+        }
+        return '';
+    }
+
+    /**
+     * API 에 연결된 메뉴 항목(nav 설정의 항목 배열). 없으면 [].
+     * 같은 class 가 여러 메뉴면 method 가 같은 항목 → method 없는(index) 항목 순
+     */
+    protected function findApiMenu(?string $spec, string $object): array
+    {
+        if($spec) {
+            [$class, $method] = array_pad(explode('/', $spec, 2), 2, '');
+        }else{
+            $class = $this->router->class;
+            $method = $object !== 'index' && method_exists($this, "{$object}_".strtolower($this->input->method())) ? $object : '';
+        }
+
+        $items = [];
+        $walk = function ($menu) use (&$walk, &$items, $class) {
+            foreach ($menu as $item) {
+                if(($item['class'] ?? '') === $class) $items[] = $item;
+                if(!empty($item['subMenu'])) $walk($item['subMenu']);
+            }
+        };
+        $walk($this->config->item("{$this->flag}_nav_menu") ?: []);
+        if(!count($items)) return [];
+
+        foreach ($items as $item) if($method !== '' && ($item['method'] ?? '') === $method) return $item;
+        foreach ($items as $item) if(in_array($item['method'] ?? '', ['', 'index'], true)) return $item;
+        return $items[0];
+    }
+
+    /**
+     * 메뉴 권한 행 {menu_auth, is_show}. 기본은 회원 등급(user_cd)별 menu_auth.
+     * 파트너별 권한처럼 다른 기준을 쓰는 프로젝트는 오버라이드한다.
+     */
+    protected function getApiMenuAuth(array $menu): ?object
+    {
+        $this->load->model('Model_Menu');
+        $this->load->model('Model_Menu_Auth');
+
+        $method = $menu['method'] ?? '';
+        $row = $this->Model_Menu->getData(['menu_id'], [
+            'where' => [
+                'class' => $menu['class'],
+                'method' => $method !== '' ? $method : 'index',
+            ],
+        ]);
+        if(!$row) return null;
+
+        $auth = $this->Model_Menu_Auth->getData(['menu_auth', 'is_show'], [
+            'where' => [
+                'grade_cd' => $this->session->userdata('user_cd'),
+                'menu_id' => is_object($row) ? $row->menu_id : $row,
+            ],
+        ]);
+        return is_object($auth) ? $auth : null;
+    }
+
+    protected function denyApiPermission(string $reason): void
+    {
+        $this->responseError([
+            'location' => __METHOD__,
+            'param' => ['class' => $this->router->class, 'reason' => $reason],
+            'msg' => 'Permission Denied',
+        ], [
+            'code' => FORBIDDEN_ACCESS,
+        ], RestController::HTTP_FORBIDDEN);
+    }
+
     public function _remap($object_called, $arguments = [])
     {
         // /reset, /duplicate 처럼 다른 HTTP 메서드로만 있는 엔드포인트를 잘못된 메서드로 부르면,
@@ -2439,6 +2579,9 @@ class MY_Builder_API extends MY_Controller_API
                 }
             }
         }
+
+        // 메뉴 권한 검사 (/admin/api/* 등 permissionFlags 플랫폼)
+        $this->checkApiPermission($http, (string)$object_called, $arguments);
 
         $this->mode = $this->input->get('_mode') ?? '';
         $this->submode = $this->input->get('_submode') ?? '';

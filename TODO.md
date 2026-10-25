@@ -28,17 +28,19 @@
 
 ## 2. API 권한(인가) 검사
 
-로그인만 하면 일반 계정도 관리자 API(`api/administrators`, `api/sysCfg` 등)를 직접 호출할 수 있다.
-웹 화면의 메뉴 권한(`menu_auth`)은 메뉴 표시에만 쓰이고 API에는 적용되지 않는다.
+로그인만 하면 일반 계정도 관리자 API(`api/administrators`, `api/sysCfg` 등)를 직접 호출할 수 있었다.
+웹 화면의 메뉴 권한(`menu_auth`)은 메뉴 표시에만 쓰이고 API에는 적용되지 않았다.
 
-- [ ] 설정 자리: `config/extra/api/api_method_config.php`의 `permission` 키(`menu`·`mode`·`super`·`check`)를 만들어 둠. 현재 요청 값은 `MY_Controller_API::$apiMethodFeature['permission']` (2026-10-24, 읽는 코드는 아직 없음)
-- [ ] 검사 위치: `api/Common::auth()` (현재 빈 메서드), `/admin/api/*` 요청에만 적용, `is_sys_admin`은 통과 (추가: `MY_Builder_API::prepareExports_get` 내보내기, `uploadExcel_post` 가져오기 권한도 서버에서 검사 안 함 — 버튼 노출만 제어)
-- [ ] API → 메뉴 대응표를 config로 명시 (예: `sysCfg` → `system/sysCfg`), 이름이 같으면 자동 매칭
-- [ ] 결정 필요
-    - 검사 수준: 요청 방식별 6자리 권한(생성·조회·수정·삭제·내보내기·가져오기) vs 메뉴 접근만
-    - 메뉴에 연결되지 않은 API: 로그인만 확인 vs 시스템 관리자만
-    - `CACHING_MENU=false`일 때: 웹처럼 건너뜀 vs 항상 검사
-- [ ] `isSuper` 메뉴(시스템 설정, 에러 로그 등)는 시스템 관리자만
+- [x] `MY_Builder_API::checkApiPermission()` (`_remap`에서 호출, 2026-10-25)
+    - 결정: 요청별 6자리 권한 / 메뉴와 연결되지 않은 API는 로그인만 / `CACHING_MENU=false`는 화면처럼 생략(super는 적용) / `/admin/api/*`(`$permissionFlags = ['admin']`)만
+    - 시스템 관리자·로그인 전 요청·`permission.check=false` 통과, `permission.super`·isSuper 메뉴는 시스템 관리자만
+    - 메뉴 연결: `api_method_config`의 `permission.menu`, 없으면 API 클래스와 같은 이름의 nav 메뉴(같은 class가 여럿이면 method가 같은 메뉴). 시스템 설정 API 4개(sysCfg·sysCode·menuList·menuAuth)는 `system/{메서드}`로 연결
+    - 권한 자리: GET 조회, 식별자 없는 POST 등록, 식별자 있는 POST·PUT·PATCH 수정, DELETE 삭제, 내보내기 export, 엑셀 import, 복제 create (`$permissionEndpointModes`, `permission.mode`로 바꿀 수 있음)
+    - 권한 행: `getApiMenuAuth()` 기본은 `menu_auth`(회원 등급). 파트너별 권한 등은 프로젝트에서 오버라이드
+- [x] 내보내기·가져오기 권한도 같은 검사(export·import 자리)
+- [ ] 화면 쪽 `MY_Builder_WEB::setupPlatformPage`의 메서드별 mode 검사 정리(목록이 baseMethod가 아닌 route는 검사 안 함, `000000`이면 생략) — API 검사와 같은 기준으로 맞출지 결정 필요
+- [ ] 파일 삭제(`deleteFile_patch`)·첨부의 소유 엔티티 확인 — 지금은 update 권한만 확인
+- [ ] `users` API(내 정보 화면이 사용)는 메뉴와 연결되지 않아 로그인만 확인 → 본인 데이터만 다루도록 제한할지 결정
 
 ## 3. 운영 배포 전 설정
 

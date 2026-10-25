@@ -727,7 +727,7 @@ $config['api_method_config'] = [
 | `log` | bool | `rest_logs` 기록 여부 | 〃 |
 | `limit` / `time` | int / 초(기본 3600) | `time` 초 동안 허용할 요청 수(`rest_enable_limits`) | 〃 → `_check_limit()` |
 | `level` | int | 필요한 API 키 레벨 | 〃 |
-| `permission` | `menu`·`mode`·`super`·`check` | **예정** — API 권한 검사(TODO.md 2장). 지금은 `$this->apiMethodFeature['permission']`에 담기기만 한다 | — |
+| `permission` | `menu`·`mode`·`super`·`check` | 메뉴 권한 검사(`/admin/api/*`). `menu`: 연결할 메뉴 `class` 또는 `class/method`(생략하면 API 클래스명), `mode`: 검사할 권한 자리, `super`: 시스템 관리자만, `check: false`: 검사 생략 | `MY_Builder_API::checkApiPermission()` |
 
 - 파일 위치: `custom_routes.php`의 `api_folders`에 있는 폴더마다 `config/extra/{폴더}/{폴더}_method_config.php`(`$config['{폴더}_method_config']`)를 둔다. 기본 `api` 폴더는 `config/extra/api/api_method_config.php`. API 폴더의 컨트롤러는 모두 `MY_Controller_API`를 상속하므로(빌더 기능이 필요하면 `MY_Builder_API`) 빌더를 쓰지 않는 API에도 적용된다.
 - 읽는 곳: `MY_Controller_API::applyApiMethodAuth()`(부모 생성자 전), `applyApiMethodFeatures()`(부모 생성자 후). 현재 요청에 적용된 값은 `$this->apiMethodFeature`에 있다.
@@ -736,3 +736,22 @@ $config['api_method_config'] = [
 > **주의**
 > - 우선순위: 컨트롤러가 `$this->methods`를 직접 지정하면 그 값 > `api_method_config` > `rest_config`.
 > - `auth`는 HTTP 메서드를 `$this->input->method()`(실제 요청 메서드)로 판단한다. `X-HTTP-Method-Override`로 메서드를 바꾸는 요청은 RestController와 판단이 다를 수 있다.
+
+### 8-1. 메뉴 권한 검사 (`checkApiPermission()`)
+
+`MY_Builder_API::_remap()`이 요청마다 부른다. 적용 플랫폼은 `$permissionFlags`(기본 `['admin']`, 즉 `/admin/api/*`).
+
+| 순서 | 조건 | 결과 |
+|---|---|---|
+| 1 | 시스템 관리자, 로그인 전 요청(auth `none` 엔드포인트), `permission.check === false` | 통과 |
+| 2 | `permission.super`, 또는 연결된 메뉴가 `isSuper` | 시스템 관리자가 아니면 403 |
+| 3 | 연결된 메뉴 없음 | 통과(로그인만) |
+| 4 | `CACHING_MENU=false`, 또는 메뉴 `isAuth=false` | 통과(화면과 같음) |
+| 5 | 메뉴 권한 행 없음·숨김 | 403 |
+| 6 | 요청 권한 자리가 꺼짐 | 403 |
+
+- 메뉴 연결: `permission.menu` → API 클래스와 같은 `class`의 nav 메뉴(여럿이면 API 메서드와 같은 `method`, 다음은 method 없는 메뉴).
+- 권한 자리(`getApiPermissionMode()`): GET `read`, 식별자 없는 POST `create`, 식별자 있는 POST·PUT·PATCH `update`, DELETE `delete`. 이름 있는 엔드포인트는 `$permissionEndpointModes`(내보내기 `export`, 엑셀 `import`, `duplicate` `create`), 그 밖에는 GET `read`·DELETE `delete`·나머지 `update`. `permission.mode`가 있으면 그 값.
+- 권한 행(`getApiMenuAuth()`): 기본은 `menu_auth`에서 `grade_cd = 세션 user_cd`. 파트너별 권한처럼 다른 기준이면 프로젝트의 `api/Common`에서 오버라이드한다.
+- 403 응답: `code = FORBIDDEN_ACCESS`, `errors[0].param.reason` = `super` | `menu` | 권한 자리.
+

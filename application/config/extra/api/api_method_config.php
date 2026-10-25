@@ -27,10 +27,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |   limit      : time 초 동안 허용할 요청 수 (rest_enable_limits)
 |   time       : limit 기준 시간(초). 기본 3600
 |   level      : 필요한 API 키 레벨
-|   permission : [예정 - 아직 읽는 코드 없음] API 권한 검사 (TODO.md 2장, 메뉴 권한과 API 대응)
+|   permission : 메뉴 권한 검사 (MY_Builder_API::checkApiPermission, /admin/api/* 에만 적용)
 |     menu  : 대응하는 메뉴 'class' 또는 'class/method' (예: 'system/sysCfg'). 생략하면 API 클래스명과 같은 메뉴
-|     mode  : 검사할 권한 자리. create | read | update | delete | export | import (생략하면 HTTP 메서드로 판단)
-|     super : true 면 시스템 관리자만 허용
+|             (같은 class 메뉴가 여럿이면 API 메서드와 같은 method 메뉴). 메뉴와 연결되지 않으면 로그인만 확인
+|     mode  : 검사할 권한 자리. create | read | update | delete | export | import (생략하면 요청으로 판단:
+|             GET 조회, 식별자 없는 POST 등록, 식별자 있는 POST·PUT·PATCH 수정, DELETE 삭제, 내보내기 export, 엑셀 import)
+|     super : true 면 시스템 관리자만 허용 (연결된 메뉴가 isSuper 여도 같음)
 |     check : false 면 권한 검사 생략 (로그인만 확인)
 |
 | 예시
@@ -43,6 +45,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 $config['api_method_config'] = [
+    // 시스템 설정 화면(route system 의 메서드)이 쓰는 API → 메뉴 system/{메서드} (isSuper 메뉴라 시스템 관리자만)
+    'sysCfg'   => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCfg']]]],
+    'sysCode'  => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCode']]]],
+    'menuList' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuList']]]],
+    'menuAuth' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuAuth']]]],
+
     // 인증·회원 API: 로그인 전에 쓰는 엔드포인트는 auth none, 키·로그 생략
     'auth' => [
         'dupCheck'      => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
