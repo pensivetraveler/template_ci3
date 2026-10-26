@@ -27,7 +27,8 @@ class Categories extends Common
     protected function beforeList($data): array
     {
         $data = parent::beforeList($data);
-        $data['orderBy'] = ['category_srt' => 'ASC'];
+        // 기본은 정렬 순서, 목록 머리글로 정렬을 요청하면 그 순서 (MY_Builder_API::getRequestedListOrder)
+        if(empty($data['orderBy'])) $data['orderBy'] = ['category_srt' => 'ASC'];
         return $data;
     }
 
