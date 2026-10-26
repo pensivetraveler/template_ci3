@@ -83,7 +83,7 @@
 - [x] 자동 로그인 체크박스가 제출 때 풀림 (결함 B, 2026-10-26): 스크립트 로드 중 체크한 것을 `app-page-auth.js`의 `resetFrmInputs()`가 지움(bizsoft #빌더-31 trace 확인) → 로그인 계열 화면에서 초기화 호출 제거
 - [x] 같은 계정 동시 로그인 → 한 곳만 허용으로 결정(2026-10-26). 토큰은 회원당 하나 그대로, 화면도 `isSessionTokenCurrent()`로 확인해 바뀌었으면 로그아웃
 - [x] 로그아웃·세션 종료(`destroyUserData`) 때 autologin 쿠키와 함께 `user_autologin` 키 행도 삭제 (2026-10-26)
-- [ ] `MY_Builder_API::duplicate_post` 고유 컬럼(`uniqueKeyList`·PK)을 그대로 복사해 중복 키로 500 (bizsoft frames: frame_nick, 2026-10-25 확인) — 고유 컬럼 처리 규칙(접미사 추가·비우기·엔티티 hook) 결정 필요
+- [x] `MY_Builder_API::duplicate_post` (2026-10-26): 고유 컬럼 `_copy` 접미사(`getDuplicateUniqueValue`), 파일 컬럼 비움, 민감 컬럼 제외(`beforeDuplicate`), 일반 등록 경로(`beforeAdd`·범위 값 검사·`executeAdd`, 메인 Model만), 딸린 표는 엔티티 `afterDuplicate`. 이전에는 고유 컬럼 복사로 500, beforeAdd 건너뜀(bizsoft frame_uuid), 같은 file_id 공유
 - [x] 세션 토큰이 `user_token`에 없을 때 화면이 열리던 것 (2026-10-26): 원인은 화면이 세션에 token이 있는지만 봤기 때문 → `checkLoggedIn`에서 `isSessionTokenCurrent()` 확인 후 아니면 로그아웃·"Logged in elsewhere" 안내
 - [x] `api/SysCode.php:53` `category_srt` → `cd_srt` (추가: `SysCode::executeModify`의 `$original->category_srt` 비교 때문에 정렬 변경 여부와 무관하게 reorder 실행) → `$original->cd_srt`로 수정, 수정 대상을 `$this->idData`로 조회해 부분 PATCH(sml_cd·cmb_cd 없음)도 처리 (bizsoft-mig에서 500 재현, 2026-10-24)
 - [x] `api/Comments.php` `in_array($id, $adminList)` 객체 배열 비교로 `is_admin` 항상 false, 댓글 N+1 쿼리 → 원래 created_id(user_id)로 비교(관리자 목록은 값 배열), 답글·작성자를 각각 한 번에 조회해 N+1 제거 (2026-10-25)
