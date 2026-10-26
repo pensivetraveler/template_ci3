@@ -332,7 +332,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
     protected function beforeViewApp($data = []): array
     {
         if($this->formExist) {
-            if(in_array('dropzone',array_column($this->formColumns, 'subtype'))) {
+            // dropzone·dropzone-full·dropzone-single 모두 같은 에셋을 쓴다 (전에는 정확히 'dropzone' 일 때만 불러와 나머지는 동작 안 함)
+            $usesDropzone = count(array_filter(array_column($this->formColumns, 'subtype'), function ($subtype) {
+                return is_string($subtype) && strpos($subtype, 'dropzone') === 0;
+            })) > 0;
+            if($usesDropzone) {
                 $this->addCSS[] = [
                     base_url('public/assets/builder/vendor/libs/dropzone/dropzone.css'),
                     base_url(BUILDER_ASSET_LIBS_URI.'/dropzone/style.css'),

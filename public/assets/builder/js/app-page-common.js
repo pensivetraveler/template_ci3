@@ -400,9 +400,10 @@ function prepareExports(kind, filterData = null) {
             'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
         },
         success: function(response, textStatus, jqXHR) {
-            const token = encodeURIComponent(response.data[0].filename);
+            // 파일명은 URL 인코딩해서 넘긴다
+            const filename = encodeURIComponent(response.data[0].filename);
             const iframe = document.getElementById('downloadFrame');
-            iframe.src = common.API_URI+'/downloadExports?filename='+response.data[0].filename;
+            iframe.src = common.API_URI+'/downloadExports?filename='+filename;
         },
     });
 }
