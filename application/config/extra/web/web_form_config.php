@@ -570,7 +570,8 @@ $config['form_myinfo_config'] = [
 	[
 		'field' => 'id',
 		'label' => 'lang:user.id',
-		'rules' => 'trim|required|min_length[4]|is_unique[user.id.user_id]',
+		// 내 정보에서는 읽기 전용이라 사용자가 고칠 수 없으므로 검증하지 않는다 (중복은 모델 uniqueKeyList 검사가 막음)
+		'rules' => 'trim',
 		'form' => true,
 		'errors' => [],
 		'type' => 'text',
