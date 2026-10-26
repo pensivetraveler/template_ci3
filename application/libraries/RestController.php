@@ -1220,6 +1220,25 @@ abstract class RestController extends \MY_Controller {
             return TRUE;
         }
 
+        // 제한 표 구조가 다르면(uri·api_key 컬럼 없음) 요청 전체가 500 이 되므로, 제한만 건너뛰고 오류 로그를 남긴다
+        // 맞추는 SQL: docs/migrations/2026-10-27-rest-user-limits.sql
+        static $limitsTableReady = NULL;
+        if ($limitsTableReady === NULL)
+        {
+            $table = $this->config->item('rest_limits_table');
+            $limitsTableReady = $this->rest->db->table_exists($table)
+                && $this->rest->db->field_exists('uri', $table)
+                && $this->rest->db->field_exists('api_key', $table);
+            if ( ! $limitsTableReady)
+            {
+                log_message('error', __METHOD__.' : rest limits table "'.$table.'" needs uri·api_key columns — limit skipped. See docs/migrations/2026-10-27-rest-user-limits.sql');
+            }
+        }
+        if ( ! $limitsTableReady)
+        {
+            return TRUE;
+        }
+
         // How many times can you get to this method in a defined time_limit (default: 1 hour)?
         $limit = $this->methods[$controller_method]['limit'];
 
