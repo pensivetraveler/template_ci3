@@ -2358,9 +2358,11 @@ class MY_Builder_API extends MY_Controller_API
         }
 
         $dto = (array)$data;
-        foreach ([$this->identifier, CREATED_ID_COLUMN_NAME, CREATED_DT_COLUMN_NAME, UPDATED_ID_COLUMN_NAME, UPDATED_DT_COLUMN_NAME, DEL_YN_COLUMN_NAME, USE_YN_COLUMN_NAME] as $field) {
+        // 사용 여부(use_yn)는 원본 값을 그대로 둔다 (빼면 DB 기본값 NULL 로 들어감 — bizsoft #빌더-34)
+        foreach ([$this->identifier, CREATED_ID_COLUMN_NAME, CREATED_DT_COLUMN_NAME, UPDATED_ID_COLUMN_NAME, UPDATED_DT_COLUMN_NAME, DEL_YN_COLUMN_NAME] as $field) {
             unset($dto[$field]);
         }
+        if($this->Model->isDelYn) $dto[DEL_YN_COLUMN_NAME] = 'N';
 
         // 일반 등록과 같은 경로 (엔티티 beforeAdd·데이터 범위 값 검사), 메인 Model 만 저장
         $dto = $this->beforeDuplicate($dto, $data);
