@@ -35,7 +35,16 @@ class File extends Common
         'png',
         'gif',
         'webp',
-        'svg'
+    ];
+
+    /**
+     * 업로드 이미지의 실제 형식(MIME). svg 는 스크립트를 담을 수 있어 받지 않는다
+     */
+    private $imageMimeTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
     ];
 
     public function __construct()
@@ -44,12 +53,21 @@ class File extends Common
 
         parent::__construct();
 
-        $this->roots = $this->config->item('file_editor_roots') ?: ['public/'];
+        $this->roots = $this->config->item('file_editor_roots') ?: [];
 
         $this->output->set_content_type('application/json', 'utf-8');
 
         if (!$this->session->userdata('token')) {
             $this->json_response(false, 'Login Needed', [], 401);
+        }
+
+        // 편집 범위를 설정하지 않은 프로젝트는 편집기를 쓰지 않는다
+        if (!count($this->roots)) {
+            $this->json_response(false, 'File editor is disabled', [], 404);
+        }
+
+        if (!$this->canUseFileEditor()) {
+            $this->json_response(false, 'Permission Denied', [], 403);
         }
 
         $this->load->helper(['file', 'directory']);
@@ -265,6 +283,11 @@ class File extends Common
 
         if (!$this->isImageExtension($uploadExt)) {
             $this->json_response(false, '업로드할 수 없는 이미지 형식입니다.');
+        }
+
+        // 확장자만 바꾼 파일을 막도록 내용으로 형식 확인
+        if (!$this->isRealImage($_FILES['image']['tmp_name'] ?? '')) {
+            $this->json_response(false, '이미지 파일이 아닙니다.');
         }
 
         /**
@@ -503,6 +526,61 @@ class File extends Common
         return in_array(strtolower($ext), $this->imageExtensions);
     }
 
+    private function isRealImage($tmpName)
+    {
+        if (!$tmpName || !is_file($tmpName) || @getimagesize($tmpName) === false) return false;
+
+        $mime = function_exists('finfo_open')
+            ? finfo_file(finfo_open(FILEINFO_MIME_TYPE), $tmpName)
+            : (getimagesize($tmpName)['mime'] ?? '');
+
+        return in_array($mime, $this->imageMimeTypes, true);
+    }
+
+    /**
+     * 편집기를 쓸 수 있는지: 시스템 관리자, 또는 file_editor_menu 메뉴의 수정(update) 권한자
+     * CACHING_MENU=false 면 메뉴 권한 데이터가 없으므로 시스템 관리자만
+     */
+    protected function canUseFileEditor(): bool
+    {
+        if ($this->session->userdata('is_sys_admin')) return true;
+
+        $menu = (string)($this->config->item('file_editor_menu') ?: '');
+        if ($menu === '' || !env('CACHING_MENU')) return false;
+
+        $auth = $this->getFileEditorMenuAuth($menu);
+        if (!$auth || (int)($auth->is_show ?? 0) !== 1) return false;
+
+        $this->load->helper('builder/builder_auth');
+        return is_auth_avaliable('update', (string)$auth->menu_auth);
+    }
+
+    /**
+     * 메뉴('class' 또는 'class/method') 권한 행. 기본은 menu_auth(회원 등급), 다른 기준이면 프로젝트에서 수정
+     */
+    protected function getFileEditorMenuAuth(string $menu): ?object
+    {
+        $this->load->model('Model_Menu');
+        $this->load->model('Model_Menu_Auth');
+
+        list($class, $method) = array_pad(explode('/', $menu, 2), 2, '');
+        $row = $this->Model_Menu->getData(['menu_id'], [
+            'where' => [
+                'class' => $class,
+                'method' => $method !== '' ? $method : 'index',
+            ],
+        ]);
+        if (!$row) return null;
+
+        $auth = $this->Model_Menu_Auth->getData(['menu_auth', 'is_show'], [
+            'where' => [
+                'grade_cd' => $this->session->userdata('user_cd'),
+                'menu_id' => is_object($row) ? $row->menu_id : $row,
+            ],
+        ]);
+        return is_object($auth) ? $auth : null;
+    }
+
     /**
      * 저장/삭제 전 백업
      *
@@ -514,7 +592,8 @@ class File extends Common
             return true;
         }
 
-        $backupBasePath = FCPATH . 'file_backups/' . date('Ymd') . '/';
+        // 웹 루트 밖(application/cache)에 둔다 — 웹 서버 설정과 관계없이 내려받을 수 없도록
+        $backupBasePath = APPPATH . 'cache/file_backups/' . date('Ymd') . '/';
 
         if (!is_dir($backupBasePath)) {
             if (!mkdir($backupBasePath, 0755, true)) {

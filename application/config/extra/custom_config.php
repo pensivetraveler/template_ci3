@@ -46,8 +46,12 @@ $config['kakao_login']['secret'] = '';
 |--------------------------------------------------------------------------
 | FILE EDITOR (module/file)
 |--------------------------------------------------------------------------
-| 편집기로 열람·수정할 수 있는 최상위 경로 (FCPATH 기준, 끝에 /)
+| 편집기로 열람·수정할 수 있는 최상위 경로 (FCPATH 기준, 끝에 /). 비어 있으면 편집기를 쓰지 않음
+|   예: ['public/templates/']
+| file_editor_menu: 시스템 관리자 외에 편집기를 쓸 수 있는 메뉴('class' 또는 'class/method'),
+|   그 메뉴의 수정(update) 권한자만 허용. 비어 있으면 시스템 관리자만
 */
-$config['file_editor_roots'] = ['public/'];
+$config['file_editor_roots'] = [];
+$config['file_editor_menu'] = '';
 
 require_once __DIR__.'/custom_options.php';
