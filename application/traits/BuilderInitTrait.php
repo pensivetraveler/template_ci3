@@ -11,7 +11,7 @@ trait BuilderInitTrait
         }
 
         // 2. DB 테이블 존재 여부 확인
-        if($this->Model_Common->getTableCount() === 0) {
+        if((int)$this->Model_Common->getTableCount() === 0) {
             $this->setupBuilderDB();
             return false;
         }

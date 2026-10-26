@@ -76,7 +76,7 @@
 - [ ] XSS: `views/module/player.php`의 `$poster`, `$source` → `json_encode(..., JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT)`
 - [ ] 인증 토큰이 JS 전역(`common.HOOK_PHPTOJS_VAR_TOKEN`)에 노출, 32곳 이상에서 개별 주입
 - [ ] `module/File.php`: `basePath`를 템플릿 디렉토리로 제한, svg 업로드 제외·MIME 검사, 백업 폴더를 웹 루트 밖으로
-- [ ] `api/Setup.php`: 파일 캐시(`init_done`, TTL 1일)만으로 보호 → DB 상태로 판정, SQL 실행은 CLI 마이그레이션으로
+- [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 
 ### 버그
 - [ ] `MY_Builder_API::duplicate_post` 고유 컬럼(`uniqueKeyList`·PK)을 그대로 복사해 중복 키로 500 (bizsoft frames: frame_nick, 2026-10-25 확인) — 고유 컬럼 처리 규칙(접미사 추가·비우기·엔티티 hook) 결정 필요
