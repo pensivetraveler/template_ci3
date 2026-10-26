@@ -777,7 +777,9 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
             if($this->lang->line_exists($label.'_list')) $label = $label.'_list';
 
-            $carry[] = array_merge($attributes, $item, [
+            // 기본값 < 항목 값 < list_attributes (목록 전용 설정이 가장 우선 — 항목은 이미 기본값과 합쳐져 있어
+            // 예전 순서(list_attributes, 항목)에서는 list_attributes 의 type·onclick·render 가 늘 무시됐음)
+            $carry[] = array_merge($item, $item['list_attributes'] ?? [], [
                 'field' => $field,
                 'label' => $label ?? $this->router->class.'.'.$field,
             ]);
@@ -818,7 +820,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $buttons['add'] = is_auth_avaliable('create', $this->pageAuth);
         }
         if(array_key_exists('excel', $buttons) && $buttons['excel']) {
-            $buttons['excel'] = is_auth_avaliable('import', $this->pageAuth);
+            // 가져오기 화면(excel method)이 있는 route 에서만
+            $buttons['excel'] = route_has_excel_method($this->routeConfig['methods'] ?? []) && is_auth_avaliable('import', $this->pageAuth);
         }
         return $buttons;
     }

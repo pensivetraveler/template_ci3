@@ -114,11 +114,11 @@
 | `actions.list` | `true` | `PAGE_LIST_URI` 생성 여부(`excel.php`에는 목록 버튼 없음) | `setJSVariables()` |
 | `properties.templateDownload`, `preview`, `validateBeforeImport` | `true` | **미구현** — 읽는 코드 없음. 샘플 다운로드·미리보기·사전검증은 항상 켜져 있음 | – |
 
-진입 경로: list 메소드의 `buttons.excel = true`(기본값 true) + 메뉴 권한 import + route `methods`에 `excel` 키가 있어야 한다.
+진입 경로: list 메소드의 `buttons.excel = true`(기본값 true) + route `methods`에 excel method(키 `excel` 또는 category `excel`) + 메뉴 권한 import. excel method가 없으면 버튼과 base_auth의 I 비트가 꺼진다(`route_has_excel_method()`).
 
 - `setJSVariables()`가 `PAGE_EXCEL_URI = {href}/excel`을 만들고, `setListButtons()`가 import 권한으로 버튼을 거른다.
 - 목록 툴바의 "Upload Excel" 버튼은 `app-page-list.js` `getListButtons()`가 출력한다.
-- list의 `actions.excel`은 `setJSVariables()`에서 `buttons`와 병합될 때 `buttons.excel`에 덮어써지므로 사실상 효과가 없다.
+- 엑셀 버튼은 `buttons.excel`이 정한다. list의 `actions.excel`은 목록 액션이 아니며(`setJSVariables()`에서 `buttons`와 병합될 때 `buttons.excel`에 덮어써짐) 효과가 없다.
 
 ### 2. 헤더 설정 (`excel_{name}_config`)
 

@@ -256,13 +256,13 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 
 **공통·route/method/nav**
 - [ ] `BuilderCommonTrait::saveMenuList` `tbl_menu.base_auth`는 메뉴 최초 생성 때만 계산되고, 다시 계산하려면 `MenuList::reset_get()`(메뉴·권한 truncate, menu_id 재생성)뿐 → route/method 설정을 바꾼 뒤 menu_id를 유지한 채 base_auth만 재계산하는 경로 필요 (bizsoft 다운로드 export 권한 반영 때 DB 직접 수정)
-- [ ] `BuilderCommonTrait::fillRouteConfigProperties` `properties.allows`를 `array_keys(methods)`로 무조건 덮어씀 (`projects`, `dashboard`의 `allows` 지정 무효 — 키 제거 또는 교집합 처리 결정)
+- [x] (2026-10-26 C-1-5: 적었으면 methods와 교집합) `BuilderCommonTrait::fillRouteConfigProperties` `properties.allows`를 `array_keys(methods)`로 무조건 덮어씀 (`projects`, `dashboard`의 `allows` 지정 무효 — 키 제거 또는 교집합 처리 결정)
 - [ ] `builder_route_config.php` route `category`(page/api)를 읽는 코드 없음 (구 README의 type `tabs`/`rest`/`cli`, subtype `json` config도 없음)
 - [ ] `builder_route_config.php` route `properties.formExist` 기본값이 있지만 route 레벨에서 읽지 않음 (method `properties.formExist`만 유효)
 - [ ] `builder_route_config.php` `route_page_auth_config`, `route_modal_base_config` 정의만 있고 사용하는 route 없음 (admin `auth`는 같은 값을 직접 기입)
 - [ ] `builder_method_config.php` `method_form_article_config.properties`(editor, thumbnail, attachments, seo, preview) 읽는 코드 없음
 - [ ] `builder_method_config.php` 구 README의 type `grid`/`detail`/`process`, subtype `wizard`/`side` 전용 config 없음 (실제 `grid`는 form subtype), mode `import` 누락, `authenticate`/`process`는 권한 맵에 없어 항상 허용
-- [ ] `builder_method_config.php` `method_list_base_config` `buttons.excel=true` 기본값 (excel method 없는 list도 base_auth I 비트 1)
+- [x] (2026-10-26 C-1-7: excel method가 있을 때만 import·버튼) `builder_method_config.php` `method_list_base_config` `buttons.excel=true` 기본값 (excel method 없는 list도 base_auth I 비트 1)
 - [ ] `MY_Builder_WEB::setJSVariables` list `properties.viewConfig`를 읽지만 `method_list_base_config`에 기본값·문서 없음 (`PAGE_VIEW_URI` 비우기에만 쓰는 숨은 스위치)
 - [ ] `MY_Builder_WEB::setJSVariables` `LIST_PLUGIN`, `LIST_OPTIONS`, `FORM_TYPE`, `FORM_STYLE`, `VIEW_TYPE`, `VIEW_COLUMNS`를 builder JS가 읽지 않음 (`properties.plugin`, `formStyle` 무효 — 구현 또는 제거)
 - [ ] `MY_Builder_WEB::prepareListData` `properties.formType`을 넘기지만 `layout/list.php`가 `'side'` 하드코딩 (리스트 formType 설정 무효)
@@ -296,7 +296,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 **list/filter·export**
 - [ ] `builder_list_config.php::builder_list_base` `format` 키를 JS/PHP 어디서도 읽지 않고 렌더링은 `type`으로 함 (구 README의 `list_attributes.format` 설명과 다름 — 키 제거 결정)
 - [ ] `app-page-list.js::renderColumn` class 키는 `classes`(배열)이고 구 README의 `class_name`은 읽지 않음
-- [ ] `MY_Builder_WEB::setListColumns` base 키는 item top-level 값이 `list_attributes`를 덮어써 `list_attributes`의 onclick/render/type 등이 무시됨 (merge 순서 변경 검토)
+- [x] (2026-10-26 C-1-1: 기본값 < 항목 < list_attributes) `MY_Builder_WEB::setListColumns` base 키는 item top-level 값이 `list_attributes`를 덮어써 `list_attributes`의 onclick/render/type 등이 무시됨 (merge 순서 변경 검토)
 - [ ] `MY_Builder_WEB::getListColumns` WEB은 form config `list => true` fallback이 없고 list config가 없으면 `show_error` (API와 동작 다름)
 - [ ] `app-page-list.js::getColumnOnclick` `popup` kind 미구현(빈 onclick) (구 README의 iframe 모달 동작 없음)
 - [ ] `app-page-list.js::openViewModal` `getData()` 후 `console.log`만 하는 스텁이고 `view_modal.php`를 포함하는 곳 없음 (onclick view에 `attrs`가 없거나 `PAGE_VIEW_URI`가 없으면 상세 보기 불가) (보류: 모달 상세는 페이지형 상세 확인 후 다음 단계)
@@ -315,7 +315,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `builder_method_config.php` `method_excel_base_config.properties`(templateDownload, preview, validateBeforeImport) 읽는 코드 없음
 - [ ] `builder_method_config.php` `method_view_base_config` `properties.formConfig/formType`을 view에서 읽는 코드 없음
 - [ ] `builder_view_config.php` `builder_view_config` 템플릿(`hiddens/fields/actions/buttons`, `actions[].onclick`)을 어디서도 읽지 않음 (예시로만 존재, 실제 구조와 다름)
-- [ ] `MY_Builder_WEB::setJSVariables` list `actions.excel`이 `buttons.excel`과 병합되며 덮어써져 효과 없음 (`admin_route_config.php`의 `actions.excel=false` 무의미)
+- [x] (2026-10-26 C-1-6: 문서에 buttons.excel 명시, 코드 그대로) `MY_Builder_WEB::setJSVariables` list `actions.excel`이 `buttons.excel`과 병합되며 덮어써져 효과 없음 (`admin_route_config.php`의 `actions.excel=false` 무의미)
 - [ ] `admin_view_config.php`, `web_view_config.php`에 실제 `view_*_config` 예시 없음, 저장소에 `excel` method route와 `excel_*_config`도 없음 (동작 검증 수단 없음)
 
 **API hooks·모델**
@@ -328,7 +328,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `api/Common::message_read_patch` 공통 클래스에 있어 모든 엔티티 API에 `/message_read/{id}` 노출, `Model_Message` 없는 파생 프로젝트에선 오류
 
 ### 구조
-- [ ] `MY_Builder_WEB::__construct` `admin_base_config.php`가 builder base와 같은 내용으로 최상위 교체 (base config 깊은 병합 필요 — TODO 주석 존재)
+- [x] (2026-10-26 C-1-4: platform_config 깊은 병합) `MY_Builder_WEB::__construct` `admin_base_config.php`가 builder base와 같은 내용으로 최상위 교체 (base config 깊은 병합 필요 — TODO 주석 존재)
 - [ ] `builder_route_helper.php::fill_config_properties` 빈 배열로 상위 기본값을 끌 방법이 없음 (키마다 `false` 필요 — `null`/명시적 리스트 등 끄기 규칙 정의)
 - [ ] `MY_Builder_WEB::setMethodConfig` `category` 없는 method 항목은 내용이 통째로 버려지고 `method_base_config`로 대체 (경고 없이 설정 무시)
 - [x] `MY_Builder_WEB::setMethodConfig` `category: 'action'`은 레이어링을 생략하는데 `setJSVariables()`가 `actions`/`buttons`/`properties.identifier`를 요구 (action 전용 기본값 config 필요) → `method_base_config`로 빈 키를 채우도록 수정

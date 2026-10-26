@@ -42,9 +42,13 @@ trait BuilderCommonTrait
 
         if(!$this->flag) show_error("Platform flag is not set.");
 
+        // 플랫폼 설정({flag}_base_config 의 platform_config)은 builder 기본값 위에 바꿀 키만 덮어쓴다
+        // (config->load 는 최상위 키를 통째로 바꾸므로 따로 합침, 목록 값은 플랫폼 값이 그대로 이김)
+        $builderPlatform = $this->config->item('platform_config') ?: [];
         foreach (glob(APPPATH . "config/extra/{$this->flag}/[!.]*_config.php") as $file) {
             $this->config->load("extra/{$this->flag}/" . substr(basename($file),0,strpos(basename($file),'.')));
         }
+        $this->config->set_item('platform_config', fill_config_properties($this->config->item('platform_config') ?: [], $builderPlatform));
         foreach (glob(APPPATH . "config/extra/{$this->flag}/[!.]*_constants.php") as $file) {
             require_once $file;
         }
@@ -87,7 +91,12 @@ trait BuilderCommonTrait
             }
         }
 
-        $this->allowedMethods = $config['properties']['allows'] = array_keys($config['methods']);
+        // allows 를 적었으면 method 목록과의 교집합(method 가 있어도 버튼·링크는 숨김), 안 적었으면 method 전체
+        $methodKeys = array_keys($config['methods']);
+        $allows = $config['properties']['allows'] ?? [];
+        $this->allowedMethods = $config['properties']['allows'] = (is_array($allows) && count($allows))
+            ? array_values(array_intersect($methodKeys, $allows))
+            : $methodKeys;
 
         return $config;
     }
@@ -281,7 +290,7 @@ trait BuilderCommonTrait
             // route methods에 없는 메뉴 method는 setMethodConfig처럼 baseMethod 기준으로 계산
             $methodConfig = $routeConfig['methods'][$method] ?? $routeConfig['methods'][$routeConfig['properties']['baseMethod']];
 
-            $baseAuth = make_base_auth_from_method($methodConfig);
+            $baseAuth = make_base_auth_from_method($methodConfig, $routeConfig['methods']);
 
             // 같은 route의 action 메서드(다운로드 등)가 요구하는 권한도 메뉴 권한 화면에서 줄 수 있게 합침
             foreach ($routeConfig['methods'] as $otherMethod) {

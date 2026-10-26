@@ -1,6 +1,20 @@
 <?php
 
-function make_base_auth_from_method(array $method): string
+/**
+ * route 에 엑셀 가져오기 화면(category excel 또는 excel 키)이 있는지
+ */
+function route_has_excel_method(array $methods): bool
+{
+    foreach ($methods as $key => $method) {
+        if ($key === 'excel' || (is_array($method) && ($method['category'] ?? '') === 'excel')) return true;
+    }
+    return false;
+}
+
+/**
+ * $routeMethods: 같은 route 의 methods. import 자리는 buttons.excel 이 켜져 있고 excel method 가 있을 때만 켠다
+ */
+function make_base_auth_from_method(array $method, array $routeMethods = []): string
 {
     // 화면 없는 action 메서드: 지정한 mode 자리만 켬 (setupPlatformPage가 이 mode로 권한 검사)
     if (($method['category'] ?? '') === 'action') {
@@ -37,7 +51,7 @@ function make_base_auth_from_method(array $method): string
 
     // I: Import
     // 현재 구조상 buttons.excel 은 Export 가 아니라 CSV/Excel Import 화면 진입 버튼
-    $i = !empty($method['buttons']['excel']) ? '1' : '0';
+    $i = !empty($method['buttons']['excel']) && route_has_excel_method($routeMethods) ? '1' : '0';
 
     return $c . $r . $u . $d . $e . $i;
 }
@@ -61,7 +75,7 @@ function make_base_auth_from_route(array $route): string
     $base_auth = BASE_AUTH_CHAR;
 
     foreach (($route['methods'] ?? []) as $method) {
-        $method_auth = make_base_auth_from_method($method);
+        $method_auth = make_base_auth_from_method($method, $route['methods'] ?? []);
         $base_auth = merge_auth($base_auth, $method_auth);
     }
 

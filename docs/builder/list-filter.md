@@ -102,7 +102,7 @@
 
 ### 2-5. 컬럼 item 키
 
-> **중요 — top-level에 작성할 것.** 최종 컬럼은 `array_merge($attributes, $item, …)`이고 item에는 이미 base 기본값이 채워져 있으므로, `builder_list_base`에 있는 키(`list, type, subtype, field, label, format, icon, text, classes, onclick, render, option_attributes, options`)는 **항상 item(top-level) 값이 `list_attributes` 값을 덮어쓴다.** `list_attributes`는 `label`과 base에 없는 키(예: `onchange`)에만 효과가 있다.
+> **우선순위: 기본값 < 항목(top-level) 값 < `list_attributes`.** 최종 컬럼은 `array_merge($item, $item['list_attributes'], …)`이다(item에는 이미 base 기본값이 채워져 있음). form 설정 항목을 목록에도 쓸 때 `list_attributes`로 목록 표시(type·onclick·render·classes 등)를 따로 줄 수 있다. (2026-10-26 전에는 항목 값이 `list_attributes`를 덮어써 label 외에는 무시됐음)
 >
 > **렌더링은 `type`이 결정한다(`format` 아님). class 키는 `classes`(배열)이다(`class_name` 아님).** 이전 문서의 `list_attributes.format`, `list_attributes.class_name` 설명은 실제 코드와 다르다.
 
@@ -122,7 +122,7 @@
 | `render` | dict | `[]` | `{callback: '함수명', params: mixed}` 커스텀 렌더러 (2-7) | DataTable `columnDefs` |
 | `option_attributes` | dict | `[]` | `type=select` 셀의 옵션 소스. form과 같은 규칙(`MY_Controller::getOptions()`), 단 `option_field`는 무시 | `getListColumns()` |
 | `options` | dict | `[]` | (자동 생성) `{value: text}` | `renderSelectColumn()` |
-| `list_attributes` | dict | 없음 | `label` 외에는 위 경고대로 대부분 무시 | `setListColumns()` |
+| `list_attributes` | dict | 없음 | 목록 전용 값. 항목 값보다 우선 | `setListColumns()` |
 
 DataTable 컬럼 정의의 `width`, `orderable`, `searchable`, `visible`, `className` 등을 설정으로 조절하는 키는 **없다**. 데이터 컬럼은 모두 `searchable: true, orderable: false`로 고정된다.
 

@@ -43,7 +43,7 @@ builder 기반 플랫폼(현재 `admin`)에서 페이지 하나는 **route 항�
 
 세 가지 방식이 섞여 있다.
 
-1. **파일 간: 최상위 키 교체.** `config->load()`는 CI3 `CI_Config::load()`의 `array_merge($this->config, $config)`를 따른다. 같은 최상위 키(예: `platform_config`)를 `admin_base_config.php`에 다시 정의하면 builder 쪽 배열이 **통째로 교체**된다. 깊은 병합은 없다.
+1. **파일 간: 최상위 키 교체.** `config->load()`는 CI3 `CI_Config::load()`의 `array_merge($this->config, $config)`를 따른다. 같은 최상위 키를 플랫폼 파일에 다시 정의하면 builder 쪽 배열이 **통째로 교체**된다. 예외: `platform_config`는 `BuilderCommonTrait::loadConfigs()`가 builder 기본값 위에 플랫폼 값을 채워 합친다(`fill_config_properties`, 플랫폼에는 바꿀 키만 적으면 됨, 목록 값은 플랫폼 값이 그대로 이김).
 2. **route / method / nav 항목: `builder_route_helper.php` `fill_config_properties($config, $base)`**
    - `$config`(구체적인 쪽)에 이미 있는 키가 이긴다. `$base`는 빠진 키만 채운다.
    - `$base` 값이 **연관배열**이면 재귀적으로 채운다(`properties`, `includes`, `buttons`, `actions`, `exports` 등). 이때 `$config` 쪽 값이 `[]`여도 `$base`의 키가 **그대로 채워진다**. 즉 `'actions' => []`로는 상위 기본값을 지울 수 없고, 끄려면 키마다 `false`를 줘야 한다.
@@ -68,7 +68,7 @@ builder 기반 플랫폼(현재 `admin`)에서 페이지 하나는 **route 항�
 | 파일 | 내용 |
 |---|---|
 | `config/extra/builder/builder_base_config.php` | 기본값 |
-| `config/extra/admin/admin_base_config.php` | builder와 **동일 내용**으로 재정의. 최상위 교체이므로 builder 값은 사실상 쓰이지 않는다 |
+| `config/extra/admin/admin_base_config.php` | 바꿀 키만 적으면 builder 값 위에 덮어쓴다(지금은 builder와 같은 내용) |
 | `config/extra/web/web_base_config.php` | `loggedInRedirect`, `noLoginRedirect`만 있음 |
 
 `MY_Builder_WEB::__construct()`에도 "base config 병합 필요" TODO가 남아 있다. 키 하나만 바꾸려 해도 플랫폼 파일에 전체를 다시 적어야 한다.
@@ -124,7 +124,7 @@ route_config[class]                    (가장 우선)
 - 병합 후 처리:
   - `methods`가 비어 있으면 `E_USER_ERROR`.
   - `properties.baseMethod`가 비어 있으면 **첫 번째 method 키**를 넣는다. 지정했는데 `methods`에 없으면 `E_USER_ERROR`.
-  - `properties.allows = array_keys(methods)`로 **무조건 덮어쓴다**. `$this->allowedMethods`에도 같은 값을 넣는다.
+  - `properties.allows`: 적었으면 `allows ∩ array_keys(methods)`, 비어 있으면 `array_keys(methods)`. `$this->allowedMethods`에도 같은 값을 넣는다.
 
 ### 정의된 type/subtype 조합
 
@@ -144,7 +144,7 @@ route_config[class]                    (가장 우선)
 | `subtype` | string | `'base'` | `route_{type}_{subtype}_config` 선택에 쓴다 |
 | `methods` | assoc (method명 → method 항목) | `[]` (비면 E_USER_ERROR) | 허용 method 목록이자 method 설정. 키가 곧 URL 세그먼트. → [4. Method 설정](#4-method-설정) |
 | `properties.baseMethod` | string | `''` → 첫 method | `/{flag}/{class}`(index)로 들어오면 실행할 method. `setMethodConfig()`, `index()`, `viewApp()` 뷰 탐색, `setupPlatformPage()`, `BuilderColumnsTrait::setFormColumns()`, `getMenuBaseAuth()`에서 사용 |
-| `properties.allows` | list | `[]` | **주의** — 지정해도 `array_keys(methods)`로 덮어씀. list/form/view `actions` 필터링과 `PAGE_*_URI` 생성 여부를 정한다 |
+| `properties.allows` | list | `[]` | 비우면 methods 전체, 적으면 methods와의 교집합(method가 있어도 버튼·링크를 숨길 때). list/form/view `actions` 필터링과 `PAGE_*_URI` 생성 여부를 정한다 |
 | `properties.noIndex` | bool | `false` | `true`면 `index()`가 `{href}/{baseMethod}`로 redirect. 메뉴 관리 API의 method 선택 목록에서 `index`가 빠진다 |
 | `properties.allowNoLogin` | bool | `false` | `false`이고 비로그인이면 세션 정리 후 `noLoginRedirect`(`checkLoggedIn()`, `index()`) |
 | `properties.includes.{head,header,modalPrepend,modalAppend,footer,tail}` | bool | 모두 `true` | 레이아웃 조각 출력 여부. `beforeViewApp()` → `$includes` → `layout/index.php` |
@@ -301,7 +301,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
   3. `pageAuth`(= 메뉴의 `menu_auth`)가 `'000000'`이 아님(**000000이면 검사 없이 통과**)
   4. route의 **baseMethod 항목이 list category**이고 현재 method가 baseMethod가 아님
 - list 화면 버튼/액션 권한 필터(`pageAuth` 기준): `buttons.add`→create, `buttons.excel`→import, `actions.view`→read, `actions.edit`→update, `actions.delete`→delete, `exports.*`→export. 시스템 관리자는 `pageAuth=INIT_AUTH_CHAR`(전체 허용).
-- 메뉴 기본 권한(`base_auth`)은 `builder_menu_helper.php` `make_base_auth_from_method()`가 **list category method에 대해서만** 계산한다: C=`buttons.add`, R=`actions.view`, U=`actions.edit`, D=`actions.delete`, E=`exports` 중 하나라도 true, I=`buttons.excel`. list가 아니면 `'000000'`. 예: administrators.list → `101100`.
+- 메뉴 기본 권한(`base_auth`)은 `builder_menu_helper.php` `make_base_auth_from_method()`가 **list category method에 대해서만** 계산한다: C=`buttons.add`, R=`actions.view`, U=`actions.edit`, D=`actions.delete`, E=`exports` 중 하나라도 true, I=`buttons.excel`이 true이고 같은 route에 excel method(키 `excel` 또는 category `excel`)가 있을 때(`route_has_excel_method()`). list가 아니면 `'000000'`. 예: administrators.list → `101100`.
 - `category: 'action'` 메서드는 `mode` 자리만 켠다(예: `export` → `000010`, mode 생략 시 `read`). `getMenuBaseAuth()`는 baseMethod 권한에 같은 route의 action 메서드 권한을 합친다. 그래서 다운로드처럼 화면 없는 메서드가 요구하는 권한도 메뉴 권한 화면에서 줄 수 있다.
 
 ### 예시 (`admin_route_config.php` `administrators.list`)
@@ -312,7 +312,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
     'type' => 'table',         // (method_list_table_config 없음)
     'subtype' => 'datatable',  // method_list_table_datatable_config → plugin=datatable, datatables asset 로드
     'buttons' => ['excel' => false],                  // 업로드 버튼 숨김 (add는 기본 true → create 권한 필요)
-    'actions' => ['view' => false, 'excel' => false], // actions.excel은 JS 아이콘이 없어 무시됨
+    'actions' => ['view' => false, 'excel' => false], // actions.excel은 읽는 곳이 없음 — 엑셀 버튼은 buttons.excel
     'properties' => ['formExist' => true],            // 목록 + offcanvas 사이드 폼, add()/edit()는 404
 ],
 // 결과: LIST_BUTTONS={add:<create권한>, excel:false}, LIST_ACTIONS=['edit','delete'](권한 필터 후),
@@ -323,7 +323,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
 > - view 파이프라인은 `subtype === 'view'`에서만 동작하는데 그런 config가 없다 — 현재 `VIEW_COLUMNS`/`prepareViewData()`는 어디서도 실행되지 않음. dashboard는 `builder/layout/view.php`가 잡혀 `$viewType` 미정의.
 > - form 페이지의 `$formType`은 `type`, JS `FORM_TYPE`은 `subtype` — 이름은 같고 의미가 다르다. `layout/form_{type}.php`는 base/side/modal/tabs만 있어 auth/menu/article type은 컨트롤러가 `subPage`를 직접 지정해야 한다.
 > - baseMethod 항목에 `category`가 없으면 `setupPlatformPage()`에서 notice, list가 아닌 baseMethod route는 mode 검사를 전혀 하지 않는다.
-> - `method_list_base_config`의 `buttons.excel=true` 기본값 때문에 excel method가 없어도 base_auth의 I 비트가 켜진다.
+> - `buttons.excel=true` 기본값이어도 route에 excel method가 없으면 base_auth의 I 비트와 엑셀 버튼은 꺼진다(2026-10-26).
 > - excel 페이지는 `getExcelHeaders()` 버그로 현재 항상 에러 — [view-excel.md](view-excel.md) 참고.
 
 ---
