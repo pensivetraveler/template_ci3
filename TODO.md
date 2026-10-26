@@ -79,6 +79,7 @@
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 
 ### 버그
+- [ ] sysCode 등록에서 cmb_cd를 빼고 보내면 cmb_cd=''로 행이 들어가고 `BuilderCommonTrait::reorderList`에서 Undefined index → 500 (bizsoft #빌더-41 관찰, 화면은 cmb_cd를 보내서 영향 없음) — cmb_cd 필수 검증·reorderList 방어 필요
 - [x] 자동 로그인이 한 번도 동작하지 않음 (2026-10-26, 결함 A): hook이 세션에 user_id만 넣어 `checkLoggedIn`이 token 없음으로 보고 `destroyUserData()`가 세션·autologin 쿠키를 지움 → `MY_Controller::loginWithAutologinCookie`(MY_Builder_WEB 생성자)·`startUserSession`(Auth::login과 공통)으로 옮김
 - [x] 자동 로그인 체크박스가 제출 때 풀림 (결함 B, 2026-10-26): 스크립트 로드 중 체크한 것을 `app-page-auth.js`의 `resetFrmInputs()`가 지움(bizsoft #빌더-31 trace 확인) → 로그인 계열 화면에서 초기화 호출 제거
 - [x] 같은 계정 동시 로그인 → 한 곳만 허용으로 결정(2026-10-26). 토큰은 회원당 하나 그대로, 화면도 `isSessionTokenCurrent()`로 확인해 바뀌었으면 로그아웃

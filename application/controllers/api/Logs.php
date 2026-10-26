@@ -70,7 +70,8 @@ class Logs extends Common
         $limit = $this->input->get('limit') ?? 10;
         $filters = $this->input->get('filters') ?? [];
 
-        $date = $filters['date']['on_date'] ? : date('Y-m-d');
+        // 날짜 필터 없이 부르면 오늘 (전에는 Undefined index 로 500)
+        $date = ($filters['date']['on_date'] ?? '') ?: date('Y-m-d');
         $logThreshold = $filters['whereIn']['log_threshold'] ?? [];
         $keyword = $filters['like'][0]['value'] ?? '';
         $isToday = $date === date('Y-m-d');
