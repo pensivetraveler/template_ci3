@@ -329,7 +329,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 
 ### 구조
 - [x] (2026-10-26 C-1-4: platform_config 깊은 병합) `MY_Builder_WEB::__construct` `admin_base_config.php`가 builder base와 같은 내용으로 최상위 교체 (base config 깊은 병합 필요 — TODO 주석 존재)
-- [ ] `builder_route_helper.php::fill_config_properties` 빈 배열로 상위 기본값을 끌 방법이 없음 (키마다 `false` 필요 — `null`/명시적 리스트 등 끄기 규칙 정의)
+- [x] (2026-10-26 C-1-2: 묶음 `false` = 하위 bool 모두 false 배열, bool 아닌 값이 섞이면 기본값+로그, 목록 JS는 객체가 아닌 버튼 건너뜀) `builder_route_helper.php::fill_config_properties` 빈 배열로 상위 기본값을 끌 방법이 없음 (키마다 `false` 필요 — `null`/명시적 리스트 등 끄기 규칙 정의)
 - [x] (2026-10-26 C-1-3: category 'base'로 보고 기본값만 채움 + 로그, bizsoft·템플릿 해당 0건 확인) `MY_Builder_WEB::setMethodConfig` `category` 없는 method 항목은 내용이 통째로 버려지고 `method_base_config`로 대체 (경고 없이 설정 무시)
 - [x] `MY_Builder_WEB::setMethodConfig` `category: 'action'`은 레이어링을 생략하는데 `setJSVariables()`가 `actions`/`buttons`/`properties.identifier`를 요구 (action 전용 기본값 config 필요) → `method_base_config`로 빈 키를 채우도록 수정
 - [ ] `MY_Builder_API::__construct` method/nav config를 로드하지 않아 `getMethodList()`·`MenuList::options_get()`이 원본 route를 별도 규칙으로 해석 (WEB 레이어링 결과와 불일치)

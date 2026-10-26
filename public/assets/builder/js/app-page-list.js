@@ -900,6 +900,8 @@ function getListButtons() {
 		if(['excel', 'add'].includes(btnName)) continue;
 
 		const btnObj = common.LIST_BUTTONS[btnName];
+		// 끈 버튼(false)·잘못 적은 값은 건너뜀 (그대로 그리면 빈 버튼이 생겼음)
+		if(btnObj === null || typeof btnObj !== 'object') continue;
 		data.push(
 			{
 				text: '<span class="d-none d-sm-inline-block">' + getLocale(btnObj.text, common.LOCALE) + '</span>',

@@ -46,13 +46,16 @@ builder 기반 플랫폼(현재 `admin`)에서 페이지 하나는 **route 항�
 1. **파일 간: 최상위 키 교체.** `config->load()`는 CI3 `CI_Config::load()`의 `array_merge($this->config, $config)`를 따른다. 같은 최상위 키를 플랫폼 파일에 다시 정의하면 builder 쪽 배열이 **통째로 교체**된다. 예외: `platform_config`는 `BuilderCommonTrait::loadConfigs()`가 builder 기본값 위에 플랫폼 값을 채워 합친다(`fill_config_properties`, 플랫폼에는 바꿀 키만 적으면 됨, 목록 값은 플랫폼 값이 그대로 이김).
 2. **route / method / nav 항목: `builder_route_helper.php` `fill_config_properties($config, $base)`**
    - `$config`(구체적인 쪽)에 이미 있는 키가 이긴다. `$base`는 빠진 키만 채운다.
-   - `$base` 값이 **연관배열**이면 재귀적으로 채운다(`properties`, `includes`, `buttons`, `actions`, `exports` 등). 이때 `$config` 쪽 값이 `[]`여도 `$base`의 키가 **그대로 채워진다**. 즉 `'actions' => []`로는 상위 기본값을 지울 수 없고, 끄려면 키마다 `false`를 줘야 한다.
+   - `$base` 값이 **연관배열**이면 재귀적으로 채운다(`properties`, `includes`, `buttons`, `actions`, `exports` 등). `$config` 쪽 값에 따라:
+     - `[]`: 기본값을 그대로 쓴다.
+     - `false`: **묶음 전체 끄기** — 하위 bool 값을 모두 `false`로 채운 배열이 된다(`config_bool_group_off()`, 하위 연관배열도 같은 규칙). bool이 아닌 값이 섞인 묶음(예: `properties`)은 끌 수 없어 기본값을 쓰고 로그를 남긴다.
+     - `['excel' => false]`처럼 일부만 적으면 그 키만 바뀐다.
    - `$base` 값이 **리스트(숫자 키) 배열이거나 빈 배열**이면 잎(leaf)으로 취급해 `$config`에 키가 없을 때만 통째로 넣는다(`format_helper.php` `is_list_type()`은 빈 배열에도 `true`를 돌려준다).
-   - `$base`는 연관배열인데 `$config`의 같은 키가 스칼라면(예: `'includes' => false`) 배열 타입힌트 때문에 TypeError가 난다.
+   - `$base`는 연관배열인데 `$config`의 같은 키가 `false`가 아닌 스칼라면 설정값을 그대로 두고 로그를 남긴다.
 3. **builder 파일 내부의 사전 병합: `array_replace_recursive`** (`builder_method_config.php`의 `method_form_base_config`, `method_form_base_grid_config`, `method_form_auth_*_config`). 여기서도 빈 배열로 덮어써도 키가 지워지지 않는다.
 
 > **주의**
-> - 빈 배열(`[]`)은 어떤 병합 방식에서도 "비우기"로 동작하지 않는다 — 끌 키는 `false`로 명시.
+> - 빈 배열(`[]`)은 어떤 병합 방식에서도 "비우기"로 동작하지 않는다 — 묶음 전체는 `false`, 일부는 키마다 `false`. (`array_replace_recursive`로 미리 합치는 builder 파일 내부 병합에는 묶음 `false` 규칙이 없다)
 
 ### Config 조회 헬퍼 (`MY_Config`)
 
