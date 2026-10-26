@@ -50,7 +50,7 @@
     - bizsoft: 운영 이미지 빌드에서 바꿈 (`deploy/php/Dockerfile`), 저장소의 `.htaccess`는 development 유지
 - [ ] `.env`의 `APP_DEBUG`는 코드에서 읽지 않음 → 정리 (에러 노출은 `CI_ENV`가 결정)
 - [x] `config/production/hooks.php`의 존재하지 않는 `setPearPath` hook 제거 (`f49aaa6`)
-- [ ] 세션·보안 설정: `cookie_httponly`, `csrf_protection`, `allow_any_cors_domain`
+- [x] 세션·보안 설정 (2026-10-26): `cookie_httponly` TRUE(개발·운영), 로그인 응답의 `aul_key` 제거·JS `setCookie('autologin', data.autologin)` 제거(없는 값으로 서버 쿠키를 덮어쓰던 것), CORS는 `.env` `CORS_ALLOWED_ORIGINS`/`CORS_ALLOW_ANY`로(기본 같은 출처만). `csrf_protection`은 끈 채 유지 — API는 Authorization 헤더 토큰(운영 `rest_enable_keys`)과 `rest_ajax_only`가 CSRF 방어 역할
 - [x] 암호화 키를 `.env`의 `ENCRYPTION_KEY`로 이동 (`MY_Hooks::loadEnv`에서 `encryption_key` 설정, `hex:` 접두사 지원)
 - [x] 운영 `ENCRYPTION_KEY` 결정 (현재 의도적으로 비워 둠 → 비어 있으면 `show_error`로 모든 요청 중단)
     - bizsoft 운영: 개발 데이터를 옮긴 뒤 비밀번호 전환을 마치고 무작위 키로 교체 (2026-10-17, 개발 키는 `ENCRYPTION_KEY_PREVIOUS`)

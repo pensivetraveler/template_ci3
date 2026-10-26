@@ -148,7 +148,8 @@ class Auth extends Common
         $this->response([
             'code' => DATA_AVAILABLE,
             'data' => [
-                'aul_key' => $cookie_value ?? '',
+                // 자동 로그인 키는 HttpOnly 쿠키로만 보낸다 (응답 본문에 담으면 JS·XSS 가 읽을 수 있음)
+                'autologin' => isset($cookie_value),
             ],
         ]);
     }

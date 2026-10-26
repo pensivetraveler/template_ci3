@@ -665,7 +665,8 @@ $config['allowed_cors_methods'] = [
 | source domain
 |
 */
-$config['allow_any_cors_domain'] = true;
+// 기본은 같은 출처만. 다른 출처가 필요하면 .env 의 CORS_ALLOWED_ORIGINS(쉼표 구분) 또는 CORS_ALLOW_ANY=true
+$config['allow_any_cors_domain'] = function_exists('env') && env('CORS_ALLOW_ANY', false) === true;
 
 /*
 |--------------------------------------------------------------------------
@@ -678,7 +679,9 @@ $config['allow_any_cors_domain'] = true;
 | e.g. $config['allowed_origins'] = ['http://www.example.com', 'https://spa.example.com']
 |
 */
-$config['allowed_cors_origins'] = [];
+$config['allowed_cors_origins'] = function_exists('env') && env('CORS_ALLOWED_ORIGINS')
+    ? array_values(array_filter(array_map('trim', explode(',', (string)env('CORS_ALLOWED_ORIGINS')))))
+    : [];
 
 /*
 |--------------------------------------------------------------------------
