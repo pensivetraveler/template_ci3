@@ -45,6 +45,8 @@ $config['method_list_base_config'] = [
         'copy' => false,
     ],
     'properties' => [
+        // false 면 페이징 없이 전체를 한 번에 조회 (짧은 목록)
+        'paging' => true,
         'noIdentifier' => false,
         'identifier' => [],
         'plugin' => '',

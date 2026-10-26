@@ -238,7 +238,32 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function beforeList($data): array
     {
+        $order = $this->getRequestedListOrder();
+        if(count($order)) $data['orderBy'] = $order;
+
         return $data;
+    }
+
+    /**
+     * 목록 정렬 요청(orderField·orderDir). 목록 설정에 있고 orderable 이 false 가 아니며
+     * 요청 조건으로 받을 수 있는 컬럼(getAllowedRequestFields — 실제 DB 컬럼)만 받는다. 아니면 [] (모델 기본 정렬)
+     */
+    protected function getRequestedListOrder(): array
+    {
+        $field = $this->input->get('orderField');
+        $dir = strtolower((string)$this->input->get('orderDir'));
+        if(!is_string($field) || $field === '' || !in_array($dir, ['asc', 'desc'], true)) return [];
+
+        $listFields = [];
+        foreach ($this->listConfig ?: [] as $item) {
+            if(!isset($item['field']) || ($item['orderable'] ?? true) === false) continue;
+            if(in_array($item['type'] ?? '', ['row_num', 'actions', 'common'], true)) continue;
+            $listFields[] = $item['field'];
+        }
+        if(!in_array($field, $listFields, true)) return [];
+        if(!in_array($field, $this->getAllowedRequestFields(), true)) return [];
+
+        return [$field => strtoupper($dir)];
     }
 
     protected function executeList($data, $model = null): array

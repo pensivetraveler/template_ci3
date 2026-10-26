@@ -305,10 +305,10 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `app-page-list.js::renderSelectColumn` `onchange`는 함수명 문자열만 동작, `{kind, attrs, params}` dict는 `[object Object]`
 - [ ] `app-page-list.js` DataTable `columnDefs` `render.params`가 없으면 `null` 전달 (구 README의 "this 전달" 설명과 다름)
 - [x] (2026-10-26 C-2-3) `MY_Builder_WEB::getListColumns` list 컬럼의 `option_attributes.option_field`가 무시되고 항상 `field`로 옵션 조회 (필터와 동작 불일치)
-- [ ] `MY_Builder_WEB::setJSVariables` `LIST_CHEKBOX` 체크박스 선택값을 읽는 코드 없음 (일괄 삭제 등 미구현)
+- [x] (2026-10-26 B-3: 선택 삭제 버튼, 행마다 DELETE) `MY_Builder_WEB::setJSVariables` `LIST_CHEKBOX` 체크박스 선택값을 읽는 코드 없음 (일괄 삭제 등 미구현)
 - [ ] `builder_filter_config.php::builder_filter_config` `buttons` 키, `app-page-form.js::getFilterData` `filters.text` 사용처 없음 (제거 또는 구현)
-- [ ] `app-page-list.js` DataTable `ajax.data`가 `order/columns/search`를 보내지 않음 (`order` 옵션 무의미, 컬럼 정렬·`orderable` 설정 불가 — 서버 정렬 미구현)
-- [ ] `MY_Builder_WEB::setJSVariables` `LIST_PAGING` 항상 `true` 하드코딩 (페이징 끄기 불가)
+- [x] (2026-10-26 B-1: orderField·orderDir, 서버 getRequestedListOrder, 컬럼 orderable:false로 끔) `app-page-list.js` DataTable `ajax.data`가 `order/columns/search`를 보내지 않음 (`order` 옵션 무의미, 컬럼 정렬·`orderable` 설정 불가 — 서버 정렬 미구현)
+- [x] (2026-10-26 B-2: list properties.paging) `MY_Builder_WEB::setJSVariables` `LIST_PAGING` 항상 `true` 하드코딩 (페이징 끄기 불가)
 - [ ] `MY_Builder_API::transformView` 옵션 텍스트 치환용 `transTargetKeys`를 채우는 API 컨트롤러 없음 (list/view config의 `option_attributes` 라벨 변환 사실상 미동작)
 
 **view·excel import**

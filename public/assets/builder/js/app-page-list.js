@@ -65,6 +65,16 @@ $(function () {
                         filters : {},
                     };
 
+                    // 서버 정렬: 사용자가 고른 컬럼만 보낸다 (서버가 목록 설정·실제 컬럼인지 다시 확인)
+                    const order = (data.order || [])[0];
+                    if(order) {
+                        const column = common.LIST_COLUMNS[order.column - 1 - common.LIST_CHEKBOX];
+                        if(column && column.field) {
+                            req.orderField = column.field;
+                            req.orderDir = order.dir;
+                        }
+                    }
+
                     if($('#formFilter').length) req.filters = getFilterData('#formFilter', isFirstDraw);
 
                     return req;
@@ -156,7 +166,8 @@ $(function () {
                         default :
                             return {
                                 searchable: true,
-                                orderable: false,
+                                // 기본은 정렬 허용, 컬럼 설정 orderable: false 로 끔
+                                orderable: column.orderable !== false,
                                 targets: 1+common.LIST_CHEKBOX+index,
                                 render: function (data, type, full, meta) {
                                     if(column.render && column.render.callback && typeof window[`${column.render.callback}`] !== 'function'){
@@ -184,7 +195,8 @@ $(function () {
                     }
                 }),
             ],
-            order: [[1+common.LIST_CHEKBOX, 'desc']],
+            // 처음에는 정렬을 보내지 않음 (모델 기본 정렬) — 사용자가 머리글을 누르면 서버 정렬
+            order: [],
             dom:
                 '<"card-header d-flex rounded-0 flex-wrap pb-md-0 pt-0 justify-content-end"' +
                 // '<"d-flex justify-content-start align-items-center me-5 ms-n2"<"search-category-wrap me-2">f>' +
@@ -917,6 +929,19 @@ function getListButtons() {
 		);
 	}
 
+	// 체크박스로 고른 행 삭제 (체크박스가 켜져 있고 행 삭제 권한이 있을 때)
+	if(common.LIST_CHEKBOX && Array.isArray(common.LIST_ACTIONS) && common.LIST_ACTIONS.includes('delete')) {
+		data.push(
+			{
+				text: '<i class="ri-delete-bin-7-line ri-16px me-0 me-sm-2 align-baseline"></i><span class="d-none d-sm-inline-block">' + getLocale('Delete Selected', common.LOCALE) + '</span>',
+				className: 'btn btn-outline-danger waves-effect me-4',
+				action: function () {
+					deleteSelectedRecords();
+				}
+			}
+		);
+	}
+
 	if(Object.hasOwn(common.LIST_BUTTONS, 'excel') && common.LIST_BUTTONS['excel']) {
 		data.push(
 			{
@@ -952,6 +977,60 @@ function getListButtons() {
 	}
 
 	return data;
+}
+
+/**
+ * 체크한 행을 하나씩 DELETE (행마다 서버의 권한·데이터 범위·삭제 hook 을 그대로 거친다)
+ */
+function deleteSelectedRecords() {
+	const table = $('.datatables-records').DataTable();
+	const targets = [];
+	$('.datatables-records tbody input.dt-checkboxes:checked').each(function() {
+		const full = table.row($(this).closest('tr')).data();
+		if(full) targets.push(getIdentifiersData(full, common.IDENTIFIER));
+	});
+
+	if(!targets.length) {
+		showAlert({type: 'warning', text: getLocale('No rows selected', common.LOCALE)});
+		return;
+	}
+
+	Swal.fire({
+		title: getLocale('Do you really want to delete?', common.LOCALE),
+		text: `${targets.length} / ` + getLocale('You can\'t undo this action', common.LOCALE),
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonText: getLocale('Delete', common.LOCALE),
+		cancelButtonText: getLocale('Cancel', common.LOCALE),
+		customClass: {
+			confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+			cancelButton: 'btn btn-outline-secondary waves-effect'
+		},
+		buttonsStyling: false
+	}).then(function (result) {
+		if(!result.isConfirmed) return;
+
+		let done = 0;
+		let failed = 0;
+		targets.forEach(function(idData) {
+			executeAjax({
+				async: false,
+				url: getUrlWithIdentifiers(common.API_URI, Object.keys(idData).length === 1 ? Object.values(idData)[0] : idData, common.API_PARAMS),
+				headers: {
+					'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+				},
+				method: 'delete',
+				success: function() { done++; },
+				error: function() { failed++; },
+			});
+		});
+
+		showAlert({
+			type: failed ? 'warning' : 'success',
+			text: getLocale('Deleted', common.LOCALE) + ` ${done}` + (failed ? ` / ` + getLocale('Failed', common.LOCALE) + ` ${failed}` : ''),
+			callback: function() { table.ajax.reload(null, false); },
+		});
+	});
 }
 
 function getListExports() {

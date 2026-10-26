@@ -549,7 +549,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                         'LIST_PLUGIN' => $methodConfig['properties']['plugin'],
                         'LIST_OPTIONS' => $methodConfig['properties'],
                         'LIST_CHEKBOX' => $methodConfig['properties']['isCheckbox'],
-                        'LIST_PAGING' => true,
+                        'LIST_PAGING' => ($methodConfig['properties']['paging'] ?? true) !== false,
                     ]);
                 }
 

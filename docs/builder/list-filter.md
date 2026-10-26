@@ -124,7 +124,7 @@
 | `options` | dict | `[]` | (자동 생성) `{value: text}` | `renderSelectColumn()` |
 | `list_attributes` | dict | 없음 | 목록 전용 값. 항목 값보다 우선 | `setListColumns()` |
 
-DataTable 컬럼 정의의 `width`, `orderable`, `searchable`, `visible`, `className` 등을 설정으로 조절하는 키는 **없다**. 데이터 컬럼은 모두 `searchable: true, orderable: false`로 고정된다.
+DataTable 컬럼 정의의 `width`, `searchable`, `visible`, `className` 등을 설정으로 조절하는 키는 **없다**. `orderable`만 컬럼 설정으로 끌 수 있다(기본 정렬 허용, 아래 서버 정렬 참고).
 
 ### 2-6. `type`별 셀 렌더링 (`app-page-list.js`)
 
@@ -234,8 +234,8 @@ function renderMenuAuthCheckbox(data, type, full, meta, column, params) {
 | 변수 | 출처 | 내용 |
 |---|---|---|
 | `LIST_COLUMNS` | `setListColumns()` | 2장 |
-| `LIST_CHEKBOX` (철자 그대로) | `properties.isCheckbox` (기본 false) | true면 두 번째 컬럼에 `dt-checkboxes` 체크박스. **미구현** — 선택값을 읽는 코드 없음 |
-| `LIST_PAGING` | 항상 `true` 하드코딩 | DataTable `paging`. 설정으로 끌 수 없음 |
+| `LIST_CHEKBOX` (철자 그대로) | `properties.isCheckbox` (기본 false) | true면 두 번째 컬럼에 `dt-checkboxes` 체크박스. 행 삭제 권한(`LIST_ACTIONS`에 delete)이 있으면 "선택 삭제" 버튼이 생겨, 고른 행을 하나씩 DELETE한다(`deleteSelectedRecords()`, 행마다 서버 권한·데이터 범위·hook 적용) |
+| `LIST_PAGING` | `properties.paging` (기본 true) | DataTable `paging`. false면 전체를 한 번에 조회(`limit=-1`) |
 | `LIST_ACTIONS` | `setListActions(actions)` → true인 키 목록 | row action (4-4) |
 | `LIST_BUTTONS` | `setListButtons(buttons)` | 상단 버튼 (4-5) |
 | `LIST_EXPORTS` | `setListExports(exports)` | Export 드롭다운 (4-6) |
@@ -264,7 +264,7 @@ method config 기본값은 `method_list_base_config` + `method_list_table_datata
 | `searchWord`, `searchCategory` | 항상 `''` (dom에서 검색창 `f`가 주석 처리됨) |
 | `filters` | `getFilterData('#formFilter', isFirstDraw)` 결과 (5-6) |
 
-`ajax.data`가 새 객체를 반환하므로 DataTables 기본 `order/columns/search` 파라미터는 **전송되지 않는다**. `order: [[1+LIST_CHEKBOX, 'desc']]`는 의미가 없고, 정렬은 모델 기본값(`MY_Model::orderBy()`: auto-increment identifier DESC, 없으면 `created_dt` DESC)을 따른다.
+`ajax.data`가 새 객체를 반환하므로 DataTables 기본 `order/columns/search` 파라미터는 전송되지 않는다. **서버 정렬**: 머리글을 누르면 `orderField`(LIST_COLUMNS의 field)·`orderDir`(asc|desc)을 보내고, 서버 `MY_Builder_API::getRequestedListOrder()`가 목록 설정에 있고 `orderable !== false`이며 실제 컬럼(`getAllowedRequestFields`)인 필드만 `orderBy`로 넣는다. 처음 조회(`order: []`)와 받지 않은 필드는 모델 기본 정렬(`MY_Model::orderBy()`: auto-increment identifier DESC, 없으면 `created_dt` DESC).
 
 서버 처리:
 
