@@ -70,6 +70,7 @@
 ## 5. 코드 검토에서 나온 남은 항목
 
 ### 보안
+- [x] 로그인·아이디/비밀번호 찾기 시도 횟수 제한 (2026-10-26): IP별 60초 10회(`api_method_config` limit·time). RestController가 API 키 없는 요청은 limit을 검사하지 않았고(IP_ADDRESS 방식일 때만), 빈 키로 세면 모든 사용자가 한 카운터를 같이 썼음 → 키가 없으면 IP로 셈. 로드밸런서 뒤에서는 `PROXY_IPS`가 설정돼 있어야 사용자 IP로 셈(아니면 LB IP 하나로 묶여 전체가 막힘). 요청 로그(log)는 비밀번호가 평문 저장되므로 끈 채 둠
 - [ ] XSS: 목록 셀 렌더링(`app-page-list.js` `innerHTML`, inline `onclick`), 뷰 출력 `html_escape` 미사용 (추가: `renderColumn` text 셀, 반응형 `responsive.details.renderer`, `getColumnOnclick` redirect/download/view의 `location.href`/`window.open` 문자열(`javascript:` URL 포함), checkbox·select 셀 inline `onchange`의 식별자 값, `app-page-view.js::applyViewData` `SPAN.innerHTML`) (추가 2026-10-25: 상세 보기 `app-page-view.js`는 textContent로 넣도록 수정됨)
     - [x] 목록 셀(`app-page-list.js`): 값은 텍스트 노드·`setAttribute`로, inline `onclick`/`onchange` 대신 `data-cell-click`·`data-onchange` + 위임 이벤트(`bindListCellEvents`), 이동 URL의 `javascript:`·`data:` 스킴 차단, 메뉴 권한 체크박스(`app-page-menu-auth.js`)도 같은 방식 (2026-10-25)
     - [ ] 남은 것: PHP 뷰 출력 `html_escape` 미사용, 화면별 커스텀 렌더러가 `renderColumnHTML`에 HTML 문자열을 넘기는 경우(호환용으로 문자열도 받음)

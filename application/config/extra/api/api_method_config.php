@@ -60,10 +60,12 @@ $config['api_method_config'] = [
         'dupCheck'      => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
         'idCheck'       => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
         'emailCheck'    => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
-        'login'         => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
+        // 로그인·아이디/비밀번호 찾기: IP 별 60초에 10회 (무차별 대입 방지, RestController user_limits).
+        // log 는 끈 채 둔다 — rest_logs 는 요청 파라미터를 그대로 저장해 비밀번호가 남는다
+        'login'         => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         'signup'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
-        'findId'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
-        'findPassword'  => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
+        'findId'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
+        'findPassword'  => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         'passwordCheck' => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
         // 로그인 상태에서 쓰는 엔드포인트: 인증은 rest_auth(session) 그대로
         'withdraw'      => ['post' => ['key' => false, 'log' => false]],

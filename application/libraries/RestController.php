@@ -731,7 +731,8 @@ abstract class RestController extends \MY_Controller {
         }
 
         //check request limit by ip without login
-        elseif ($this->config->item('rest_limits_method') == "IP_ADDRESS" && $this->config->item('rest_enable_limits') && $this->_check_limit($controller_method) === FALSE)
+        // API 키 없이 부르는 엔드포인트(로그인 등)도 limit 이 정해져 있으면 IP 별로 센다 (전에는 IP_ADDRESS 방식일 때만 검사)
+        elseif (($this->config->item('rest_limits_method') == "IP_ADDRESS" || isset($this->methods[$controller_method]['limit'])) && $this->config->item('rest_enable_limits') && $this->_check_limit($controller_method) === FALSE)
         {
             $response = [$this->config->item('rest_status_field_name') => FALSE, $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_ip_address_time_limit')];
             $this->response($response, self::HTTP_UNAUTHORIZED);
@@ -1205,6 +1206,12 @@ abstract class RestController extends \MY_Controller {
                 }
                 $limited_uri = 'uri:'.$limited_uri.':'.$this->request->method; // It's good to differentiate GET from PUT
                 break;
+        }
+
+        // API 키가 없으면 IP 별로 센다 (빈 키로 세면 모든 사용자가 한 카운터를 같이 써서, 로그인 제한이 사이트 전체를 막음)
+        if ($api_key === '' || $api_key === NULL)
+        {
+            $api_key = $this->input->ip_address();
         }
 
         if (isset($this->methods[$controller_method]['limit']) === FALSE )
