@@ -208,22 +208,7 @@ trait BuilderCommonTrait
             return;
         }
 
-        // methods 없는 route는 메뉴 권한 계산 대상에서 뺀다 (fillRouteConfigProperties의 E_USER_ERROR로 저장 전체가 실패하지 않게)
-        $routeConfigs = array_filter($this->config->item("route_config") ?: [], function ($item) {
-            return !empty($item['methods']);
-        });
-        $config = array_combine(
-            array_keys($routeConfigs),
-            array_map(function ($className, $item) {
-                foreach ($item['methods'] as $method=>$config) {
-                    $item['methods'][$method] = $this->fillMethodConfigProperties($config);
-                }
-                return $this->fillRouteConfigProperties($className, $item);
-            },
-                array_keys($routeConfigs),
-                $routeConfigs
-            )
-        );
+        $config = $this->getMenuRouteConfigs();
 
         foreach ($menuList as $i=>$item) {
             $item = $this->setMenuData($item, $config, $i+1);
@@ -241,6 +226,29 @@ trait BuilderCommonTrait
         }
 
         $this->cache->file->save('menu_done', $menuList, 0);
+    }
+
+    /**
+     * 메뉴 기본 권한(base_auth) 계산에 쓰는 route 설정 (route·method 기본값을 채운 것)
+     * methods 없는 route는 뺀다 (fillRouteConfigProperties의 E_USER_ERROR로 저장 전체가 실패하지 않게)
+     */
+    protected function getMenuRouteConfigs(): array
+    {
+        $routeConfigs = array_filter($this->config->item("route_config") ?: [], function ($item) {
+            return !empty($item['methods']);
+        });
+        return array_combine(
+            array_keys($routeConfigs),
+            array_map(function ($className, $item) {
+                foreach ($item['methods'] as $method=>$config) {
+                    $item['methods'][$method] = $this->fillMethodConfigProperties($config);
+                }
+                return $this->fillRouteConfigProperties($className, $item);
+            },
+                array_keys($routeConfigs),
+                $routeConfigs
+            )
+        );
     }
 
     /**

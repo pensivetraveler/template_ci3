@@ -35,6 +35,41 @@ class MenuList extends Common
         $this->response(['code' => DATA_PROCESSED]);
     }
 
+    /**
+     * 메뉴 기본 권한(base_auth)을 지금 route·method 설정으로 다시 계산한다 (menu_id·등급별·파트너별 권한은 그대로).
+     * 설정을 바꾼 뒤(엑셀·상세 화면 추가 등) 메뉴 권한 화면에서 새 자리를 켤 수 있게 한다. 줄어든 자리는 기존 권한에서 끄지 않는다
+     */
+    public function recalcBaseAuth_post()
+    {
+        $config = $this->getMenuRouteConfigs();
+        $changed = [];
+
+        foreach ($this->Model->getList([], []) as $row) {
+            $item = [
+                'isSubMenu' => (bool)$row->is_sub_menu,
+                'class' => (string)$row->class,
+                'method' => ($row->method ?? '') !== '' ? $row->method : 'index',
+            ];
+            $baseAuth = $this->getMenuBaseAuth($item, $config);
+            if($baseAuth === (string)$row->base_auth) continue;
+
+            $this->Model->modData(['base_auth' => $baseAuth], ['menu_id' => $row->menu_id]);
+            $changed[] = [
+                'menu_id' => $row->menu_id,
+                'title' => $row->title,
+                'before' => $row->base_auth,
+                'after' => $baseAuth,
+            ];
+        }
+
+        if(count($changed)) $this->cachingMenu();
+
+        $this->response([
+            'code' => DATA_PROCESSED,
+            'data' => $changed,
+        ]);
+    }
+
     public function caching_get()
     {
         $this->cachingMenu();

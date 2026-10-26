@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadMenuData(true)
     });
     document.getElementById('saveCacheBtn').addEventListener('click', handleCacheMenu);
+    document.getElementById('recalcBaseAuthBtn')?.addEventListener('click', handleRecalcBaseAuth);
     document.getElementById('addMenuCodeBtn').addEventListener('click', handleAddMenuCode);
     document.getElementById('checkConfigBtn').addEventListener('click', handleCheckConfig);
 
@@ -418,6 +419,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: 'Complete',
                     text: response.msg,
                     callback: reload,
+                });
+            },
+        });
+    }
+
+    // 메뉴 기본 권한을 지금 설정으로 다시 계산 (바뀐 메뉴와 전후 값을 보여 줌)
+    function handleRecalcBaseAuth() {
+        executeAjax({
+            url: common.API_URI + '/recalcBaseAuth',
+            method: 'post',
+            headers: {
+                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+            },
+            success: function(response) {
+                const changed = Array.isArray(response.data) ? response.data : [];
+                // 메뉴 이름은 텍스트 노드로 넣는다 (html 로 해석되지 않게)
+                const box = document.createElement('div');
+                if(changed.length) {
+                    changed.forEach((item) => {
+                        const line = document.createElement('div');
+                        line.textContent = `${item.title} : ${item.before} → ${item.after}`;
+                        box.appendChild(line);
+                    });
+                }else{
+                    box.textContent = getLocale('No changes', common.LOCALE);
+                }
+                showAlert({
+                    type: 'success',
+                    title: 'Complete',
+                    html: box.innerHTML,
                 });
             },
         });
