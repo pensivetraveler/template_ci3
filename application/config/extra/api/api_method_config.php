@@ -34,6 +34,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |             GET 조회, 식별자 없는 POST 등록, 식별자 있는 POST·PUT·PATCH 수정, DELETE 삭제, 내보내기 export, 엑셀 import)
 |     super : true 면 시스템 관리자만 허용 (연결된 메뉴가 isSuper 여도 같음)
 |     check : false 면 권한 검사 생략 (로그인만 확인)
+|   resource   : 이 API 가 쓸 엔티티 설정 이름 (form·list·view, MY_Builder_API). 생략하면 API 클래스명.
+|                화면이 route 의 resourceConfig 로 다른 설정을 쓰면 API 도 같은 값을 준다 (예: users → myinfo)
 |
 | 예시
 |   'sysCfg' => [
@@ -46,6 +48,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 $config['api_method_config'] = [
     // 시스템 설정 화면(route system 의 메서드)이 쓰는 API → 메뉴 system/{메서드} (isSuper 메뉴라 시스템 관리자만)
+    // 내 정보 화면(myinfo route, resourceConfig 'myinfo')이 쓰는 API → 같은 form 설정으로 서버 검증
+    'users'    => ['*' => ['*' => ['resource' => 'myinfo']]],
     'sysCfg'   => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCfg']]]],
     'sysCode'  => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCode']]]],
     'menuList' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuList']]]],

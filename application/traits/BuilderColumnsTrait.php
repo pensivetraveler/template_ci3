@@ -43,6 +43,26 @@ trait BuilderColumnsTrait
         }, []);
     }
 
+    /**
+     * list 설정이 없을 때 form 설정의 list => true 항목으로 목록 항목을 만든다 (WEB·API 공통).
+     * 목록 전용 값은 list_attributes (항목 값보다 우선, MY_Builder_WEB::setListColumns)
+     */
+    protected function getListConfigFromForm(array $formConfig): array
+    {
+        $list = [];
+        foreach ($formConfig as $item) {
+            if(empty($item['list']) || !isset($item['field']) || ($item['type'] ?? '') === 'common') continue;
+            $attributes = is_array($item['list_attributes'] ?? null) ? $item['list_attributes'] : [];
+            $list[] = array_merge($attributes, [
+                'field' => $item['field'],
+                'label' => is_empty($attributes, 'label') ? ($item['label'] ?? '') : $attributes['label'],
+                'option_attributes' => !empty($attributes['option_attributes']) ? $attributes['option_attributes'] : ($item['option_attributes'] ?? []),
+                'list_attributes' => $attributes,
+            ]);
+        }
+        return $list;
+    }
+
     protected function setFormColumn($item)
     {
         $item = array_merge(

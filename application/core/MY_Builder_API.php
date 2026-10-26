@@ -86,10 +86,13 @@ class MY_Builder_API extends MY_Controller_API
 
         $this->loadConfigs(['builder_base_config', 'builder_route_config', 'builder_form_config', 'builder_list_config', 'builder_view_config']);
 
-        // 설정 이름은 WEB과 같은 규칙(Resource_loader, builder_config_name())
-        if($this->listConfigName === '') $this->listConfigName = $this->resourceLoader->entityConfigName('list', $this->router->class);
-        if($this->formConfigName === '') $this->formConfigName = $this->resourceLoader->entityConfigName('form', $this->router->class);
-        if($this->viewConfigName === '') $this->viewConfigName = $this->resourceLoader->entityConfigName('view', $this->router->class);
+        // 설정 이름은 WEB과 같은 규칙(Resource_loader, builder_config_name()).
+        // api_method_config 의 resource 로 다른 엔티티 설정을 쓸 수 있다 (예: users API ↔ 내 정보 화면의 myinfo 설정)
+        $resource = is_string($this->apiMethodFeature['resource'] ?? null) && $this->apiMethodFeature['resource'] !== ''
+            ? $this->apiMethodFeature['resource'] : $this->router->class;
+        if($this->listConfigName === '') $this->listConfigName = $this->resourceLoader->entityConfigName('list', $resource);
+        if($this->formConfigName === '') $this->formConfigName = $this->resourceLoader->entityConfigName('form', $resource);
+        if($this->viewConfigName === '') $this->viewConfigName = $this->resourceLoader->entityConfigName('view', $resource);
 
         if($this->router->method === 'index') {
             if($this->noIndexMethod) show_404();
@@ -1288,8 +1291,14 @@ class MY_Builder_API extends MY_Controller_API
             $this->listConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_list_base'), $item);
             }, $this->resourceLoader->entityConfig($this->listConfigName, [], false));
+            // 화면과 같은 해석(setFormColumn: form·option·list attributes 기본값, option_field 옵션).
+            // 서버 검증은 원래 label('lang:' 접두어)·rules·errors 로 한다 (setFormColumn 은 화면용으로 바꿈)
             $this->formConfig = array_map(function ($item) {
-                return array_merge($this->config->get('builder_form_base'), $item);
+                $merged = array_merge($this->config->get('builder_form_base'), $item);
+                if(($merged['type'] ?? '') === 'common' || !isset($merged['field'])) return $merged;
+                $column = $this->setFormColumn($item);
+                foreach (['label', 'rules', 'errors', 'subtype'] as $key) $column[$key] = $merged[$key] ?? null;
+                return $column;
             }, $this->resourceLoader->entityConfig($this->formConfigName, [], false));
             $this->viewConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_view_base'), $item);
@@ -1297,25 +1306,15 @@ class MY_Builder_API extends MY_Controller_API
 
             if($this->input->method() === 'get') {
                 if(is_empty($this->listConfig)) {
+                    // form 설정의 list => true 항목으로 (WEB 과 같은 규칙, getListConfigFromForm)
                     $this->listConfig = array_map(
                         function($item) {
-                            $attributes = $item['list_attributes'] ?? [];
-                            $label = is_empty($attributes, 'label')?$item['label']:$attributes['label'];
+                            $label = (string)$item['label'];
                             if(sscanf($label, 'lang:%s', $line) === 1) $label = $line;
                             if($this->lang->line_exists($label.'_list')) $label = $label.'_list';
-                            return array_merge(
-                                $this->config->get('builder_list_base', []),
-                                $attributes,
-                                [
-                                    'field' => $item['field'],
-                                    'label' => $label,
-                                    'option_attributes' => $item['option_attributes'] ?? []
-                                ]
-                            );
+                            return array_merge($this->config->get('builder_list_base', []), $item, ['label' => $label]);
                         },
-                        array_filter($this->formConfig, function ($item) {
-                            return array_key_exists('list', $item) && $item['list'];
-                        })
+                        $this->getListConfigFromForm($this->formConfig)
                     );
                 }
             }

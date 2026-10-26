@@ -727,11 +727,14 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 'list', $this->methodConfig['resourceConfig'] ?? null
             ), [], false);
         }
+        $formConfig = $this->resourceLoader->entityConfig($this->setConfigList('form', $this->methodConfig['properties']['formConfig'] ?? null), [], false) ?: [];
+        // list 설정이 없으면 form 설정의 list => true 항목으로 (API 와 같은 규칙, getListConfigFromForm)
+        if(empty($config) && !isset($name)) $config = $this->getListConfigFromForm($formConfig);
         if(empty($config)) show_error(__METHOD__." : List Config is Empty For ".$this->router->location);
 
         // 목록 항목에 option_attributes 가 없으면 같은 필드의 form 설정 값을 쓴다 (셀에 코드 대신 라벨 표시)
         $formOptions = [];
-        foreach ($this->resourceLoader->entityConfig($this->setConfigList('form', $this->methodConfig['properties']['formConfig'] ?? null), [], false) ?: [] as $formItem) {
+        foreach ($formConfig as $formItem) {
             if(isset($formItem['field']) && !is_empty($formItem, 'option_attributes')) $formOptions[$formItem['field']] = $formItem['option_attributes'];
         }
 
@@ -741,8 +744,9 @@ class MY_Builder_WEB extends MY_Controller_WEB
             if(is_empty($item, 'option_attributes') && isset($item['field'], $formOptions[$item['field']]))
                 $item['option_attributes'] = $formOptions[$item['field']];
 
+            // 폼·필터와 같이 option_field 가 있으면 그 필드로 옵션을 찾는다
             if(!is_empty($item, 'option_attributes'))
-                $item['options'] = $this->getOptions($item['field'], $item['option_attributes']);
+                $item['options'] = $this->getOptions($item['option_attributes']['option_field'] ?? $item['field'], $item['option_attributes']);
 
             if($item['type'] === 'hidden') $item['list'] = false;
 

@@ -297,13 +297,13 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `builder_list_config.php::builder_list_base` `format` 키를 JS/PHP 어디서도 읽지 않고 렌더링은 `type`으로 함 (구 README의 `list_attributes.format` 설명과 다름 — 키 제거 결정)
 - [ ] `app-page-list.js::renderColumn` class 키는 `classes`(배열)이고 구 README의 `class_name`은 읽지 않음
 - [x] (2026-10-26 C-1-1: 기본값 < 항목 < list_attributes) `MY_Builder_WEB::setListColumns` base 키는 item top-level 값이 `list_attributes`를 덮어써 `list_attributes`의 onclick/render/type 등이 무시됨 (merge 순서 변경 검토)
-- [ ] `MY_Builder_WEB::getListColumns` WEB은 form config `list => true` fallback이 없고 list config가 없으면 `show_error` (API와 동작 다름)
+- [x] (2026-10-26 C-2-4: getListConfigFromForm 공통) `MY_Builder_WEB::getListColumns` WEB은 form config `list => true` fallback이 없고 list config가 없으면 `show_error` (API와 동작 다름)
 - [ ] `app-page-list.js::getColumnOnclick` `popup` kind 미구현(빈 onclick) (구 README의 iframe 모달 동작 없음)
 - [ ] `app-page-list.js::openViewModal` `getData()` 후 `console.log`만 하는 스텁이고 `view_modal.php`를 포함하는 곳 없음 (onclick view에 `attrs`가 없거나 `PAGE_VIEW_URI`가 없으면 상세 보기 불가) (보류: 모달 상세는 페이지형 상세 확인 후 다음 단계)
 - [ ] `app-page-list.js::renderColumnHTML` `bs` kind는 `attrs` 1단계 키만 `data-bs-{key}`로 부여 (구 README의 중첩 `attrs.attrs` 미지원)
 - [ ] `app-page-list.js::renderSelectColumn` `onchange`는 함수명 문자열만 동작, `{kind, attrs, params}` dict는 `[object Object]`
 - [ ] `app-page-list.js` DataTable `columnDefs` `render.params`가 없으면 `null` 전달 (구 README의 "this 전달" 설명과 다름)
-- [ ] `MY_Builder_WEB::getListColumns` list 컬럼의 `option_attributes.option_field`가 무시되고 항상 `field`로 옵션 조회 (필터와 동작 불일치)
+- [x] (2026-10-26 C-2-3) `MY_Builder_WEB::getListColumns` list 컬럼의 `option_attributes.option_field`가 무시되고 항상 `field`로 옵션 조회 (필터와 동작 불일치)
 - [ ] `MY_Builder_WEB::setJSVariables` `LIST_CHEKBOX` 체크박스 선택값을 읽는 코드 없음 (일괄 삭제 등 미구현)
 - [ ] `builder_filter_config.php::builder_filter_config` `buttons` 키, `app-page-form.js::getFilterData` `filters.text` 사용처 없음 (제거 또는 구현)
 - [ ] `app-page-list.js` DataTable `ajax.data`가 `order/columns/search`를 보내지 않음 (`order` 옵션 무의미, 컬럼 정렬·`orderable` 설정 불가 — 서버 정렬 미구현)
@@ -334,9 +334,9 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `MY_Builder_WEB::setMethodConfig` `category: 'action'`은 레이어링을 생략하는데 `setJSVariables()`가 `actions`/`buttons`/`properties.identifier`를 요구 (action 전용 기본값 config 필요) → `method_base_config`로 빈 키를 채우도록 수정
 - [ ] `MY_Builder_API::__construct` method/nav config를 로드하지 않아 `getMethodList()`·`MenuList::options_get()`이 원본 route를 별도 규칙으로 해석 (WEB 레이어링 결과와 불일치)
 - [x] 설정 이름 규칙 이원화: WEB `BuilderColumnsTrait::setConfigList`는 `snakeize(class)`와 탐색 순서, `MY_Builder_API::__construct`는 `form_/list_/view_{strtolower(class)}_config`, `MY_Builder_WEB::setViewColumns`는 `view_{resourceConfig}_config`(둘 다 `setConfigList` 미적용) (camelCase 클래스·resourceConfig 사용 시 WEB/API가 다른 설정을 읽음) → `builder_config_name()`으로 WEB·API 이름 규칙 통일, `form_syscfg/syscode`·`list_syscode` 키를 snake로 변경 (2026-10-24)
-- [ ] API가 route 설정(`resourceConfig`·method 후보)을 읽지 않아 WEB이 `resourceConfig`로 다른 이름의 설정을 빌려 쓰면 API는 클래스명 설정만 봄 (`myInfo`↔`users` 등, ResourceLoader에서 해결 예정)
-- [ ] `MY_Builder_API::setProperties` API `formConfig`가 `builder_form_base`와만 얕게 병합되고 form/group_attributes 기본값 미병합 (WEB `BuilderColumnsTrait::setFormColumn`과 해석 다름)
-- [ ] `MY_Builder_WEB::setFormData`(group_attributes 첫 항목부터 누적) vs `MY_Builder_API::validateFormRules`(마지막 항목만) 그룹 속성 해석 불일치 (헬퍼 하나로 통일)
+- [x] (2026-10-26 C-2-5: api_method_config `resource`, users → myinfo) API가 route 설정(`resourceConfig`·method 후보)을 읽지 않아 WEB이 `resourceConfig`로 다른 이름의 설정을 빌려 쓰면 API는 클래스명 설정만 봄 (`myInfo`↔`users` 등, ResourceLoader에서 해결 예정)
+- [x] (2026-10-26 C-2-2: setFormColumn으로 해석, 검증용 label·rules·errors는 원래 값) `MY_Builder_API::setProperties` API `formConfig`가 `builder_form_base`와만 얕게 병합되고 form/group_attributes 기본값 미병합 (WEB `BuilderColumnsTrait::setFormColumn`과 해석 다름)
+- [x] (2026-10-26 C-2-1: 이미 API도 누적 병합으로 맞춰져 있음 확인) `MY_Builder_WEB::setFormData`(group_attributes 첫 항목부터 누적) vs `MY_Builder_API::validateFormRules`(마지막 항목만) 그룹 속성 해석 불일치 (헬퍼 하나로 통일)
 - [ ] `views/builder/layout/form_base_custom_dropzone-full.php`, `app-page-form.js::applyFrmValuesByCategory` id `thumbnail-dropzone-wrapper`, data-field `thumbnail` 하드코딩 (field 기반으로 일반화)
 - [ ] 그룹 뷰(`addr_daum`/`new_password`/`reply_list`/`repeater_*`)와 custom 뷰가 `get_group_field_name` 대신 `$item['field']`를 name으로 사용 (envelope/repeater name 규칙이 `form_side_group_base`에서만 적용)
 - [ ] `MY_form_helper.php::form_options_by_field` 설정에 옵션이 없으면 `Option 1/2` 더미로 대체 (설정 누락이 가려짐 — 빈 배열 + 경고)

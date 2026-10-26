@@ -73,14 +73,14 @@
 - `{method}` = `snakeize(router->method)`. 단 **method가 `index`이면 `list`로 치환**된다(filter는 치환하지 않음, 5-1).
   예: `/admin/administrators/list` → `list_administrators_list_config` → `list_administrators_config` → `list_list_config`.
 - 아무것도 없으면 `show_error("… List Config is Empty For …")`.
-- **WEB은 form config(`list => true`)로부터 리스트를 만들지 않는다.** form 설정의 `list`/`list_attributes`는 WEB 리스트에 쓰이지 않는다(6장 참고).
+- list 설정이 없으면 WEB·API 모두 form 설정의 `list => true` 항목으로 목록을 만든다(`BuilderColumnsTrait::getListConfigFromForm()`, 2026-10-26). 목록 표시는 `list_attributes`로 따로 줄 수 있다.
 
 ### 2-3. 컬럼 가공 과정 (WEB)
 
 `MY_Builder_WEB::getListColumns()`:
 
 1. 각 item에 `builder_list_base`를 `array_merge` → base의 모든 키가 item에 항상 존재한다.
-2. `option_attributes`가 비어 있지 않으면 `options = getOptions(field, option_attributes)`. **`option_field`는 무시**되고 항상 `field`로 조회한다.
+2. `option_attributes`가 비어 있지 않으면 `options = getOptions(option_field ?? field, option_attributes)` (폼·필터와 같음).
 3. `type === 'hidden'`이면 `list = false` → 화면 컬럼에서 빠지지만 `$this->listColumns`(identifier 수집용)에는 남는다.
 
 `MY_Builder_WEB::setListColumns()`:
@@ -120,7 +120,7 @@
 | `onclick` (`onClick`) | dict | `[]` | 셀 클릭 동작 (3장) | `renderColumnHTML()`, `getColumnClickAction()` |
 | `onchange` (`onChange`) | **string** | 없음 | `type=select` 전용. change 시 호출할 **전역 함수명**. 기본 `afterSelectColumnChange` | `renderSelectColumn()` |
 | `render` | dict | `[]` | `{callback: '함수명', params: mixed}` 커스텀 렌더러 (2-7) | DataTable `columnDefs` |
-| `option_attributes` | dict | `[]` | `type=select` 셀의 옵션 소스. form과 같은 규칙(`MY_Controller::getOptions()`), 단 `option_field`는 무시 | `getListColumns()` |
+| `option_attributes` | dict | `[]` | `type=select` 셀의 옵션 소스. form과 같은 규칙(`MY_Controller::getOptions()`, `option_field` 포함) | `getListColumns()` |
 | `options` | dict | `[]` | (자동 생성) `{value: text}` | `renderSelectColumn()` |
 | `list_attributes` | dict | 없음 | 목록 전용 값. 항목 값보다 우선 | `setListColumns()` |
 

@@ -727,6 +727,7 @@ $config['api_method_config'] = [
 | `log` | bool | `rest_logs` 기록 여부 | 〃 |
 | `limit` / `time` | int / 초(기본 3600) | `time` 초 동안 허용할 요청 수(`rest_enable_limits`) | 〃 → `_check_limit()` |
 | `level` | int | 필요한 API 키 레벨 | 〃 |
+| `resource` | 엔티티 설정 이름 | 이 API가 쓸 form·list·view 설정 이름(생략하면 API 클래스명). 화면이 route `resourceConfig`로 다른 설정을 쓰면 같은 값을 준다(예: `users` → `myinfo`) | `MY_Builder_API::__construct()` |
 | `permission` | `menu`·`mode`·`super`·`check` | 메뉴 권한 검사(`/admin/api/*`). `menu`: 연결할 메뉴 `class` 또는 `class/method`(생략하면 API 클래스명), `mode`: 검사할 권한 자리, `super`: 시스템 관리자만, `check: false`: 검사 생략 | `MY_Builder_API::checkApiPermission()` |
 
 - 파일 위치: `custom_routes.php`의 `api_folders`에 있는 폴더마다 `config/extra/{폴더}/{폴더}_method_config.php`(`$config['{폴더}_method_config']`)를 둔다. 기본 `api` 폴더는 `config/extra/api/api_method_config.php`. API 폴더의 컨트롤러는 모두 `MY_Controller_API`를 상속하므로(빌더 기능이 필요하면 `MY_Builder_API`) 빌더를 쓰지 않는 API에도 적용된다.
@@ -772,4 +773,8 @@ $config['api_method_config'] = [
 
 - 첫 인자가 식별자인 프로젝트 엔드포인트(예: `getDefaultStyle/{id}`)는 엔티티에서 `$scopeKeyEndpoints`에 추가한다.
 - 회사 컬럼이 없고 다른 키로 이어지는 엔티티(예: 로그 → `frame_id`)는 엔티티에서 `getDataScope()`를 오버라이드해 그 키의 허용 값을 반환한다.
+
+### form 설정 해석 (2026-10-26)
+
+API의 `formConfig`도 화면과 같은 `BuilderColumnsTrait::setFormColumn()`으로 해석한다(form·option·list attributes 기본값, `option_field`로 옵션 조회). 다만 서버 검증에 쓰는 `label`(`lang:` 접두어 유지)·`rules`·`errors`·`subtype`은 원래 값을 쓴다. 선택형 항목은 요청마다 옵션을 불러온다.
 
