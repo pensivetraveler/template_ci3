@@ -3,6 +3,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Common extends MY_Builder_API
 {
+    private array $userLoginIds = [];
+
     function __construct()
     {
         parent::__construct();
@@ -64,12 +66,24 @@ class Common extends MY_Builder_API
         // 사용자가 soft delete 되어 조회되지 않으면 '' 로 둔다
         foreach (['created_id', 'updated_id'] as $field) {
             if(property_exists($data, $field) && !empty($data->{$field})) {
-                $user = $this->Model_User->getDataWhere([], ['user_id' => $data->{$field}]);
-                $data->{$field} = $user ? $user->id : '';
+                $data->{$field} = $this->getUserLoginId($data->{$field});
             }
         }
 
         return $this->transformViewByMode($data);
+    }
+
+    /**
+     * user_id → 로그인 id. 한 요청 안에서는 한 번만 조회 (목록 행마다 작성자·수정자를 조회하던 N+1 제거)
+     */
+    protected function getUserLoginId($userId): string
+    {
+        $key = (string)$userId;
+        if(!array_key_exists($key, $this->userLoginIds)) {
+            $user = $this->Model_User->getDataWhere(['id'], ['user_id' => $userId]);
+            $this->userLoginIds[$key] = is_object($user) ? (string)$user->id : (is_string($user) ? $user : '');
+        }
+        return $this->userLoginIds[$key];
     }
 
     protected function transformViewByMode($data): object

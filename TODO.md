@@ -347,8 +347,8 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] (2026-10-26 C-4-4) `app-page-common.js::prepareExports` `encodeURIComponent`한 `token`을 만들고 쓰지 않고 원본 filename을 URL에 사용 (인코딩 누락)
 - [ ] `app-page-list.js` DataTable 정보 문구, `views/builder/layout/filter.php` 필터 버튼 문구(`검색`/`초기화`) 하드코딩 (다국어 미지원)
 - [x] `MY_Builder_API::executeAdd/executeModify` 모델 순서를 `['Model_Parent','Model','Model_Child']`로 하드코딩, `beforePost/beforePut/executeRemove/isForeignKeyGeneratedByPreviousModel`은 `getModelPipeline()` 사용 → 파이프라인 오버라이드 시 검증·삭제와 저장 순서 불일치 → `executeAdd/executeModify`도 `getModelPipeline()` 사용 (2026-10-25)
-- [ ] 파이프라인·hook 전반에 트랜잭션 경계 없음: 모델별 `addData/modData`가 각자 commit → `Model` INSERT 실패 시 `Model_Parent` 행 잔존, `afterAdd/afterModify`에서 오류 응답해도 저장은 유지 (bizsoft `Templates::afterAdd`, `Apis::beforeRemove`의 선삭제 패턴)
-- [ ] `MY_Builder_API::beforePost/beforePut` `validateFormRules()`가 파이프라인 모델 수만큼 같은 formConfig로 반복 실행
-- [ ] `api/Common::transformView` 행마다 사용자 2회 조회(N+1), `Comments::transformList`(행당 3회+), `Partners::transformView`(회사 수만큼) → 목록 크기에 비례한 쿼리 수
-- [ ] `MY_Builder_API::loggingUserlog` 모든 GET(DataTable 재조회·옵션 조회 포함)마다 user_log INSERT, `log_id`는 RestController 요청 로그 id(`rest_enable_logging` 꺼져 있으면 `''`). `MenuList::beforeResponse`는 parent를 부르지 않아 메뉴 변경 로그 누락
-- [ ] `MY_Builder_API::checkIdentifierExist` non-AI 모델은 URL key를 무시하고 GET의 PK 파라미터만 사용 → `SysCode::beforeRemove`처럼 `$key`와 `idData`가 서로 다른 출처에서 올 수 있음
+- [ ] (2026-10-26 C-5-1: 검토 후 진행 여부 결정 — 후보: 쓰기 요청 단위 바깥 트랜잭션, response()에서 2xx·3xx 커밋 / 4xx·5xx 롤백) 파이프라인·hook 전반에 트랜잭션 경계 없음: 모델별 `addData/modData`가 각자 commit → `Model` INSERT 실패 시 `Model_Parent` 행 잔존, `afterAdd/afterModify`에서 오류 응답해도 저장은 유지 (bizsoft `Templates::afterAdd`, `Apis::beforeRemove`의 선삭제 패턴)
+- [x] (2026-10-26 C-5-2: form 규칙은 한 번, 모델별 필수·고유값만 모델마다) `MY_Builder_API::beforePost/beforePut` `validateFormRules()`가 파이프라인 모델 수만큼 같은 formConfig로 반복 실행
+- [x] (2026-10-26 C-5-3: Common::getUserLoginId 요청 단위 캐시, Comments는 이미 일괄 조회. bizsoft Partners는 bizsoft에서) `api/Common::transformView` 행마다 사용자 2회 조회(N+1), `Comments::transformList`(행당 3회+), `Partners::transformView`(회사 수만큼) → 목록 크기에 비례한 쿼리 수
+- [ ] (2026-10-26 C-5-4 보류: 조회 로그 정책 결정 필요 — 후보: 단건만 남기기 + api_method_config로 엔티티별 조정) `MY_Builder_API::loggingUserlog` 모든 GET(DataTable 재조회·옵션 조회 포함)마다 user_log INSERT, `log_id`는 RestController 요청 로그 id(`rest_enable_logging` 꺼져 있으면 `''`). `MenuList::beforeResponse`는 parent를 부르지 않아 메뉴 변경 로그 누락
+- [x] (2026-10-26 C-5-5: 기본키가 하나면 URL 키를 그 값으로, 복합키는 쿼리 파라미터) `MY_Builder_API::checkIdentifierExist` non-AI 모델은 URL key를 무시하고 GET의 PK 파라미터만 사용 → `SysCode::beforeRemove`처럼 `$key`와 `idData`가 서로 다른 출처에서 올 수 있음

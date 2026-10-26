@@ -387,11 +387,13 @@ class MY_Builder_API extends MY_Controller_API
             if(!isset($data[$field])) $data[$field] = $default;
         }
 
+        // form 규칙은 한 번만 검증하고(전에는 파이프라인 모델 수만큼 같은 규칙을 다시 돌림), 모델별 필수값·고유값만 모델마다
+        $this->validateFormRules('', $data);
         foreach ($this->getModelPipeline() as $modelName) {
             if (property_exists($this, $modelName)) {
                 $exceptRequiredKeys = $this->getGeneratedForeignKeyFields($this->{$modelName}, $modelName);
 
-                $this->validate($data, $this->{$modelName}, true, '', $exceptRequiredKeys);
+                $this->validate($data, $this->{$modelName}, false, '', $exceptRequiredKeys);
                 $this->checkUniqueExist($data, $this->{$modelName});
             }
         }
@@ -420,11 +422,13 @@ class MY_Builder_API extends MY_Controller_API
             if(!isset($data[$field])) $data[$field] = $default;
         }
 
+        // form 규칙은 한 번만 검증하고(전에는 파이프라인 모델 수만큼 같은 규칙을 다시 돌림), 모델별 필수값·고유값만 모델마다
+        $this->validateFormRules('', $data);
         foreach ($this->getModelPipeline() as $modelName) {
             if (property_exists($this, $modelName)) {
                 $exceptRequiredKeys = $this->getGeneratedForeignKeyFields($this->{$modelName}, $modelName);
 
-                $this->validate($data, $this->{$modelName}, true, '', $exceptRequiredKeys);
+                $this->validate($data, $this->{$modelName}, false, '', $exceptRequiredKeys);
                 $this->checkUniqueExist($data, $this->{$modelName});
             }
         }
@@ -1381,6 +1385,13 @@ class MY_Builder_API extends MY_Controller_API
 
         if (count($model->primaryKeyList) > 0) {
             $found = [];
+
+            // 기본키가 하나뿐이면 URL 키(/sysCode/ABC001)를 그 값으로 쓴다. 없으면 쿼리 파라미터
+            // (전에는 URL 키를 무시해 SysCode::beforeRemove 처럼 idData 와 $key 가 다른 출처에서 올 수 있었음)
+            if (count($model->primaryKeyList) === 1 && $key !== null && $key !== '' && $key !== 0 && $key !== '0') {
+                $this->idData = [$model->primaryKeyList[0] => $key];
+                return $this->idData;
+            }
 
             foreach ($model->primaryKeyList as $field) {
                 $value = $this->input->get($field);
