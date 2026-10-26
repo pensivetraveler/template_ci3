@@ -743,6 +743,10 @@ abstract class RestController extends \MY_Controller {
             $this->_log_request($authorized = TRUE);
         }
 
+        // 인증·요청 제한·요청 로그를 마친 뒤, 컨트롤러 메서드 직전 (MY_Builder_API 가 요청 트랜잭션을 여기서 연다 —
+        // 로그·제한 카운터가 트랜잭션 안에 들어가 실패 응답 때 함께 롤백되지 않도록)
+        $this->beforeControllerMethod($controller_method);
+
         // Call the controller method and passed arguments
         try
         {
@@ -758,6 +762,13 @@ abstract class RestController extends \MY_Controller {
             $_error = &load_class('Exceptions', 'core');
             $_error->show_exception($ex);
         }
+    }
+
+    /**
+     * 컨트롤러 메서드를 부르기 직전 (하위 클래스에서 오버라이드)
+     */
+    protected function beforeControllerMethod(string $controller_method): void
+    {
     }
 
     /**

@@ -290,7 +290,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `views/builder/layout/form_base_custom_dropzone-single.php` 빈 파일 (custom/dropzone-single 미구현)
 - [ ] `type=textarea, subtype=quill` PHP 분기 없음 → 일반 textarea, `builder_form_helper.php::get_admin_form_textarea`는 dead code
 - [ ] `type=text, subtype=cleave-version` `get_admin_form_attributes`에 분기 없어 `.cleave` 클래스 미부여 (`setCleave` 분기 미실행)
-- [ ] `MY_Builder_API::reorder_patch` GET 파라미터만 검사 후 아무것도 안 함 (`list_sorter` 정렬 저장 안 됨) (추가: 파라미터가 있으면 아무 응답 없이 빈 200)
+- [ ] (2026-10-26 B-4: 게시판 정리 때 함께 — 화면은 web 게시글 첨부(article_attachment.sort_order)용, 값은 PATCH 본문인데 서버는 GET에서 찾음, swap 방식이라 전체 순서를 보내야 함) `MY_Builder_API::reorder_patch` GET 파라미터만 검사 후 아무것도 안 함 (`list_sorter` 정렬 저장 안 됨) (추가: 파라미터가 있으면 아무 응답 없이 빈 200)
 - [ ] `MY_Builder_API::deleteRepeater_patch` `DATA_DELETED`만 응답하는 스텁 (컨트롤러 오버라이드 필요하다는 점이 코드에 명시 안 됨)
 - [x] (2026-10-26 C-4-3: dropzone으로 시작하는 subtype 모두) `MY_Builder_WEB::beforeViewApp` dropzone 에셋을 subtype이 정확히 `dropzone`일 때만 로드 (`dropzone-full` 사용 시 에셋 누락)
 
@@ -347,7 +347,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] (2026-10-26 C-4-4) `app-page-common.js::prepareExports` `encodeURIComponent`한 `token`을 만들고 쓰지 않고 원본 filename을 URL에 사용 (인코딩 누락)
 - [ ] `app-page-list.js` DataTable 정보 문구, `views/builder/layout/filter.php` 필터 버튼 문구(`검색`/`초기화`) 하드코딩 (다국어 미지원)
 - [x] `MY_Builder_API::executeAdd/executeModify` 모델 순서를 `['Model_Parent','Model','Model_Child']`로 하드코딩, `beforePost/beforePut/executeRemove/isForeignKeyGeneratedByPreviousModel`은 `getModelPipeline()` 사용 → 파이프라인 오버라이드 시 검증·삭제와 저장 순서 불일치 → `executeAdd/executeModify`도 `getModelPipeline()` 사용 (2026-10-25)
-- [ ] (2026-10-26 C-5-1: 검토 후 진행 여부 결정 — 후보: 쓰기 요청 단위 바깥 트랜잭션, response()에서 2xx·3xx 커밋 / 4xx·5xx 롤백) 파이프라인·hook 전반에 트랜잭션 경계 없음: 모델별 `addData/modData`가 각자 commit → `Model` INSERT 실패 시 `Model_Parent` 행 잔존, `afterAdd/afterModify`에서 오류 응답해도 저장은 유지 (bizsoft `Templates::afterAdd`, `Apis::beforeRemove`의 선삭제 패턴)
+- [x] (2026-10-26 C-5-1 구현: 쓰기 요청 단위 트랜잭션, RestController::beforeControllerMethod에서 시작·response()에서 끝, reset·Setup 제외, 파일 저장소는 되돌리지 못함) 파이프라인·hook 전반에 트랜잭션 경계 없음: 모델별 `addData/modData`가 각자 commit → `Model` INSERT 실패 시 `Model_Parent` 행 잔존, `afterAdd/afterModify`에서 오류 응답해도 저장은 유지 (bizsoft `Templates::afterAdd`, `Apis::beforeRemove`의 선삭제 패턴)
 - [x] (2026-10-26 C-5-2: form 규칙은 한 번, 모델별 필수·고유값만 모델마다) `MY_Builder_API::beforePost/beforePut` `validateFormRules()`가 파이프라인 모델 수만큼 같은 formConfig로 반복 실행
 - [x] (2026-10-26 C-5-3: Common::getUserLoginId 요청 단위 캐시, Comments는 이미 일괄 조회. bizsoft Partners는 bizsoft에서) `api/Common::transformView` 행마다 사용자 2회 조회(N+1), `Comments::transformList`(행당 3회+), `Partners::transformView`(회사 수만큼) → 목록 크기에 비례한 쿼리 수
 - [ ] (2026-10-26 C-5-4 보류: 조회 로그 정책 결정 필요 — 후보: 단건만 남기기 + api_method_config로 엔티티별 조정) `MY_Builder_API::loggingUserlog` 모든 GET(DataTable 재조회·옵션 조회 포함)마다 user_log INSERT, `log_id`는 RestController 요청 로그 id(`rest_enable_logging` 꺼져 있으면 `''`). `MenuList::beforeResponse`는 parent를 부르지 않아 메뉴 변경 로그 누락

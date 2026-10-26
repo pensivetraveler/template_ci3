@@ -5,6 +5,9 @@ require_once __DIR__.'/Common.php';
 
 class Setup extends Common
 {
+    // 받은 SQL(DDL 포함)을 실행하므로 요청 트랜잭션으로 묶지 않는다
+    protected bool $useRequestTransaction = false;
+
     function __construct()
     {
         parent::__construct();

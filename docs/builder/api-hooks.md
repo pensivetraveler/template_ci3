@@ -778,3 +778,14 @@ $config['api_method_config'] = [
 
 API의 `formConfig`도 화면과 같은 `BuilderColumnsTrait::setFormColumn()`으로 해석한다(form·option·list attributes 기본값, `option_field`로 옵션 조회). 다만 서버 검증에 쓰는 `label`(`lang:` 접두어 유지)·`rules`·`errors`·`subtype`은 원래 값을 쓴다. 선택형 항목은 요청마다 옵션을 불러온다.
 
+### 요청 트랜잭션 (2026-10-26)
+
+쓰기 요청(POST·PUT·PATCH·DELETE)은 한 트랜잭션으로 묶인다.
+
+- 시작: RestController가 인증·요청 제한·요청 로그(`rest_logs`)를 마친 뒤 `beforeControllerMethod()`에서 연다(`MY_Builder_API::$useRequestTransaction`, 기본 true). 로그·제한 카운터는 트랜잭션 밖이라 실패 응답에도 남는다.
+- 끝: `MY_Controller_API::response()`가 응답 직전 `finishRequestTransaction()` — 2xx·3xx 커밋, 그 밖 롤백. 모델 트랜잭션(`MY_Model::addDataPDO` 등)은 그 안에 중첩된다(CI3 트랜잭션 깊이).
+- 응답 없이 끝나면(`show_error`, 치명적 오류) 커밋하지 않은 트랜잭션은 DB 연결이 닫힐 때 롤백된다.
+- 빼는 곳: `$noTransactionEndpoints`(기본 `['reset']` — 표를 비우는 초기화), `Setup`(`$useRequestTransaction = false`, DDL). truncate·DDL은 MySQL이 그 자리에서 커밋하므로 묶이지 않는다.
+- 되돌리지 못하는 것: 파일 저장소(업로드·삭제·복사), 외부 호출.
+- 한 요청 안에서 쿼리가 한 번 실패하면 같은 요청의 이후 모델 쓰기도 실패로 돌아온다(CI3 트랜잭션 상태가 요청 끝까지 유지됨).
+

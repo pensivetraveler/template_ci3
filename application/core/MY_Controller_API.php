@@ -258,10 +258,40 @@ class MY_Controller_API extends RestController
         return is_array($data) ? $data : [];
     }
 
+    /**
+     * 쓰기 요청 하나를 묶는 바깥 트랜잭션이 열려 있는지 (MY_Builder_API::_remap 이 연다)
+     */
+    protected bool $requestTransactionOpen = false;
+
+    protected function beginRequestTransaction(): void
+    {
+        if($this->requestTransactionOpen) return;
+        $this->db->trans_begin();
+        $this->requestTransactionOpen = true;
+    }
+
+    /**
+     * 응답 직전에 바깥 트랜잭션을 끝낸다: 2xx·3xx 커밋, 그 밖 롤백.
+     * 모델의 트랜잭션(MY_Model::addDataPDO 등)은 그 안에 중첩되어 실제 커밋·롤백은 여기서만 일어난다.
+     * 응답 없이 끝나면(show_error·치명적 오류) 커밋하지 않은 트랜잭션은 DB 연결이 닫힐 때 롤백된다.
+     */
+    protected function finishRequestTransaction(int $httpCode): void
+    {
+        if(!$this->requestTransactionOpen) return;
+        $this->requestTransactionOpen = false;
+
+        if($httpCode >= 200 && $httpCode < 400) {
+            $this->db->trans_commit();
+        }else{
+            $this->db->trans_rollback();
+        }
+    }
+
     public function response($data = null, $http_code = null, $exit = true)
     {
         // code 없이 부르면 floor(0/10)=0 → RestController 가 200으로 바꾸므로 500으로 응답한다
         if($http_code === null) $http_code = empty($data['code']) ? RestController::HTTP_INTERNAL_SERVER_ERROR : floor((int)$data['code']/10);
+        $this->finishRequestTransaction((int)$http_code);
         $response = $this->setResponseData($data, $http_code);
         RestController::response($response, $http_code);
 

@@ -2771,6 +2771,24 @@ class MY_Builder_API extends MY_Controller_API
     private ?array $dataScope = null;
 
     /**
+     * 쓰기 요청(POST·PUT·PATCH·DELETE) 하나를 트랜잭션 하나로 묶을지. 저장 중간에 실패하면 앞 단계 저장도 되돌린다.
+     * 파일 저장소(업로드·삭제·복사)는 되돌리지 못한다. truncate·DDL 은 MySQL 이 그 자리에서 커밋하므로 그런 엔드포인트는 뺀다
+     */
+    protected bool $useRequestTransaction = true;
+
+    /**
+     * 요청 트랜잭션을 쓰지 않는 이름 있는 엔드포인트 (표를 비우는 초기화 등)
+     */
+    protected array $noTransactionEndpoints = ['reset'];
+
+    private bool $wantRequestTransaction = false;
+
+    protected function beforeControllerMethod(string $controller_method): void
+    {
+        if($this->wantRequestTransaction) $this->beginRequestTransaction();
+    }
+
+    /**
      * 요청자가 다룰 수 있는 범위: [필드 => 허용 값 목록]. 빈 배열이면 제한 없음 (기본).
      * 프로젝트의 api/Common 에서 세션(등급·담당 회사 등)과 $scopeFields 로 구현한다.
      * 적용: 목록·내보내기 조건, 식별자로 지정한 행(단건·수정·삭제·$scopeKeyEndpoints), 등록·수정 값, 엑셀 가져오기 행
@@ -2881,6 +2899,12 @@ class MY_Builder_API extends MY_Controller_API
 
         // 데이터 범위 검사 (식별자로 지정한 행이 getDataScope() 범위 밖이면 404)
         $this->checkDataScopeTarget($http, (string)$object_called, $arguments);
+
+        // 쓰기 요청은 한 트랜잭션으로 (RestController 가 인증·제한·요청 로그를 마친 뒤 beforeControllerMethod 에서 열고,
+        // 응답할 때 커밋·롤백 — MY_Controller_API::finishRequestTransaction)
+        $this->wantRequestTransaction = $this->useRequestTransaction
+            && in_array($http, ['post', 'put', 'patch', 'delete'], true)
+            && !in_array((string)$object_called, $this->noTransactionEndpoints, true);
 
         $this->mode = $this->input->get('_mode') ?? '';
         $this->submode = $this->input->get('_submode') ?? '';
