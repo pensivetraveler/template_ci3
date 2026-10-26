@@ -172,6 +172,15 @@ function deleteFile(btn, type = '') {
 }
 
 function deleteRepeater(repeater, deleteElement) {
+    // 식별자는 리피터가 속한 폼에서 읽는다 (선언되지 않은 identifier 를 써서 ReferenceError 로 요청이 나가지 않았음)
+    const form = $(repeater).closest('form')[0];
+    const identifier = form && form[common.IDENTIFIER] ? form[common.IDENTIFIER].value : '';
+    if(!identifier) {
+        // 아직 저장하지 않은 행(등록 화면)은 화면에서만 지운다
+        $(repeater).slideUp(deleteElement);
+        return;
+    }
+
     const data = {};
     $(repeater).find('input, select, textarea').each(function(i , item) {
         if(item.type === 'file') return;

@@ -80,15 +80,15 @@
 
 ### 버그
 - [x] 자동 로그인이 한 번도 동작하지 않음 (2026-10-26, 결함 A): hook이 세션에 user_id만 넣어 `checkLoggedIn`이 token 없음으로 보고 `destroyUserData()`가 세션·autologin 쿠키를 지움 → `MY_Controller::loginWithAutologinCookie`(MY_Builder_WEB 생성자)·`startUserSession`(Auth::login과 공통)으로 옮김
-- [ ] 자동 로그인 체크박스가 제출 때 풀림 (결함 B) — bizsoft 브라우저 확인 중(#빌더-31), 가설: 스크립트 로드 전 체크를 `resetFrmInputs()`가 지움
-- [ ] 토큰이 회원당 하나(`setToken`이 같은 user_id 행을 교체) → 같은 계정이 다른 곳에서 로그인·자동 로그인하면 먼저 쓰던 곳의 API가 403. 의도(동시 로그인 1곳)인지 결정 필요
-- [ ] 로그아웃 때 autologin 쿠키만 지우고 `user_autologin` 행은 남음(만료까지)
+- [x] 자동 로그인 체크박스가 제출 때 풀림 (결함 B, 2026-10-26): 스크립트 로드 중 체크한 것을 `app-page-auth.js`의 `resetFrmInputs()`가 지움(bizsoft #빌더-31 trace 확인) → 로그인 계열 화면에서 초기화 호출 제거
+- [x] 같은 계정 동시 로그인 → 한 곳만 허용으로 결정(2026-10-26). 토큰은 회원당 하나 그대로, 화면도 `isSessionTokenCurrent()`로 확인해 바뀌었으면 로그아웃
+- [x] 로그아웃·세션 종료(`destroyUserData`) 때 autologin 쿠키와 함께 `user_autologin` 키 행도 삭제 (2026-10-26)
 - [ ] `MY_Builder_API::duplicate_post` 고유 컬럼(`uniqueKeyList`·PK)을 그대로 복사해 중복 키로 500 (bizsoft frames: frame_nick, 2026-10-25 확인) — 고유 컬럼 처리 규칙(접미사 추가·비우기·엔티티 hook) 결정 필요
-- [ ] 세션 토큰이 `user_token`에 없을 때(같은 계정 다른 곳 로그인 등) API는 모두 403 "API Key 값이 전달되지 않았습니다"인데 화면(`checkLoggedIn`·`isSessionTokenValid`)은 로그아웃시키지 않고 열림 — bizsoft 운영에서 관찰(2026-10-25), 원인 미확인
+- [x] 세션 토큰이 `user_token`에 없을 때 화면이 열리던 것 (2026-10-26): 원인은 화면이 세션에 token이 있는지만 봤기 때문 → `checkLoggedIn`에서 `isSessionTokenCurrent()` 확인 후 아니면 로그아웃·"Logged in elsewhere" 안내
 - [x] `api/SysCode.php:53` `category_srt` → `cd_srt` (추가: `SysCode::executeModify`의 `$original->category_srt` 비교 때문에 정렬 변경 여부와 무관하게 reorder 실행) → `$original->cd_srt`로 수정, 수정 대상을 `$this->idData`로 조회해 부분 PATCH(sml_cd·cmb_cd 없음)도 처리 (bizsoft-mig에서 500 재현, 2026-10-24)
 - [x] `api/Comments.php` `in_array($id, $adminList)` 객체 배열 비교로 `is_admin` 항상 false, 댓글 N+1 쿼리 → 원래 created_id(user_id)로 비교(관리자 목록은 값 배열), 답글·작성자를 각각 한 번에 조회해 N+1 제거 (2026-10-25)
-- [ ] `app-page-common.js:166` 선언되지 않은 `identifier` (추가: `deleteRepeater`에서 ReferenceError → 리피터 행 삭제 요청 실패)
-- [ ] `app-page-utils.js` `replaceValidationMessage` 중복 정의
+- [x] (2026-10-26 수정: 폼의 식별자 사용, 식별자 없으면 화면에서만 삭제) `app-page-common.js:166` 선언되지 않은 `identifier` (추가: `deleteRepeater`에서 ReferenceError → 리피터 행 삭제 요청 실패)
+- [x] `app-page-utils.js` `replaceValidationMessage` 중복 정의 (2026-10-26 하나로)
 - [x] `MY_Model::orderBy` 정의되지 않은 `$defaultOrderBy`, `querySql`의 `strpos(...) !== -1` (추가: orderBy는 재귀 호출 인자(`$table`) 누락으로 `defaultOrderBy` 프로퍼티가 전혀 적용되지 않음, querySql은 UPDATE/DELETE도 `insert_id()` 반환) → `$this->orderBy($table, $this->defaultOrderBy)`로 수정, querySql은 SQL이 INSERT로 시작할 때만 `insert_id()` (2026-10-25)
 
 ### 구조
@@ -240,7 +240,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `MY_Builder_API::checkDuplicate` `$dto[$model->identifier]` — 수정 시 바디에 identifier가 없거나 `checkDuplicate_get`에 다른 쿼리 키(`_mode` 등)가 있으면 Notice + `where_not_in(identifier, [null])` → 자기 행 제외 값은 메인 Model이면 idData, 아니면 dto의 식별자. 둘 다 없으면 whereNot 없음 (2026-10-25)
 - [x] `reformat_get_data` `exceptValidateKeys`에 `_submode`가 없음 → GET에 `_submode`를 붙이면 where `_submode` 컬럼 SQL 오류 (`_remap()`은 `_submode`를 읽도록 되어 있음)
 - [x] `reformat_get_data` `if(!$value) continue` → `'0'` 값으로 where 불가 (예: `?depth=0`, `?is_show=0`)
-- [ ] `MY_Builder_API::prepareExports_get` `is_null($this->Model)` — Model 미정의 컨트롤러에서는 undefined property Warning을 내고 나서야 `MODEL_IS_NOT_DEFINED` (property_exists 필요) (보류: 내보내기 함수는 별도 작업 범위라 손대지 않음)
+- [x] (2026-10-26 property_exists 추가) `MY_Builder_API::prepareExports_get` `is_null($this->Model)` — Model 미정의 컨트롤러에서는 undefined property Warning을 내고 나서야 `MODEL_IS_NOT_DEFINED` (property_exists 필요) (보류: 내보내기 함수는 별도 작업 범위라 손대지 않음)
 - [x] `MY_Builder_API::beforeResponse` `_mode=option`으로 상세(view) 조회 시 `$data['list']` 미정의 → `list` 키가 있을 때만 옵션 변환, `render` 기본값 `[]` (2026-10-25)
 - [x] `MY_Builder_API::beforeDelete` 식별자 없이 DELETE하면 `getDeleteBaseRow()`의 `show_error()`로 HTML 500 (JSON 아님) → `getDeleteBaseRow()`의 `show_error()`를 `keyNotExist()`(JSON 400 EMPTY_REQUIRED_KEY)로 교체 (2026-10-25)
 - [x] `MY_Controller_API::response` `code` 없이 호출하면 `floor(0/10)=0` → RestController가 200으로 바꿔 HTTP 200 + `status:false, code:0` 응답 → `code`·`$http_code` 모두 없으면 500으로 응답 (2026-10-25)

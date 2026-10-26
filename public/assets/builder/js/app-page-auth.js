@@ -7,7 +7,8 @@ $(function() {
 
     onLoadedLayout(formRecord);
 	preparePlugins(formRecord);
-	resetFrmInputs(formRecord, common.FORM_DATA);
+	// 서버가 빈 폼을 내려주므로 초기화하지 않는다. 스크립트가 뜨기 전에 사용자가 체크한 자동 로그인·
+	// 브라우저 자동완성 값을 resetFrmInputs 가 지우던 문제 (bizsoft #빌더-31 확인)
 	readyFrmInputs(formRecord, 'add', common.FORM_DATA);
 	refreshPlugins(formRecord);
 

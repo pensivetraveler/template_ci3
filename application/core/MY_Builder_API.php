@@ -1722,7 +1722,7 @@ class MY_Builder_API extends MY_Controller_API
         /**
          * 1.Model check
          */
-        if(is_null($this->Model)) {
+        if(!property_exists($this, 'Model') || is_null($this->Model)) {
             $this->response([
                 'code' => MODEL_IS_NOT_DEFINED,
             ]);

@@ -1201,6 +1201,12 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
     protected function checkLoggedIn()
     {
+        // 다른 곳에서 같은 계정으로 로그인해 토큰이 바뀌었으면 로그아웃 (API 는 이미 그 토큰을 거부함)
+        if($this->session->userdata('token') && !$this->isSessionTokenCurrent()) {
+            $this->destroyUserData();
+            alert(lang('Logged in elsewhere'), base_url($this->noLoginRedirect));
+        }
+
         if($this->session->userdata('token')) {
             $this->sessionData = $this->session->userdata();
             $this->isSystemAdmin = $this->session->userdata('is_sys_admin') ?? false;

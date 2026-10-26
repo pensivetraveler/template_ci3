@@ -582,6 +582,22 @@ class MY_Controller extends CI_Controller
     }
 
     /**
+     * 세션의 토큰이 그 회원의 현재 토큰인지 (토큰은 회원당 하나 — 다른 곳에서 로그인하면 바뀐다)
+     * 같은 계정은 한 곳에서만 로그인 (2026-10-26 결정)
+     */
+    protected function isSessionTokenCurrent(): bool
+    {
+        $token = $this->session->userdata('token');
+        $userId = $this->session->userdata('user_id');
+        if(!$token || !$userId) return false;
+
+        return $this->Model_User_Token->getCntWhere([
+            'user_id' => $userId,
+            'token' => $token,
+        ]) > 0;
+    }
+
+    /**
      * 자동 로그인 쿠키로 로그인 (config/extra/autologin_config.php).
      * 키·만료·IP·회원 상태(user_limit_conditions, 삭제 회원)가 맞으면 startUserSession, 아니면 키 행과 쿠키를 지운다.
      * 예전에는 hook(MY_Hooks::checkPermission)이 세션에 user_id 만 넣어, 화면이 token 이 없다고 보고

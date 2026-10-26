@@ -5,7 +5,14 @@ trait BuilderCommonTrait
 {
     protected function destroyUserData(): void
     {
-        delete_cookie('autologin');
+        // 자동 로그인 키 행도 함께 지운다 (쿠키만 지우면 행이 만료까지 남음)
+        $cookieName = $this->config->item('autologin_cookie_name') ?: 'autologin';
+        $key = get_cookie($cookieName);
+        if($key && $this->config->item('autologin_table')) {
+            $columns = $this->config->item('autologin_columns');
+            $this->db->delete($this->config->item('autologin_table'), [$columns['key'] => $key]);
+        }
+        delete_cookie($cookieName);
 
         parent::destroyUserData();
     }
