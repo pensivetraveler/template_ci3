@@ -195,7 +195,7 @@ route_config[class]                    (가장 우선)
   - 대상 method는 요청 method. `index`면 `baseMethod`를 쓴다.
   - `routeConfig['methods']`에서 찾고, 없으면 소문자로 다시 찾는다.
   - 목록에 없는 method면 `trigger_error` 후 생성자 안에서 `$this->index()`를 호출한다(이 시점엔 로그인 확인 전이라 `allowNoLogin=false` route는 `noLoginRedirect`로 간다).
-  - `category`가 없으면 항목 내용을 **무시하고** `method_base_config`를 그대로 쓴다.
+  - `category`가 없으면 `'base'`로 보고 적은 내용 위에 기본값을 채운다(로그에 경고). 2026-10-26 전에는 내용을 버리고 `method_base_config`를 그대로 썼다.
   - `category === 'action'`(화면 없는 메서드, 예: 파일 다운로드)이면 category별 레이어링은 하지 않고 `method_base_config`로 빈 키만 채운다. `mode`를 지정하지 않으면 `read`가 된다.
   - 그 외에는 `BuilderCommonTrait::fillMethodConfigProperties()`를 거친다.
 

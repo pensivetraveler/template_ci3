@@ -510,8 +510,9 @@ class MY_Builder_WEB extends MY_Controller_WEB
         if(empty($methodConfig)) $methodConfig = $data;
 
         if(!isset($methodConfig['category'])) {
-            $this->methodConfig = $this->config->get("method_base_config", []);
-            return;
+            // 예전에는 적은 내용을 통째로 버리고 method_base_config 로 바꿨다 → category 'base' 로 보고 기본값만 채움
+            if(!empty($methodConfig)) log_message('error', __METHOD__." : method '{$method}' of '{$this->router->class}' has no category, treated as 'base'.");
+            $methodConfig['category'] = 'base';
         }
 
         if($methodConfig['category'] === 'action') {
