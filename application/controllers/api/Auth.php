@@ -138,17 +138,7 @@ class Auth extends Common
             set_cookie('autologin', $cookie_value, 2592000); // 30일간 저장
         }
 
-        $this->session->set_userdata([
-            'name' => $userData->name,
-            'id' => $userData->id,
-            'user_id' => $userData->user_id,
-            'user_cd' => $userData->user_cd,
-            'is_sys_admin' => in_array($userData->user_cd, ['USR000']),
-            'is_admin' => in_array($userData->user_cd, ['USR000', 'USR001', 'USR002']),
-            'token' => $this->setToken([
-                'user_id' => $userData->user_id,
-            ]),
-        ]);
+        $this->startUserSession($userData);
 
         $this->loggingUserlog();
 

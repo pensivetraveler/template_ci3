@@ -67,57 +67,8 @@ class MY_Hooks
             $CI->load->library('PHPtoJS', $CI->config->item('phptojs.namespace')?['namespace' => $CI->config->item('phptojs.namespace')]:[]);
         }
 
-        // autologin
-        if($CI->config->item('autologin_config_loaded')){
-            $aulCookie = $CI->config->item('autologin_cookie_name');
-            $aulTable = $CI->config->item('autologin_table');
-            $aulColumns = $CI->config->item('autologin_columns');
-            $aulLifetime = $CI->config->item('autologin_cookie_lifetime') ?: 86400 * 30;
-            $userTable = $CI->config->item('user_table');
-            $userLimit = $CI->config->item('user_limit_conditions');
-
-            if (get_cookie($aulCookie) && ! $CI->session->userdata(USER_ID_COLUMN_NAME)) {
-                $autoLogin = $CI->db
-                    ->order_by($aulColumns['date'], 'desc')
-                    ->where([$aulColumns['key'] => get_cookie($aulCookie)])->get($aulTable)->result_array();
-                if(count($autoLogin)) {
-                    $autoLogin = $autoLogin[0];
-
-                    if ( ! element(USER_ID_COLUMN_NAME, $autoLogin)) {
-                        delete_cookie($aulCookie);
-                    }else{
-                        $valid = true;
-                        if ( ! element($aulColumns['date'], $autoLogin) OR (strtotime(element($aulColumns['date'], $autoLogin)) < ctimestamp() - $aulLifetime)) {
-                            $valid = false;
-                        } elseif ($CI->input->ip_address() !== element($aulColumns['ip'], $autoLogin)) {
-                            $valid = false;
-                        } else {
-                            $userData = $CI->db
-                                ->select([USER_ID_COLUMN_NAME, ...array_keys($userLimit)])
-                                ->where([USER_ID_COLUMN_NAME => element(USER_ID_COLUMN_NAME, $autoLogin)])
-                                ->get($userTable)->result_array();
-
-                            if(count($userData)) {
-                                $userData = $userData[0];
-                                if(element(USER_ID_COLUMN_NAME, $userData)) {
-                                    foreach ($userData as $key => $val) {
-                                        if($key === USER_ID_COLUMN_NAME) continue;
-                                        if($val === $userLimit[$key]) $valid = false;
-                                    }
-                                }
-                            }
-                        }
-
-                        if(!$valid) {
-                            $CI->db->delete($aulTable, [$aulColumns['id'] => element($aulColumns['id'], $autoLogin)]);
-                            delete_cookie($aulCookie);
-                        }else{
-                            $CI->session->set_userdata(USER_ID_COLUMN_NAME, element(USER_ID_COLUMN_NAME, $autoLogin));
-                        }
-                    }
-                }
-            }
-        }
+        // 자동 로그인은 MY_Controller::loginWithAutologinCookie (MY_Builder_WEB 생성자에서 호출)로 옮김.
+        // hook 에서는 토큰을 발급할 수 없어 세션에 user_id 만 들어가고, 화면이 로그인 안 됨으로 보고 세션·쿠키를 지웠다.
     }
 
     public function setPHPVars()

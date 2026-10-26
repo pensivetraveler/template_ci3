@@ -563,6 +563,75 @@ class MY_Controller extends CI_Controller
         }
     }
 
+    /**
+     * 로그인 세션을 채운다 (Auth::login_post 와 자동 로그인이 같은 값을 쓰도록 한 곳에 둔다)
+     */
+    protected function startUserSession(object $userData): void
+    {
+        $this->session->set_userdata([
+            'name' => $userData->name,
+            'id' => $userData->id,
+            'user_id' => $userData->user_id,
+            'user_cd' => $userData->user_cd,
+            'is_sys_admin' => in_array($userData->user_cd, ['USR000']),
+            'is_admin' => in_array($userData->user_cd, ['USR000', 'USR001', 'USR002']),
+            'token' => $this->setToken([
+                'user_id' => $userData->user_id,
+            ]),
+        ]);
+    }
+
+    /**
+     * 자동 로그인 쿠키로 로그인 (config/extra/autologin_config.php).
+     * 키·만료·IP·회원 상태(user_limit_conditions, 삭제 회원)가 맞으면 startUserSession, 아니면 키 행과 쿠키를 지운다.
+     * 예전에는 hook(MY_Hooks::checkPermission)이 세션에 user_id 만 넣어, 화면이 token 이 없다고 보고
+     * 세션과 쿠키를 지웠다 → 자동 로그인이 한 번도 되지 않았음
+     */
+    protected function loginWithAutologinCookie(): bool
+    {
+        if(!$this->config->item('autologin_config_loaded')) return false;
+        if($this->session->userdata('token')) return false;
+
+        $cookieName = $this->config->item('autologin_cookie_name');
+        $key = get_cookie($cookieName);
+        if(!$key) return false;
+
+        $table = $this->config->item('autologin_table');
+        $columns = $this->config->item('autologin_columns');
+        $lifetime = $this->config->item('autologin_cookie_lifetime') ?: 86400 * 30;
+        $limits = $this->config->item('user_limit_conditions') ?: [];
+
+        $row = $this->db->order_by($columns['date'], 'desc')
+            ->where([$columns['key'] => $key])->get($table)->row_array();
+        if(!$row) {
+            delete_cookie($cookieName);
+            return false;
+        }
+
+        $userData = null;
+        $valid = element(USER_ID_COLUMN_NAME, $row)
+            && element($columns['date'], $row)
+            && strtotime(element($columns['date'], $row)) >= ctimestamp() - $lifetime
+            && $this->input->ip_address() === element($columns['ip'], $row);
+
+        if($valid) {
+            $userData = $this->Model_User->getDataWhere([], [USER_ID_COLUMN_NAME => element(USER_ID_COLUMN_NAME, $row)]);
+            if(!is_object($userData)) $valid = false;
+            foreach ($limits as $field => $value) {
+                if($valid && property_exists($userData, $field) && $userData->{$field} === $value) $valid = false;
+            }
+        }
+
+        if(!$valid) {
+            $this->db->delete($table, [$columns['id'] => element($columns['id'], $row)]);
+            delete_cookie($cookieName);
+            return false;
+        }
+
+        $this->startUserSession($userData);
+        return true;
+    }
+
     protected function destroyUserData(): void
     {
         if(count($this->session->userdata())) {

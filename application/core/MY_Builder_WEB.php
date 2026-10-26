@@ -49,6 +49,10 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $this->config->load('extra/autologin_config', false);
 
+        // 세션이 없으면 자동 로그인 쿠키로 먼저 로그인. 생성자에서 해야 post_controller_constructor hook(setPHPVars)이
+        // 새 토큰을 화면 JS 에 넣고, _remap 의 checkLoggedIn 이 로그인으로 본다
+        $this->loginWithAutologinCookie();
+
         if(!$this->flag) show_error("Platform flag is not set.");
 
         /**

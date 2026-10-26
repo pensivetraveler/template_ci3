@@ -79,6 +79,10 @@
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 
 ### 버그
+- [x] 자동 로그인이 한 번도 동작하지 않음 (2026-10-26, 결함 A): hook이 세션에 user_id만 넣어 `checkLoggedIn`이 token 없음으로 보고 `destroyUserData()`가 세션·autologin 쿠키를 지움 → `MY_Controller::loginWithAutologinCookie`(MY_Builder_WEB 생성자)·`startUserSession`(Auth::login과 공통)으로 옮김
+- [ ] 자동 로그인 체크박스가 제출 때 풀림 (결함 B) — bizsoft 브라우저 확인 중(#빌더-31), 가설: 스크립트 로드 전 체크를 `resetFrmInputs()`가 지움
+- [ ] 토큰이 회원당 하나(`setToken`이 같은 user_id 행을 교체) → 같은 계정이 다른 곳에서 로그인·자동 로그인하면 먼저 쓰던 곳의 API가 403. 의도(동시 로그인 1곳)인지 결정 필요
+- [ ] 로그아웃 때 autologin 쿠키만 지우고 `user_autologin` 행은 남음(만료까지)
 - [ ] `MY_Builder_API::duplicate_post` 고유 컬럼(`uniqueKeyList`·PK)을 그대로 복사해 중복 키로 500 (bizsoft frames: frame_nick, 2026-10-25 확인) — 고유 컬럼 처리 규칙(접미사 추가·비우기·엔티티 hook) 결정 필요
 - [ ] 세션 토큰이 `user_token`에 없을 때(같은 계정 다른 곳 로그인 등) API는 모두 403 "API Key 값이 전달되지 않았습니다"인데 화면(`checkLoggedIn`·`isSessionTokenValid`)은 로그아웃시키지 않고 열림 — bizsoft 운영에서 관찰(2026-10-25), 원인 미확인
 - [x] `api/SysCode.php:53` `category_srt` → `cd_srt` (추가: `SysCode::executeModify`의 `$original->category_srt` 비교 때문에 정렬 변경 여부와 무관하게 reorder 실행) → `$original->cd_srt`로 수정, 수정 대상을 `$this->idData`로 조회해 부분 PATCH(sml_cd·cmb_cd 없음)도 처리 (bizsoft-mig에서 500 재현, 2026-10-24)
