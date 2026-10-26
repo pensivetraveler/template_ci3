@@ -84,7 +84,9 @@ class MY_Builder_API extends MY_Controller_API
             $this->flag = $this->uri->segment(1);
         }
 
-        $this->loadConfigs(['builder_base_config', 'builder_route_config', 'builder_form_config', 'builder_list_config', 'builder_view_config']);
+        // builder_method_config: 메뉴 기본 권한 계산(getMenuRouteConfigs → fillMethodConfigProperties)이 method 기본값을 쓴다.
+        // 플랫폼 설정보다 먼저 불러야 하므로 여기서 (WEB 과 같은 순서)
+        $this->loadConfigs(['builder_base_config', 'builder_route_config', 'builder_method_config', 'builder_form_config', 'builder_list_config', 'builder_view_config']);
 
         // 설정 이름은 WEB과 같은 규칙(Resource_loader, builder_config_name()).
         // api_method_config 의 resource 로 다른 엔티티 설정을 쓸 수 있다 (예: users API ↔ 내 정보 화면의 myinfo 설정)
