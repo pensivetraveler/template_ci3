@@ -104,6 +104,13 @@ class Auth extends Common
         if(!custom_password_verify($password, $userData->password, PASSWORD_DECRYPTABLE))
             $this->response(['code' => PASSWORD_IS_NOT_MATCHED, 'data' => []]);
 
+        // 해시 모드인데 암호화 값으로 남은 계정은 로그인할 때 해시로 바꿔 저장 (일괄 전환 없이 차례로 옮겨짐)
+        if(password_needs_upgrade($userData->password)) {
+            if($this->Model->modData(['password' => create_hash($password)], ['user_id' => $userData->user_id]) === false) {
+                log_message('error', 'login password upgrade failed : user_id '.$userData->user_id);
+            }
+        }
+
         if ($this->input->post('autologin')) {
             $vericode = array('$', '/', '.');
 

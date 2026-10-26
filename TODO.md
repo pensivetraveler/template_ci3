@@ -9,11 +9,11 @@
 현재 개발 환경은 `PASSWORD_DECRYPTABLE=TRUE`(복호화 가능한 암호화)로 저장한다.
 운영 전환 시 기존 암호화 데이터를 해시로 일괄 변환하고 플래그를 `FALSE`로 바꿔야 한다.
 
-- [ ] `custom_password_verify`가 플래그가 아닌 **저장값 형태**로 판별하도록 변경
+- [x] `custom_password_verify`가 플래그가 아닌 **저장값 형태**로 판별하도록 변경 (2026-10-26, `is_password_hash`·로그인 성공 시 `password_needs_upgrade`면 해시로 다시 저장)
     - `password_get_info($hash)['algo']`가 있으면 `password_verify`, 없으면 `decrypt` 비교
     - 플래그는 "새로 저장할 때의 방식"만 결정 → 전환 도중에도 로그인이 깨지지 않음
     - 위치: `application/helpers/encryption_helper.php`
-- [ ] CLI 일괄 전환 명령 구현: `php index.php module/migration migrateEncryptedData`
+- [x] ~~CLI 일괄 전환 명령 구현~~ → 만들지 않음 (2026-10-26 결정: 로그인 시 자동 전환으로 대신, 한 번에 옮겨야 하면 프로젝트 스크립트로. 아래 하위 항목은 기록으로 남김)
     - bizsoft 운영은 이 명령 대신 `deploy/password-hash.php`로 전환함 (2026-10-17)
     - 위치: `application/controllers/module/Migration.php` (CLI 전용, 현재 뼈대만 있음)
     - 사용자별 `decrypt` → `password_hash` → 저장 (복호화 실패/이미 해시인 행은 건너뜀)
@@ -24,7 +24,7 @@
 - [x] 순서: 비밀번호 일괄 전환 → `.env` 변경 (bizsoft 운영 2026-10-17: bcrypt 전환 후 `PASSWORD_DECRYPTABLE=FALSE`)
 - [x] `.env.production`이 git 추적 중이라 서버에서 수정하면 `git pull` 시 충돌/덮어쓰기 위험 → 4번 항목과 함께 정리 (`57b0483`)
 - [ ] 해시 모드의 `findPassword_post`: 현재 "관리자에게 문의" 응답 → 이메일 재설정 링크(토큰) 방식 검토 (`Auth.php` TODO 주석)
-- [ ] `composer.json`에 `"ext-mbstring": "*"` 추가 (`get_starred_*`가 `mb_*` 사용)
+- [x] `composer.json`에 `"ext-mbstring": "*"` 추가 (`get_starred_*`가 `mb_*` 사용, 2026-10-26)
 
 ## 2. API 권한(인가) 검사
 
@@ -73,7 +73,7 @@
 - [ ] XSS: 목록 셀 렌더링(`app-page-list.js` `innerHTML`, inline `onclick`), 뷰 출력 `html_escape` 미사용 (추가: `renderColumn` text 셀, 반응형 `responsive.details.renderer`, `getColumnOnclick` redirect/download/view의 `location.href`/`window.open` 문자열(`javascript:` URL 포함), checkbox·select 셀 inline `onchange`의 식별자 값, `app-page-view.js::applyViewData` `SPAN.innerHTML`) (추가 2026-10-25: 상세 보기 `app-page-view.js`는 textContent로 넣도록 수정됨)
     - [x] 목록 셀(`app-page-list.js`): 값은 텍스트 노드·`setAttribute`로, inline `onclick`/`onchange` 대신 `data-cell-click`·`data-onchange` + 위임 이벤트(`bindListCellEvents`), 이동 URL의 `javascript:`·`data:` 스킴 차단, 메뉴 권한 체크박스(`app-page-menu-auth.js`)도 같은 방식 (2026-10-25)
     - [ ] 남은 것: PHP 뷰 출력 `html_escape` 미사용, 화면별 커스텀 렌더러가 `renderColumnHTML`에 HTML 문자열을 넘기는 경우(호환용으로 문자열도 받음)
-- [ ] XSS: `views/module/player.php`의 `$poster`, `$source` → `json_encode(..., JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT)`
+- [x] ~~XSS: `views/module/player.php`~~ → 템플릿에 없는 bizsoft 전용 파일 (2026-10-26 bizsoft 세션에 넘김)
 - [ ] 인증 토큰이 JS 전역(`common.HOOK_PHPTOJS_VAR_TOKEN`)에 노출, 32곳 이상에서 개별 주입
 - [x] `module/File.php` 파일 편집기 (2026-10-26): 로그인만 하면 편집 가능하던 것을 시스템 관리자 또는 `file_editor_menu` 메뉴 update 권한자로 제한(`canUseFileEditor`·`getFileEditorMenuAuth`, CACHING_MENU=false면 시스템 관리자만), 기본 편집 범위 `[]`(꺼짐, 쓰는 프로젝트만 `file_editor_roots` 설정), svg 업로드 제외·`getimagesize`/MIME 검사, 백업을 `application/cache/file_backups/`로
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
