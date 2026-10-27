@@ -83,6 +83,7 @@
 							<button class="btn btn-outline-danger" id="checkConfigBtn"><?=lang('Show Config')?></button>
 							<button class="btn btn-outline-primary" id="refreshMenuBtn"><?=lang('Refresh Menu')?></button>
 							<button class="btn btn-outline-primary" id="recalcBaseAuthBtn"><?=lang('Recalculate Base Auth')?></button>
+							<button class="btn btn-outline-primary" id="syncFromConfigBtn"><?=lang('Import Menus From Config')?></button>
 							<button class="btn btn-primary" id="saveCacheBtn"><?=lang('Caching')?></button>
 						</div>
 					</div>

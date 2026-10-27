@@ -84,6 +84,7 @@ $lang['Show Config'] = 'Show Config';
 $lang['Hide Config'] = 'Hide Config';
 $lang['Refresh Menu'] = 'Refresh Menu';
 $lang['Caching'] = 'Caching Menu';
+$lang['Import Menus From Config'] = 'Import Menus From Config';
 $lang['Fill Default Auth'] = 'Fill Default Auth';
 $lang['Menus without saved auth will get the default auth.'] = 'Menus without saved auth will get the default auth. Saved menus are not changed.';
 $lang['Select a target first'] = 'Select a grade or partner first.';

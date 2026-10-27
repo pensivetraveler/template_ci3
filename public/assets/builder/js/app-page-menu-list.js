@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     document.getElementById('saveCacheBtn').addEventListener('click', handleCacheMenu);
     document.getElementById('recalcBaseAuthBtn')?.addEventListener('click', handleRecalcBaseAuth);
+    document.getElementById('syncFromConfigBtn')?.addEventListener('click', handleSyncFromConfig);
     document.getElementById('addMenuCodeBtn').addEventListener('click', handleAddMenuCode);
     document.getElementById('checkConfigBtn').addEventListener('click', handleCheckConfig);
 
@@ -419,6 +420,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: 'Complete',
                     text: response.msg,
                     callback: reload,
+                });
+            },
+        });
+    }
+
+    // nav 설정에 있는데 DB 에 없는 메뉴를 가져옴 (있는 메뉴는 그대로)
+    function handleSyncFromConfig() {
+        executeAjax({
+            url: common.API_URI + '/syncFromConfig',
+            method: 'post',
+            headers: {
+                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+            },
+            success: function(response) {
+                const added = Array.isArray(response.data) ? response.data : [];
+                const box = document.createElement('div');
+                if(added.length) {
+                    added.forEach((title) => {
+                        const line = document.createElement('div');
+                        line.textContent = String(title);
+                        box.appendChild(line);
+                    });
+                }else{
+                    box.textContent = getLocale('No changes', common.LOCALE);
+                }
+                showAlert({
+                    type: 'success',
+                    title: 'Complete',
+                    html: box.innerHTML,
+                    callback: added.length ? reload : null,
                 });
             },
         });

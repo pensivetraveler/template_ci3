@@ -70,6 +70,71 @@ class MenuList extends Common
         ]);
     }
 
+    /**
+     * nav 설정({flag}_nav_menu)에 있는데 DB(tbl_menu)에 없는 메뉴를 추가한다. 있는 메뉴는 고치거나 지우지 않는다.
+     * 메뉴는 처음 한 번 설정에서 DB 로 들어가고 그 뒤로는 메뉴 목록 화면에서 편집하므로, 나중에 설정에 추가한 메뉴는
+     * 이 버튼으로 가져온다. 같은 메뉴: 일반 메뉴는 class·method, 하위 메뉴 묶음은 같은 깊이의 title
+     */
+    public function syncFromConfig_post()
+    {
+        $config = $this->getMenuRouteConfigs();
+        $rows = $this->Model->getList([], ['orderBy' => ['depth' => 'asc', 'srt' => 'asc']]);
+
+        $added = [];
+        foreach ($this->getMenuList() as $item) {
+            $parent = $this->findSavedMenu($rows, $item, 1, null);
+            if(!$parent) {
+                $parent = $this->addConfigMenu($item, $config, $rows, 1, 0);
+                $added[] = $item['title'];
+            }
+
+            foreach ($item['isSubMenu'] ? $item['subMenu'] : [] as $subItem) {
+                if($this->findSavedMenu($rows, $subItem, 2, (int)$parent->menu_id)) continue;
+                $this->addConfigMenu($subItem, $config, $rows, 2, (int)$parent->menu_id);
+                $added[] = $item['title'].' > '.$subItem['title'];
+            }
+        }
+
+        if(count($added)) $this->cachingMenu();
+
+        $this->response(['code' => DATA_PROCESSED, 'data' => $added]);
+    }
+
+    protected function findSavedMenu(array $rows, array $item, int $depth, ?int $parentId)
+    {
+        foreach ($rows as $row) {
+            if((int)$row->depth !== $depth) continue;
+            if($parentId !== null && (int)$row->parent_id !== $parentId) continue;
+            if($item['isSubMenu']) {
+                if((int)$row->is_sub_menu === 1 && (string)$row->title === (string)$item['title']) return $row;
+            }else{
+                $method = ($row->method ?? '') !== '' ? $row->method : 'index';
+                if((string)$row->class === (string)$item['class'] && $method === $item['method']) return $row;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 설정 메뉴 하나를 같은 단계 맨 뒤(srt 최대+1)에 추가하고 $rows 에도 넣는다
+     */
+    protected function addConfigMenu(array $item, array $config, array &$rows, int $depth, int $parentId)
+    {
+        $srt = 0;
+        foreach ($rows as $row) {
+            if((int)$row->depth === $depth && (int)($row->parent_id ?? 0) === $parentId) $srt = max($srt, (int)$row->srt);
+        }
+
+        $subMenu = $item['subMenu'];
+        $item['subMenu'] = [];
+        $data = $this->setMenuData($item, $config, $srt + 1, $parentId);
+        $menuId = $this->Model->addData($this->transformMenuData($data));
+
+        $row = $this->Model->getDataWhere([], ['menu_id' => $menuId]);
+        $rows[] = $row;
+        return $row;
+    }
+
     public function caching_get()
     {
         $this->cachingMenu();

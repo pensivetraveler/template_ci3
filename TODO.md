@@ -261,7 +261,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 
 **공통·route/method/nav**
 - [x] (2026-10-26 C-3: `MenuList::recalcBaseAuth_post` + 메뉴 목록 화면 "기본 권한 다시 계산" 버튼, menu_id·등급별·파트너별 권한 유지, 줄어든 자리는 기존 권한에서 끄지 않음) `BuilderCommonTrait::saveMenuList` `tbl_menu.base_auth`는 메뉴 최초 생성 때만 계산되고, 다시 계산하려면 `MenuList::reset_get()`(메뉴·권한 truncate, menu_id 재생성)뿐 → route/method 설정을 바꾼 뒤 menu_id를 유지한 채 base_auth만 재계산하는 경로 필요 (bizsoft 다운로드 export 권한 반영 때 DB 직접 수정)
-- [ ] nav 설정에 새로 추가한 메뉴가 DB(`tbl_menu`)에 들어가지 않음: `saveMenuList`가 DB에 메뉴가 있으면 DB 내용으로만 캐시를 만듦 → 메뉴 편집 화면(`saveAll`)과 어떻게 맞물리는지 확인 후 결정
+- [x] (2026-10-28: 메뉴 목록 화면 "설정에서 빠진 메뉴 가져오기" — MenuList::syncFromConfig_post, 없는 메뉴만 같은 단계 맨 뒤에 추가, 있는 메뉴는 그대로, 새 메뉴의 권한 행은 만들지 않음) nav 설정에 새로 추가한 메뉴가 DB(`tbl_menu`)에 들어가지 않음: `saveMenuList`가 DB에 메뉴가 있으면 DB 내용으로만 캐시를 만듦 → 메뉴 편집 화면(`saveAll`)과 어떻게 맞물리는지 확인 후 결정
 - [x] (2026-10-26 C-1-5: 적었으면 methods와 교집합) `BuilderCommonTrait::fillRouteConfigProperties` `properties.allows`를 `array_keys(methods)`로 무조건 덮어씀 (`projects`, `dashboard`의 `allows` 지정 무효 — 키 제거 또는 교집합 처리 결정)
 - [ ] `builder_route_config.php` route `category`(page/api)를 읽는 코드 없음 (구 README의 type `tabs`/`rest`/`cli`, subtype `json` config도 없음)
 - [ ] `builder_route_config.php` route `properties.formExist` 기본값이 있지만 route 레벨에서 읽지 않음 (method `properties.formExist`만 유효)
