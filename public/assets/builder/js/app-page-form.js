@@ -1534,14 +1534,49 @@ $(document).on('click', '[data-repeater-type="manual"] [data-manual-repeater-del
 
 /**
  * option_attributes 의 브라우저 쪽 옵션 (builder_form_helper get_admin_form_attributes 가 data-option-* 로 넣음)
- * - option_type api: option_data.url(BASE_URI 기준)·params 로 GET(_mode=option, render) → 받은 목록으로 채움
- * - option_type script: window[option_data.function](node) 가 돌려준 목록({값: 라벨} 또는 [{id, text}])으로 채움
- * - onload: 옵션을 채운 뒤 window[이름](node), onchange: 값이 바뀔 때 window[이름](node, event)
+ * - option_type api: option_data.url(BASE_URI 기준, 없으면 화면 API 의 /options)·method·params 로 요청(_mode=option, render)
+ * - option_type script: window[option_data.method](node, params) 가 돌려준 목록({값: 라벨} 또는 [{id, text}])
+ * - data-option-extra: 옵션 값별 추가 값 → <option data-{컬럼}> (option_data.select.extra)
+ * - render.callback: 옵션마다 window[이름](option, params ?? node) — false 를 돌려주면 그 옵션을 빼고, 문자열이면 라벨로 씀
+ * - onload: 옵션을 채운 뒤 window[이름](params ?? node), onchange: 값이 바뀔 때 window[이름](params ?? node, event)
  * 값 채우기(applyFrmValues)보다 먼저 끝나도록 동기 요청을 쓴다 (executeAjax 기본)
  */
+function getOptionCallback(node, name) {
+    const fn = node.getAttribute(`data-option-${name}`);
+    if(!fn) return null;
+    let params;
+    const raw = node.getAttribute(`data-option-${name}-params`);
+    if(raw !== null) {
+        try { params = JSON.parse(raw); } catch (e) { params = raw; }
+    }
+    if(typeof window[fn] !== 'function') {
+        console.warn(`option ${name} '${fn}' is not defined`);
+        return null;
+    }
+    return {fn: window[fn], params: params};
+}
+
+function decorateOptions(node) {
+    let extras = {};
+    try { extras = JSON.parse(node.getAttribute('data-option-extra') || '{}') || {}; } catch (e) { extras = {}; }
+    const render = getOptionCallback(node, 'render');
+
+    Array.from(node.options || []).forEach(function(option) {
+        const extra = extras[option.value];
+        if(extra && typeof extra === 'object') {
+            Object.keys(extra).forEach((key) => option.setAttribute(`data-${key.replace(/_/g, '-')}`, extra[key] ?? ''));
+        }
+        if(render) {
+            const result = render.fn(option, render.params !== undefined ? render.params : node);
+            if(result === false) option.remove();
+            else if(typeof result === 'string') option.text = result;
+        }
+    });
+}
+
 function loadOptionSources(form) {
     if(!form) return;
-    form.querySelectorAll('[data-option-type], [data-option-onload], [data-option-onchange]').forEach(function(node) {
+    form.querySelectorAll('[data-option-type], [data-option-onload], [data-option-onchange], [data-option-render], [data-option-extra]').forEach(function(node) {
         if(node.dataset.optionLoaded === '1') return;
         node.dataset.optionLoaded = '1';
 
@@ -1552,9 +1587,12 @@ function loadOptionSources(form) {
             try { params = JSON.parse(node.getAttribute('data-option-params') || '{}') || {}; } catch (e) { params = {}; }
             try { render = JSON.parse(node.getAttribute('data-option-render') || '{}') || {}; } catch (e) { render = {}; }
             const path = String(node.getAttribute('data-option-url') || '');
-            const url = /^https?:\/\//.test(path) ? path : common.BASE_URI.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+            const url = path === ''
+                ? common.API_URI + '/options'
+                : (/^https?:\/\//.test(path) ? path : common.BASE_URI.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, ''));
             executeAjax({
                 url: url,
+                method: node.getAttribute('data-option-method') === 'post' ? 'post' : 'get',
                 headers: {
                     'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
                 },
@@ -1567,25 +1605,19 @@ function loadOptionSources(form) {
                 },
             });
         }else if(type === 'script') {
-            const fn = node.getAttribute('data-option-function');
-            if(typeof window[fn] === 'function') {
-                prepareSelectOptions(node, window[fn](node) || []);
-            }else{
-                console.warn(`option script '${fn}' is not defined`);
-            }
+            const script = getOptionCallback(node, 'function');
+            if(script) prepareSelectOptions(node, script.fn(node, script.params) || []);
         }
 
-        const onload = node.getAttribute('data-option-onload');
-        if(onload) {
-            if(typeof window[onload] === 'function') window[onload](node);
-            else console.warn(`option onload '${onload}' is not defined`);
-        }
+        decorateOptions(node);
 
-        const onchange = node.getAttribute('data-option-onchange');
+        const onload = getOptionCallback(node, 'onload');
+        if(onload) onload.fn(onload.params !== undefined ? onload.params : node);
+
+        const onchange = getOptionCallback(node, 'onchange');
         if(onchange) {
             node.addEventListener('change', function(event) {
-                if(typeof window[onchange] === 'function') window[onchange](node, event);
-                else console.warn(`option onchange '${onchange}' is not defined`);
+                onchange.fn(onchange.params !== undefined ? onchange.params : node, event);
             });
         }
     });

@@ -313,24 +313,41 @@ function get_admin_form_attributes($item, $form_type = 'side', $form_sub_type = 
         $item['attributes'][$key] = $val;
     }
 
-    // 옵션을 브라우저에서 채우는 방식(option_type api·script)과 옵션 콜백(onload·onchange) → data-option-* (app-page-form.js loadOptionSources)
+    // 옵션을 브라우저에서 채우는 방식(option_type api·script)과 옵션 콜백(onload·onchange·render) → data-option-* (app-page-form.js loadOptionSources)
+    // 콜백은 '함수명' 또는 ['callback' => 함수명, 'params' => 값] (예전 문서 형식)
     $optionAttr = $item['option_attributes'] ?? [];
     if(is_array($optionAttr) && count($optionAttr)) {
         $optionType = $optionAttr['option_type'] ?? '';
         $optionData = is_array($optionAttr['option_data'] ?? null) ? $optionAttr['option_data'] : [];
-        if($optionType === 'api' && !empty($optionData['url'])) {
+        $toJson = function ($value) { return html_escape(json_encode($value, JSON_UNESCAPED_UNICODE)); };
+        if($optionType === 'api') {
+            // url 이 없으면 화면 API 의 공통 options (API_URI/options)
             $item['attributes']['data-option-type'] = 'api';
-            $item['attributes']['data-option-url'] = html_escape((string)$optionData['url']);
-            $item['attributes']['data-option-params'] = html_escape(json_encode($optionData['params'] ?? [], JSON_UNESCAPED_UNICODE));
-            $item['attributes']['data-option-render'] = html_escape(json_encode($optionAttr['render'] ?? [], JSON_UNESCAPED_UNICODE));
-        }elseif($optionType === 'script' && !empty($optionData['function'])) {
+            $item['attributes']['data-option-url'] = html_escape((string)($optionData['url'] ?? ''));
+            $item['attributes']['data-option-method'] = strtolower((string)($optionData['method'] ?? 'get')) === 'post' ? 'post' : 'get';
+            $item['attributes']['data-option-params'] = $toJson($optionData['params'] ?? []);
+            $mapping = array_intersect_key(is_array($optionAttr['render'] ?? null) ? $optionAttr['render'] : [], array_flip(['id', 'text', 'add']));
+            $item['attributes']['data-option-render'] = $toJson($mapping);
+        }elseif($optionType === 'script' && !empty($optionData['method'] ?? $optionData['function'] ?? '')) {
             $item['attributes']['data-option-type'] = 'script';
-            $item['attributes']['data-option-function'] = html_escape((string)$optionData['function']);
+            $item['attributes']['data-option-function'] = html_escape((string)($optionData['method'] ?? $optionData['function']));
+            if(array_key_exists('params', $optionData)) $item['attributes']['data-option-function-params'] = $toJson($optionData['params']);
         }
-        foreach (['onload', 'onchange'] as $callback) {
-            if(!empty($optionAttr[$callback]) && is_string($optionAttr[$callback])) {
-                $item['attributes']['data-option-'.$callback] = html_escape($optionAttr[$callback]);
+        $callbacks = ['onload' => $optionAttr['onload'] ?? null, 'onchange' => $optionAttr['onchange'] ?? null,
+            'render' => is_array($optionAttr['render'] ?? null) ? ($optionAttr['render']['callback'] ?? null) : null];
+        if(is_array($optionAttr['render'] ?? null) && !empty($optionAttr['render']['callback'])) {
+            $callbacks['render'] = ['callback' => $optionAttr['render']['callback'], 'params' => $optionAttr['render']['params'] ?? null];
+        }
+        foreach ($callbacks as $name => $callback) {
+            if(is_string($callback) && $callback !== '') $callback = ['callback' => $callback];
+            if(!is_array($callback) || empty($callback['callback']) || !is_string($callback['callback'])) continue;
+            $item['attributes']['data-option-'.$name] = html_escape($callback['callback']);
+            if(array_key_exists('params', $callback) && $callback['params'] !== null) {
+                $item['attributes']['data-option-'.$name.'-params'] = $toJson($callback['params']);
             }
+        }
+        if(!empty($item['option_extras']) && is_array($item['option_extras'])) {
+            $item['attributes']['data-option-extra'] = $toJson($item['option_extras']);
         }
     }
 

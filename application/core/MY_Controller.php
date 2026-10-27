@@ -331,13 +331,23 @@ class MY_Controller extends CI_Controller
         if(!$this->storage->delete($this->storage->keyFromUri($fileData->full_path))) $this->response(['code' => INTERNAL_SERVER_ERROR]);
     }
 
+    /**
+     * 마지막 getOptions 가 만든 옵션별 추가 값 [옵션 값 => [컬럼 => 값]] (option_data.select.extra 또는 render.extra)
+     * → <option data-{컬럼}> (setFormColumn 이 option_extras 로 담고 화면 JS 가 붙임)
+     */
+    public array $lastOptionExtras = [];
+
     protected function getOptions($field, $attr = []): array
     {
         if (empty($attr)) $attr['option_type'] = 'field';
 
+        $this->lastOptionExtras = [];
         $type = $attr['option_type'] ?? '';
         $data = $attr['option_data'] ?? [];
         $render = $attr['render'] ?? [];
+        // 예전 문서의 option_data.select.{id,text,extra} 도 받는다 (render 가 비었을 때)
+        if (empty($render['id']) && is_array($data['select'] ?? null)) $render = array_merge($render, $data['select']);
+        $extraColumns = is_array($render['extra'] ?? null) ? array_values($render['extra']) : [];
 
         $options = [];
         if($type === 'none' || empty($type)) {
@@ -362,8 +372,9 @@ class MY_Controller extends CI_Controller
                     break;
                 case 'code' :
                     $list = $this->getCodeList($data['params']);
-                    if (empty($render)) $render = ['id' => 'cmb_cd', 'text' => 'cd_name'];
+                    if (empty($render['id'])) $render = array_merge($render, ['id' => 'cmb_cd', 'text' => 'cd_name']);
                     $options = $this->getOptionsFromDBList($list, $render);
+                    $this->collectOptionExtras($list, $render, $extraColumns);
                     break;
                 default :
                     if (empty($data)) $this->logging(__METHOD__." : {$field} have no option data.");
@@ -375,6 +386,7 @@ class MY_Controller extends CI_Controller
                                 ->where($data['params'])
                                 ->get($data['table'])->result_array();
                             $options = $this->getOptionsFromDBList($list, $render);
+                            $this->collectOptionExtras($list, $render, $extraColumns);
                             break;
                         case 'model' :
                             if (!property_exists($this, $data['model'])) {
@@ -389,11 +401,17 @@ class MY_Controller extends CI_Controller
                                 show_error("getOptions : Method {$data['method']} not exist.", E_USER_ERROR);
 
                             // PHP 8에서 문자열 키는 named argument로 해석되므로 순서 배열로 전달
+                            // select 컬럼: id·text·add 와 extra 컬럼 (callback 등 다른 키는 컬럼이 아님)
+                            $selectColumns = array_values(array_filter(array_merge(
+                                [$render['id'] ?? null, $render['text'] ?? null, $render['add'] ?? null],
+                                $extraColumns
+                            )));
                             $list = call_user_func_array([$this->{$data['model']}, $data['method']], [
-                                array_values($render),
+                                $selectColumns,
                                 $data['params'] ?? [],
                             ]);
                             $options = $this->getOptionsFromDBList($list, $render);
+                            $this->collectOptionExtras($list, $render, $extraColumns);
                             break;
                         case 'custom' :
                             $options = call_user_func_array($data['method'], $data['params']);
@@ -401,6 +419,24 @@ class MY_Controller extends CI_Controller
                     }
             }
             return $options;
+        }
+    }
+
+    /**
+     * 옵션 행에서 extra 컬럼 값을 모은다 → $this->lastOptionExtras
+     */
+    protected function collectOptionExtras($list, array $render, array $extraColumns): void
+    {
+        if (!count($extraColumns) || !is_array($list) || empty($render['id'])) return;
+        foreach ($list as $row) {
+            $row = (array)$row;
+            if (!array_key_exists($render['id'], $row)) continue;
+            $values = [];
+            foreach ($extraColumns as $column) {
+                $name = strpos($column, '.') !== false ? substr($column, strrpos($column, '.') + 1) : $column;
+                if (array_key_exists($name, $row)) $values[$name] = $row[$name];
+            }
+            if (count($values)) $this->lastOptionExtras[(string)$row[$render['id']]] = $values;
         }
     }
 

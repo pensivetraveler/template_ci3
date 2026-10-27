@@ -97,6 +97,8 @@ trait BuilderColumnsTrait
                 $item['option_attributes']
             );
             $item['options'] = $this->getOptions($item['option_attributes']['option_field'] ?? $item['field'], $item['option_attributes']);
+            // option_data.select.extra(또는 render.extra) 값 → <option data-*> (get_admin_form_attributes 가 data-option-extra 로)
+            if(count($this->lastOptionExtras)) $item['option_extras'] = $this->lastOptionExtras;
         }
 
         // form attributes

@@ -330,10 +330,12 @@ JS 가 직접 읽는 attributes:
 | `add` | 값이 있으면 text 뒤에 ` (add값)` |
 
 > **주의**
-> - `option_data.select.{id,text,extra}` 는 없다. 실제 키는 `render.{id,text,add}` 이고 `extra`(→`data-*`)는 **미구현**.
-> - `option_type => 'api'`: `option_data.url`(BASE_URI 기준 경로, 예: `api/frames/options`)·`option_data.params`로 브라우저가 GET(`_mode=option`, `render`)해서 채운다. `option_type => 'script'`: `window[option_data.function](node)`가 돌려준 목록(`{값: 라벨}` 또는 `[{id, text}]`). 둘 다 서버 쪽 옵션은 비어 있다(`getOptions`가 `[]`).
-> - `option_attributes.onload`: 옵션을 채운 뒤 `window[이름](node)`, `onchange`: 값이 바뀔 때 `window[이름](node, event)` (`app-page-form.js loadOptionSources`, `preparePlugins` 처음에 실행). 2026-10-28 구현.
-> - `render(callback)`, `option_data.select.extra`(→`data-*`)는 아직 **미구현**.
+> - 컬럼 매핑은 `render.{id,text,add}`. 예전 문서의 `option_data.select.{id,text,extra}`도 받는다(render 가 비었을 때). `extra`(컬럼 목록, `render.extra`도 됨): db·model·code 옵션에서 그 컬럼 값을 `<option data-{컬럼}>`으로 붙인다(`collectOptionExtras` → `option_extras` → `data-option-extra` → `decorateOptions`).
+> - `option_type => 'api'`: `option_data.url`(BASE_URI 기준 경로, 예: `api/frames/options`. 없으면 화면 API의 `/options`)·`method`(get|post)·`params`로 브라우저가 요청(`_mode=option`, `render`의 id·text·add)해서 채운다. `option_type => 'script'`: `window[option_data.method](node, option_data.params)`(`function` 키도 됨)가 돌려준 목록(`{값: 라벨}` 또는 `[{id, text}]`). 둘 다 서버 쪽 옵션은 비어 있다(`getOptions`가 `[]`).
+> - 콜백(2026-10-28 구현, `app-page-form.js loadOptionSources`, `preparePlugins` 처음): 값은 `'함수명'` 또는 `['callback' => 함수명, 'params' => 값]`.
+>   - `onload`: 옵션을 채운 뒤 `window[이름](params ?? node)`
+>   - `onchange`: 값이 바뀔 때 `window[이름](params ?? node, event)`
+>   - `render.callback`: 옵션마다 `window[이름](option, params ?? node)` — `false`면 그 옵션을 빼고, 문자열이면 라벨로 씀
 > - 체크박스 구분자 `option_attributes.seperator` 는 읽히지 않아 항상 `,` 다(`MY_Builder_API::setData()`, `applyFrmValuesByCategory()`).
 
 ### 6-3. 동적 옵션 (JS, `app-page-form.js`)
