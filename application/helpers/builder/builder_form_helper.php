@@ -332,6 +332,12 @@ function get_admin_form_attributes($item, $form_type = 'side', $form_sub_type = 
                 $attributes['placeholder'] = '123-45-67890';
                 $ci->addFormAssets('cleave');
                 break;
+            case 'cleave-version' :
+                // app-page-utils.js setCleave 가 이 클래스로 1.2.3 형식 입력을 건다 (전에는 클래스를 붙이지 않아 동작 안 함)
+                $classList[] = 'cleave form-input_text-cleave-version';
+                if(!isset($attributes['placeholder'])) $attributes['placeholder'] = '1.0.0';
+                $ci->addFormAssets('cleave');
+                break;
         }
     }
 

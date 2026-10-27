@@ -84,6 +84,7 @@ $lang['Show Config'] = 'Config 보기';
 $lang['Hide Config'] = 'Config 숨김';
 $lang['Refresh Menu'] = '메뉴 갱신';
 $lang['Caching'] = '캐싱';
+$lang['Add Row'] = '추가';
 $lang['Delete Selected'] = '선택 삭제';
 $lang['No rows selected'] = '선택한 행이 없습니다.';
 $lang['Deleted'] = '삭제';

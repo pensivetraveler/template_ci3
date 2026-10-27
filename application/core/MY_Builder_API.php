@@ -425,7 +425,34 @@ class MY_Builder_API extends MY_Controller_API
 
         if(count($this->fileList) > 0) $data = $this->uploadFileInList($data);
 
+        $data = $this->sanitizeRichTextFields($data);
+
         return [$key, $data];
+    }
+
+    /**
+     * form 설정에서 subtype 이 quill(에디터)인 필드의 HTML 을 정화한다 (sanitize_rich_html, 허용 태그·속성만)
+     */
+    protected function sanitizeRichTextFields($data)
+    {
+        if(!is_array($data)) return $data;
+
+        foreach ($this->formConfig ?: [] as $item) {
+            if(($item['subtype'] ?? '') !== 'quill' || !isset($item['field'])) continue;
+            $field = $item['field'];
+            if(!isset($data[$field]) || !is_string($data[$field]) || $data[$field] === '') continue;
+            try {
+                $data[$field] = sanitize_rich_html($data[$field]);
+            } catch (RuntimeException $e) {
+                $this->responseError([
+                    'location' => __METHOD__,
+                    'param' => $field,
+                    'msg' => $e->getMessage(),
+                ], ['code' => INTERNAL_SERVER_ERROR], RestController::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return $data;
     }
 
     protected function afterPost($key, $data = [])
@@ -458,6 +485,8 @@ class MY_Builder_API extends MY_Controller_API
             }
         }
 
+        $data = $this->sanitizeRichTextFields($data);
+
         return [$key, $data];
     }
 
@@ -478,6 +507,8 @@ class MY_Builder_API extends MY_Controller_API
         list($key, $data) = parent::beforePatch($key);
 
         if(is_array($data) && count($data)) $this->validatePatchFormRules($data);
+
+        $data = $this->sanitizeRichTextFields($data);
 
         return [$key, $data];
     }

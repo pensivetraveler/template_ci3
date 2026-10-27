@@ -84,6 +84,7 @@ $lang['Show Config'] = 'Show Config';
 $lang['Hide Config'] = 'Hide Config';
 $lang['Refresh Menu'] = 'Refresh Menu';
 $lang['Caching'] = 'Caching Menu';
+$lang['Add Row'] = 'Add';
 $lang['Delete Selected'] = 'Delete Selected';
 $lang['No rows selected'] = 'No rows selected.';
 $lang['Deleted'] = 'Deleted';

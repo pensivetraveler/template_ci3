@@ -358,6 +358,9 @@ function resetFrmInputs(form, fields = []) {
     if($('[data-repeater-type="jquery"]').length) {
         $('[data-repeater-type="jquery"]').attr('data-repeater-count', 1);
     }
+    if($('[data-repeater-type="manual"]').length) {
+        $('[data-repeater-type="manual"]').attr('data-repeater-count', 1);
+    }
 
     if ($('[data-repeater-item]').length) {
         $('[data-repeater-item]').each(function (i, v) {
@@ -550,6 +553,15 @@ function applyFrmValues(form, data, fields = [], triggerEvent = true) {
         // group_repeater row 생성
         if(groupAttrs[groupName].group_repeater) {
             // group_repeater type jquery
+            // group_repeater type manual: 데이터 개수만큼 행을 만든다
+            if(groupAttrs[groupName].repeater_type === 'manual') {
+                const wrap = document.querySelector(`[data-repeater-type="manual"][data-group-name="${groupName}"]`);
+                if(wrap && data.hasOwnProperty(groupName) && Array.isArray(data[groupName])) {
+                    while(wrap.querySelectorAll('[data-repeater-list] > [data-repeater-item]').length < data[groupName].length) {
+                        if(!addManualRepeaterRow(wrap)) break;
+                    }
+                }
+            }
             if(groupAttrs[groupName].repeater_type === 'jquery' && $('[data-repeater-type="jquery"]').length) {
                 const repeater = document.querySelector(`[data-repeater-type="jquery"][data-group-name="${groupName}"]`);
                 const rowCount = parseInt(repeater.getAttribute('data-repeater-count'));
@@ -844,8 +856,10 @@ function refreshPlugins(form, data = null) {
                 theme: 'snow'
             });
 
-            $(`#${this.id}`).on('keydown', function(e) {
-                $(`[data-textarea-id="${this.id}"]`).val(editors[this.id].root.innerHTML)
+            // 내용이 바뀔 때마다 hidden 입력에 넣는다 (전에는 keydown 만 봐서 붙여넣기·툴바 서식이 빠질 수 있었음)
+            const editorId = this.id;
+            editors[editorId].on('text-change', function() {
+                $(`[data-textarea-id="${editorId}"]`).val(editors[editorId].root.innerHTML);
             });
         })
     }
@@ -1445,3 +1459,73 @@ function activateFilterForm(selector = null, callback = undefined, params = unde
         }
     }
 }
+
+/**
+ * 리피터 manual (jQuery 리피터 플러그인 없이 직접 추가·삭제, form_side_group_repeater_manual.php)
+ * 새 행은 <template data-manual-repeater-template> 의 __INDEX__ 를 다음 행 번호로 바꿔 붙인다.
+ * 행 번호는 지운 뒤에도 다시 매기지 않는다 (서버는 group[번호][필드] 를 순서대로 받음)
+ */
+function addManualRepeaterRow(wrap) {
+    const list = wrap.querySelector('[data-repeater-list]');
+    const template = wrap.querySelector('template[data-manual-repeater-template]');
+    if(!list || !template) return null;
+
+    let index = 0;
+    list.querySelectorAll(':scope > [data-repeater-item]').forEach((row) => {
+        const rowIndex = parseInt(row.getAttribute('data-row-index'), 10);
+        if(!isNaN(rowIndex) && rowIndex >= index) index = rowIndex + 1;
+    });
+
+    const holder = document.createElement('div');
+    holder.innerHTML = template.innerHTML.replaceAll('__INDEX__', String(index)).trim();
+    const row = holder.firstElementChild;
+    if(!row) return null;
+    list.appendChild(row);
+    wrap.setAttribute('data-repeater-count', list.querySelectorAll(':scope > [data-repeater-item]').length);
+
+    window.dispatchEvent(new CustomEvent('addRepeaterItem', {
+        bubbles : false,
+        cancelable : true,
+        composed : false,
+        detail : { node : row },
+    }));
+
+    const groupName = wrap.getAttribute('data-group-name');
+    const cbName = camelize(`after_${groupName}_repeater_show`);
+    if(typeof window[cbName] === 'function') window[cbName](row);
+
+    return row;
+}
+
+function removeManualRepeaterRow(row) {
+    const wrap = row.closest('[data-repeater-type="manual"]');
+    const removeRow = function() {
+        row.remove();
+        if(wrap) wrap.setAttribute('data-repeater-count', wrap.querySelectorAll('[data-repeater-list] > [data-repeater-item]').length);
+    };
+
+    // 저장된 행(수정 화면이고 repeater_id 값이 있음)은 확인 후 서버 삭제(deleteRepeater), 아니면 화면에서만
+    const form = row.closest('form');
+    const identifier = form && form[common.IDENTIFIER] ? form[common.IDENTIFIER].value : '';
+    const repeaterId = wrap ? wrap.getAttribute('data-repeater-id') : '';
+    const idInput = repeaterId ? row.querySelector(`[data-group-field="${repeaterId}"]`) : null;
+    if(!identifier || !idInput || idInput.value === '') {
+        removeRow();
+        return;
+    }
+
+    showSwalAlert({
+        type: 'delete',
+        callback: deleteRepeater,
+        params: {repeater: row, deleteElement: removeRow},
+    });
+}
+
+$(document).on('click', '[data-repeater-type="manual"] [data-manual-repeater-add]', function() {
+    addManualRepeaterRow(this.closest('[data-repeater-type="manual"]'));
+});
+
+$(document).on('click', '[data-repeater-type="manual"] [data-manual-repeater-delete]', function() {
+    removeManualRepeaterRow(this.closest('[data-repeater-item]'));
+});
+

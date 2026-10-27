@@ -289,11 +289,11 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `MY_Controller::getOptions` option_type `api`/`script` 분기 없음 → `[]`
 - [ ] `option_attributes.onload`/`onchange`/`render(callback)`, `option_data.select.extra`(→`data-*`) 미구현 (`render`는 `{id,text,add}` 컬럼 매핑만)
 - [ ] `builder_form_config.php` `builder_form_base_option_attributes.option_stack='vertical'` 미사용 (`get_admin_form_choice`는 `form_attributes.option_stack`, 기본 horizon을 읽음)
-- [ ] `group_attributes.repeater_type='manual'` 대응 뷰 `form_side_group_repeater_manual.php` 없음
+- [x] (2026-10-28 B-5: 플러그인 없이 직접 추가·삭제하는 사이드 폼 뷰와 JS) `group_attributes.repeater_type='manual'` 대응 뷰 `form_side_group_repeater_manual.php` 없음
 - [ ] 페이지 base 폼의 `group_attributes.type='base'` 그룹 뷰(`form_base_group_base.php`) 없음, 미추적 `views/builder/layout/form_group_base.php`는 빈 파일
-- [ ] `views/builder/layout/form_base_custom_dropzone-single.php` 빈 파일 (custom/dropzone-single 미구현)
-- [ ] `type=textarea, subtype=quill` PHP 분기 없음 → 일반 textarea, `builder_form_helper.php::get_admin_form_textarea`는 dead code
-- [ ] `type=text, subtype=cleave-version` `get_admin_form_attributes`에 분기 없어 `.cleave` 클래스 미부여 (`setCleave` 분기 미실행)
+- [ ] (2026-10-28 B-5: 게시판 정리 때 dropzone-full 하드코딩과 함께) `views/builder/layout/form_base_custom_dropzone-single.php` 빈 파일 (custom/dropzone-single 미구현)
+- [x] (2026-10-28 B-5: 페이지 폼은 custom quill 뷰로, 저장 때 HTMLPurifier 정화, text-change로 hidden 동기화. get_admin_form_textarea는 여전히 쓰지 않음) `type=textarea, subtype=quill` PHP 분기 없음 → 일반 textarea, `builder_form_helper.php::get_admin_form_textarea`는 dead code
+- [x] (2026-10-28 B-5) `type=text, subtype=cleave-version` `get_admin_form_attributes`에 분기 없어 `.cleave` 클래스 미부여 (`setCleave` 분기 미실행)
 - [ ] (2026-10-26 B-4: 게시판 정리 때 함께 — 화면은 web 게시글 첨부(article_attachment.sort_order)용, 값은 PATCH 본문인데 서버는 GET에서 찾음, swap 방식이라 전체 순서를 보내야 함) `MY_Builder_API::reorder_patch` GET 파라미터만 검사 후 아무것도 안 함 (`list_sorter` 정렬 저장 안 됨) (추가: 파라미터가 있으면 아무 응답 없이 빈 200)
 - [ ] `MY_Builder_API::deleteRepeater_patch` `DATA_DELETED`만 응답하는 스텁 (컨트롤러 오버라이드 필요하다는 점이 코드에 명시 안 됨)
 - [x] (2026-10-26 C-4-3: dropzone으로 시작하는 subtype 모두) `MY_Builder_WEB::beforeViewApp` dropzone 에셋을 subtype이 정확히 `dropzone`일 때만 로드 (`dropzone-full` 사용 시 에셋 누락)

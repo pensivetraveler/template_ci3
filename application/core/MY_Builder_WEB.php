@@ -676,6 +676,13 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 $item['subtype'] = 'autosize';
             }
 
+            // 페이지 폼의 textarea + quill 은 custom quill 뷰(form_{type}_custom_quill.php)로 그린다
+            // (전에는 일반 textarea 로 나왔음). 그 폼 type 의 quill 뷰가 없으면 textarea 그대로
+            if(!$this->listForm && $item['type'] === 'textarea' && $item['subtype'] === 'quill') {
+                $pageFormType = $this->methodConfig['type'] ?? 'base';
+                if(is_file(APPPATH."views/builder/layout/form_{$pageFormType}_custom_quill.php")) $item['type'] = 'custom';
+            }
+
             if ($item['group'] !== 'base') {
                 if(!in_array($item['group'], $groups)) {
                     $groups[] = $item['group'];

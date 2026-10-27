@@ -138,3 +138,42 @@ if ( ! function_exists('reformat_request_select'))
         return array_values(array_unique($columns));
     }
 }
+
+if ( ! function_exists('sanitize_rich_html'))
+{
+    /**
+     * 에디터(quill) HTML 을 허용 태그·속성만 남겨 정화한다 (화면에 HTML 로 그대로 출력되므로 저장형 XSS 방지).
+     * HTMLPurifier(composer ezyang/htmlpurifier)가 필요하다. 없으면 예외 — 정화 없이 저장하지 않는다.
+     */
+    function sanitize_rich_html(string $html): string
+    {
+        static $purifier = null;
+
+        if($purifier === null) {
+            if(!class_exists('HTMLPurifier')) {
+                $auto = FCPATH.'vendor/ezyang/htmlpurifier/library/HTMLPurifier.auto.php';
+                if(is_file($auto)) require_once $auto;
+            }
+            if(!class_exists('HTMLPurifier')) {
+                throw new RuntimeException('HTMLPurifier is required to save rich text (composer require ezyang/htmlpurifier).');
+            }
+
+            $config = HTMLPurifier_Config::createDefault();
+            $config->set('Cache.DefinitionImpl', null);
+            // quill 이 만드는 마크업: 서식·목록·제목·인용·코드·링크·이미지, 정렬·들여쓰기·글꼴·크기는 class(ql-*), 색은 style
+            $config->set('HTML.Allowed', implode(',', [
+                'p[class]', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'sub', 'sup',
+                'span[class|style]', 'a[href|target|rel]', 'ul[class]', 'ol[class]', 'li[class]',
+                'h1[class]', 'h2[class]', 'h3[class]', 'h4[class]', 'h5[class]', 'h6[class]',
+                'blockquote[class]', 'pre[class]', 'code', 'img[src|alt|width|height]',
+            ]));
+            $config->set('Attr.AllowedFrameTargets', ['_blank']);
+            $config->set('Attr.EnableID', false);
+            $config->set('CSS.AllowedProperties', ['color', 'background-color', 'text-align']);
+            $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true, 'data' => true]);
+            $purifier = new HTMLPurifier($config);
+        }
+
+        return $purifier->purify($html);
+    }
+}

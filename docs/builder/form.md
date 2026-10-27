@@ -169,7 +169,7 @@ PHP 클래스는 공통으로 `form-control dt-{field} form-input_{category} for
 | `text` | `readonly` | `readonly` 속성 + `detect_changed=0` 강제 | - | 동일 | 동일 | detect_changed=0 → 항상 전송 |
 | `text` | `identifier` | 일반 input. `IDENTIFIER` 목록에 포함(`MY_Builder_WEB::setIdentifier()`), 페이지 폼에서 URI 마지막 세그먼트를 default 로(`setFormData()`) | - | 동일 | 동일 | 동일 |
 | `text` | `cleave-bizno` | class `cleave cleave-bizno`, placeholder `123-45-67890` | `app-page-utils.js` `setCleave()` (blocks 3-2-5) | inputs | 동일 | 동일 |
-| `text` | `cleave-version` | **부분 구현** — PHP 분기가 없어 `.cleave` 클래스가 안 붙고 Cleave 가 초기화되지 않음 | (`setCleave()` 에 분기만 있음) | inputs | | |
+| `text` | `cleave-version` | `.cleave.form-input_text-cleave-version` + cleave 에셋, placeholder 기본 `1.0.0` | `setCleave()` 버전 형식(1.2.3, 숫자만) | inputs | | |
 | `text` | `zipcode` | 일반 input (addr_daum 그룹 뷰에서 사용) | - | inputs | | |
 | `hidden` | `base`/`identifier` | 폼 상단 hidden. `detect_changed=0` 강제 | - | inputs | value='' (default 있으면 유지) | 항상 전송 (`checkInputSubmittable()`) |
 | `password` | `base`/`password_confirm` | `form_password` | - | **적용하지 않음**(`excepts`) | value='' | 변경 시 전송. 서버에서 빈 값이면 제거, 있으면 `create_hash` (`MY_Builder_API::setData()`) |
@@ -191,7 +191,7 @@ PHP 클래스는 공통으로 `form-control dt-{field} form-input_{category} for
 | `select` | `select2-repeater` | class `select2-repeater` | 리피터용 select2 (`preparePlugins()`, `addRepeaterItem` 이벤트 핸들러) | 동일 | | |
 | `textarea` | `base` | `form_textarea`, class `h-px-100`, rows 사이드 3 / 페이지 5 | - | `textareas` | value='' | |
 | `textarea` | `autosize` | class `textarea-autosize`, rows 2. **사이드 폼에서는 모든 textarea 가 autosize 로 강제**(`setFormData()`) | `autosize()`, refresh 때 높이 재계산 | textareas | | |
-| `textarea` | `quill` | **미구현** — 일반 textarea 로 렌더링됨. Quill 은 `custom/quill` 사용 | - | - | | |
+| `textarea` | `quill` | 페이지 폼이면 `custom/quill` 뷰로 그림(그 폼 type 의 `form_{type}_custom_quill.php` 가 있을 때). 목록 사이드 폼은 autosize | 아래 `custom/quill` 과 같음 | 아래와 같음 | | |
 | `checkbox` | `base`(다중) | `get_admin_form_choice()`: options 수만큼 `name[]` 체크박스 | - | `name[]` 중 값이 data(문자열이면 `,` split, 배열이면 includes)에 포함되면 checked | checked=false | 체크된 것만 `name[]` 반복 append. 서버에서 `join(',')`. **주의** — 모두 해제하면 아무것도 전송되지 않아 "전부 해제" 저장 불가 |
 | `checkbox` | `single` | options 있으면 각 옵션을 단일 `name`(배열 아님) 체크박스로, 없으면 value=1 하나 | - | value 일치 시 checked | | 체크 시 `name=value`. **주의** — 서버 `setData()` 의 `join()` 이 스칼라를 받아 PHP 8 에서 TypeError |
 | `checkbox` | `onoff` | `builder/custom/onoff` 뷰: `<input type=checkbox name={field} value=Y>` 토글. **주의** — attributes/data-* 를 출력하지 않음 | custom-toggle CSS | data 가 truthy 면 checked (`'N'` 도 checked) | reset 안 됨 | 체크+변경 시 `Y`. 서버: 미전송이면 `N` 으로 저장 |
@@ -205,7 +205,7 @@ PHP 클래스는 공통으로 `form-control dt-{field} form-input_{category} for
 | `custom` | `unique` | `form_{base,grid,side}_custom_unique.php`: hidden `{field}_unique` + input(`type="custom"`) + 중복확인 버튼 | `[data-btn-type=dup_check]` input 핸들러로 버튼 활성화(`app-page-form-event.js`), `checkDuplicate()` | `customs` 기본 분기 `form[name].value=data` + `data-original-value` 기록 | | 값 + `{field}_unique`(hidden, 서버에서 컬럼이 아니라 제거) |
 | `custom` | `youtube` | `form_{base,side}_custom_youtube.php`: `<input type=url>` + 링크 목록 | - | `setFormListItem()` (youtube) | | |
 | `custom` | `version` | `form_{base,side}_custom_version.php`: 일반 input | - | 기본 분기 | | |
-| `custom` | `quill` | `form_base_custom_quill.php`: hidden(`data-textarea-id`) + `div#{id}-quill.textarea-quill` (**페이지 base 전용**) | refresh 때 `new Quill`, 검증 직전 hidden 에 HTML 복사(`app-page-add.js` `core.validator.validating` 핸들러) | div innerHTML + hidden value | | hidden |
+| `custom` | `quill` | `form_base_custom_quill.php`: hidden(`data-textarea-id`) + `div#{id}-quill.textarea-quill` (**페이지 base 전용**) | refresh 때 `new Quill`, 내용이 바뀔 때마다(`text-change`)와 검증 직전 hidden 에 HTML 복사. **저장 때 서버가 HTML 을 정화**(`sanitize_rich_html`, HTMLPurifier, 허용 태그·속성만) | div innerHTML + hidden value | | hidden |
 | `custom` | `tag-base` | `form_side_custom_tag-base.php`, class `tagify h-auto` (**사이드 전용**) | `new Tagify` (`appPlugins.form.tagify[name]` 로 옵션 지정, 기본은 값 배열) | 기본 분기 | | |
 | `custom` | `dropzone-full` | `form_base_custom_dropzone-full.php`. **주의** — id `thumbnail-dropzone-wrapper`, data-field `thumbnail` 하드코딩 | `setDropzone()` | Dropzone mock 파일 표시 | | Dropzone |
 | `custom` | `domain_register`/`ip_register`/`domain_list` | grid 전용 뷰, 에셋 등록(`get_admin_form_attributes()`) | 각 lib common.js | | | |
@@ -355,7 +355,7 @@ JS 가 직접 읽는 attributes:
 | `key` | string | `''` | 그룹 `data` 배열의 키(뷰에서 `extract()` 되는 변수명). 비면 `{group}{순번}` | `restructure_admin_form_data()` |
 | `envelope_name` | bool | `false` | `true`: name `group[field]` | `get_group_field_name()` |
 | `group_repeater` | bool | `false` | 반복 그룹. name 에 index 삽입 | 동일 |
-| `repeater_type` | string | `'base'` | `base`(뷰 `repeater_base`) / `jquery`(jquery-repeater). `manual` 은 **미구현**(뷰 없음) | `setFormData()` |
+| `repeater_type` | string | `'base'` | `base`(뷰 `repeater_base`) / `jquery`(jquery-repeater) / `manual`(플러그인 없이 직접 추가·삭제, `form_side_group_repeater_manual.php` — `<template>`의 `__INDEX__`를 다음 행 번호로 바꿔 붙임, 저장된 행은 확인 후 `deleteRepeater`) | `setFormData()`, `addManualRepeaterRow()` |
 | `repeater_id` | string | `''` | 행 식별 필드. 비어있는 행은 서버 호출 없이 삭제 | `preparePlugins()` 리피터 hide 콜백 |
 | `repeater_count` | int | `1` | repeater_base 초기 행 수 | `form_side_group_repeater_base.php` |
 | `colspan` | int | `12` | grid 열 너비 | `restructure_admin_form_data()` |
@@ -690,11 +690,11 @@ $config['form_administrators_config'] = [
 |---|---|
 | `category` 로 identifier/unique/common/hidden/text/select/tel/date/number/file/textarea/custom/addr 분기 | `category` 는 CSS 클래스뿐. 분기는 `type`/`subtype`. identifier = **subtype**, unique = **custom 의 subtype**, common/hidden = **type** |
 | `type: addr` (zipcode, addr1, addr2) | 없음. 주소는 `group_attributes.type = 'addr_daum'` + `key` 가 `zipcode/addr1/addr2` 인 그룹 (7-3) |
-| `textarea: quill` | `type=textarea, subtype=quill` 은 동작하지 않음. `type=custom, subtype=quill` (페이지 base 전용) |
+| `textarea: quill` | 페이지 base 폼에서 `custom/quill`과 같게 동작(2026-10-28). 저장 때 HTML 정화 |
 | `custom` 은 `form_side_{custom}` 호출 | `form_{formType 또는 formSubType}_custom_{subtype}` |
 | `group` 이 있으면 `form_side_{group}` 호출 | `form_{...}_group_{group_attributes.type}` (group 이름이 아님) |
 | `view_mod: ''` = 전체 노출 | 2026-10-25 수정으로 문서대로 전체 노출 (배열 값도 지원) |
 | `list_type` 값 dup_check/addr_daum | 실제 값은 thumbnail/youtube/reply_list/그 외(파일) |
-| `repeater_type: manual` | 대응 뷰가 없음 (`base` / `jquery` 만) |
+| `repeater_type: manual` | 사이드 폼 뷰 구현(2026-10-28). 페이지 base 폼의 그룹 뷰는 아직 없음 |
 
 이전 문서에 없던 구현: `writable`, `editable`, `form_validation`, `show_if_field/show_if_value`, `change_after`, `set_default_first`, `option_stack`(form_attributes), `wrap_with_border`, `unit`, `sample_file`, `check_delete`, `list_field`, `option_field`, `colspan`, `tab_index`, `group_attributes.repeater_count/colspan/tab_index`, option_type `none/blank/method/설정키`, `render.add`, `attributes.clipboard`, `data-add-hypen`, `appPlugins.form.*`, `applyFrmValues{Group}` / `applyFrmValuesCustom{Field}` 훅, `common` 타입(space/text/divider).
