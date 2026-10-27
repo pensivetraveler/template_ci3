@@ -401,7 +401,9 @@ class MY_Builder_API extends MY_Controller_API
                 foreach ($this->formConfig ?: [] as $formItem) {
                     if(isset($formItem['field']) && !empty($formItem['option_attributes'])) $formOptions[$formItem['field']] = $formItem['option_attributes'];
                 }
-                foreach ($targetConfig as $item) {
+                // list·view 설정이 없으면(예: view 설정 없는 엔티티의 단건 조회) form 설정 항목으로
+                $labelItems = count($targetConfig) ? $targetConfig : ($this->formConfig ?: []);
+                foreach ($labelItems as $item) {
                     $key = $item['field'] ?? '';
                     $optionAttributes = !empty($item['option_attributes']) ? $item['option_attributes'] : ($formOptions[$key] ?? []);
                     if($key === '' || empty($optionAttributes) || !property_exists($data, $key)) continue;
