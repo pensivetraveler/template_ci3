@@ -39,6 +39,7 @@ $lang['nav']['MenuList Management'] = $lang['nav']['MenuList'];
 $lang['nav']['MenuAuth'] = '메뉴 권한';
 $lang['nav']['MenuAuth Management'] = $lang['nav']['MenuAuth'];
 
+$lang['nav']['Dashboard'] = '대시보드';
 $lang['nav']['MyInfo'] = '내 정보';
 $lang['nav']['Statistics'] = '접속 통계';
 $lang['nav']['Logs'] = '로그';

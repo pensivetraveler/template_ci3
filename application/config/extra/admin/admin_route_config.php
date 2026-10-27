@@ -119,6 +119,12 @@ $config['route_config'] = [
                 'buttons' => [
                     'add' => false,
                     'excel' => false,
+                    'fillDefault' => [
+                        'text' => 'Fill Default Auth',
+                        'classes' => ['btn','btn-outline-primary','waves-effect','waves-light','my-5','me-2'],
+                        'action' => 'fillDefaultAuth',
+                        'params' => ['field' => 'partner_id'],
+                    ],
                     'resetDB' => [
                         'text' => 'DB 초기화',
                         'classes' => ['btn','btn-warning','waves-effect','waves-light','my-5'],
@@ -361,6 +367,12 @@ $config['route_config'] = [
                 'buttons' => [
                     'add' => false,
                     'excel' => false,
+                    'fillDefault' => [
+                        'text' => 'Fill Default Auth',
+                        'classes' => ['btn','btn-outline-primary','waves-effect','waves-light','me-2'],
+                        'action' => 'fillDefaultAuth',
+                        'params' => ['field' => 'grade_cd'],
+                    ],
                     'resetDB' => [
                         'text' => 'DB 초기화',
                         'classes' => ['btn','btn-warning','waves-effect','waves-light'],

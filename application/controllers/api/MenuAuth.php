@@ -35,74 +35,101 @@ class MenuAuth extends Common
         return [$key, $data];
     }
 
+    /**
+     * 목록(GET)은 읽기만 한다. 권한 행이 없는 메뉴는 is_show 0·000000 으로 계산해 보여 주고 DB 에는 쓰지 않는다.
+     * 행이 없는 메뉴는 실제 권한 검사에서도 접근 불가 (2026-10-28 결정: 접근 불가 유지).
+     * 전에는 그 등급의 행이 하나도 없으면 GET 에서 기본 행을 INSERT 했다 (화면을 여는 것만으로 기본 권한이 생기고,
+     * 나중에 추가한 메뉴는 행이 생기지 않았음)
+     */
     protected function beforeList($data): array
     {
-        // 등급이 없거나 없는 코드면 기본 권한 행을 만들지 않고 400 (전에는 grade_cd NULL 로 INSERT 를 시도함 — bizsoft #bizsoft-1)
-        $gradeCd = $data['filter']['where']['grade_cd'] ?? '';
+        $this->listGradeCd = $this->requireGradeCd($data['filter']['where']['grade_cd'] ?? '');
+
+        return parent::beforeList($data);
+    }
+
+    private string $listGradeCd = '';
+
+    /**
+     * 등급 코드가 sys_code USR 등급에 있어야 한다 (없거나 잘못된 값이면 400)
+     */
+    protected function requireGradeCd($gradeCd): string
+    {
         $this->load->model('Model_Sys_Code');
         if(!is_string($gradeCd) || $gradeCd === ''
             || !$this->Model_Sys_Code->getCnt(['where' => ['big_cd' => 'USR', 'cmb_cd' => $gradeCd]])) {
             $this->response(['code' => BAD_REQUEST, 'msg' => '등급을 선택해 주세요.']);
         }
+        return $gradeCd;
+    }
 
-        $isDataExist = $this->Model->getCnt([
-            'where' => [
-                'grade_cd' => $gradeCd
-            ]
-        ]) > 0;
+    /**
+     * 권한을 줄 수 있는 메뉴 (시스템 관리자 전용·권한 검사 없는·사용 안 하는 메뉴 제외), 상위 → 하위 순
+     */
+    protected function getAuthMenuList(): array
+    {
+        $menus = $this->Model_Menu->getList([], [
+            'where' => ['is_super' => 0, 'is_auth' => 1, 'is_use' => 1],
+            'orderBy' => ['depth' => 'asc', 'parent_id' => 'asc', 'srt' => 'asc'],
+        ]);
 
-        if(!$isDataExist){
-            $menuList = $this->Model_Menu->getList([], [
-                'where' => [
-                    'is_super' => 0,
-                    'is_auth' => 1,
-                    'is_use' => 1,
-                ],
-                'orderBy' => [
-                    'depth' => 'asc',
-                    'parent_id' => 'asc',
-                    'srt' => 'asc',
-                ]
-            ]);
+        $children = [];
+        foreach ($menus as $menu) if((int)$menu->depth > 1) $children[(int)$menu->parent_id][] = $menu;
 
-            foreach ($menuList as $item) {
-                $this->Model->addData([
-                    'grade_cd' => $gradeCd,
-                    'menu_id' => $item->menu_id,
-                    'is_show' => 1,
-                    'menu_auth' => $item->base_auth,
-                    'scope_cd' => 'SCP001',
-                ]);
-            }
+        $ordered = [];
+        foreach ($menus as $menu) {
+            if((int)$menu->depth !== 1) continue;
+            $ordered[] = $menu;
+            foreach ($children[(int)$menu->menu_id] ?? [] as $child) $ordered[] = $child;
         }
-
-        return parent::beforeList($data);
+        return $ordered;
     }
 
     protected function executeList($data, $model = null): array
     {
-        $data['orderBy'] = [
-            'menu.depth' => 'asc',
-            'menu.parent_id' => 'asc',
-            'menu.srt' => 'asc',
-        ];
+        $rows = [];
+        foreach ($this->Model->getList([], ['where' => ['grade_cd' => $this->listGradeCd]]) as $row) $rows[(int)$row->menu_id] = $row;
 
         $list = [];
-        $data['where']['menu.depth'] = 1;
-        foreach ($this->Model->getList([], $data) as $menu) {
-            $list[] = $menu;
-            if((int)$menu->is_sub_menu) {
-                $data['where']['menu.depth'] = 2;
-                $data['where']['menu.parent_id'] = $menu->menu_id;
-                foreach ($this->Model->getList([], $data) as $submenu) {
-                    $list[] = $submenu;
-                }
-            }
+        foreach ($this->getAuthMenuList() as $menu) {
+            $row = $rows[(int)$menu->menu_id] ?? null;
+            $list[] = (object)[
+                'grade_cd' => $this->listGradeCd,
+                'menu_id' => $menu->menu_id,
+                'is_show' => $row ? $row->is_show : 0,
+                'menu_auth' => $row ? $row->menu_auth : BASE_AUTH_CHAR,
+                'scope_cd' => $row ? $row->scope_cd : 'SCP001',
+                'title' => $menu->title,
+                'code' => $menu->code,
+                'depth' => $menu->depth,
+                'is_sub_menu' => $menu->is_sub_menu,
+                'base_auth' => $menu->base_auth,
+                'is_saved' => $row ? 1 : 0,
+            ];
         }
 
         $data['list'] = $this->transformList($list);
+        // 목록은 메뉴 수 기준 (권한 행 수가 아님)
+        $data['extraFields']['recordsTotal'] = count($data['list']);
+        $data['extraFields']['recordsFiltered'] = count($data['list']);
 
         return $data;
+    }
+
+    /**
+     * 수정 대상 권한 행이 없으면 먼저 만든다 (보임 0·000000 — 아직 권한 없음과 같은 값)
+     */
+    protected function ensureAuthRow(array $idData): void
+    {
+        if(empty($idData['grade_cd']) || empty($idData['menu_id'])) return;
+        if($this->Model->getCnt(['where' => $idData])) return;
+        $this->Model->addData([
+            'grade_cd' => $idData['grade_cd'],
+            'menu_id' => $idData['menu_id'],
+            'is_show' => 0,
+            'menu_auth' => BASE_AUTH_CHAR,
+            'scope_cd' => 'SCP001',
+        ]);
     }
 
     protected function transformView($data): object
@@ -125,6 +152,9 @@ class MenuAuth extends Common
 
     protected function beforeModify($key, $dto): array
     {
+        $this->requireGradeCd($this->idData['grade_cd'] ?? '');
+        $this->ensureAuthRow($this->idData);
+
         $field = array_key_first($dto);
 
         if(in_array($field, ['create','read','update','delete','export','import'])) {
@@ -161,21 +191,61 @@ class MenuAuth extends Common
         $subMenuList = $this->Model_Menu->getList([], [
             'where' => ['parent_id' => $this->idData['menu_id'],]
         ]);
+        $menuIds = [(int)$this->idData['menu_id']];
         if(count($subMenuList)) {
             foreach ($subMenuList as $subMenuData) {
-                $this->Model->modData($dto, array_merge($this->idData,['menu_id' => $subMenuData->menu_id]));
+                $subIdData = array_merge($this->idData, ['menu_id' => $subMenuData->menu_id]);
+                $this->ensureAuthRow($subIdData);
+                $this->Model->modData($dto, $subIdData);
+                $menuIds[] = (int)$subMenuData->menu_id;
             }
         }
 
-        /**
-         * TODO : Model_Partner_Auth 관련 커스텀 동작
-         */
-        if($this->idData['grade_cd'] === 'USR002') {
-            $this->load->model('Model_Partner_Auth');
-            $this->Model_Partner_Auth->truncate();
-        }
+        // 파트너 등급을 바꾸면 그 메뉴의 파트너별 권한을 등급 권한 안으로 줄인다
+        // (전에는 partner_auth 표 전체를 truncate — 파트너별 권한이 모두 지워지고 요청 트랜잭션도 끊겼음)
+        if($this->idData['grade_cd'] === 'USR002') $this->trimPartnerAuth($menuIds);
 
         parent::afterModify($key, $dto);
+    }
+
+    /**
+     * 파트너별 권한을 파트너 등급(USR002) 권한 안으로 줄인다. 등급 메뉴가 숨김이면 파트너도 숨김·000000.
+     * 등급 권한을 넓혀도 파트너 값은 그대로 (넓히기는 파트너 권한 화면에서)
+     */
+    protected function trimPartnerAuth(array $menuIds): void
+    {
+        $this->load->model('Model_Partner_Auth');
+        foreach ($menuIds as $menuId) {
+            $grade = $this->Model->getData(['is_show', 'menu_auth'], ['where' => ['grade_cd' => 'USR002', 'menu_id' => $menuId]]);
+            foreach ($this->Model_Partner_Auth->getList([], ['where' => ['menu_id' => $menuId]]) as $partner) {
+                $set = (!is_object($grade) || (int)$grade->is_show !== 1)
+                    ? ['is_show' => 0, 'menu_auth' => BASE_AUTH_CHAR]
+                    : ['menu_auth' => normalize_menu_auth((string)$grade->menu_auth, (string)$partner->menu_auth)];
+                $this->Model_Partner_Auth->modData($set, ['partner_id' => $partner->partner_id, 'menu_id' => $menuId]);
+            }
+        }
+    }
+
+    /**
+     * "기본 권한으로 채우기": 그 등급에 권한 행이 없는 메뉴만 보임 1·메뉴 기본 권한(base_auth)으로 만든다 (있는 행은 그대로)
+     */
+    public function fillDefault_post()
+    {
+        $gradeCd = $this->requireGradeCd($this->input->post('grade_cd'));
+
+        $filled = 0;
+        foreach ($this->getAuthMenuList() as $menu) {
+            $idData = ['grade_cd' => $gradeCd, 'menu_id' => $menu->menu_id];
+            if($this->Model->getCnt(['where' => $idData])) continue;
+            $this->Model->addData(array_merge($idData, [
+                'is_show' => 1,
+                'menu_auth' => $menu->base_auth,
+                'scope_cd' => 'SCP001',
+            ]));
+            $filled++;
+        }
+
+        $this->response(['code' => DATA_PROCESSED, 'data' => ['filled' => $filled]]);
     }
 
     // 메뉴·권한 테이블을 비우는 동작이라 GET(링크·프리페치로 실행될 수 있음)이 아닌 POST로만 받음

@@ -39,6 +39,7 @@ $lang['nav']['MenuList Management'] = $lang['nav']['MenuList'];
 $lang['nav']['MenuAuth'] = 'Menu Auth';
 $lang['nav']['MenuAuth Management'] = $lang['nav']['MenuAuth'];
 
+$lang['nav']['Dashboard'] = 'Dashboard';
 $lang['nav']['MyInfo'] = 'MyInfo';
 $lang['nav']['Statistics'] = 'Statistics';
 $lang['nav']['Logs'] = 'Logs';

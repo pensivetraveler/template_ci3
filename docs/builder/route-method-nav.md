@@ -416,3 +416,13 @@ $config['admin_nav_menu'] = [
 > - `menu_done` 캐시가 사라진 상태에서 `CACHING_MENU=true`면 `saveMenuList()`가 기존 행을 지우지 않고 다시 insert해 메뉴가 중복될 수 있다.
 > - 메뉴 `method`가 route `methods`에 없으면 `getMenuBaseAuth()`에서 undefined index. `class`는 대소문자를 구분해 매칭한다(`myInfo` ≠ `myinfo` → `000000`).
 > - 권한 있는 메뉴가 0개면 `setupPlatformMenuAuth()`가 `null`을 돌려 오류가 나고, 첫 항목이 `isUse=false`면 `menuList[0]`이 없을 수 있다.
+
+### 메뉴 권한 행 (2026-10-28)
+
+- 권한 행(`tbl_menu_auth` 등급별, `tbl_partner_auth` 파트너별)이 없는 메뉴는 화면·API 권한 검사에서 **접근 불가**.
+- 메뉴 권한·파트너 권한 화면의 목록(GET)은 **읽기만** 한다. 행이 없는 메뉴도 목록에 나오고 보임 0·`000000`으로 계산해 보여 준다(`MenuAuth::executeList`, `PartnerAuth::executeList`). 나중에 추가한 메뉴도 바로 나온다.
+- 체크박스를 바꾸면 그 행이 없을 때 먼저 만든 뒤 고친다(`ensureAuthRow`). 보임을 켜면 메뉴 기본 권한(`base_auth`, 파트너는 파트너 등급 권한)이 들어간다.
+- "기본 권한으로 채우기" 버튼(`fillDefault_post`): 행이 없는 메뉴만 보임 1·기본 권한으로 만든다. 이미 저장된 행은 그대로.
+- 파트너 등급(USR002) 권한을 바꾸면 그 메뉴(와 하위 메뉴)의 파트너별 권한을 등급 권한 안으로 줄인다(`MenuAuth::trimPartnerAuth`). 등급에서 숨기면 파트너도 숨김·`000000`.
+- `isAuth => false` 메뉴(내 정보, 템플릿 대시보드)는 권한 검사가 없어 로그인한 모두가 쓴다. 권한 화면에도 나오지 않는다.
+

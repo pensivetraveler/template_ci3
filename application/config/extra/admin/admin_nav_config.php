@@ -8,6 +8,13 @@ $config['admin_nav_top'] = [
 ];
 
 $config['admin_nav_menu'] = [
+    // 대시보드: 로그인한 모든 사용자 (권한 검사 없음, 내 정보와 같음)
+    [
+        'icon' => 'ri-home-smile-line',
+        'title' => 'Dashboard',
+        'class' => 'dashboard',
+        'isAuth' => false,
+    ],
     [
         'icon' => 'ri-team-line',
         'title' => 'Administrators Management',

@@ -50,78 +50,56 @@ class PartnerAuth extends Common
         return [$key, $data];
     }
 
+    /**
+     * 목록(GET)은 읽기만 한다. 파트너 등급(USR002)에서 보이는 메뉴를 나열하고, 파트너 행이 없는 메뉴는
+     * is_show 0·000000 으로 계산해 보여 준다 (행이 없으면 실제 권한도 없음, 2026-10-28 결정). 전에는 GET 에서 기본 행을 INSERT 했다
+     */
     protected function beforeList($data): array
     {
-        // 파트너가 없거나 없는 번호면 기본 행을 만들지 않고 400 (beforeGet 은 isset 만 봄 — bizsoft #bizsoft-1)
-        $partnerId = $data['where']['partner_id'] ?? '';
-        $this->load->model('Model_Partner');
+        $this->listPartnerId = $this->requirePartnerId($data['where']['partner_id'] ?? '');
+
+        return parent::beforeList($data);
+    }
+
+    private int $listPartnerId = 0;
+
+    protected function requirePartnerId($partnerId): int
+    {
         if(!is_numeric($partnerId) || !$this->Model_Partner->getCnt(['where' => ['partner_id' => (int)$partnerId]])) {
             $this->response(['code' => BAD_REQUEST, 'msg' => '파트너를 선택해 주세요.']);
         }
+        return (int)$partnerId;
+    }
 
-        $baseAuthList = $this->Model_Menu_Auth->getList([], [
-            'where' => [
-                'grade_cd' => 'USR002'
-            ]
-        ]);
-
-        if(!count($baseAuthList) > 0) {
-            $this->response([
-                'code' => BAD_REQUEST,
-                'msg' => '파트너 등급에 대한 메뉴별 기본 권한을 먼저 생성해주세요.'
-            ]);
-        }
-
-        if(!$this->Model->getCnt($data)){
-            $menuList = $this->Model_Menu_Auth->getList([], [
-                'join' => [
-                    'select' => 'title,code,depth,is_sub_menu,base_auth',
-                    'table' => 'menu',
-                    'matches' => [
-                        'menu_id' => 'menu_id'
-                    ],
-                    'direction' => 'left'
-                ],
-                'where' => [
-                    'grade_cd' => 'USR002',
-                    'is_show' => 1,
-                ],
-                'orderBy' => [
-                    'menu.depth' => 'asc',
-                    'menu.parent_id' => 'asc',
-                    'menu.srt' => 'asc',
-                ]
-            ]);
-
-            foreach ($menuList as $item) {
-                $this->Model->addData([
-                    'partner_id' => $data['where']['partner_id'],
-                    'menu_id' => $item->menu_id,
-                    'is_show' => 1,
-                    'menu_auth' => $item->menu_auth,
-                    'scope_cd' => $item->scope_cd,
-                ]);
-            }
-        }
-
-        $data['join'] = [
-            [
-                'select' => 'title,code,depth,is_sub_menu',
+    /**
+     * 파트너 등급(USR002)에서 보이는 메뉴의 등급 권한 행, 상위 → 하위 순 (메뉴 정보 포함)
+     */
+    protected function getGradeMenuList(): array
+    {
+        $rows = $this->Model_Menu_Auth->getList([], [
+            'join' => [
+                'select' => 'title,code,depth,is_sub_menu,parent_id,srt',
                 'table' => 'menu',
-                'matches' => [
-                    'menu_id' => 'menu_id'
-                ],
-                'direction' => 'left'
+                'matches' => ['menu_id' => 'menu_id'],
+                'direction' => 'left',
             ],
-        ];
+            'where' => ['grade_cd' => 'USR002', 'is_show' => 1],
+            'orderBy' => ['menu.depth' => 'asc', 'menu.parent_id' => 'asc', 'menu.srt' => 'asc'],
+        ]);
+        if(!count($rows)) {
+            $this->response(['code' => BAD_REQUEST, 'msg' => '파트너 등급에 대한 메뉴별 기본 권한을 먼저 생성해주세요.']);
+        }
 
-        $data['orderBy'] = [
-            'menu.depth' => 'asc',
-            'menu.parent_id' => 'asc',
-            'menu.srt' => 'asc',
-        ];
+        $children = [];
+        foreach ($rows as $row) if((int)$row->depth > 1) $children[(int)$row->parent_id][] = $row;
 
-        return parent::beforeList($data);
+        $ordered = [];
+        foreach ($rows as $row) {
+            if((int)$row->depth !== 1) continue;
+            $ordered[] = $row;
+            foreach ($children[(int)$row->menu_id] ?? [] as $child) $ordered[] = $child;
+        }
+        return $ordered;
     }
 
     protected function transformView($data): object
@@ -131,12 +109,6 @@ class PartnerAuth extends Common
             // 목록 셀은 값을 텍스트로 넣으므로 HTML 엔티티(&nbsp;) 대신 NBSP 문자로 들여쓰기
             $data->title = str_repeat("\u{00A0}", ($data->depth-1)*4).'- '.$data->title;
         }
-        $data->base_auth = $this->Model_Menu_Auth->getData(['menu_auth'], [
-            'where' => [
-                'menu_id' => $data->menu_id,
-                'grade_cd' => 'USR002'
-            ]
-        ]);
         $data->create = (int)substr($data->menu_auth, 0, 1);
         $data->read = (int)substr($data->menu_auth, 1, 1);
         $data->update = (int)substr($data->menu_auth, 2, 1);
@@ -150,32 +122,79 @@ class PartnerAuth extends Common
 
     protected function executeList($data, $model = null): array
     {
-        $data['orderBy'] = [
-            'menu.depth' => 'asc',
-            'menu.parent_id' => 'asc',
-            'menu.srt' => 'asc',
-        ];
+        $rows = [];
+        foreach ($this->Model->getList([], ['where' => ['partner_id' => $this->listPartnerId]]) as $row) $rows[(int)$row->menu_id] = $row;
 
         $list = [];
-        $data['where']['menu.depth'] = 1;
-        foreach ($this->Model->getList([], $data) as $menu) {
-            $list[] = $menu;
-            if((int)$menu->is_sub_menu) {
-                $data['where']['menu.depth'] = 2;
-                $data['where']['menu.parent_id'] = $menu->menu_id;
-                foreach ($this->Model->getList([], $data) as $submenu) {
-                    $list[] = $submenu;
-                }
-            }
+        foreach ($this->getGradeMenuList() as $grade) {
+            $row = $rows[(int)$grade->menu_id] ?? null;
+            $list[] = (object)[
+                'partner_id' => $this->listPartnerId,
+                'menu_id' => $grade->menu_id,
+                'is_show' => $row ? $row->is_show : 0,
+                'menu_auth' => $row ? $row->menu_auth : BASE_AUTH_CHAR,
+                'scope_cd' => $row ? $row->scope_cd : $grade->scope_cd,
+                'title' => $grade->title,
+                'code' => $grade->code,
+                'depth' => $grade->depth,
+                'is_sub_menu' => $grade->is_sub_menu,
+                // 파트너가 받을 수 있는 최대 권한 = 파트너 등급 권한
+                'base_auth' => $grade->menu_auth,
+                'is_saved' => $row ? 1 : 0,
+            ];
         }
 
         $data['list'] = $this->transformList($list);
+        $data['extraFields']['recordsTotal'] = count($data['list']);
+        $data['extraFields']['recordsFiltered'] = count($data['list']);
 
         return $data;
     }
 
+    /**
+     * 수정 대상 파트너 행이 없으면 먼저 만든다 (보임 0·000000)
+     */
+    protected function ensureAuthRow(array $idData): void
+    {
+        if(empty($idData['partner_id']) || empty($idData['menu_id'])) return;
+        if($this->Model->getCnt(['where' => $idData])) return;
+        $grade = $this->Model_Menu_Auth->getData(['scope_cd'], ['where' => ['grade_cd' => 'USR002', 'menu_id' => $idData['menu_id']]]);
+        $this->Model->addData([
+            'partner_id' => $idData['partner_id'],
+            'menu_id' => $idData['menu_id'],
+            'is_show' => 0,
+            'menu_auth' => BASE_AUTH_CHAR,
+            'scope_cd' => is_object($grade) ? $grade->scope_cd : (is_string($grade) && $grade !== '' ? $grade : 'SCP001'),
+        ]);
+    }
+
+    /**
+     * "기본 권한으로 채우기": 파트너 행이 없는 메뉴만 파트너 등급 권한 그대로(보임 1) 만든다
+     */
+    public function fillDefault_post()
+    {
+        $partnerId = $this->requirePartnerId($this->input->post('partner_id'));
+
+        $filled = 0;
+        foreach ($this->getGradeMenuList() as $grade) {
+            $idData = ['partner_id' => $partnerId, 'menu_id' => $grade->menu_id];
+            if($this->Model->getCnt(['where' => $idData])) continue;
+            $this->Model->addData(array_merge($idData, [
+                'is_show' => 1,
+                'menu_auth' => $grade->menu_auth,
+                'scope_cd' => $grade->scope_cd,
+            ]));
+            $filled++;
+        }
+
+        $this->response(['code' => DATA_PROCESSED, 'data' => ['filled' => $filled]]);
+    }
+
     protected function beforeModify($key, $dto): array
     {
+        $this->requirePartnerId($this->idData['partner_id'] ?? '');
+        $this->ensureAuthRow($this->idData);
+
         $field = array_key_first($dto);
 
         if(in_array($field, ['create','read','update','delete','export','import'])) {
@@ -215,7 +234,9 @@ class PartnerAuth extends Common
         ]);
         if(count($subMenuList)) {
             foreach ($subMenuList as $subMenuData) {
-                $this->Model->modData($dto, array_merge($this->idData,['menu_id' => $subMenuData->menu_id]));
+                $subIdData = array_merge($this->idData, ['menu_id' => $subMenuData->menu_id]);
+                $this->ensureAuthRow($subIdData);
+                $this->Model->modData($dto, $subIdData);
             }
         }
         parent::afterModify($key, $dto);
