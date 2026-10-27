@@ -48,6 +48,9 @@ function onLoadedLayout(form) {
 }
 
 function preparePlugins(form) {
+    // 옵션 출처 api·script, onload·onchange 콜백 (select2·selectpicker 초기화 전에 옵션을 채운다)
+    loadOptionSources(form);
+
     // select picker
     if ($(form).find('.selectpicker').length) {
         initSelectpicker(form);
@@ -1528,4 +1531,75 @@ $(document).on('click', '[data-repeater-type="manual"] [data-manual-repeater-add
 $(document).on('click', '[data-repeater-type="manual"] [data-manual-repeater-delete]', function() {
     removeManualRepeaterRow(this.closest('[data-repeater-item]'));
 });
+
+/**
+ * option_attributes 의 브라우저 쪽 옵션 (builder_form_helper get_admin_form_attributes 가 data-option-* 로 넣음)
+ * - option_type api: option_data.url(BASE_URI 기준)·params 로 GET(_mode=option, render) → 받은 목록으로 채움
+ * - option_type script: window[option_data.function](node) 가 돌려준 목록({값: 라벨} 또는 [{id, text}])으로 채움
+ * - onload: 옵션을 채운 뒤 window[이름](node), onchange: 값이 바뀔 때 window[이름](node, event)
+ * 값 채우기(applyFrmValues)보다 먼저 끝나도록 동기 요청을 쓴다 (executeAjax 기본)
+ */
+function loadOptionSources(form) {
+    if(!form) return;
+    form.querySelectorAll('[data-option-type], [data-option-onload], [data-option-onchange]').forEach(function(node) {
+        if(node.dataset.optionLoaded === '1') return;
+        node.dataset.optionLoaded = '1';
+
+        const type = node.getAttribute('data-option-type');
+        if(type === 'api') {
+            let params = {};
+            let render = {};
+            try { params = JSON.parse(node.getAttribute('data-option-params') || '{}') || {}; } catch (e) { params = {}; }
+            try { render = JSON.parse(node.getAttribute('data-option-render') || '{}') || {}; } catch (e) { render = {}; }
+            const path = String(node.getAttribute('data-option-url') || '');
+            const url = /^https?:\/\//.test(path) ? path : common.BASE_URI.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+            executeAjax({
+                url: url,
+                headers: {
+                    'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+                },
+                data: Object.assign({_mode: 'option'}, params, Object.keys(render).length ? {render: render} : {}),
+                success: function(json) {
+                    prepareSelectOptions(node, normalizeOptionResponse(json && json.data ? json.data : []));
+                },
+                error: function() {
+                    console.error(`${node.id} 옵션 로드 실패`);
+                },
+            });
+        }else if(type === 'script') {
+            const fn = node.getAttribute('data-option-function');
+            if(typeof window[fn] === 'function') {
+                prepareSelectOptions(node, window[fn](node) || []);
+            }else{
+                console.warn(`option script '${fn}' is not defined`);
+            }
+        }
+
+        const onload = node.getAttribute('data-option-onload');
+        if(onload) {
+            if(typeof window[onload] === 'function') window[onload](node);
+            else console.warn(`option onload '${onload}' is not defined`);
+        }
+
+        const onchange = node.getAttribute('data-option-onchange');
+        if(onchange) {
+            node.addEventListener('change', function(event) {
+                if(typeof window[onchange] === 'function') window[onchange](node, event);
+                else console.warn(`option onchange '${onchange}' is not defined`);
+            });
+        }
+    });
+}
+
+/**
+ * 옵션 응답 모양을 prepareSelectOptions 가 받는 형태로: [{id, text}] 는 그대로,
+ * 공통 options API(_mode=option)처럼 {값: 라벨} 하나가 배열에 감싸여 오면([{1: 'a'}]) 그 객체를 쓴다
+ */
+function normalizeOptionResponse(data) {
+    if(Array.isArray(data) && data.length === 1 && data[0] !== null && typeof data[0] === 'object'
+        && !Object.hasOwn(data[0], 'id') && !Object.hasOwn(data[0], 'text')) {
+        return data[0];
+    }
+    return data;
+}
 

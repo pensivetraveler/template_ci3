@@ -348,6 +348,9 @@ class MY_Controller extends CI_Controller
             return empty($data) ? form_options_by_field() : $data;
         }else if($type === 'field') {
             return form_options_by_field($field ?? 'default');
+        }else if(in_array($type, ['api', 'script'], true)) {
+            // 브라우저가 채운다 (data-option-type, app-page-form.js loadOptionSources). 서버 쪽 옵션은 비움
+            return [];
         }else if(in_array($type, array_keys(config_item('options')))) {
             return form_options_by_field($type);
         }else{

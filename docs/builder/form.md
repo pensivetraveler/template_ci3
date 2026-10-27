@@ -331,7 +331,9 @@ JS 가 직접 읽는 attributes:
 
 > **주의**
 > - `option_data.select.{id,text,extra}` 는 없다. 실제 키는 `render.{id,text,add}` 이고 `extra`(→`data-*`)는 **미구현**.
-> - `option_attributes.onload` / `onchange` / `render(callback)` JS 콜백은 **미구현**. select 연동은 `form_attributes.change_after` 나 `appPlugins.form.select2[name].onHandler` 를 쓴다.
+> - `option_type => 'api'`: `option_data.url`(BASE_URI 기준 경로, 예: `api/frames/options`)·`option_data.params`로 브라우저가 GET(`_mode=option`, `render`)해서 채운다. `option_type => 'script'`: `window[option_data.function](node)`가 돌려준 목록(`{값: 라벨}` 또는 `[{id, text}]`). 둘 다 서버 쪽 옵션은 비어 있다(`getOptions`가 `[]`).
+> - `option_attributes.onload`: 옵션을 채운 뒤 `window[이름](node)`, `onchange`: 값이 바뀔 때 `window[이름](node, event)` (`app-page-form.js loadOptionSources`, `preparePlugins` 처음에 실행). 2026-10-28 구현.
+> - `render(callback)`, `option_data.select.extra`(→`data-*`)는 아직 **미구현**.
 > - 체크박스 구분자 `option_attributes.seperator` 는 읽히지 않아 항상 `,` 다(`MY_Builder_API::setData()`, `applyFrmValuesByCategory()`).
 
 ### 6-3. 동적 옵션 (JS, `app-page-form.js`)

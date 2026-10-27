@@ -287,8 +287,8 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `form_attributes.list_onclick`/`list_click`/`list_click_params`/`list_sorter_params` 참조 코드 없음 (`list_onclick` 기본값 `'download'`만 존재)
 - [ ] `form_attributes.dup_check`/`btn_params` 주석 처리된 코드(`app-page-form-event.js`)에서만 참조
 - [ ] `app-page-form-event.js` `input, textarea` 핸들러 `text_type`이 `eng`/`num`/`eng|num`만 처리 (`email` 등 무시)
-- [ ] `MY_Controller::getOptions` option_type `api`/`script` 분기 없음 → `[]`
-- [ ] `option_attributes.onload`/`onchange`/`render(callback)`, `option_data.select.extra`(→`data-*`) 미구현 (`render`는 `{id,text,add}` 컬럼 매핑만)
+- [x] (2026-10-28 B-7: 브라우저가 채움 — data-option-*, loadOptionSources) `MY_Controller::getOptions` option_type `api`/`script` 분기 없음 → `[]`
+- [ ] (2026-10-28 B-7: onload·onchange 구현, render(callback)·select.extra는 남음) `option_attributes.onload`/`onchange`/`render(callback)`, `option_data.select.extra`(→`data-*`) 미구현 (`render`는 `{id,text,add}` 컬럼 매핑만)
 - [ ] `builder_form_config.php` `builder_form_base_option_attributes.option_stack='vertical'` 미사용 (`get_admin_form_choice`는 `form_attributes.option_stack`, 기본 horizon을 읽음)
 - [x] (2026-10-28 B-5: 플러그인 없이 직접 추가·삭제하는 사이드 폼 뷰와 JS) `group_attributes.repeater_type='manual'` 대응 뷰 `form_side_group_repeater_manual.php` 없음
 - [ ] 페이지 base 폼의 `group_attributes.type='base'` 그룹 뷰(`form_base_group_base.php`) 없음, 미추적 `views/builder/layout/form_group_base.php`는 빈 파일

@@ -313,6 +313,27 @@ function get_admin_form_attributes($item, $form_type = 'side', $form_sub_type = 
         $item['attributes'][$key] = $val;
     }
 
+    // 옵션을 브라우저에서 채우는 방식(option_type api·script)과 옵션 콜백(onload·onchange) → data-option-* (app-page-form.js loadOptionSources)
+    $optionAttr = $item['option_attributes'] ?? [];
+    if(is_array($optionAttr) && count($optionAttr)) {
+        $optionType = $optionAttr['option_type'] ?? '';
+        $optionData = is_array($optionAttr['option_data'] ?? null) ? $optionAttr['option_data'] : [];
+        if($optionType === 'api' && !empty($optionData['url'])) {
+            $item['attributes']['data-option-type'] = 'api';
+            $item['attributes']['data-option-url'] = html_escape((string)$optionData['url']);
+            $item['attributes']['data-option-params'] = html_escape(json_encode($optionData['params'] ?? [], JSON_UNESCAPED_UNICODE));
+            $item['attributes']['data-option-render'] = html_escape(json_encode($optionAttr['render'] ?? [], JSON_UNESCAPED_UNICODE));
+        }elseif($optionType === 'script' && !empty($optionData['function'])) {
+            $item['attributes']['data-option-type'] = 'script';
+            $item['attributes']['data-option-function'] = html_escape((string)$optionData['function']);
+        }
+        foreach (['onload', 'onchange'] as $callback) {
+            if(!empty($optionAttr[$callback]) && is_string($optionAttr[$callback])) {
+                $item['attributes']['data-option-'.$callback] = html_escape($optionAttr[$callback]);
+            }
+        }
+    }
+
     // type & subtype
     $classList[] = 'form-input_'.$item['type'].'-'.$item['subtype'];
 
