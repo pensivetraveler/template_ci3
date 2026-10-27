@@ -81,6 +81,7 @@
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 
 ### 버그
+- [ ] 메뉴 권한·파트너 권한 목록(GET)이 기본 권한 행을 INSERT 함 — 조회가 쓰기를 하고 요청 트랜잭션 밖이며 동시 조회 시 중복 행 가능. 기본 행 생성을 등급·파트너 생성 때나 명시적 초기화(POST)로 옮길지 결정 (2026-10-28 우선 등급·파트너 값 검증만 추가)
 - [ ] `MY_Controller::setToken`이 토큰을 바꿀 때 `created_dt`를 now로 넣지만 저장되지 않는 것으로 보임(bizsoft dev 토큰 created_dt가 첫 발급 값 그대로, #빌더-44 관찰, 원인 미확인 — getValidSetData가 감사 컬럼을 거르는지 확인) → 토큰 교체 시각을 알 수 없고 토큰 유효기간을 둘 수 없음
 - [ ] sysCode 등록에서 cmb_cd를 빼고 보내면 cmb_cd=''로 행이 들어가고 `BuilderCommonTrait::reorderList`에서 Undefined index → 500 (bizsoft #빌더-41 관찰, 화면은 cmb_cd를 보내서 영향 없음) — cmb_cd 필수 검증·reorderList 방어 필요
 - [x] 자동 로그인이 한 번도 동작하지 않음 (2026-10-26, 결함 A): hook이 세션에 user_id만 넣어 `checkLoggedIn`이 token 없음으로 보고 `destroyUserData()`가 세션·autologin 쿠키를 지움 → `MY_Controller::loginWithAutologinCookie`(MY_Builder_WEB 생성자)·`startUserSession`(Auth::login과 공통)으로 옮김

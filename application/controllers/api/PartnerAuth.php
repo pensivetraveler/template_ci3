@@ -52,6 +52,13 @@ class PartnerAuth extends Common
 
     protected function beforeList($data): array
     {
+        // 파트너가 없거나 없는 번호면 기본 행을 만들지 않고 400 (beforeGet 은 isset 만 봄 — bizsoft #bizsoft-1)
+        $partnerId = $data['where']['partner_id'] ?? '';
+        $this->load->model('Model_Partner');
+        if(!is_numeric($partnerId) || !$this->Model_Partner->getCnt(['where' => ['partner_id' => (int)$partnerId]])) {
+            $this->response(['code' => BAD_REQUEST, 'msg' => '파트너를 선택해 주세요.']);
+        }
+
         $baseAuthList = $this->Model_Menu_Auth->getList([], [
             'where' => [
                 'grade_cd' => 'USR002'

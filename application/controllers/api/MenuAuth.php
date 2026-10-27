@@ -37,9 +37,17 @@ class MenuAuth extends Common
 
     protected function beforeList($data): array
     {
+        // 등급이 없거나 없는 코드면 기본 권한 행을 만들지 않고 400 (전에는 grade_cd NULL 로 INSERT 를 시도함 — bizsoft #bizsoft-1)
+        $gradeCd = $data['filter']['where']['grade_cd'] ?? '';
+        $this->load->model('Model_Sys_Code');
+        if(!is_string($gradeCd) || $gradeCd === ''
+            || !$this->Model_Sys_Code->getCnt(['where' => ['big_cd' => 'USR', 'cmb_cd' => $gradeCd]])) {
+            $this->response(['code' => BAD_REQUEST, 'msg' => '등급을 선택해 주세요.']);
+        }
+
         $isDataExist = $this->Model->getCnt([
             'where' => [
-                'grade_cd' => $data['filter']['where']['grade_cd']
+                'grade_cd' => $gradeCd
             ]
         ]) > 0;
 
@@ -59,7 +67,7 @@ class MenuAuth extends Common
 
             foreach ($menuList as $item) {
                 $this->Model->addData([
-                    'grade_cd' => $data['filter']['where']['grade_cd'],
+                    'grade_cd' => $gradeCd,
                     'menu_id' => $item->menu_id,
                     'is_show' => 1,
                     'menu_auth' => $item->base_auth,
