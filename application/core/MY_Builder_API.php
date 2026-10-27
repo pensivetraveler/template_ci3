@@ -396,11 +396,17 @@ class MY_Builder_API extends MY_Controller_API
             // _label=1: 선택형 컬럼(option_attributes 가 있는 list·view 설정)마다 {필드}_label 을 붙인다.
             // 값은 바꾸지 않는다 (화면 JS 는 코드 값으로 셀·체크박스·클릭 동작을 그림). 외부에서 API 를 바로 쓸 때용
             if($this->input->get('_label')) {
+                // list·view 항목에 option_attributes 가 없으면 같은 필드의 form 설정 값을 쓴다 (화면 getListColumns 와 같음)
+                $formOptions = [];
+                foreach ($this->formConfig ?: [] as $formItem) {
+                    if(isset($formItem['field']) && !empty($formItem['option_attributes'])) $formOptions[$formItem['field']] = $formItem['option_attributes'];
+                }
                 foreach ($targetConfig as $item) {
                     $key = $item['field'] ?? '';
-                    if($key === '' || empty($item['option_attributes']) || !property_exists($data, $key)) continue;
-                    if(in_array($item['option_attributes']['option_type'] ?? '', ['api', 'script'], true)) continue;
-                    $options = $this->getCachedOptions($key, $item['option_attributes']);
+                    $optionAttributes = !empty($item['option_attributes']) ? $item['option_attributes'] : ($formOptions[$key] ?? []);
+                    if($key === '' || empty($optionAttributes) || !property_exists($data, $key)) continue;
+                    if(in_array($optionAttributes['option_type'] ?? '', ['api', 'script'], true)) continue;
+                    $options = $this->getCachedOptions($optionAttributes['option_field'] ?? $key, $optionAttributes);
                     $value = $data->{$key};
                     if(is_array($value)) {
                         $data->{$key.'_label'} = array_map(function ($v) use ($options) { return $options[$v] ?? $v; }, $value);

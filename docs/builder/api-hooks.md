@@ -792,7 +792,7 @@ API의 `formConfig`도 화면과 같은 `BuilderColumnsTrait::setFormColumn()`�
 ### 선택형 값 라벨 (2026-10-28)
 
 - 화면은 목록·상세에서 코드 값을 브라우저가 라벨로 바꿔 보여 준다(`getListOptionLabel`, `formatViewValue`). API 응답 값은 코드 그대로다.
-- 외부에서 API를 바로 쓸 때는 `_mode=list|view`와 함께 `_label=1`을 주면, list·view 설정에서 `option_attributes`가 있는 컬럼마다 `{필드}_label`을 붙인다. 값은 바꾸지 않는다. option_type `api`·`script`는 서버에서 옵션을 알 수 없어 뺀다.
+- 외부에서 API를 바로 쓸 때는 `_mode=list|view`와 함께 `_label=1`을 주면, list·view 설정에서 `option_attributes`가 있는 컬럼(없으면 같은 필드의 form 설정 `option_attributes`, 화면 `getListColumns`와 같음)마다 `{필드}_label`을 붙인다. 값은 바꾸지 않는다. option_type `api`·`script`는 서버에서 옵션을 알 수 없어 뺀다.
 - 컨트롤러가 `$transTargetKeys['list'|'view']`를 정하면 지금처럼 그 필드의 값을 라벨로 **바꾼다**(화면에서 쓰면 셀·체크박스가 코드 값을 잃으니 주의).
 - 옵션은 한 요청 안에서 필드마다 한 번만 만든다(`getCachedOptions`).
 
