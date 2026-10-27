@@ -789,3 +789,10 @@ API의 `formConfig`도 화면과 같은 `BuilderColumnsTrait::setFormColumn()`�
 - 되돌리지 못하는 것: 파일 저장소(업로드·삭제·복사), 외부 호출.
 - 한 요청 안에서 쿼리가 한 번 실패하면 같은 요청의 이후 모델 쓰기도 실패로 돌아온다(CI3 트랜잭션 상태가 요청 끝까지 유지됨).
 
+### 선택형 값 라벨 (2026-10-28)
+
+- 화면은 목록·상세에서 코드 값을 브라우저가 라벨로 바꿔 보여 준다(`getListOptionLabel`, `formatViewValue`). API 응답 값은 코드 그대로다.
+- 외부에서 API를 바로 쓸 때는 `_mode=list|view`와 함께 `_label=1`을 주면, list·view 설정에서 `option_attributes`가 있는 컬럼마다 `{필드}_label`을 붙인다. 값은 바꾸지 않는다. option_type `api`·`script`는 서버에서 옵션을 알 수 없어 뺀다.
+- 컨트롤러가 `$transTargetKeys['list'|'view']`를 정하면 지금처럼 그 필드의 값을 라벨로 **바꾼다**(화면에서 쓰면 셀·체크박스가 코드 값을 잃으니 주의).
+- 옵션은 한 요청 안에서 필드마다 한 번만 만든다(`getCachedOptions`).
+

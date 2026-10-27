@@ -314,7 +314,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `builder_filter_config.php::builder_filter_config` `buttons` 키, `app-page-form.js::getFilterData` `filters.text` 사용처 없음 (제거 또는 구현)
 - [x] (2026-10-26 B-1: orderField·orderDir, 서버 getRequestedListOrder, 컬럼 orderable:false로 끔) `app-page-list.js` DataTable `ajax.data`가 `order/columns/search`를 보내지 않음 (`order` 옵션 무의미, 컬럼 정렬·`orderable` 설정 불가 — 서버 정렬 미구현)
 - [x] (2026-10-26 B-2: list properties.paging) `MY_Builder_WEB::setJSVariables` `LIST_PAGING` 항상 `true` 하드코딩 (페이징 끄기 불가)
-- [ ] `MY_Builder_API::transformView` 옵션 텍스트 치환용 `transTargetKeys`를 채우는 API 컨트롤러 없음 (list/view config의 `option_attributes` 라벨 변환 사실상 미동작)
+- [x] (2026-10-28 B-8: `_label=1`이면 `{필드}_label` 추가(값은 그대로 — 화면 JS가 코드 값을 씀), 옵션 요청 단위 캐시. transTargetKeys는 그대로 두고 문서화) `MY_Builder_API::transformView` 옵션 텍스트 치환용 `transTargetKeys`를 채우는 API 컨트롤러 없음 (list/view config의 `option_attributes` 라벨 변환 사실상 미동작)
 
 **view·excel import**
 - [x] `builder-common.js` `appPlugins.view` 훅이 `app-page-view.js::applyViewData`에서 `console.log`만 함 (필드별 커스텀 렌더 불가) → `appPlugins.view[필드](element, value, data, column)` 호출 (2026-10-25)

@@ -74,7 +74,7 @@ class MY_Builder_API extends MY_Controller_API
 
         $this->validateMessages = [];
         $this->validateCallback = [];
-        $this->exceptValidateKeys = ['_mode', '_submode', '_event', '_', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
+        $this->exceptValidateKeys = ['_mode', '_submode', '_event', '_', '_label', 'select', 'format', 'draw', 'pageNo', 'limit', 'searchWord', 'searchCategory', 'filters'];
         $this->transTargetKeys = [];
 
         // /{API 폴더}/... 로 직접 들어오면 web 플랫폼, /{플랫폼}/{API 폴더}/... 면 그 플랫폼
@@ -351,6 +351,20 @@ class MY_Builder_API extends MY_Controller_API
         }
     }
 
+    private array $cachedOptions = [];
+
+    /**
+     * 같은 요청 안에서는 필드별 옵션을 한 번만 만든다 (목록 행마다 getOptions — DB 조회 포함 — 하지 않게)
+     */
+    protected function getCachedOptions(string $field, array $optionAttributes): array
+    {
+        $key = $field.'|'.md5(json_encode($optionAttributes));
+        if(!array_key_exists($key, $this->cachedOptions)) {
+            $this->cachedOptions[$key] = $this->getOptions($field, $optionAttributes);
+        }
+        return $this->cachedOptions[$key];
+    }
+
     protected function transformView($data): object
     {
         if($this->input->get('_mode') && $this->input->get('_mode') !== 'form') {
@@ -374,8 +388,25 @@ class MY_Builder_API extends MY_Controller_API
                     $idx = array_search($key, array_column($targetConfig, 'field'));
                     $item = $targetConfig[$idx];
                     if(!isset($item['option_attributes'])) continue;
-                    $options = $this->getOptions($key, $item['option_attributes']);
+                    $options = $this->getCachedOptions($key, $item['option_attributes']);
                     $data->{$key} = $options[$data->{$key}] ?? $data->{$key};
+                }
+            }
+
+            // _label=1: 선택형 컬럼(option_attributes 가 있는 list·view 설정)마다 {필드}_label 을 붙인다.
+            // 값은 바꾸지 않는다 (화면 JS 는 코드 값으로 셀·체크박스·클릭 동작을 그림). 외부에서 API 를 바로 쓸 때용
+            if($this->input->get('_label')) {
+                foreach ($targetConfig as $item) {
+                    $key = $item['field'] ?? '';
+                    if($key === '' || empty($item['option_attributes']) || !property_exists($data, $key)) continue;
+                    if(in_array($item['option_attributes']['option_type'] ?? '', ['api', 'script'], true)) continue;
+                    $options = $this->getCachedOptions($key, $item['option_attributes']);
+                    $value = $data->{$key};
+                    if(is_array($value)) {
+                        $data->{$key.'_label'} = array_map(function ($v) use ($options) { return $options[$v] ?? $v; }, $value);
+                    }else{
+                        $data->{$key.'_label'} = ($value === null || $value === '') ? '' : ($options[$value] ?? $value);
+                    }
                 }
             }
         }
