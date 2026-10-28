@@ -26,7 +26,7 @@ class SysCfg extends Common
         $cmbCfg = $data['cmb_cfg'] ?? '';
         if($cmbCfg === '') $cmbCfg = $key ?: ($data['big_cfg'] ?? '').'_'.($data['sml_cfg'] ?? '');
         $value = trim((string)($data['cfg_val'] ?? ''));
-        if($cmbCfg === 'auth_token_lifetime' && $value !== '' && !ctype_digit($value)) {
+        if($cmbCfg === 'SYS_AUTH_TOKEN_LIFETIME' && $value !== '' && !ctype_digit($value)) {
             $this->responseError([
                 'location' => __METHOD__,
                 'param' => 'cfg_val',
