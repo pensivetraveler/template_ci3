@@ -42,6 +42,12 @@ CodeIgniter 3 기반 관리자 템플릿이다. 설정 파일(config)만으로 �
    - `PASSWORD_DECRYPTABLE`: `TRUE`면 비밀번호를 복호화 가능한 암호화로, `FALSE`면 해시로 저장한다.
    - `SYSTEM_INSPECTION`, `ALLOWED_IPS`: 점검 모드와 점검 중 허용 IP
 
+### DB 준비
+
+1. 빈 DB에 [docs/schema/schema.sql](docs/schema/schema.sql)(표 구조) → [docs/schema/seed.sql](docs/schema/seed.sql)(기본 코드·환경값) 순서로 실행한다.
+2. 처음 접속하면 설치 화면에서 시스템 관리자(USR000)를 만든다. 설치 화면에 schema.sql을 붙여 넣어 표를 만들 수도 있다(개발 환경만, 표 구조만이라 seed.sql은 따로 실행).
+3. DB 구조를 바꾸면 `schema.sql`과 `docs/migrations/<날짜>-<주제>.sql`을 같이 고친다. 자세한 규칙은 [docs/schema/README.md](docs/schema/README.md)
+
 ---
 
 ## 빌더 구조
