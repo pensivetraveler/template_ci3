@@ -40,7 +40,7 @@
 - [x] 내보내기·가져오기 권한도 같은 검사(export·import 자리)
 - [x] 화면 권한 검사를 API 기준과 맞춤 (`MY_Builder_WEB::setupPlatformPage`·`getPageAuthMode`, 2026-10-25): 목록은 메뉴 표시만, 상세 read|update, 등록 create, 수정 update, 엑셀 import(mode 없으면 method 이름으로), 메뉴가 가리키는 화면(메뉴 method·기준 화면)은 메뉴 표시만(표시 = 첫 화면 열람, bizsoft 트래픽 로그·IP 접근 관리처럼 `000000` 보기 전용 메뉴 유지), 그 안의 화면은 `000000`이어도 검사. `menu_auth.scope_cd`는 읽기만 하고 쓰는 곳 없음(데이터 범위와 연결할지 나중에 결정)
 - [x] 파일 삭제 소유 확인 (`deleteFile_patch`, 2026-10-25): `type`이 모델 파일 필드여야 하고(아니면 엔티티 `deleteOtherFile()`, 없으면 400), 그 행 컬럼에 file_id가 있어야 삭제(아니면 404), 삭제 후 행 컬럼에서 file_id 제거. 게시글 첨부는 `Articles::deleteOtherFile`. 카테고리 아이콘 `list_delete`가 `thumbnail`로 잘못 지정돼 있던 것 수정
-- [ ] 파일 다운로드(`downloader/{file_id}`)도 소속 확인 없음. 단 파일이 웹에서 바로 열리는 `public/uploads/`에 있어 다운로드만 막아도 주소로 열림 → 저장 위치를 웹 밖으로 옮기는 작업과 함께 결정
+- [ ] (2026-10-28 결정: 업로드는 공개 주소(public/uploads·S3 CDN)가 설계 — 비공개가 필요한 프로젝트가 생기면 필드별 비공개 저장소 옵션(서명된 URL·권한 확인 다운로드)을 추가) 파일 다운로드(`downloader/{file_id}`)도 소속 확인 없음. 단 파일이 웹에서 바로 열리는 `public/uploads/`에 있어 다운로드만 막아도 주소로 열림 → 저장 위치를 웹 밖으로 옮기는 작업과 함께 결정
 - [x] `users` API 본인 제한 (`api/Users.php`, 2026-10-25): 시스템 관리자가 아니면 목록·이름 있는 GET 허용(목록이 필요하다는 결정), 단건 조회·수정은 본인만, 수정 때 등급·상태·아이디·API 키(`$selfProtectedFields`)는 저장 안 함, 등록·삭제·이름 있는 쓰기 403. 비밀번호 변경은 내 정보에서 계속 허용
 - [x] 데이터 범위 공통 장치 `getDataScope()`·`$scopeFields` (2026-10-25): 목록·내보내기 조건, 식별자 지정 행(단건·수정·삭제)·등록/수정 값·엑셀 행 검사, 범위 밖 404 (결정: 404 / bizsoft는 프레임 계열만 / 엔티티 속성으로 지정). 발견: 내보내기는 `beforeList`를 거치지 않아 목록 범위가 적용되지 않았음
 
@@ -74,15 +74,15 @@
 - [x] 로그인·아이디/비밀번호 찾기 시도 횟수 제한 (2026-10-26): IP별 60초 10회(`api_method_config` limit·time). RestController가 API 키 없는 요청은 limit을 검사하지 않았고(IP_ADDRESS 방식일 때만), 빈 키로 세면 모든 사용자가 한 카운터를 같이 썼음 → 키가 없으면 IP로 셈. 로드밸런서 뒤에서는 `PROXY_IPS`가 설정돼 있어야 사용자 IP로 셈(아니면 LB IP 하나로 묶여 전체가 막힘). 요청 로그(log)는 비밀번호가 평문 저장되므로 끈 채 둠 — 제한 표 `tbl_user_limits`는 uri·api_key 컬럼이 필요(bizsoft는 예전 구조 url이라 로그인 500, #빌더-44). 맞추는 SQL: `docs/migrations/2026-10-27-rest-user-limits.sql`. 구조가 다르면 RestController가 제한만 건너뛰고 오류 로그(요청은 막지 않음)
 - [ ] XSS: 목록 셀 렌더링(`app-page-list.js` `innerHTML`, inline `onclick`), 뷰 출력 `html_escape` 미사용 (추가: `renderColumn` text 셀, 반응형 `responsive.details.renderer`, `getColumnOnclick` redirect/download/view의 `location.href`/`window.open` 문자열(`javascript:` URL 포함), checkbox·select 셀 inline `onchange`의 식별자 값, `app-page-view.js::applyViewData` `SPAN.innerHTML`) (추가 2026-10-25: 상세 보기 `app-page-view.js`는 textContent로 넣도록 수정됨)
     - [x] 목록 셀(`app-page-list.js`): 값은 텍스트 노드·`setAttribute`로, inline `onclick`/`onchange` 대신 `data-cell-click`·`data-onchange` + 위임 이벤트(`bindListCellEvents`), 이동 URL의 `javascript:`·`data:` 스킴 차단, 메뉴 권한 체크박스(`app-page-menu-auth.js`)도 같은 방식 (2026-10-25)
-    - [ ] 남은 것: PHP 뷰 출력 `html_escape` 미사용, 화면별 커스텀 렌더러가 `renderColumnHTML`에 HTML 문자열을 넘기는 경우(호환용으로 문자열도 받음)
+    - [ ] 남은 것: (2026-10-28 DB 값을 그대로 내던 시스템 설정·시스템 코드·왼쪽 메뉴는 html_escape 처리, 나머지 raw 출력은 개발자 설정 값) PHP 뷰 출력 `html_escape` 미사용, 화면별 커스텀 렌더러가 `renderColumnHTML`에 HTML 문자열을 넘기는 경우(호환용으로 문자열도 받음)
 - [x] ~~XSS: `views/module/player.php`~~ → 템플릿에 없는 bizsoft 전용 파일 (2026-10-26 bizsoft 세션에 넘김)
-- [ ] 인증 토큰이 JS 전역(`common.HOOK_PHPTOJS_VAR_TOKEN`)에 노출, 32곳 이상에서 개별 주입
+- [ ] 인증 토큰이 JS 전역(`common.HOOK_PHPTOJS_VAR_TOKEN`)에 노출, 32곳 이상에서 개별 주입 — (2026-10-28 결정: REST 인증 방식 교체(HttpOnly 쿠키 + CSRF)는 TODO로 보류. 먼저 토큰 유효기간(발급 시각 created_dt 저장은 고침, 마지막 사용 시각·만료 정책은 미정))
 - [x] `module/File.php` 파일 편집기 (2026-10-26): 로그인만 하면 편집 가능하던 것을 시스템 관리자 또는 `file_editor_menu` 메뉴 update 권한자로 제한(`canUseFileEditor`·`getFileEditorMenuAuth`, CACHING_MENU=false면 시스템 관리자만), 기본 편집 범위 `[]`(꺼짐, 쓰는 프로젝트만 `file_editor_roots` 설정), svg 업로드 제외·`getimagesize`/MIME 검사, 백업을 `application/cache/file_backups/`로
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 
 ### 버그
 - [x] (2026-10-28 결정 ①: 목록은 읽기만 — 행 없는 메뉴는 보임 0·000000으로 계산해 표시, 실제 권한도 접근 불가 유지. "기본 권한으로 채우기" 버튼(fillDefault_post), 수정 때 행이 없으면 먼저 만듦, 템플릿 MenuAuth의 partner_auth truncate를 trimPartnerAuth로) 메뉴 권한·파트너 권한 목록(GET)이 기본 권한 행을 INSERT 함 — 조회가 쓰기를 하고 요청 트랜잭션 밖이며 동시 조회 시 중복 행 가능. 기본 행 생성을 등급·파트너 생성 때나 명시적 초기화(POST)로 옮길지 결정 (2026-10-28 우선 등급·파트너 값 검증만 추가)
-- [ ] `MY_Controller::setToken`이 토큰을 바꿀 때 `created_dt`를 now로 넣지만 저장되지 않는 것으로 보임(bizsoft dev 토큰 created_dt가 첫 발급 값 그대로, #빌더-44 관찰, 원인 미확인 — getValidSetData가 감사 컬럼을 거르는지 확인) → 토큰 교체 시각을 알 수 없고 토큰 유효기간을 둘 수 없음
+- [x] (2026-10-28: 원인 — Model_User_Token 저장 가능 컬럼에 created_dt가 없어 수정 때 걸러짐 → nullList에 추가) `MY_Controller::setToken`이 토큰을 바꿀 때 `created_dt`를 now로 넣지만 저장되지 않는 것으로 보임(bizsoft dev 토큰 created_dt가 첫 발급 값 그대로, #빌더-44 관찰, 원인 미확인 — getValidSetData가 감사 컬럼을 거르는지 확인) → 토큰 교체 시각을 알 수 없고 토큰 유효기간을 둘 수 없음
 - [ ] sysCode 등록에서 cmb_cd를 빼고 보내면 cmb_cd=''로 행이 들어가고 `BuilderCommonTrait::reorderList`에서 Undefined index → 500 (bizsoft #빌더-41 관찰, 화면은 cmb_cd를 보내서 영향 없음) — cmb_cd 필수 검증·reorderList 방어 필요
 - [x] 자동 로그인이 한 번도 동작하지 않음 (2026-10-26, 결함 A): hook이 세션에 user_id만 넣어 `checkLoggedIn`이 token 없음으로 보고 `destroyUserData()`가 세션·autologin 쿠키를 지움 → `MY_Controller::loginWithAutologinCookie`(MY_Builder_WEB 생성자)·`startUserSession`(Auth::login과 공통)으로 옮김
 - [x] 자동 로그인 체크박스가 제출 때 풀림 (결함 B, 2026-10-26): 스크립트 로드 중 체크한 것을 `app-page-auth.js`의 `resetFrmInputs()`가 지움(bizsoft #빌더-31 trace 확인) → 로그인 계열 화면에서 초기화 호출 제거

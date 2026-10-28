@@ -21,7 +21,7 @@
                         </button>
                     </li>
                     <?php foreach ($category as $i=>$item): ?>
-                    <li class="nav-item" data-id="<?=$item->big_cd?>">
+                    <li class="nav-item" data-id="<?=html_escape($item->big_cd)?>">
                         <button
                                 type="button"
                                 class="nav-link py-6"
@@ -31,7 +31,7 @@
                                 aria-controls="navs-justified-list"
                                 aria-selected="false">
                         <span class="d-none d-sm-block">
-                            <?=$item->cd_name?> (<?=$item->big_cd?>)
+                            <?=html_escape($item->cd_name)?> (<?=html_escape($item->big_cd)?>)
                         </span>
                         </button>
                     </li>

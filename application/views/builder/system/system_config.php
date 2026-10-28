@@ -52,19 +52,19 @@
 				<div class="tab-pane" id="navs-justified-config" role="tabpanel">
 					<?php foreach ($data as $bigCfg=>$list): ?>
 					<div class="p-4 mb-4">
-						<h5 class="text-primary fw-bolder"><?=$bigCfg?></h5>
+						<h5 class="text-primary fw-bolder"><?=html_escape($bigCfg)?></h5>
 						<?php foreach ($list as $item): ?>
 						<div class="row mb-3">
-							<label for="form_page-family_name" class="col-sm-2 col-form-label"><?=$item['cfg_name']?></label>
+							<label for="form_page-family_name" class="col-sm-2 col-form-label"><?=html_escape($item['cfg_name'])?></label>
 							<div class="col-sm-10">
 								<div class="input-group input-group-merge">
-									<input type="<?=$item['cfg_type']==='password'?'password':'text'?>" name="<?=$item['cmb_cfg']?>" value="<?=$item['cfg_val']?>" id="<?=$item['cmb_cfg']?>" class="form-control dt-family_name form-input_base form-input_text-base" readonly>
+									<input type="<?=$item['cfg_type']==='password'?'password':'text'?>" name="<?=html_escape($item['cmb_cfg'])?>" value="<?=html_escape($item['cfg_val'])?>" id="<?=html_escape($item['cmb_cfg'])?>" class="form-control dt-family_name form-input_base form-input_text-base" readonly>
 									<?php if($isSystemAdmin): ?>
-									<span class="input-group-text text-primary cursor-pointer edit-record" data-id="<?=$item['cmb_cfg']?>"><i class="ri-edit-box-line"></i></span>
-									<span class="input-group-text text-danger cursor-pointer delete-record" data-id="<?=$item['cmb_cfg']?>"><i class="ri-close-circle-fill"></i></span>
+									<span class="input-group-text text-primary cursor-pointer edit-record" data-id="<?=html_escape($item['cmb_cfg'])?>"><i class="ri-edit-box-line"></i></span>
+									<span class="input-group-text text-danger cursor-pointer delete-record" data-id="<?=html_escape($item['cmb_cfg'])?>"><i class="ri-close-circle-fill"></i></span>
 									<?php endif; ?>
 								</div>
-								<div class="form-text ms-1 <?=!$item['cfg_desc']?'d-none':''?>"><?=$item['cfg_desc']?></div>
+								<div class="form-text ms-1 <?=!$item['cfg_desc']?'d-none':''?>"><?=html_escape($item['cfg_desc'])?></div>
 							</div>
 						</div>
 						<?php endforeach; ?>
