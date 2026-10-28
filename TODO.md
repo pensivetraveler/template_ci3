@@ -81,6 +81,8 @@
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 
 ### 버그
+- [x] (2026-10-28, bizsoft #빌더-49 관찰) `MY_Builder_API::setData`가 문자열 컬럼(`strList`)에서 `empty($value)`로 '0'·0까지 ''로 바꿔, 환경값 화면에서 토큰 유효 시간 0(만료 없음)을 저장할 수 없었음 → 숫자 값은 남기고 null·''·false·[]만 ''로
+- [ ] `user_autologin` 행이 계정마다 쌓임(bizsoft dev 계정 23행): `destroyUserData`는 지금 쿠키의 행만 지우고, 쿠키를 지우지 않고 버린 브라우저·만료된 행은 남음 — 만료 행 정리(로그인 때 같은 user_id의 오래된 행 삭제 등) 검토
 - [x] (2026-10-28 결정 ①: 목록은 읽기만 — 행 없는 메뉴는 보임 0·000000으로 계산해 표시, 실제 권한도 접근 불가 유지. "기본 권한으로 채우기" 버튼(fillDefault_post), 수정 때 행이 없으면 먼저 만듦, 템플릿 MenuAuth의 partner_auth truncate를 trimPartnerAuth로) 메뉴 권한·파트너 권한 목록(GET)이 기본 권한 행을 INSERT 함 — 조회가 쓰기를 하고 요청 트랜잭션 밖이며 동시 조회 시 중복 행 가능. 기본 행 생성을 등급·파트너 생성 때나 명시적 초기화(POST)로 옮길지 결정 (2026-10-28 우선 등급·파트너 값 검증만 추가)
 - [x] (2026-10-28: 원인 — Model_User_Token 저장 가능 컬럼에 created_dt가 없어 수정 때 걸러짐 → nullList에 추가) `MY_Controller::setToken`이 토큰을 바꿀 때 `created_dt`를 now로 넣지만 저장되지 않는 것으로 보임(bizsoft dev 토큰 created_dt가 첫 발급 값 그대로, #빌더-44 관찰, 원인 미확인 — getValidSetData가 감사 컬럼을 거르는지 확인) → 토큰 교체 시각을 알 수 없고 토큰 유효기간을 둘 수 없음
 - [ ] sysCode 등록에서 cmb_cd를 빼고 보내면 cmb_cd=''로 행이 들어가고 `BuilderCommonTrait::reorderList`에서 Undefined index → 500 (bizsoft #빌더-41 관찰, 화면은 cmb_cd를 보내서 영향 없음) — cmb_cd 필수 검증·reorderList 방어 필요

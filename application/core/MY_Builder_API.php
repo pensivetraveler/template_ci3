@@ -613,7 +613,8 @@ class MY_Builder_API extends MY_Controller_API
             }
 
             if(!is_object($value) && !is_array($value)) $data[$field] = trim(preg_replace('/\s\s+/', ' ', $value));
-            if(in_array($field, $model->strList) && empty($value)) $data[$field] = '';
+            // 빈 값(null·''·false·[])만 ''로 맞춘다. empty()는 '0'·0 도 비워서 문자열 컬럼에 0 을 저장할 수 없었음
+            if(in_array($field, $model->strList) && empty($value) && !is_numeric($value)) $data[$field] = '';
             if(in_array($field, $model->intList)) {
                 if(array_key_exists($field, $data)) {
                     $data[$field] = (int)$data[$field];
