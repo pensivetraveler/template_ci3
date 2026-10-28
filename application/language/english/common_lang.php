@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 $lang['Incorrect Access'] = 'This is an invalid access.';
+$lang['Session expired'] = 'Your session has expired. Please log in again.';
 $lang['Logged in elsewhere'] = 'You have been logged out because this account signed in elsewhere.';
 $lang['Token Expired'] = 'The token has expired.';
 $lang['Invalid Token'] = 'The token is invalid.';

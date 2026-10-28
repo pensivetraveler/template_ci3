@@ -264,3 +264,32 @@ if ( ! function_usable('recursive_ksort')) {
         unset($value);
     }
 }
+
+if ( ! function_exists('token_lifetime'))
+{
+    /**
+     * 인증 토큰 유효 시간(초). .env TOKEN_LIFETIME, 기본 12시간(43200), 0 이면 만료 없음
+     */
+    function token_lifetime(): int
+    {
+        $value = getenv('TOKEN_LIFETIME');
+        if ($value === false || $value === '') return 43200;
+        return max(0, (int)$value);
+    }
+}
+
+if ( ! function_exists('is_token_expired'))
+{
+    /**
+     * 발급 시각(user_token.created_dt)부터 token_lifetime() 이 지났는지 (발급 후 고정 시간 방식)
+     */
+    function is_token_expired($createdDt): bool
+    {
+        $lifetime = token_lifetime();
+        if ($lifetime === 0) return false;
+        $issued = $createdDt ? strtotime((string)$createdDt) : false;
+        if ($issued === false) return true;
+        return $issued + $lifetime < time();
+    }
+}
+

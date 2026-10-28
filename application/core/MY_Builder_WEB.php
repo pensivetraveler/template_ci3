@@ -41,6 +41,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
     public bool $isSystemAdmin = false;
     public array $errors = [];
     public bool $methodNotInRoute = false;
+    protected bool $tokenExpired = false;
 
 
     public function __construct()
@@ -48,6 +49,12 @@ class MY_Builder_WEB extends MY_Controller_WEB
         parent::__construct();
 
         $this->config->load('extra/autologin_config', false);
+
+        // 토큰이 만료(TOKEN_LIFETIME)됐으면 로그인 값만 지우고, 자동 로그인 쿠키가 있으면 아래에서 새 토큰을 받는다
+        if($this->session->userdata('token') && $this->getSessionTokenState() === 'expired') {
+            $this->clearLoginSession();
+            $this->tokenExpired = true;
+        }
 
         // 세션이 없으면 자동 로그인 쿠키로 먼저 로그인. 생성자에서 해야 post_controller_constructor hook(setPHPVars)이
         // 새 토큰을 화면 JS 에 넣고, _remap 의 checkLoggedIn 이 로그인으로 본다
@@ -1240,7 +1247,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         if(!$this->isLoggedIn && !$this->routeConfig['properties']['allowNoLogin']) {
             $this->destroyUserData();
-            alert(lang('Login Needed'), base_url($this->noLoginRedirect));
+            // 토큰 만료로 끊긴 경우는 안내 문구를 다르게
+            alert(lang($this->tokenExpired && !$this->session->userdata('token') ? 'Session expired' : 'Login Needed'), base_url($this->noLoginRedirect));
         }
     }
 

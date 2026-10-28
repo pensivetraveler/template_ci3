@@ -626,14 +626,33 @@ class MY_Controller extends CI_Controller
      */
     protected function isSessionTokenCurrent(): bool
     {
+        return $this->getSessionTokenState() === 'current';
+    }
+
+    /**
+     * 세션 토큰 상태: none(세션에 없음) | replaced(다른 곳 로그인으로 바뀜) | expired(TOKEN_LIFETIME 지남) | current
+     */
+    protected function getSessionTokenState(): string
+    {
         $token = $this->session->userdata('token');
         $userId = $this->session->userdata('user_id');
-        if(!$token || !$userId) return false;
+        if(!$token || !$userId) return 'none';
 
-        return $this->Model_User_Token->getCntWhere([
-            'user_id' => $userId,
-            'token' => $token,
-        ]) > 0;
+        $row = $this->Model_User_Token->getDataWhere(['token', 'created_dt'], ['user_id' => $userId]);
+        if(!is_object($row) || (string)$row->token !== (string)$token) return 'replaced';
+        if(is_token_expired($row->created_dt ?? null)) return 'expired';
+
+        return 'current';
+    }
+
+    /**
+     * 만료된 세션의 로그인 값만 지운다 (자동 로그인 쿠키는 남겨 새 토큰을 받을 수 있게)
+     */
+    protected function clearLoginSession(): void
+    {
+        foreach (['name', 'id', 'user_id', 'user_cd', 'is_sys_admin', 'is_admin', 'token'] as $key) {
+            $this->session->unset_userdata($key);
+        }
     }
 
     /**

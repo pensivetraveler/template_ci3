@@ -796,3 +796,10 @@ API의 `formConfig`도 화면과 같은 `BuilderColumnsTrait::setFormColumn()`�
 - 컨트롤러가 `$transTargetKeys['list'|'view']`를 정하면 지금처럼 그 필드의 값을 라벨로 **바꾼다**(화면에서 쓰면 셀·체크박스가 코드 값을 잃으니 주의).
 - 옵션은 한 요청 안에서 필드마다 한 번만 만든다(`getCachedOptions`).
 
+### 인증 토큰 유효기간 (2026-10-28)
+
+- 로그인할 때 발급하는 토큰(`user_token`, `MY_Controller::setToken`)은 발급 시각(`created_dt`)부터 `.env` `TOKEN_LIFETIME`초(기본 43200 = 12시간, 0이면 만료 없음)가 지나면 만료된다(`common_helper` `is_token_expired`). 쓰는 동안 늘어나지 않는다(발급 후 고정 시간).
+- API: API 키 검사가 켜져 있으면(`rest_enable_keys`, 운영) 만료 토큰은 키가 없는 것과 같다(`RestController::_detect_api_key`).
+- 화면: `MY_Builder_WEB` 생성자가 만료를 보면 로그인 값만 지우고(`clearLoginSession`), 자동 로그인 쿠키가 있으면 새 토큰으로 다시 로그인한다. 없으면 "로그인 유효 시간이 지나 로그아웃되었습니다" 후 로그인 화면.
+- 다른 곳 로그인으로 토큰이 바뀐 경우(`getSessionTokenState` replaced)는 지금처럼 "다른 곳에서 같은 계정으로 로그인" 안내.
+
