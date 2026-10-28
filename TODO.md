@@ -76,7 +76,7 @@
     - [x] 목록 셀(`app-page-list.js`): 값은 텍스트 노드·`setAttribute`로, inline `onclick`/`onchange` 대신 `data-cell-click`·`data-onchange` + 위임 이벤트(`bindListCellEvents`), 이동 URL의 `javascript:`·`data:` 스킴 차단, 메뉴 권한 체크박스(`app-page-menu-auth.js`)도 같은 방식 (2026-10-25)
     - [ ] 남은 것: (2026-10-28 DB 값을 그대로 내던 시스템 설정·시스템 코드·왼쪽 메뉴는 html_escape 처리, 나머지 raw 출력은 개발자 설정 값) PHP 뷰 출력 `html_escape` 미사용, 화면별 커스텀 렌더러가 `renderColumnHTML`에 HTML 문자열을 넘기는 경우(호환용으로 문자열도 받음)
 - [x] ~~XSS: `views/module/player.php`~~ → 템플릿에 없는 bizsoft 전용 파일 (2026-10-26 bizsoft 세션에 넘김)
-- [ ] 인증 토큰이 JS 전역(`common.HOOK_PHPTOJS_VAR_TOKEN`)에 노출, 32곳 이상에서 개별 주입 — (2026-10-28 결정: REST 인증 방식 교체(HttpOnly 쿠키 + CSRF)는 TODO로 보류. 토큰 유효기간은 구현 — 발급 후 고정 시간(TOKEN_LIFETIME, 기본 12시간, 0=만료 없음), API 키 검사·화면 모두, 화면은 만료 시 자동 로그인 쿠키로 새 토큰)
+- [ ] 인증 토큰이 JS 전역(`common.HOOK_PHPTOJS_VAR_TOKEN`)에 노출, 32곳 이상에서 개별 주입 — (2026-10-28 결정: REST 인증 방식 교체(HttpOnly 쿠키 + CSRF)는 TODO로 보류. 토큰 유효기간은 구현 — 발급 후 고정 시간(관리자 환경값 auth_token_lifetime → .env TOKEN_LIFETIME → 기본 12시간, 0=만료 없음), API 키 검사·화면 모두, 화면은 만료 시 자동 로그인 쿠키로 새 토큰)
 - [x] `module/File.php` 파일 편집기 (2026-10-26): 로그인만 하면 편집 가능하던 것을 시스템 관리자 또는 `file_editor_menu` 메뉴 update 권한자로 제한(`canUseFileEditor`·`getFileEditorMenuAuth`, CACHING_MENU=false면 시스템 관리자만), 기본 편집 범위 `[]`(꺼짐, 쓰는 프로젝트만 `file_editor_roots` 설정), svg 업로드 제외·`getimagesize`/MIME 검사, 백업을 `application/cache/file_backups/`로
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 

@@ -630,7 +630,7 @@ class MY_Controller extends CI_Controller
     }
 
     /**
-     * 세션 토큰 상태: none(세션에 없음) | replaced(다른 곳 로그인으로 바뀜) | expired(TOKEN_LIFETIME 지남) | current
+     * 세션 토큰 상태: none(세션에 없음) | replaced(다른 곳 로그인으로 바뀜) | expired(token_lifetime() 지남) | current
      */
     protected function getSessionTokenState(): string
     {

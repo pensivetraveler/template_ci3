@@ -1055,7 +1055,7 @@ abstract class RestController extends \MY_Controller {
                 return FALSE;
             }
 
-            // 발급 후 TOKEN_LIFETIME 이 지난 토큰은 받지 않는다 (common_helper is_token_expired, 0 이면 만료 없음)
+            // 발급 후 token_lifetime() 이 지난 토큰은 받지 않는다 (common_helper is_token_expired, 0 이면 만료 없음)
             if (property_exists($row, 'created_dt') && function_exists('is_token_expired') && is_token_expired($row->created_dt))
             {
                 return FALSE;

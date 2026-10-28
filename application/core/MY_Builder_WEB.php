@@ -50,7 +50,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $this->config->load('extra/autologin_config', false);
 
-        // 토큰이 만료(TOKEN_LIFETIME)됐으면 로그인 값만 지우고, 자동 로그인 쿠키가 있으면 아래에서 새 토큰을 받는다
+        // 토큰이 만료(token_lifetime())됐으면 로그인 값만 지우고, 자동 로그인 쿠키가 있으면 아래에서 새 토큰을 받는다
         if($this->session->userdata('token') && $this->getSessionTokenState() === 'expired') {
             $this->clearLoginSession();
             $this->tokenExpired = true;

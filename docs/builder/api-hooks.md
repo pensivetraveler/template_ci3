@@ -798,7 +798,9 @@ API의 `formConfig`도 화면과 같은 `BuilderColumnsTrait::setFormColumn()`�
 
 ### 인증 토큰 유효기간 (2026-10-28)
 
-- 로그인할 때 발급하는 토큰(`user_token`, `MY_Controller::setToken`)은 발급 시각(`created_dt`)부터 `.env` `TOKEN_LIFETIME`초(기본 43200 = 12시간, 0이면 만료 없음)가 지나면 만료된다(`common_helper` `is_token_expired`). 쓰는 동안 늘어나지 않는다(발급 후 고정 시간).
+- 로그인할 때 발급하는 토큰(`user_token`, `MY_Controller::setToken`)은 발급 시각(`created_dt`)부터 유효 시간(초, 0이면 만료 없음)가 지나면 만료된다(`common_helper` `is_token_expired`). 쓰는 동안 늘어나지 않는다(발급 후 고정 시간).
+- 유효 시간은 `common_helper` `token_lifetime()`이 시스템 환경값(`tbl_sys_cfg` `auth_token_lifetime`, 관리자 > 시스템 > 환경값 설정) → `.env` `TOKEN_LIFETIME` → 43200(12시간) 순서로 정한다. 환경값이 비었거나 숫자가 아니면 다음으로 넘어간다(숫자가 아니면 error 로그). 저장할 때 `api/SysCfg`가 0 이상 정수만 받는다. 행은 `docs/migrations/2026-10-28-sys-cfg-token-lifetime.sql`로 넣는다.
+- 값을 바꾸면 다음 요청부터 이미 발급된 토큰에도 적용된다(발급 시각 기준이라 줄이면 바로 만료될 수 있음).
 - API: API 키 검사가 켜져 있으면(`rest_enable_keys`, 운영) 만료 토큰은 키가 없는 것과 같다(`RestController::_detect_api_key`).
 - 화면: `MY_Builder_WEB` 생성자가 만료를 보면 로그인 값만 지우고(`clearLoginSession`), 자동 로그인 쿠키가 있으면 새 토큰으로 다시 로그인한다. 없으면 "로그인 유효 시간이 지나 로그아웃되었습니다" 후 로그인 화면.
 - 다른 곳 로그인으로 토큰이 바뀐 경우(`getSessionTokenState` replaced)는 지금처럼 "다른 곳에서 같은 계정으로 로그인" 안내.

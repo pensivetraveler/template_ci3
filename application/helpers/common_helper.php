@@ -268,13 +268,32 @@ if ( ! function_usable('recursive_ksort')) {
 if ( ! function_exists('token_lifetime'))
 {
     /**
-     * 인증 토큰 유효 시간(초). .env TOKEN_LIFETIME, 기본 12시간(43200), 0 이면 만료 없음
+     * 인증 토큰 유효 시간(초), 0 이면 만료 없음.
+     * 시스템 환경값(tbl_sys_cfg auth_token_lifetime, 관리자 > 시스템 > 환경값 설정) → .env TOKEN_LIFETIME → 기본 12시간(43200).
+     * 환경값이 비었거나 숫자가 아니면 다음 순서로 넘어간다. 한 요청 안에서는 한 번만 읽는다
      */
     function token_lifetime(): int
     {
-        $value = getenv('TOKEN_LIFETIME');
-        if ($value === false || $value === '') return 43200;
-        return max(0, (int)$value);
+        static $lifetime = null;
+        if ($lifetime !== null) return $lifetime;
+
+        $value = null;
+        $CI =& get_instance();
+        if (isset($CI->db)) {
+            $row = $CI->db->select('cfg_val')->where('cmb_cfg', 'auth_token_lifetime')->get('sys_cfg')->row();
+            $value = $row ? trim((string)$row->cfg_val) : null;
+            if ($value !== null && $value !== '' && !ctype_digit($value)) {
+                log_message('error', 'sys_cfg auth_token_lifetime is not a number: '.$value);
+                $value = null;
+            }
+        }
+
+        if ($value === null || $value === '') {
+            $value = getenv('TOKEN_LIFETIME');
+            if ($value === false || $value === '') $value = 43200;
+        }
+
+        return $lifetime = max(0, (int)$value);
     }
 }
 
