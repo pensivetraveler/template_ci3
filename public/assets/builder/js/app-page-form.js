@@ -761,18 +761,14 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
                         // setFormListItem(`#${id}`, data[fieldName], field);
                         break;
                     case 'dropzone-full' :
+                    case 'dropzone-single' :
+                        // 기존 파일을 그 필드의 드롭존에 미리보기로 (전에는 thumbnail 필드 고정)
                         setTimeout(() => {
                             if(data[fieldName] === undefined) console.warn(`applyFrmValues : data doesn't have '${name}'.`);
-                            if(data[fieldName]) {
-                                const inst = Dropzone.instances.find((item) => item.element.getAttribute('data-field') === 'thumbnail');
-                                const mockFile = {
-                                    name: data[fieldName][0].file_name,
-                                    size: data[fieldName][0].file_size,
-                                    accepted: true,
-                                };
-                                inst.displayExistingFile(mockFile, data[fieldName][0].file_link)
-                                inst.mockup = true;
-                            }
+                            const files = isArray(data[fieldName]) ? data[fieldName] : (data[fieldName] ? [data[fieldName]] : []);
+                            const inst = window['Dropzone'] ? Dropzone.instances.find((item) => item.element.getAttribute('data-field') === fieldName) : null;
+                            if(!inst || !files.length || !files[0].file_id) return;
+                            setDropzoneExistingFile(inst, files[0], fieldName);
                         },0);
                         break;
                     default :

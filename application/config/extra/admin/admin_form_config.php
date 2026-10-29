@@ -709,22 +709,19 @@ $config['form_articles_config'] = [
         ],
     ],
     [
+        // 파일 하나 드롭존: 미리보기로 보여 주고 바꾸기·지우기 (form_base_custom_dropzone-single.php)
         'field' => 'thumbnail',
         'label' => 'lang:article.thumbnail',
         'form' => true,
         'rules' => 'trim',
         'errors' => [],
         'category' => 'base',
-        'type' => 'file',
+        'type' => 'custom',
+        'subtype' => 'dropzone-single',
         'icon' => null,
         // 서버 허용 형식(custom_upload_config thumbnail_upload_config)과 같게
         'attributes' => [
             'accept' => 'image/jpeg,image/png,image/gif',
-            'extension' => 'jpg,jpeg,png,gif',
-        ],
-        'form_attributes' => [
-            'with_list' => true,
-            'list_delete' => 'thumbnail',
         ],
     ],
     [

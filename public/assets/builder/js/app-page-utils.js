@@ -585,7 +585,9 @@ function setDropzone(node, addOptions = {}, previewTemplate = '') {
                     .filter(attr => attr.name.startsWith('dz-') && attr.value !== '')
                     .reduce((acc, attr) => {
                         const name = camelize(attr.name.replace('dz-',''));
-                        acc[name] = isNaN(attr.value)?attr.value:parseInt(attr.value);
+                        // 'true'·'false' 는 문자열이면 항상 참이라 불리언으로
+                        if(attr.value === 'true' || attr.value === 'false') acc[name] = attr.value === 'true';
+                        else acc[name] = isNaN(attr.value)?attr.value:parseInt(attr.value);
                         return acc;
                     }, {}),
                 addOptions
@@ -595,7 +597,8 @@ function setDropzone(node, addOptions = {}, previewTemplate = '') {
             new Dropzone(node,
                 Object.assign({
                     url: node.closest('form').action,
-                    autoProcessQueue: true,
+                    // 파일은 폼 저장 때 getFormData() 가 함께 보낸다 (자동 업로드하면 페이지 주소로 따로 POST 됨)
+                    autoProcessQueue: false,
                     thumbnailWidth: null,
                     thumbnailHeight: null,
                     previewTemplate: previewTemplate,
@@ -611,14 +614,17 @@ function setDropzone(node, addOptions = {}, previewTemplate = '') {
                             console.log("업로드 실패:", errorMessage);
                         });
                         this.on('addedfile', function (file) {
-                            console.log("파일 추가");
-
-                            // if (this.files.length > 1) {
-                            // 	this.removeFile(this.files[0]);
-                            // }
+                            // 한 개만 받는 드롭존(maxFiles 1)은 새 파일로 바꾼다: 고른 파일·기존 파일 미리보기를 모두 뺀다
+                            if(this.options.maxFiles === 1) {
+                                this.files.filter((item) => item !== file).forEach((item) => this.removeFile(item));
+                                if(this.existingFile) {
+                                    this.existingFile.previewElement?.remove();
+                                    this.existingFile = null;
+                                }
+                            }
 
                             const previewContainer = this.element.querySelector('.dropzone-file-container');
-                            previewContainer.appendChild(file.previewElement); // 이미지 미리보기만 추가
+                            if(previewContainer && file.previewElement) previewContainer.appendChild(file.previewElement); // 이미지 미리보기만 추가
                         });
                         this.on("sending", function (file, errorMessage) {
                             console.log("업로드");
@@ -628,6 +634,48 @@ function setDropzone(node, addOptions = {}, previewTemplate = '') {
             );
         }
     }
+}
+
+/**
+ * 수정 화면: 저장된 파일을 드롭존에 미리보기로 보여 주고, 미리보기에서 지우면 서버 파일도 지운다
+ * (deleteFile/{행 id}?type={field}, 본문 file_id)
+ */
+function setDropzoneExistingFile(inst, item, fieldName) {
+    const mockFile = {
+        name: item.orig_name ?? item.file_name,
+        size: Math.round(parseFloat(item.file_size ?? 0) * 1024),
+        accepted: true,
+        file_id: item.file_id,
+    };
+    inst.displayExistingFile(mockFile, item.file_link);
+    inst.existingFile = mockFile;
+
+    const removeLink = mockFile.previewElement?.querySelector('[data-dz-remove]');
+    if(!removeLink) return;
+    removeLink.addEventListener('click', function (e) {
+        // Dropzone 기본 삭제(미리보기만 뺌) 대신 서버에서 지운 뒤 뺀다
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        executeAjax({
+            url : getUrlWithIdentifiers(common.API_URI + '/deleteFile', common.KEY, {type: fieldName}),
+            headers : {
+                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+            },
+            method : 'patch',
+            data : {
+                file_id : mockFile.file_id,
+            },
+            success: function(response) {
+                mockFile.previewElement?.remove();
+                inst.existingFile = null;
+                showAlert({
+                    type: 'success',
+                    title: 'Complete',
+                    text: response.msg,
+                });
+            },
+        });
+    }, {capture: true});
 }
 
 function setColorisValue(selector, color) {

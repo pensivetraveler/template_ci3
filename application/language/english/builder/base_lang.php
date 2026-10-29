@@ -70,6 +70,7 @@ $lang['Add Record'] = 'New Record';
 $lang['Edit Record'] = 'Edit Record';
 $lang['Data replication has been completed'] = 'Data replication has been completed.';
 $lang['Drop files here or click to upload'] = 'Drop files here or click to upload.';
+$lang['Drop file here or click to upload'] = 'Drop a file here or click to upload.';
 $lang['No logs found'] = 'No logs found.';
 $lang['No logs match the current filters'] = 'No logs match the current filters.';
 $lang['No Option Available'] = 'No options available.';

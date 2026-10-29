@@ -298,7 +298,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `builder_form_config.php` `builder_form_base_option_attributes.option_stack='vertical'` 미사용 (`get_admin_form_choice`는 `form_attributes.option_stack`, 기본 horizon을 읽음)
 - [x] (2026-10-28 B-5: 플러그인 없이 직접 추가·삭제하는 사이드 폼 뷰와 JS) `group_attributes.repeater_type='manual'` 대응 뷰 `form_side_group_repeater_manual.php` 없음
 - [ ] 페이지 base 폼의 `group_attributes.type='base'` 그룹 뷰(`form_base_group_base.php`) 없음, 미추적 `views/builder/layout/form_group_base.php`는 빈 파일
-- [ ] (2026-10-28 B-5: 게시판 정리 때 dropzone-full 하드코딩과 함께) `views/builder/layout/form_base_custom_dropzone-single.php` 빈 파일 (custom/dropzone-single 미구현)
+- [x] (2026-10-29: 파일 하나 드롭존 구현, 게시글 썸네일에 사용) (2026-10-28 B-5: 게시판 정리 때 dropzone-full 하드코딩과 함께) `views/builder/layout/form_base_custom_dropzone-single.php` 빈 파일 (custom/dropzone-single 미구현)
 - [x] (2026-10-28 B-5: 페이지 폼은 custom quill 뷰로, 저장 때 HTMLPurifier 정화, text-change로 hidden 동기화. get_admin_form_textarea는 여전히 쓰지 않음) `type=textarea, subtype=quill` PHP 분기 없음 → 일반 textarea, `builder_form_helper.php::get_admin_form_textarea`는 dead code
 - [x] (2026-10-28 B-5) `type=text, subtype=cleave-version` `get_admin_form_attributes`에 분기 없어 `.cleave` 클래스 미부여 (`setCleave` 분기 미실행)
 - [x] (2026-10-29 B-4 완료: 화면은 끌어놓을 때 목록 순서 전체(file_ids)를 reorder/{행 id}?type= 로, 저장은 엔티티 reorderFiles — Articles 가 article_attachment.sort_order. 새 첨부는 뒤 순서, 목록은 sort_order 순) (2026-10-26 B-4: 게시판 정리 때 함께 — 화면은 web 게시글 첨부(article_attachment.sort_order)용, 값은 PATCH 본문인데 서버는 GET에서 찾음, swap 방식이라 전체 순서를 보내야 함) `MY_Builder_API::reorder_patch` GET 파라미터만 검사 후 아무것도 안 함 (`list_sorter` 정렬 저장 안 됨) (추가: 파라미터가 있으면 아무 응답 없이 빈 200)
@@ -349,7 +349,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] (2026-10-26 C-2-5: api_method_config `resource`, users → myinfo) API가 route 설정(`resourceConfig`·method 후보)을 읽지 않아 WEB이 `resourceConfig`로 다른 이름의 설정을 빌려 쓰면 API는 클래스명 설정만 봄 (`myInfo`↔`users` 등, ResourceLoader에서 해결 예정)
 - [x] (2026-10-26 C-2-2: setFormColumn으로 해석, 검증용 label·rules·errors는 원래 값) `MY_Builder_API::setProperties` API `formConfig`가 `builder_form_base`와만 얕게 병합되고 form/group_attributes 기본값 미병합 (WEB `BuilderColumnsTrait::setFormColumn`과 해석 다름)
 - [x] (2026-10-26 C-2-1: 이미 API도 누적 병합으로 맞춰져 있음 확인) `MY_Builder_WEB::setFormData`(group_attributes 첫 항목부터 누적) vs `MY_Builder_API::validateFormRules`(마지막 항목만) 그룹 속성 해석 불일치 (헬퍼 하나로 통일)
-- [ ] (2026-10-26 C-4-5: 게시판 기능 정리 때 함께 — 보류) `views/builder/layout/form_base_custom_dropzone-full.php`, `app-page-form.js::applyFrmValuesByCategory` id `thumbnail-dropzone-wrapper`, data-field `thumbnail` 하드코딩 (field 기반으로 일반화)
+- [x] (2026-10-29: id·data-field·applyFrmValues 를 필드 기준으로, setDropzone 자동 업로드 끔·'true'/'false' 불리언 처리) (2026-10-26 C-4-5: 게시판 기능 정리 때 함께 — 보류) `views/builder/layout/form_base_custom_dropzone-full.php`, `app-page-form.js::applyFrmValuesByCategory` id `thumbnail-dropzone-wrapper`, data-field `thumbnail` 하드코딩 (field 기반으로 일반화)
 - [ ] (2026-10-26 C-4-1 보류 결정 — 묶는 방식(envelope_name)이 실제로 필요할 때 ①뷰 name ②검증 규칙의 이름 참조(matches[password] 등 `[name="..."]`로 찾음) ③서버 저장 경로를 함께 맞춤. 영향 검증: 템플릿 15·bizsoft 14건 모두 envelope_name=false라 name=field, 현재 영향 없음. reply_list는 쓰는 설정 없음, bizsoft carousel_simple은 envelope이지만 name을 쓰지 않는 JS 뷰) 그룹 뷰(`addr_daum`/`new_password`/`reply_list`/`repeater_*`)와 custom 뷰가 `get_group_field_name` 대신 `$item['field']`를 name으로 사용 (envelope/repeater name 규칙이 `form_side_group_base`에서만 적용)
 - [ ] 일반 등록·수정은 선택형 값이 옵션에 있는지 검사하지 않음 (bizsoft 확인: company_cd=COM999 저장됨, 엑셀 가져오기만 검사)
 - [ ] `setData`가 NULL 값을 ''로 바꿔 저장 (bizsoft 복제 검증에서 관찰, 영향 작음)

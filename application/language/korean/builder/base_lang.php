@@ -70,6 +70,7 @@ $lang['Add Record'] = '등록';
 $lang['Edit Record'] = '수정';
 $lang['Data replication has been completed'] = '데이터 복제가 완료되었습니다.';
 $lang['Drop files here or click to upload'] = '파일을 드래그하거나 클릭하여 업로드하세요.';
+$lang['Drop file here or click to upload'] = '파일 하나를 드래그하거나 클릭하여 업로드하세요.';
 $lang['No logs found'] = '기록된 로그가 없습니다.';
 $lang['No logs match the current filters'] = '검색 조건에 부합된 로그가 존재하지 않습니다.';
 $lang['No Option Available'] = '선택 가능한 옵션이 없습니다.';

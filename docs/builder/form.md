@@ -207,7 +207,8 @@ PHP 클래스는 공통으로 `form-control dt-{field} form-input_{category} for
 | `custom` | `version` | `form_{base,side}_custom_version.php`: 일반 input | - | 기본 분기 | | |
 | `custom` | `quill` | `form_base_custom_quill.php`: hidden(`data-textarea-id`) + `div#{id}-quill.textarea-quill` (**페이지 base 전용**) | refresh 때 `new Quill`, 내용이 바뀔 때마다(`text-change`)와 검증 직전 hidden 에 HTML 복사. **저장 때 서버가 HTML 을 정화**(`sanitize_rich_html`, HTMLPurifier, 허용 태그·속성만) | div innerHTML + hidden value | | hidden |
 | `custom` | `tag-base` | `form_side_custom_tag-base.php`, class `tagify h-auto` (**사이드 전용**) | `new Tagify` (`appPlugins.form.tagify[name]` 로 옵션 지정, 기본은 값 배열) | 기본 분기 | | |
-| `custom` | `dropzone-full` | `form_base_custom_dropzone-full.php`. **주의** — id `thumbnail-dropzone-wrapper`, data-field `thumbnail` 하드코딩 | `setDropzone()` | Dropzone mock 파일 표시 | | Dropzone |
+| `custom` | `dropzone-full` | `form_base_custom_dropzone-full.php`: 넓은 끌어놓기 영역. id `{field}-dropzone-wrapper`, `data-field={field}` (2026-10-29 필드 기준으로) | `setDropzone()` (자동 업로드 없음) | 저장된 파일을 미리보기로(`setDropzoneExistingFile`), 미리보기 삭제 = `deleteFile/{행 id}?type={field}` | | Dropzone 파일을 `field` / `field[i]` 로 append |
+| `custom` | `dropzone-single` | `form_base_custom_dropzone-single.php`: 파일 하나(썸네일 등), `max` 1 고정. 새 파일을 고르면 이전 파일·기존 미리보기를 바꿈 (2026-10-29) | 같음 | 같음 | | 같음 (`field`) |
 | `custom` | `domain_register`/`ip_register`/`domain_list` | grid 전용 뷰, 에셋 등록(`get_admin_form_attributes()`) | 각 lib common.js | | | |
 | `custom` | `reply_list` | `*_group_reply_list` 그룹 뷰와 연동 | | 아무것도 안 함 | | |
 | `common` | `space`/`text`/`divider` | 필드가 아닌 레이아웃 요소. grid: `form_inputs.php` 에서 공백 / `<h6>{content}</h6>` / 구분선. `form_base.php` grid 에선 공백만. base subtype 에선 제외(`reformat_form_data_by_type()`) | - | - | - | - |
