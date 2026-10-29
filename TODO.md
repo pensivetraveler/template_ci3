@@ -301,7 +301,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] (2026-10-28 B-5: 게시판 정리 때 dropzone-full 하드코딩과 함께) `views/builder/layout/form_base_custom_dropzone-single.php` 빈 파일 (custom/dropzone-single 미구현)
 - [x] (2026-10-28 B-5: 페이지 폼은 custom quill 뷰로, 저장 때 HTMLPurifier 정화, text-change로 hidden 동기화. get_admin_form_textarea는 여전히 쓰지 않음) `type=textarea, subtype=quill` PHP 분기 없음 → 일반 textarea, `builder_form_helper.php::get_admin_form_textarea`는 dead code
 - [x] (2026-10-28 B-5) `type=text, subtype=cleave-version` `get_admin_form_attributes`에 분기 없어 `.cleave` 클래스 미부여 (`setCleave` 분기 미실행)
-- [ ] (2026-10-26 B-4: 게시판 정리 때 함께 — 화면은 web 게시글 첨부(article_attachment.sort_order)용, 값은 PATCH 본문인데 서버는 GET에서 찾음, swap 방식이라 전체 순서를 보내야 함) `MY_Builder_API::reorder_patch` GET 파라미터만 검사 후 아무것도 안 함 (`list_sorter` 정렬 저장 안 됨) (추가: 파라미터가 있으면 아무 응답 없이 빈 200)
+- [x] (2026-10-29 B-4 완료: 화면은 끌어놓을 때 목록 순서 전체(file_ids)를 reorder/{행 id}?type= 로, 저장은 엔티티 reorderFiles — Articles 가 article_attachment.sort_order. 새 첨부는 뒤 순서, 목록은 sort_order 순) (2026-10-26 B-4: 게시판 정리 때 함께 — 화면은 web 게시글 첨부(article_attachment.sort_order)용, 값은 PATCH 본문인데 서버는 GET에서 찾음, swap 방식이라 전체 순서를 보내야 함) `MY_Builder_API::reorder_patch` GET 파라미터만 검사 후 아무것도 안 함 (`list_sorter` 정렬 저장 안 됨) (추가: 파라미터가 있으면 아무 응답 없이 빈 200)
 - [ ] `MY_Builder_API::deleteRepeater_patch` `DATA_DELETED`만 응답하는 스텁 (컨트롤러 오버라이드 필요하다는 점이 코드에 명시 안 됨)
 - [x] (2026-10-26 C-4-3: dropzone으로 시작하는 subtype 모두) `MY_Builder_WEB::beforeViewApp` dropzone 에셋을 subtype이 정확히 `dropzone`일 때만 로드 (`dropzone-full` 사용 시 에셋 누락)
 

@@ -293,6 +293,9 @@ class MY_Controller extends CI_Controller
     {
         $this->db->select('article_attachment.*');
         $this->db->join('article_attachment', 'article_attachment.file_id=file.file_id', 'left');
+        // 첨부 순서(reorder 로 저장한 sort_order), 순서가 없는 예전 첨부는 뒤에 올린 순서대로
+        $this->db->order_by('COALESCE('.$this->db->dbprefix('article_attachment').'.sort_order, 65535)', 'ASC', false);
+        $this->db->order_by('article_attachment.file_id', 'ASC');
         if (array_key_exists('article_id', $dto)) {
             $this->db->where('article_attachment.article_id', $dto['article_id']);
             unset($dto['article_id']);

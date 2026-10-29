@@ -2318,16 +2318,36 @@ class MY_Builder_API extends MY_Controller_API
         $this->afterGet($key, $data);
     }
 
-    public function reorder_patch()
+    /**
+     * 첨부 순서 저장: PATCH /{엔티티}/reorder/{행 id}?type={첨부 종류}, 본문 file_ids[] = 화면 목록 순서 전체
+     * 실제 저장은 엔티티의 reorderFiles() 가 한다 (예: Articles 의 article_attachment.sort_order).
+     * 전에는 GET 에서 값을 찾고(화면은 PATCH 본문으로 보냄) 아무것도 저장하지 않았다
+     */
+    public function reorder_patch($key = 0)
     {
-        $new_index = $this->input->get('new_index') ?? null;
-        $file_id = $this->input->get('file_id') ?? null;
+        $type = (string)($this->input->get('type') ?? '');
+        $fileIds = $this->input->patch('file_ids') ?? [];
+        if(is_string($fileIds)) $fileIds = explode(',', $fileIds);
+        $fileIds = array_values(array_map('strval', (array)$fileIds));
 
-        if(!$new_index || !$file_id) {
-            $this->response([
-                'code' => EMPTY_REQUIRED_DATA,
-            ]);
+        if($type === '' || !count($fileIds)) $this->response(['code' => EMPTY_REQUIRED_DATA]);
+        if(count(array_unique($fileIds)) !== count($fileIds) || count(array_filter($fileIds, 'ctype_digit')) !== count($fileIds)) {
+            $this->response(['code' => BAD_REQUEST], RestController::HTTP_BAD_REQUEST);
         }
+
+        if(!$this->reorderFiles($key, $type, $fileIds)) {
+            $this->response(['code' => BAD_REQUEST], RestController::HTTP_BAD_REQUEST);
+        }
+        $this->response(['code' => DATA_PROCESSED]);
+    }
+
+    /**
+     * 첨부 순서 저장. 처리했으면 true, 모르는 type 이면 false(400).
+     * $fileIds 가 그 행의 첨부 전체와 같은지 확인한 뒤 순서를 저장한다
+     */
+    protected function reorderFiles($key, string $type, array $fileIds): bool
+    {
+        return false;
     }
 
     public function deleteRepeater_patch($key = 0)

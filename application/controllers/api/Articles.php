@@ -115,6 +115,42 @@ class Articles extends Common
 		return true;
 	}
 
+	/**
+	 * 게시글 첨부 순서: reorder/{article_id}?type=attachment, file_ids 는 그 글의 첨부 전체(화면 목록 순서)
+	 */
+	protected function reorderFiles($key, string $type, array $fileIds): bool
+	{
+		if($type !== 'attachment') return false;
+
+		$idData = $this->checkIdentifierExist($key);
+		$articleId = $idData['article_id'] ?? 0;
+		if(!$articleId) $this->response(['code' => EMPTY_REQUIRED_DATA]);
+		if(!$this->Model->getCntWhere(['article_id' => $articleId])) {
+			$this->response(['code' => DATA_NOT_EXIST], RestController::HTTP_NOT_FOUND);
+		}
+
+		// 컬럼 1개 select 는 값 배열을 돌려준다
+		$current = array_map('strval', $this->Model_Article_Attachment->getListWhere(['file_id'], ['article_id' => $articleId]));
+		$sorted = $fileIds;
+		sort($current);
+		sort($sorted);
+		if($current !== $sorted) {
+			$this->responseError([
+				'location' => __METHOD__,
+				'param' => 'file_ids',
+				'msg' => '첨부 목록이 바뀌었습니다. 새로고침한 뒤 다시 정렬하세요.',
+			], [], RestController::HTTP_CONFLICT);
+		}
+
+		foreach ($fileIds as $i => $fileId) {
+			$this->Model_Article_Attachment->modData(['sort_order' => $i + 1], [
+				'article_id' => $articleId,
+				'file_id' => $fileId,
+			]);
+		}
+		return true;
+	}
+
 	protected function saveAttachments($articleId, $boardId): void
 	{
 		if(!$articleId) return;
@@ -127,10 +163,13 @@ class Articles extends Common
 					$this->Model_Article_Attachment->delData(['article_id' => $articleId]);
 				}
 			}
-			$set = array_map(function($item) use ($articleId) {
+			// 새 첨부는 기존 첨부 뒤 순서
+			$start = (int)$this->Model_Article_Attachment->getCntWhere(['article_id' => $articleId]);
+			$set = array_map(function($item, $i) use ($articleId, $start) {
 				$item['article_id'] = $articleId;
+				$item['sort_order'] = $start + $i + 1;
 				return $item;
-			}, $fileList);
+			}, $fileList, array_keys($fileList));
 			$this->Model_Article_Attachment->addList($set);
 		}
 	}

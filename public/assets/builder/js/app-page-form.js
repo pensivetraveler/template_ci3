@@ -181,29 +181,29 @@ function preparePlugins(form) {
 
     /**
      * file list sortable
+     * 끌어놓으면 그 목록의 순서 전체(file_ids)를 reorder/{행 id}?type={list_delete 종류} 로 보낸다 (전에는 두 개만 자리 바꿈, 서버 저장 없음)
      */
     if($('.form-list-item-wrap_sorter').length){
         $('.form-list-item-wrap_sorter').each((k, v) => {
             Sortable.create(v, {
                 animation: 150,
-                group: 'handleList',
                 handle: '.drag-handle',
-                swap: true,
                 onEnd: function (event) {
-                    const newIndex = parseInt(event.newIndex)+1;
-                    const item = event.item;
-                    const articleId = item.getAttribute('data-article-id')
-                    const fileId = item.getAttribute('data-file-id')
+                    if(event.oldIndex === event.newIndex) return;
+                    const wrap = event.from;
+                    const field = (common.FORM_DATA ?? []).find((item) => `${item.id}-list` === wrap.id);
+                    const type = field?.form_attributes?.list_delete || field?.field;
+                    const fileIds = [...wrap.querySelectorAll('[data-file-id]')].map((item) => item.getAttribute('data-file-id'));
+                    if(!type || !fileIds.length || !common.KEY) return;
+
                     executeAjax({
-                        url : common.API_URI + '/reorder',
+                        url : getUrlWithIdentifiers(common.API_URI + '/reorder', common.KEY, {type: type}),
                         headers : {
                             'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
                         },
                         method : 'patch',
                         data : {
-                            new_index : newIndex,
-                            article_id : articleId,
-                            file_id : fileId,
+                            file_ids : fileIds,
                         },
                         success: function(response) {
                             showAlert({

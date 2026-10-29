@@ -746,6 +746,8 @@ $config['form_articles_config'] = [
         ],
         'form_attributes' => [
             'with_list' => true,
+            // 끌어서 순서 바꾸면 바로 저장 (reorder → Articles::reorderFiles)
+            'list_sorter' => true,
             'list_delete' => 'attachment',
         ],
     ],
