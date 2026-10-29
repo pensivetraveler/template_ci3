@@ -9,7 +9,8 @@
 			'_mode' => 'add',
 			'_event' => '',
 			'comment_id' => '',
-			'article_id' => set_admin_form_value($identifier['field'], $identifier['default'], null),
+			// $identifier 는 식별자 항목 목록(prepareViewData) — 게시글은 article_id 하나
+			'article_id' => set_admin_form_value('article_id', '', null),
 			'depth' => 0,
 			'parent_id' => 0,
 		]);

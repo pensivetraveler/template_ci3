@@ -753,8 +753,9 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
                         setFormListItem(`#${id}-list`, data, field);
                         break;
                     case 'quill' :
-                        document.getElementById(`${id}-quill`).innerHTML = data[fieldName];
-                        form[name].value = data[fieldName];
+                        // 값이 없으면(등록 화면·NULL) 빈 내용 (전에는 "undefined"·"null" 글자가 들어감)
+                        document.getElementById(`${id}-quill`).innerHTML = data[fieldName] ?? '';
+                        form[name].value = data[fieldName] ?? '';
                         break;
                     case 'reply_list' :
                         // setFormListItem(`#${id}`, data[fieldName], field);

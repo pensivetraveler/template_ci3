@@ -298,14 +298,15 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }));
         $data['buttons'] = $this->methodConfig['buttons']??[];
 
-        // 입력 요소가 있을 때만 폼 자산을 붙임 (hidden·common 은 입력 요소가 아님)
-        if(count(array_filter($this->viewColumns, function($item) {
+        $data['isComments'] = $this->methodConfig['properties']['isComments'];
+
+        // 입력 요소가 있을 때만 폼 자산을 붙임 (hidden·common 은 입력 요소가 아님). 댓글 입력 폼(app-page-comment.js)도 FormValidation 을 쓴다
+        if($data['isComments'] || count(array_filter($this->viewColumns, function($item) {
             return !in_array($item['type'], ['view', 'hidden', 'common'], true);
         }))) {
             $this->addFormScripts();
         }
 
-        $data['isComments'] = $this->methodConfig['properties']['isComments'];
         if($data['isComments']) {
             $this->addJS['tail'][] = [
                 base_url('public/assets/builder/js/app-page-comment.js')
@@ -1117,10 +1118,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
             base_url('public/assets/builder/vendor/libs/quill/editor.css'),
         ];
 
-        // wysiwig
+        // wysiwig (app-page-preset.js 의 toolbarDefault 를 app-page-form.js 가 quill 툴바로 쓴다 — head.php 에서 빠져 있어 quill 폼이 ReferenceError)
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/vendor/libs/quill/katex.js'),
             base_url('public/assets/builder/vendor/libs/quill/quill.js'),
+            base_url('public/assets/builder/js/app-page-preset.js'),
         ];
     }
 

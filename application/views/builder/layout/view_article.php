@@ -1,5 +1,12 @@
 <?php
-extract(trans_formdata_dit_type($viewData));
+// 화면에 둘 영역(썸네일·첨부)은 view 항목(VIEW_COLUMNS, 없으면 form 설정)에 그 필드가 있을 때만 그린다.
+// $viewData 는 {hiddens, fields}(reformat_form_data_by_type) 라서 필드 이름만 모은다 (예전 trans_formdata_dit_type 는 평평한 목록용이라 실패)
+$viewFields = [];
+array_walk_recursive($viewData, function ($value, $key) use (&$viewFields) {
+	if($key === 'field' && is_string($value)) $viewFields[$value] = true;
+});
+$thumbnail = isset($viewFields['thumbnail']);
+$uploads = isset($viewFields['uploads']);
 ?>
 <div class="col-12 mb-lg-0 mb-6">
 	<div class="card">
@@ -27,7 +34,7 @@ extract(trans_formdata_dit_type($viewData));
 		?>
 		<div class="card-header">
 			<div class="d-flex align-items-center justify-content-between">
-				<h5 id="subject" class="mb-0 w-100 view-data"><span></span></h5>
+				<h5 class="mb-0 w-100"><span id="subject" class="view-data"></span></h5>
 				<div class="dropdown">
 					<button
 							class="btn btn-text-secondary rounded-pill text-muted border-0 p-1"
