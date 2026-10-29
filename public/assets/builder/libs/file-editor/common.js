@@ -3,7 +3,7 @@
  */
 let currentFilePath = '';
 let currentFileType = '';
-let API_BASE = '/module/file';
+let API_BASE = common.MODULE_URI + 'file';
 
 function fetchData(url, options = {}, method = 'GET') {
     options = Object.assign({
