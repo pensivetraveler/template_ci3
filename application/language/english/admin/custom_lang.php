@@ -1,4 +1,4 @@
-지<?php
+<?php
 $lang['placeholder'] = [
     'Select The Status' => 'Select The Status',
     'Enter The User ID' => 'Enter The User ID',
