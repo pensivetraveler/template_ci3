@@ -71,4 +71,11 @@ $config['api_method_config'] = [
         'withdraw'      => ['post' => ['key' => false, 'log' => false]],
         'logout'        => ['post' => ['key' => false, 'log' => false]],
     ],
+
+    // 설치 API: 설치 전에는 로그인할 계정이 없어 auth none (전에는 세션 인증을 요구해 빈 DB 에서 설치할 수 없었음).
+    // 설치가 끝나면(표와 USR000 이 있으면) Setup 생성자가 403, addTables 는 production 에서 403. 비밀번호를 받으므로 log 끔
+    'setup' => [
+        'addSystemUser' => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
+        'addTables'     => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
+    ],
 ];
