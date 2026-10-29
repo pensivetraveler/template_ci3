@@ -167,6 +167,32 @@ $config['route_config'] = [
             ],
         ],
     ],
+    // 게시판 관리: 게시판(tbl_board) 목록 + 옆 폼으로 등록·수정 (카테고리와 같은 방식)
+    'boards' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => false,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => true,
+                ],
+            ],
+        ],
+    ],
     'companies' => [
         'category' => 'page',
         'type' => 'page',

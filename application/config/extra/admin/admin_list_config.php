@@ -197,6 +197,32 @@ $config['list_categories_config'] = [
     ],
 ];
 
+$config['list_boards_config'] = [
+    [
+        'field' => 'board_id',
+        'label' => 'lang:board.board_id',
+        'type'  => 'hidden',
+        'subtype'  => 'identifier',
+    ],
+    [
+        'field' => 'board_name',
+        'label' => 'lang:board.board_name',
+    ],
+    [
+        // 표시는 form 설정의 BRD 코드 옵션 라벨 (list 에 옵션이 없으면 form 옵션)
+        'field' => 'board_cd',
+        'label' => 'lang:board.board_cd',
+    ],
+    [
+        'field' => 'attach_max',
+        'label' => 'lang:board.attach_max',
+    ],
+    [
+        'field' => 'created_dt',
+        'label' => 'lang:common.created_dt',
+    ],
+];
+
 $config['list_project_config'] = [
     [
         'field' => 'project_name',

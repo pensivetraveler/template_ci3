@@ -81,6 +81,7 @@
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 
 ### 버그
+- [ ] (2026-10-29 게시판 관리 화면 검증 중 발견) 일반 등록·수정(POST·PUT·PATCH)은 select 선택지 값을 검사하지 않음 — 엑셀 가져오기(`validateExcelData`)에만 있음. 화면 밖에서 아무 코드나 저장 가능(예: board_cd=XXX999). 지금은 `api/Boards::checkBoardCode`처럼 엔티티에서 확인, 공통 검사로 옮길지 검토
 - [x] (2026-10-28, bizsoft #빌더-49 관찰) `MY_Builder_API::setData`가 문자열 컬럼(`strList`)에서 `empty($value)`로 '0'·0까지 ''로 바꿔, 환경값 화면에서 토큰 유효 시간 0(만료 없음)을 저장할 수 없었음 → 숫자 값은 남기고 null·''·false·[]만 ''로
 - [ ] `user_autologin` 행이 계정마다 쌓임(bizsoft dev 계정 23행): `destroyUserData`는 지금 쿠키의 행만 지우고, 쿠키를 지우지 않고 버린 브라우저·만료된 행은 남음 — 만료 행 정리(로그인 때 같은 user_id의 오래된 행 삭제 등) 검토
 - [x] (2026-10-28 결정 ①: 목록은 읽기만 — 행 없는 메뉴는 보임 0·000000으로 계산해 표시, 실제 권한도 접근 불가 유지. "기본 권한으로 채우기" 버튼(fillDefault_post), 수정 때 행이 없으면 먼저 만듦, 템플릿 MenuAuth의 partner_auth truncate를 trimPartnerAuth로) 메뉴 권한·파트너 권한 목록(GET)이 기본 권한 행을 INSERT 함 — 조회가 쓰기를 하고 요청 트랜잭션 밖이며 동시 조회 시 중복 행 가능. 기본 행 생성을 등급·파트너 생성 때나 명시적 초기화(POST)로 옮길지 결정 (2026-10-28 우선 등급·파트너 값 검증만 추가)

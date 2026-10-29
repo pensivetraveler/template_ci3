@@ -45,6 +45,7 @@ $lang['board'] = [
     'board_id' => 'Board',
     'board_name' => 'Board Name',
     'board_cd' => 'Kind',
+    'attach_max' => 'Max Attachments',
 ];
 
 $lang['article'] = [

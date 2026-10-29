@@ -634,6 +634,73 @@ $config['form_company_config'] = [
     ],
 ];
 
+$config['form_boards_config'] = [
+    [
+        'field' => 'board_id',
+        'label' => 'lang:board.board_id',
+        'form' => true,
+        'rules' => 'trim|required_mod[edit]',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+        'icon' => null,
+    ],
+    [
+        'field' => 'board_name',
+        'label' => 'lang:board.board_name',
+        'form' => true,
+        'rules' => 'trim|required|max_length[100]',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => null,
+    ],
+    [
+        // 게시판 구분: 시스템 코드 BRD (BRD000 은 묶음 행이라 뺀다)
+        'field' => 'board_cd',
+        'label' => 'lang:board.board_cd',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'select',
+        'subtype' => 'select2',
+        'icon' => null,
+        'option_attributes' => [
+            'option_type' => 'model',
+            'option_data' => [
+                'model' => 'Model_Sys_Code',
+                'method' => 'getList',
+                'params' => [
+                    'where' => [
+                        'big_cd' => 'BRD',
+                        'use_yn' => 'Y',
+                    ],
+                    'whereNot' => [
+                        'sml_cd' => '000',
+                    ],
+                ],
+            ],
+            'render' => [
+                'id' => 'cmb_cd',
+                'text' => 'cd_name',
+            ],
+        ],
+    ],
+    [
+        'field' => 'attach_max',
+        'label' => 'lang:board.attach_max',
+        'form' => true,
+        'rules' => 'trim|is_natural',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'number',
+        'icon' => null,
+        'form_text' => '비우면 제한 없음',
+    ],
+];
+
 $config['form_categories_config'] = [
     [
         'field' => 'category_id',

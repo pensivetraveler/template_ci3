@@ -26,6 +26,16 @@ $config['admin_nav_menu'] = [
         'class' => 'categories',
     ],
     [
+        'icon' => 'ri-layout-masonry-line',
+        'title' => 'Boards',
+        'subMenu' => [
+            [
+                'title' => 'Boards Management',
+                'class' => 'boards',
+            ],
+        ],
+    ],
+    [
         'icon' => 'ri-building-line',
         'title' => 'Companies Management',
         'class' => 'companies',

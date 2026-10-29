@@ -20,6 +20,8 @@ $lang['nav']['Partner Auth Management'] = '파트너 메뉴 권한';
 
 $lang['nav']['Categories'] = '카테고리';
 $lang['nav']['Categories Management'] = '카테고리 관리';
+$lang['nav']['Boards'] = '게시판';
+$lang['nav']['Boards Management'] = '게시판 관리';
 
 $lang['nav']['Visitors'] = '접속자';
 $lang['nav']['Visitors Management'] = '접속자 관리';

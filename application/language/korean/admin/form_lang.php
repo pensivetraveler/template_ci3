@@ -45,6 +45,7 @@ $lang['board'] = [
     'board_id' => '게시판',
     'board_name' => '게시판 명',
     'board_cd' => '게시판 구분',
+    'attach_max' => '첨부 최대 개수',
 ];
 
 $lang['article'] = [

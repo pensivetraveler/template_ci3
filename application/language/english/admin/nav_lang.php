@@ -20,6 +20,8 @@ $lang['nav']['Partner Auth Management'] = 'Partners Menu Auth';
 
 $lang['nav']['Categories'] = 'Categories';
 $lang['nav']['Categories Management'] = 'Categories Management';
+$lang['nav']['Boards'] = 'Boards';
+$lang['nav']['Boards Management'] = 'Boards Management';
 
 $lang['nav']['Visitors'] = 'Visitors';
 $lang['nav']['Visitors Management'] = 'Visitors Management';
