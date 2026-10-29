@@ -1,6 +1,6 @@
 $(function () {
     executeAjax({
-        url: '/module/logger/visit',
+        url: common.MODULE_URI + 'logger/visit',
         method: 'post',
         data: {
             referrer : document.referrer
