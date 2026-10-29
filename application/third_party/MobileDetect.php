@@ -20,6 +20,7 @@
  *
  * @version 3.74.4
  */
+namespace Detection;
 
 use BadMethodCallException;
 
