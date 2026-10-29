@@ -193,6 +193,52 @@ $config['route_config'] = [
             ],
         ],
     ],
+    // 게시글 관리: 목록(게시판 필터) → 등록·수정 페이지, 상세(본문 + 댓글)
+    'articles' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => true,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => false,
+                ],
+            ],
+            'add' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'base',
+                'mode' => 'create',
+            ],
+            'edit' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'base',
+                'mode' => 'update',
+            ],
+            'view' => [
+                'category' => 'view',
+                'type' => 'base',
+                'subtype' => 'article',
+                'properties' => [
+                    'isComments' => true,
+                ],
+            ],
+        ],
+    ],
     'companies' => [
         'category' => 'page',
         'type' => 'page',

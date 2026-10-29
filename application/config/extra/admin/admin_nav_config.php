@@ -33,6 +33,10 @@ $config['admin_nav_menu'] = [
                 'title' => 'Boards Management',
                 'class' => 'boards',
             ],
+            [
+                'title' => 'Articles Management',
+                'class' => 'articles',
+            ],
         ],
     ],
     [

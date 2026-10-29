@@ -223,6 +223,43 @@ $config['list_boards_config'] = [
     ],
 ];
 
+$config['list_articles_config'] = [
+    [
+        'field' => 'article_id',
+        'label' => 'lang:article.article_id',
+        'type'  => 'hidden',
+        'subtype'  => 'identifier',
+    ],
+    [
+        // 표시는 form 설정의 게시판 옵션 라벨
+        'field' => 'board_id',
+        'label' => 'lang:board.board_id',
+    ],
+    [
+        'field' => 'subject',
+        'label' => 'lang:article.subject',
+        'onclick' => [
+            'kind' => 'view',
+        ],
+    ],
+    [
+        'field' => 'open_yn',
+        'label' => 'lang:article.open_yn',
+    ],
+    [
+        'field' => 'view_count',
+        'label' => 'lang:article.view_count',
+    ],
+    [
+        'field' => 'created_id',
+        'label' => 'lang:common.created_id',
+    ],
+    [
+        'field' => 'created_dt',
+        'label' => 'lang:common.created_dt',
+    ],
+];
+
 $config['list_project_config'] = [
     [
         'field' => 'project_name',

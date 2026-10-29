@@ -38,6 +38,7 @@ $lang['filter'] = [
     'Select The Access Type' => '접근 종류를 선택하세요.',
     'Select The Partner' => '파트너를 선택하세요.',
     'Select The Company' => '업체를 선택하세요.',
+    'Select The Board' => '게시판을 선택하세요.',
     'Select The Frame' => '프레임을 선택하세요.',
 ];
 

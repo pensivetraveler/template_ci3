@@ -634,6 +634,123 @@ $config['form_company_config'] = [
     ],
 ];
 
+$config['form_articles_config'] = [
+    [
+        'field' => 'article_id',
+        'label' => 'lang:article.article_id',
+        'form' => true,
+        'rules' => 'trim|required_mod[edit]',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+        'icon' => null,
+    ],
+    [
+        'field' => 'board_id',
+        'label' => 'lang:board.board_id',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'select',
+        'subtype' => 'select2',
+        'icon' => null,
+        'option_attributes' => [
+            'option_type' => 'model',
+            'option_data' => [
+                'model' => 'Model_Board',
+                'method' => 'getList',
+                'params' => [
+                    'orderBy' => ['board_id' => 'ASC'],
+                ],
+            ],
+            'render' => [
+                'id' => 'board_id',
+                'text' => 'board_name',
+            ],
+        ],
+    ],
+    [
+        'field' => 'subject',
+        'label' => 'lang:article.subject',
+        'form' => true,
+        'rules' => 'trim|required|max_length[300]',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => null,
+    ],
+    [
+        // 저장 때 서버가 HTML 을 정화한다 (sanitize_rich_html)
+        'field' => 'content',
+        'label' => 'lang:article.content',
+        'form' => true,
+        'rules' => 'trim',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'textarea',
+        'subtype' => 'quill',
+        'icon' => null,
+    ],
+    [
+        'field' => 'open_yn',
+        'label' => 'lang:article.open_yn',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'default' => 'Y',
+        'icon' => null,
+        'option_attributes' => [
+            'option_type' => 'yn',
+        ],
+    ],
+    [
+        'field' => 'thumbnail',
+        'label' => 'lang:article.thumbnail',
+        'form' => true,
+        'rules' => 'trim',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'file',
+        'icon' => null,
+        // 서버 허용 형식(custom_upload_config thumbnail_upload_config)과 같게
+        'attributes' => [
+            'accept' => 'image/jpeg,image/png,image/gif',
+            'extension' => 'jpg,jpeg,png,gif',
+        ],
+        'form_attributes' => [
+            'with_list' => true,
+            'list_delete' => 'thumbnail',
+        ],
+    ],
+    [
+        // 첨부: article_attachment 에 저장 (Articles::saveAttachments), 개수 제한은 게시판 attach_max
+        'field' => 'uploads',
+        'label' => 'lang:article.uploads',
+        'form' => true,
+        'rules' => 'trim',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'file',
+        'subtype' => 'multiple',
+        'icon' => null,
+        // 서버 허용 형식(custom_upload_config uploads_upload_config)과 같게. 여러 개면 화면이 uploads[] 로 보낸다
+        'attributes' => [
+            'accept' => 'application/pdf,image/jpeg,image/png,image/gif',
+            'extension' => 'pdf,jpg,jpeg,png,gif',
+            'max' => 10,
+        ],
+        'form_attributes' => [
+            'with_list' => true,
+            'list_delete' => 'attachment',
+        ],
+    ],
+];
+
 $config['form_boards_config'] = [
     [
         'field' => 'board_id',

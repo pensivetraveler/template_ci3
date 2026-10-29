@@ -81,6 +81,8 @@
 - [x] `api/Setup.php` (2026-10-26): 설치 완료를 DB 상태(테이블·USR000 존재)로 판정, `addSystemUser`는 테이블이 있고 USR000이 없을 때만, `addTables`(받은 SQL 실행)는 production에서 403. 이전에는 `init_done` 캐시(1일 만료, 새 컨테이너에 없음)만 봐서 그사이 로그인한 아무 계정이나 시스템 관리자 생성·임의 SQL 실행 가능(코드로 추론)
 
 ### 버그
+- [x] (2026-10-29 게시글 관리 화면 검증 중 발견·수정) 페이지 폼의 quill 편집기가 늘 `toolbarDefault is not defined`(head.php 에서 app-page-preset.js 가 주석) → quill 자산과 함께 로드. 빈 값이면 편집기에 "undefined". 상세 화면에 댓글만 있으면 FormValidation 이 없어 댓글 스크립트 중단. `Model_Article_Attachment` notNullList 가 비어 첨부 INSERT 때 article_id·file_id 가 빠짐. 댓글 목록이 내용·작성자를 이스케이프 없이 innerHTML
+- [ ] (2026-10-29 발견) `tbl_file.file_link` 에 `http://호스트:포트/…` 절대 주소를 저장(`get_filepath_from_link`) — 도메인·하위 경로가 바뀌면 기존 파일 주소가 깨짐. 상대 경로로 저장할지 검토
 - [ ] (2026-10-29 게시판 관리 화면 검증 중 발견) 일반 등록·수정(POST·PUT·PATCH)은 select 선택지 값을 검사하지 않음 — 엑셀 가져오기(`validateExcelData`)에만 있음. 화면 밖에서 아무 코드나 저장 가능(예: board_cd=XXX999). 지금은 `api/Boards::checkBoardCode`처럼 엔티티에서 확인, 공통 검사로 옮길지 검토
 - [x] (2026-10-28, bizsoft #빌더-49 관찰) `MY_Builder_API::setData`가 문자열 컬럼(`strList`)에서 `empty($value)`로 '0'·0까지 ''로 바꿔, 환경값 화면에서 토큰 유효 시간 0(만료 없음)을 저장할 수 없었음 → 숫자 값은 남기고 null·''·false·[]만 ''로
 - [ ] `user_autologin` 행이 계정마다 쌓임(bizsoft dev 계정 23행): `destroyUserData`는 지금 쿠키의 행만 지우고, 쿠키를 지우지 않고 버린 브라우저·만료된 행은 남음 — 만료 행 정리(로그인 때 같은 user_id의 오래된 행 삭제 등) 검토
@@ -219,8 +221,8 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `MY_Builder_WEB::viewApp` subtype base view와 dashboard(`view/dashboard/base`)가 method `view` 기준으로 `builder/layout/view.php`를 잡고 이 파일이 정의되지 않은 `$viewType`·`$viewData` 참조 (notice, `builder/dashboard/index.php`는 매칭 안 됨) → dashboard(type dashboard)는 상세 경로를 타지 않고, viewApp이 route 기본 메서드면 `{class}/index.php`도 전용 뷰로 찾음 (2026-10-25)
 - [x] `MY_Builder_WEB::prepareViewData` `reformat_form_data_by_type($cols, $viewType)`로 viewType을 form_type 자리에 넘김 (grid여도 행 배열이 안 만들어져 `view_grid.php` `foreach ($row …)` 깨짐, `common` 항목도 걸러짐) → `reformat_form_data_by_type($cols, 'page', $viewType)` (2026-10-25)
 - [x] `MY_Builder_WEB::prepareViewData` hidden 컬럼도 `type !== 'view'`에 걸려 `addFormScripts()` 로드 (불필요한 form 자산) → view·hidden·common 외 입력 요소가 있을 때만 폼 자산 (2026-10-25)
-- [ ] `views/builder/layout/view_article.php` 평평한 리스트를 기대하는 `trans_formdata_dit_type()`에 `{hiddens, fields}`를 넘기고 `default`·`group` 키도 `builder_view_base`에 없음 (article subtype 렌더 실패) (보류: 게시판형 상세는 게시판 기능 정리 때)
-- [ ] `views/builder/layout/view_comments.php` `$identifier['field']`(단건)를 쓰지만 `prepareViewData()`의 `identifier`는 배열 목록 (댓글 identifier 값 오류) (보류: 게시판형 상세는 게시판 기능 정리 때)
+- [x] (2026-10-29 게시글 관리 화면: `{hiddens, fields}`에서 필드 이름만 모아 썸네일·첨부 영역을 정함, 제목 id 를 span 으로) `views/builder/layout/view_article.php` 평평한 리스트를 기대하는 `trans_formdata_dit_type()`에 `{hiddens, fields}`를 넘기고 `default`·`group` 키도 `builder_view_base`에 없음 (article subtype 렌더 실패) (보류: 게시판형 상세는 게시판 기능 정리 때)
+- [x] (2026-10-29: 댓글 폼 article_id 는 화면이 common.KEY 로 채움, 댓글 목록 API 주소 `API_COMMENT_URI`(정의 안 됨) → `API_BASE_URI + 'comments'`, 내용·작성자 이스케이프) `views/builder/layout/view_comments.php` `$identifier['field']`(단건)를 쓰지만 `prepareViewData()`의 `identifier`는 배열 목록 (댓글 identifier 값 오류) (보류: 게시판형 상세는 게시판 기능 정리 때)
 - [x] `MY_Builder_WEB::setViewColumns` resourceConfig가 없을 때 `jsVars['FORM_DATA']`를 쓰지만 view category에서는 설정 안 됨 (undefined index), `config->get()`을 `triggerError` 기본값 true로 호출 (설정 없으면 에러 로그) → view 설정(`setConfigList('view')`)이 없으면 form 설정 필드를 읽기 전용으로, `lang:` 라벨 정리 (2026-10-25)
 - [x] `MY_Builder_API::transformView` 매칭 옵션이 없으면 `$options[$data->{$key}]` undefined index (option_attributes 라벨 변환 시 notice) → 매칭 옵션이 없으면 원래 값 (2026-10-25)
 - [x] `app-page-excel.js` `#excelFormSubmit` 열 매핑이 위치 기반(`excelHeaders[k-1].field`)이고 헤더는 허용 목록 포함 여부만 검사 (열 순서가 다르거나 일부만 있으면 값이 엉뚱한 컬럼에 저장) → 1행 헤더 이름으로 열을 찾고 표(thead data-field) 기준으로 보냄, 필수 열 누락·모르는 열은 업로드 전에 알림 (2026-10-25)

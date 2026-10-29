@@ -49,6 +49,7 @@ $lang['board'] = [
 ];
 
 $lang['article'] = [
+    'article_id' => 'Article',
     'subject' => 'Subject',
     'content' => 'Content',
     'thumbnail' => 'Thumbnail',

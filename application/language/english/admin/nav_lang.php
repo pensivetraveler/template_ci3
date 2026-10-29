@@ -22,6 +22,7 @@ $lang['nav']['Categories'] = 'Categories';
 $lang['nav']['Categories Management'] = 'Categories Management';
 $lang['nav']['Boards'] = 'Boards';
 $lang['nav']['Boards Management'] = 'Boards Management';
+$lang['nav']['Articles Management'] = 'Articles Management';
 
 $lang['nav']['Visitors'] = 'Visitors';
 $lang['nav']['Visitors Management'] = 'Visitors Management';

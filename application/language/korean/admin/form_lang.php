@@ -49,6 +49,7 @@ $lang['board'] = [
 ];
 
 $lang['article'] = [
+    'article_id' => '게시글',
     'subject' => '제목',
     'content' => '내용',
     'thumbnail' => '표지',

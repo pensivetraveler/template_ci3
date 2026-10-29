@@ -38,6 +38,7 @@ $lang['filter'] = [
     'Select The Access Type' => 'Select The Access Type.',
     'Select The Partner' => 'Select The Partner.',
     'Select The Company' => 'Select The Company.',
+    'Select The Board' => 'Select the board.',
     'Select The Frame' => 'Select The Frame.',
 ];
 
