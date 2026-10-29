@@ -3,7 +3,8 @@
 -- tbl_user_session 은 production 의 DB 세션(sess_driver=database), tbl_user_refresh_token 은 app/Common.php(앱 로그인, 아직 쓰는 화면 없음)용. bizsoft 에는 접두어 없는 user_refresh_token 으로 있지만 코드는 dbprefix 가 붙은 이름으로 넣는다.
 -- 기본 행은 seed.sql. 시스템 관리자(USR000)는 설치 화면(Setup addSystemUser)에서 만든다.
 -- 규칙: DB 구조를 바꾸면 이 파일과 docs/migrations/<날짜>-<주제>.sql 을 같이 고친다 (docs/schema/README.md).
--- 아직 없는 표(모델은 있음, 기준 DB에 없음): article, article_attachment, article_read, board, comment, reply, message, language_code, log_email, sys_version, sys_version_current, uuid_token
+-- 게시판 표(board·article·article_attachment·article_read·comment)는 playtalktalk 구조와 템플릿 모델·API 를 맞춰 2026-10-29 설계.
+-- 아직 없는 표(모델은 있음, 기준 DB에 없음): reply, message, language_code, log_email, sys_version, sys_version_current, uuid_token
 -- 문장 안에 세미콜론을 쓰지 않는다 (설치 화면 addTables 가 ; 로 나눠 실행)
 
 SET NAMES utf8mb4;
@@ -303,6 +304,67 @@ CREATE TABLE `tbl_geoip_cache` (
   UNIQUE KEY `uk_geoip_cache_ip_provider` (`ip`,`provider`),
   KEY `idx_geoip_cache_ip` (`ip`),
   KEY `idx_geoip_cache_expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `tbl_board` (
+  `board_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'auto_increment',
+  `board_name` varchar(100) NOT NULL COMMENT '게시판명',
+  `board_cd` char(6) NOT NULL COMMENT '게시판 구분 (tbl_sys_code.big_cd = BRD)',
+  `attach_max` smallint(5) unsigned DEFAULT NULL COMMENT '첨부 최대 개수 (비우면 제한 없음)',
+  `created_dt` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
+  `created_id` bigint(20) unsigned NOT NULL COMMENT '생성자 (tbl_user.user_id)',
+  `updated_dt` datetime DEFAULT NULL COMMENT '수정일시',
+  `updated_id` bigint(20) unsigned DEFAULT NULL COMMENT '수정자 (tbl_user.user_id)',
+  PRIMARY KEY (`board_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `tbl_article` (
+  `article_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'auto_increment',
+  `board_id` bigint(20) unsigned NOT NULL COMMENT '게시판 (tbl_board.board_id)',
+  `parent_id` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT '원글 (tbl_article.article_id, 0 이면 원글)',
+  `subject` varchar(300) NOT NULL COMMENT '제목',
+  `content` longtext DEFAULT NULL COMMENT '내용',
+  `thumbnail` bigint(20) unsigned DEFAULT NULL COMMENT '썸네일 (tbl_file.file_id)',
+  `link` varchar(255) DEFAULT NULL COMMENT '컨텐트 URL',
+  `view_count` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '조회수',
+  `open_yn` enum('Y','N') NOT NULL DEFAULT 'Y' COMMENT '공개 여부',
+  `del_yn` enum('Y','N') NOT NULL DEFAULT 'N' COMMENT '삭제여부',
+  `created_dt` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
+  `created_id` bigint(20) unsigned NOT NULL COMMENT '생성자 (tbl_user.user_id)',
+  `updated_dt` datetime DEFAULT NULL COMMENT '수정일시',
+  `updated_id` bigint(20) unsigned DEFAULT NULL COMMENT '수정자 (tbl_user.user_id)',
+  PRIMARY KEY (`article_id`),
+  KEY `idx_article_board` (`board_id`,`del_yn`,`created_dt`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `tbl_article_attachment` (
+  `article_id` bigint(20) unsigned NOT NULL COMMENT '게시글 (tbl_article.article_id)',
+  `file_id` bigint(20) unsigned NOT NULL COMMENT '파일 (tbl_file.file_id)',
+  `attach_cd` char(6) DEFAULT NULL COMMENT '첨부 구분',
+  `sort_order` smallint(6) DEFAULT NULL COMMENT '순서',
+  PRIMARY KEY (`article_id`,`file_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `tbl_article_read` (
+  `article_id` bigint(20) unsigned NOT NULL COMMENT '게시글 (tbl_article.article_id)',
+  `user_id` bigint(20) unsigned NOT NULL COMMENT '읽은 사용자 (tbl_user.user_id)',
+  `read_dt` datetime NOT NULL DEFAULT current_timestamp() COMMENT '마지막으로 읽은 시각',
+  PRIMARY KEY (`article_id`,`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `tbl_comment` (
+  `comment_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'auto_increment',
+  `article_id` bigint(20) unsigned NOT NULL COMMENT '게시글 (tbl_article.article_id)',
+  `parent_id` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT '부모 댓글 (tbl_comment.comment_id, 0 이면 최상위)',
+  `depth` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '깊이 (0: 댓글, 1: 답글)',
+  `content` text NOT NULL COMMENT '내용',
+  `del_yn` enum('Y','N') NOT NULL DEFAULT 'N' COMMENT '삭제여부',
+  `created_dt` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
+  `created_id` bigint(20) unsigned NOT NULL COMMENT '생성자 (tbl_user.user_id)',
+  `updated_dt` datetime DEFAULT NULL COMMENT '수정일시',
+  `updated_id` bigint(20) unsigned DEFAULT NULL COMMENT '수정자 (tbl_user.user_id)',
+  PRIMARY KEY (`comment_id`),
+  KEY `idx_comment_article` (`article_id`,`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `tbl_user_session` (

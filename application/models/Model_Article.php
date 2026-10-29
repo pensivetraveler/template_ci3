@@ -7,12 +7,12 @@ class Model_Article extends Model_Common
 {
 	public string  $table = 'article';
 	public string  $identifier = 'article_id';
-	public array   $primaryKeyList = ['article_id','board_id'];
+	public array   $primaryKeyList = ['article_id'];
 	public array   $uniqueKeyList = [];
-	public array   $notNullList = ['article_id','board_id','subject','content','del_yn','open_yn'];
-	public array   $nullList = ['thumbnail','view_count'];
-	public array   $strList = ['subject','content','del_yn','open_yn'];
-	public array   $intList = ['article_id','board_id','view_count'];
+	public array   $notNullList = ['article_id','board_id','subject','del_yn','open_yn'];
+	public array   $nullList = ['parent_id','content','thumbnail','link','view_count'];
+	public array   $strList = ['subject','content','link','del_yn','open_yn'];
+	public array   $intList = ['article_id','board_id','parent_id','view_count'];
 	public array   $fileList = ['thumbnail'];
 
 	public bool    $isAutoIncrement = true;

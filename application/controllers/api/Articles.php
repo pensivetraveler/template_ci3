@@ -16,14 +16,51 @@ class Articles extends Common
 		$this->load->model('Model_User');
 		$this->load->model('Model_Board');
 		$this->load->model('Model_Article_Attachment');
-		$this->load->model('Model_Article_Prefer');
 
 		$this->setProperties($this->Model);
 
+		// 게시판(board_id)은 요청으로 받는다 (예전에는 1 로 고정)
 		$this->defaultList = [
-			'board_id' => 1,
+			'open_yn' => 'Y',
 			'del_yn' => 'N',
 		];
+	}
+
+	protected function beforePost($key = 0, $model = null): array
+	{
+		list($key, $data) = parent::beforePost($key, $model);
+		$this->checkBoardExist($data);
+		return [$key, $data];
+	}
+
+	protected function beforePut($key = 0, $model = null): array
+	{
+		list($key, $data) = parent::beforePut($key, $model);
+		$this->checkBoardExist($data);
+		return [$key, $data];
+	}
+
+	protected function beforePatch($key = 0, $model = null): array
+	{
+		list($key, $data) = parent::beforePatch($key, $model);
+		$this->checkBoardExist($data);
+		return [$key, $data];
+	}
+
+	/**
+	 * 보낸 board_id 가 있는 게시판인지 (없으면 400)
+	 */
+	protected function checkBoardExist(array $data): void
+	{
+		if(!isset($data['board_id']) || $data['board_id'] === '') return;
+		if($this->Model_Board->getCntWhere(['board_id' => $data['board_id']])) return;
+
+		$this->responseError([
+			'location' => __METHOD__,
+			'param' => 'board_id',
+			'value' => $data['board_id'],
+			'msg' => '없는 게시판입니다.',
+		], [], RestController::HTTP_BAD_REQUEST);
 	}
 
 	protected function transformView($data): object
