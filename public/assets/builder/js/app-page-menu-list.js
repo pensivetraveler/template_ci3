@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 메뉴 데이터 로드 함수
     function loadMenuData(alert = false) {
-        fetch('/admin/api/menuList', {
+        fetch(common.API_BASE_URI + 'menuList', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

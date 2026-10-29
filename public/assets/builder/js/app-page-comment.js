@@ -183,7 +183,7 @@ $(function() {
 		// Send the form data to back-end
 		// You need to grab the form data and create an Ajax request to send them
 		submitAjax('#formComment', {
-			url: '/api/comments'+(formComment.comment_id.value?'/'+formComment.comment_id.value:''),
+			url: common.API_BASE_URI + 'comments'+(formComment.comment_id.value?'/'+formComment.comment_id.value:''),
 			success: function(response) {
 				showAlert({
 					type: 'success',
@@ -259,7 +259,7 @@ $(function() {
 				}).then(function (result) {
 					if (result.isConfirmed) {
 						executeAjax({
-							url: '/api/comments/'+formComment.comment_id.value,
+							url: common.API_BASE_URI + 'comments/'+formComment.comment_id.value,
                             headers: {
                                 'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
                             },

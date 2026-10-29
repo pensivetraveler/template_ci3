@@ -9,7 +9,7 @@ extract(trans_formdata_dit_type($formData));
 				<?php if(isset($hideLogoAtLogin)&&$hideLogoAtLogin === false): ?>
 				<!-- Logo -->
 				<div class="app-brand justify-content-center mt-5">
-					<a href="/admin" class="app-brand-link gap-2">
+					<a href="<?=base_url('admin')?>" class="app-brand-link gap-2">
 						<span class="app-brand-logo demo">
 							<?php if(file_exists(PLATFORM_ASSET_IMG_PATH.'logo.png')): ?>
 							<img src="<?=base_url(PLATFORM_ASSET_IMG_URI.'logo.png')?>" alt="logo">

@@ -1,7 +1,7 @@
 function setViewCount() {
 	executeAjax({
 		async: false,
-		url: '/api/articleRead/',
+		url: common.API_BASE_URI + 'articleRead/',
 		headers: {
 			'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
 		},
