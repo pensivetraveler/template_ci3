@@ -47,6 +47,7 @@ CodeIgniter 3 기반 관리자 템플릿이다. 설정 파일(config)만으로 �
 1. 빈 DB에 [docs/schema/schema.sql](docs/schema/schema.sql)(표 구조) → [docs/schema/seed.sql](docs/schema/seed.sql)(기본 코드·환경값) 순서로 실행한다.
 2. 처음 접속하면 설치 화면에서 시스템 관리자(USR000)를 만든다. 설치 화면에 schema.sql을 붙여 넣어 표를 만들 수도 있다(개발 환경만, 표 구조만이라 seed.sql은 따로 실행).
 3. DB 구조를 바꾸면 `schema.sql`과 `docs/migrations/<날짜>-<주제>.sql`을 같이 고친다. 자세한 규칙은 [docs/schema/README.md](docs/schema/README.md)
+4. 로컬 검증 서버(Docker): [docker/README.md](docker/README.md) — 빈 DB에서 설치부터 화면까지 확인할 때
 
 ---
 

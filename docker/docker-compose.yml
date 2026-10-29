@@ -1,0 +1,39 @@
+# template_ci3 검증 서버 (로컬). 사용법: docker/README.md
+name: template-ci3
+
+services:
+  web:
+    build: ./php
+    ports:
+      - "8080:80"
+    volumes:
+      - ..:/var/www/html
+      # 앱은 .env.development 를 읽는다. 저장소의 파일 대신 검증 서버용 값을 컨테이너 안에서만 겹쳐 쓴다
+      - ./.env.docker:/var/www/html/.env.development:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_DATABASE: template
+      MARIADB_USER: template
+      MARIADB_PASSWORD: template
+      MARIADB_ROOT_PASSWORD: template-root
+      TZ: Asia/Seoul
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      # 빈 볼륨으로 처음 뜰 때만 실행된다 (이름순)
+      - ../docs/schema/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ../docs/schema/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      retries: 40
+
+volumes:
+  db-data:
