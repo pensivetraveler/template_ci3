@@ -21,6 +21,17 @@ class Model_File extends Model_Common
 	public bool    $isUpdatedDt = false;
 
 	/**
+	 * file_path·full_path 는 서버 절대 경로 대신 저장소 키로 저장한다 (설치 경로가 바뀌어도 다운로드·삭제가 되도록). s3:// 는 그대로
+	 */
+	function addData($set, $bool = false)
+	{
+		foreach (['file_path', 'full_path'] as $column) {
+			if (isset($set[$column]) && strpos((string)$set[$column], 's3://') !== 0) $set[$column] = get_file_key_from_path($set[$column]);
+		}
+		return parent::addData($set, $bool);
+	}
+
+	/**
 	 * file_link 는 저장소 키(예: public/uploads/…)로 저장하고, 읽을 때 지금 서버 기준 주소로 바꿔 돌려준다 (get_file_url).
 	 * 예전에 저장한 전체 주소는 그대로 (docs/migrations/2026-10-30-file-link-relative.sql 로 키로 바꿀 수 있음)
 	 */

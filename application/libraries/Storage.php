@@ -395,6 +395,9 @@ class Storage
         foreach (array_unique([str_replace('\\', '/', FCPATH), str_replace('\\', '/', (string)realpath(FCPATH)) . '/']) as $base) {
             if ($base !== '/' && strpos($uri, $base) === 0) return substr($uri, strlen($base));
         }
+        // 다른 설치 경로에서 저장한 절대 경로(서버 이전 등)는 업로드 폴더부터
+        $uploads = strpos($uri, '/public/uploads/');
+        if ($uploads !== false) return substr($uri, $uploads + 1);
         return ltrim($uri, '/');
     }
 
