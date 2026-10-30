@@ -66,6 +66,8 @@
 
 - [x] `.env.*`를 git에서 제외하고 `.env.example`만 커밋할지 결정 → 제외함 (`57b0483`, 저장소가 공개라 이전 커밋의 값은 교체 필요)
 - [x] JWT 키를 `jwt_config.php`에서 `.env`의 `JWT_KEY`로 이동 (`57b0483`)
+- [x] (2026-10-30 `8ac6f0f`) `SESS_EXPIRATION`·`SESS_SAVE_PATH`는 `MY_Hooks::loadEnv`에서 적용 — config 파일은 `.env`를 읽기 전에 평가되어 `getenv`로는 `.env` 파일 값이 안 보인다
+- [ ] config의 `proxy_ips = getenv('PROXY_IPS')`도 같은 이유로 `.env` 파일 값이 반영되지 않음 (프로세스 환경 변수로 넣는 bizsoft 운영은 정상). `.env` 파일만 쓰는 파생 프로젝트가 생기면 `loadEnv`로 옮길 것
 
 ## 5. 코드 검토에서 나온 남은 항목
 
