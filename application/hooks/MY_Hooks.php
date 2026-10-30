@@ -145,7 +145,8 @@ class MY_Hooks
         $CI->output->set_header("Strict-Transport-Security: max-age=31536000")
             ->set_header("X-Content-Type-Options: nosniff")
             ->set_header("Referrer-Policy: strict-origin")
-            ->set_header("X-Frame-Options: DENY")
+            // 같은 사이트만 iframe 허용 (목록 셀 onclick popup 이 같은 사이트 화면을 띄움). 다른 사이트의 iframe(클릭재킹)은 막음
+            ->set_header("X-Frame-Options: SAMEORIGIN")
             ->set_header("X-XSS-Protection: 1; mode=block");
     }
 

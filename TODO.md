@@ -312,7 +312,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [ ] `app-page-list.js::renderColumn` class 키는 `classes`(배열)이고 구 README의 `class_name`은 읽지 않음
 - [x] (2026-10-26 C-1-1: 기본값 < 항목 < list_attributes) `MY_Builder_WEB::setListColumns` base 키는 item top-level 값이 `list_attributes`를 덮어써 `list_attributes`의 onclick/render/type 등이 무시됨 (merge 순서 변경 검토)
 - [x] (2026-10-26 C-2-4: getListConfigFromForm 공통) `MY_Builder_WEB::getListColumns` WEB은 form config `list => true` fallback이 없고 list config가 없으면 `show_error` (API와 동작 다름)
-- [ ] `app-page-list.js::getColumnOnclick` `popup` kind 미구현(빈 onclick) (구 README의 iframe 모달 동작 없음)
+- [x] (2026-10-30: 화면 전체 모달 iframe(`openPopupModal`), 새 창 링크, X-Frame-Options SAMEORIGIN) `app-page-list.js::getColumnOnclick` `popup` kind 미구현(빈 onclick) (구 README의 iframe 모달 동작 없음)
 - [x] (2026-10-30 B-6: 목록 `properties.viewConfig`로 모달 상세 — `view_modal.php`를 Bootstrap 모달로, `applyViewData` 공용, 수정·삭제는 목록 버튼 처리 재사용. 게시판 관리에 적용) `app-page-list.js::openViewModal` `getData()` 후 `console.log`만 하는 스텁이고 `view_modal.php`를 포함하는 곳 없음 (onclick view에 `attrs`가 없거나 `PAGE_VIEW_URI`가 없으면 상세 보기 불가) (보류: 모달 상세는 페이지형 상세 확인 후 다음 단계)
 - [ ] `app-page-list.js::renderColumnHTML` `bs` kind는 `attrs` 1단계 키만 `data-bs-{key}`로 부여 (구 README의 중첩 `attrs.attrs` 미지원)
 - [ ] `app-page-list.js::renderSelectColumn` `onchange`는 함수명 문자열만 동작, `{kind, attrs, params}` dict는 `[object Object]`

@@ -189,13 +189,20 @@ function renderMenuAuthCheckbox(data, type, full, meta, column, params) {
 | kind | 동작 |
 |---|---|
 | `view` | URL 이동: `attrs.href` → 없으면 `PAGE_VIEW_URI`. URL = `getUrlWithIdentifiers(uri, ids)` (ids = `params` 필드 목록 또는 `IDENTIFIER`). `attrs.target`: `_blank` → 새 창, `_self`(기본) → 현재 창, 그 밖의 값 → `openViewModal(ids, target)`. URL이 없으면 `openViewModal(ids)`. `type ≠ button`이면 `text-primary text-decoration-underline` 추가 |
-| `popup` | **미구현** — 빈 onclick만 붙는다 |
+| `popup` | 화면 전체 모달 안 iframe 으로 연다(`openPopupModal()`). 주소: `attrs.href`가 있으면 `getUrlWithIdentifiers(href, ids)`, 없으면 셀 값. 제목: `attrs.title` → 컬럼 label. http(s)·같은 사이트 경로만 열고, 외부 주소는 referrer 를 보내지 않는다. 머리글에 "새 창으로 열기" 링크(iframe 을 막는 외부 사이트용). 닫으면 iframe 을 비운다. 같은 사이트 화면은 `X-Frame-Options: SAMEORIGIN`(MY_Hooks::setHeaderSecure)이라 열린다 |
 | `redirect` | 셀 값 주소로 이동. `attrs.target === '_blank'`면 새 창 |
 | `download` | 값이 `{file_id}` 객체여야 함 → `location.href = "{CURRENT_URI}/downloader/{file_id}"` (`MY_Controller::downloader()`). 파일 배열이면 파일별 링크. `text` 미지정 시 `'Download'` |
 | `bs` | onclick 없음. `attrs`의 1단계 키를 `data-bs-{key}`로 부여 (`{toggle: 'modal', target: '#m'}` → `data-bs-toggle="modal" data-bs-target="#m"`). 값이 비면(noValue=false) 부여 안 함. 중첩 `attrs.attrs`는 지원 안 함 |
 | 그 외(custom) | `window[kind]`가 함수가 아니면 아무것도 안 함. 함수면 `kind(element, params)` 호출. `element` = 클릭된 셀 wrapper 요소, `params` = 설정 값 그대로(없거나 빈 값이면 `null`) |
 
-`openViewModal(dataId, modalId)`는 **미구현** 스텁이다(`getData()`로 조회 후 `console.log`만 함).
+`openViewModal(dataId, modalId)`는 목록 `properties.viewConfig`가 있을 때 모달 상세를 연다([view-excel.md](view-excel.md) "목록에서 모달로 보기"). 없으면 경고만 남긴다.
+
+```php
+// 예: 링크 컬럼을 팝업으로
+['field' => 'link', 'label' => 'lang:article.link', 'type' => 'button', 'text' => 'Link', 'onclick' => ['kind' => 'popup']],
+// 예: 같은 사이트 화면을 행 식별자로 열기
+['field' => 'partner_id', 'type' => 'button', 'text' => 'Detail', 'onclick' => ['kind' => 'popup', 'attrs' => ['href' => '/admin/partners/view', 'title' => 'Partner']]],
+```
 
 ```php
 [

@@ -121,3 +121,4 @@ $lang['What is System Code'] = 'What is System Code ?';
 $lang['What is System Config'] = 'What is System Config ?';
 $lang['View Record'] = 'View Record';
 $lang['Close'] = 'Close';
+$lang['Open In New Window'] = 'Open In New Window';

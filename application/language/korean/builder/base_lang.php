@@ -121,3 +121,4 @@ $lang['What is System Code'] = '시스템 코드란 ?';
 $lang['What is System Config'] = '환경값 설정이란 ?';
 $lang['View Record'] = '상세 보기';
 $lang['Close'] = '닫기';
+$lang['Open In New Window'] = '새 창으로 열기';

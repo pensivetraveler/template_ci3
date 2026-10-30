@@ -822,7 +822,7 @@ function isSafeListUrl(url) {
 
 /**
  * 셀 클릭 동작을 data-cell-click(JSON)로 표현한다. bindListCellEvents 가 실행한다.
- *   {type:'url', url, target} | {type:'modal', ids, target} | {type:'func', func, params}
+ *   {type:'url', url, target} | {type:'modal', ids, target} | {type:'popup', url, title} | {type:'func', func, params}
  */
 function getColumnClickAction(data, full, column) {
 	const key = Object.hasOwn(column, 'onClick')?'onClick':'onclick';
@@ -848,7 +848,13 @@ function getColumnClickAction(data, full, column) {
 		case 'download' :
 			if(data === null || data === undefined || !data.file_id) return null;
 			return {type: 'url', url: `${common.CURRENT_URI}/downloader/${encodeURIComponent(data.file_id)}`, target: '_self'};
-		case 'popup' :
+		case 'popup' : {
+			// 셀 값(링크) 또는 attrs.href + 행 식별자를 화면 전체 모달의 iframe 으로 연다
+			const url = onclick.attrs?.href ? getUrlWithIdentifiers(onclick.attrs.href, ids()) : data;
+			if(url === null || url === undefined || String(url).trim() === '') return null;
+			const title = onclick.attrs?.title ?? column.label ?? column.field;
+			return {type: 'popup', url: String(url).trim(), title: getLocale(title, common.LOCALE)};
+		}
 		case 'bs' :
 			return null;
 		default : {
@@ -887,6 +893,9 @@ function bindListCellEvents() {
 				break;
 			case 'modal' :
 				openViewModal(action.ids, action.target);
+				break;
+			case 'popup' :
+				openPopupModal(action.url, action.title);
 				break;
 			case 'func' :
 				if(typeof window[action.func] === 'function') window[action.func](this, action.params);
@@ -1227,6 +1236,68 @@ function afterSelectColumnChange(idData, field, value) {
 			});
 		}
 	});
+}
+
+/**
+ * 팝업으로 열 수 있는 주소인지: http(s) 또는 같은 사이트 경로만 (iframe 에 mailto·tel 등은 의미가 없다)
+ */
+function getPopupUrl(url) {
+	if(!isSafeListUrl(url)) return null;
+	let parsed;
+	try { parsed = new URL(url, location.href); } catch (error) { return null; }
+	return ['http:', 'https:'].includes(parsed.protocol) ? parsed : null;
+}
+
+/**
+ * 목록 셀 onclick.kind 'popup': 화면 전체 모달 안 iframe 으로 주소를 연다
+ * iframe 을 막는 외부 사이트가 많아 머리글에 새 창으로 열기 링크를 둔다. 닫으면 iframe 을 비운다(영상·소리 정지)
+ */
+function openPopupModal(url, title = '') {
+	const parsed = getPopupUrl(url);
+	if(!parsed) {
+		console.warn('openPopupModal : unsupported url', url);
+		return;
+	}
+
+	let modalEl = document.getElementById('listPopupModal');
+	if(!modalEl) {
+		modalEl = document.createElement('div');
+		modalEl.className = 'modal fade';
+		modalEl.id = 'listPopupModal';
+		modalEl.tabIndex = -1;
+		modalEl.setAttribute('aria-hidden', 'true');
+		modalEl.innerHTML = `
+			<div class="modal-dialog modal-fullscreen">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title text-truncate"></h5>
+						<a class="btn btn-sm btn-outline-secondary ms-auto me-2 popup-new-window" target="_blank" rel="noopener noreferrer"></a>
+						<button type="button" class="btn-close ms-0" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body p-0">
+						<iframe class="w-100 h-100 border-0"></iframe>
+					</div>
+				</div>
+			</div>`;
+		modalEl.querySelector('.popup-new-window').textContent = getLocale('Open In New Window', common.LOCALE);
+		modalEl.querySelector('.btn-close').setAttribute('aria-label', getLocale('Close', common.LOCALE));
+		modalEl.addEventListener('hidden.bs.modal', () => {
+			modalEl.querySelector('iframe').src = 'about:blank';
+		});
+		document.body.append(modalEl);
+	}
+
+	const iframe = modalEl.querySelector('iframe');
+	// 외부 주소에는 관리자 화면 주소(referrer)를 보내지 않는다
+	if(parsed.origin === location.origin) iframe.removeAttribute('referrerpolicy');
+	else iframe.setAttribute('referrerpolicy', 'no-referrer');
+	iframe.title = title;
+	iframe.src = parsed.href;
+
+	modalEl.querySelector('.modal-title').textContent = title;
+	modalEl.querySelector('.popup-new-window').href = parsed.href;
+
+	bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 /**
