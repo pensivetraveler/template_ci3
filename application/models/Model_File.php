@@ -14,6 +14,8 @@ class Model_File extends Model_Common
 	public array   $strList = ['file_name','file_link','file_type','file_path','full_path','raw_name','orig_name','client_name','file_ext','image_type','image_size_str',];
 	public array   $intList = ['file_id','file_size','is_image','image_width','image_height','download_cnt'];
 	public array   $fileList = [];
+	// 저장 경로는 응답에 싣지 않는다 (다운로드·삭제는 기본 조회로 읽음)
+	public array   $notIncludeColumns = ['file_path', 'full_path'];
 
 	public bool    $isAutoIncrement = true;
 	public bool    $isCreatedDt = true;

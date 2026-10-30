@@ -320,7 +320,7 @@ class MY_Controller extends CI_Controller
 
     protected function getFileList($dto)
     {
-        return $this->Model_File->getList([], $dto);
+        return $this->Model_File->getList($this->Model_File->notIncludeSelects(), $dto);
     }
 
     protected function delFileData($dto)

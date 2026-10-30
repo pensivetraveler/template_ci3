@@ -429,7 +429,7 @@ class MY_Builder_API extends MY_Controller_API
                 }
                 if($data->{$key}) {
                     $file_id = $data->{$key};
-                    $file_dto = $this->Model_File->getListWhere([], ['file_id' => $file_id]);
+                    $file_dto = $this->Model_File->getListWhere($this->Model_File->notIncludeSelects(), ['file_id' => $file_id]);
                     if($file_dto) {
                         $data->{$key} = $file_dto;
                     }else{

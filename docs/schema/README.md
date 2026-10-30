@@ -26,4 +26,4 @@
 ## 값 형식
 
 - `tbl_file.file_link`(2026-10-30~): 전체 주소가 아니라 저장소 키(예: `public/uploads/articles/2026/a.png`)를 저장한다. API·화면에는 `Model_File`이 읽을 때 지금 서버 기준 주소(로컬 `base_url`, S3 CDN)로 바꿔 준다(`get_file_url`). 예전에 저장한 전체 주소(`http(s)://…`)는 그대로 쓰이고, `../migrations/2026-10-30-file-link-relative.sql`로 로컬 파일 행을 키로 바꿀 수 있다.
-- `tbl_file.file_path`·`full_path`(2026-10-30~): 로컬 파일은 저장소 키(`public/uploads/…`), S3 파일은 `s3://버킷/키`. `Model_File::addData`가 저장 직전에 바꾼다(컬럼 설명 `Absolute server path`는 예전 값 기준). 예전 절대 경로도 `Storage::keyFromUri`가 읽고(설치 경로가 달라도 `/public/uploads/`부터), `../migrations/2026-10-30-file-path-relative.sql`로 키로 바꿀 수 있다.
+- `tbl_file.file_path`·`full_path`(2026-10-30~): 로컬 파일은 저장소 키(`public/uploads/…`), S3 파일은 `s3://버킷/키`. `Model_File::addData`가 저장 직전에 바꾼다(컬럼 설명 `Absolute server path`는 예전 값 기준). 예전 절대 경로도 `Storage::keyFromUri`가 읽고(설치 경로가 달라도 `/public/uploads/`부터), `../migrations/2026-10-30-file-path-relative.sql`로 키로 바꿀 수 있다. API 응답에는 싣지 않는다(`Model_File::$notIncludeColumns`, `notIncludeSelects()`).

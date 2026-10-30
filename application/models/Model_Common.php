@@ -3,6 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Model_Common extends MY_Model
 {
+    /**
+     * 응답용 조회에서 뺄 컬럼 (notIncludeSelects). 기본 조회(getList·getData 의 빈 select)에는 영향 없음
+     */
+    public array $notIncludeColumns = [];
+
     function __construct()
     {
         parent::__construct();
@@ -195,6 +200,19 @@ class Model_Common extends MY_Model
         }
         foreach ($columnList as $idx=>$column) $columnList[$idx] = "$this->table.$column";
         return $columnList;
+    }
+
+    /**
+     * 기본 select 목록에서 notIncludeColumns 를 뺀 목록. 응답에 실을 행을 조회할 때 select 로 넘긴다
+     * 예: $this->Model_File->getList($this->Model_File->notIncludeSelects(), $dto)
+     */
+    public function notIncludeSelects(): array
+    {
+        $excluded = array_map(function ($column) {
+            return "$this->table.$column";
+        }, $this->notIncludeColumns);
+
+        return array_values(array_diff($this->getSelectList(), $excluded));
     }
 
     protected function getValidSetList($set, $isUpdate = true): array

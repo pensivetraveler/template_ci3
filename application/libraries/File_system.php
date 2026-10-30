@@ -181,7 +181,7 @@ class File_system
     {
         if(!$this->fileModelLoaded) show_error('File Model not loaded');
 
-        return $this->CI->Model_File->getList([], $dto);
+        return $this->CI->Model_File->getList($this->CI->Model_File->notIncludeSelects(), $dto);
     }
 
     protected function delFileData($dto)
