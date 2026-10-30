@@ -16,6 +16,9 @@ class Auth extends Common
 
         $this->setProperties($this->Model, false);
 
+        // 자동 로그인 쿠키 이름·기간·사용자당 개수 (WEB 의 loginWithAutologinCookie 와 같은 설정)
+        $this->config->load('extra/autologin_config', false);
+
         // 엔드포인트별 인증·키·로그 설정은 config/extra/api/api_method_config.php 의 'auth' 항목
     }
 
@@ -111,6 +114,12 @@ class Auth extends Common
             }
         }
 
+        // 이 브라우저의 이전 자동 로그인 행·만료 행 정리 (다시 로그인할 때마다 새 행만 쌓이던 문제)
+        $cookieName = $this->config->item('autologin_cookie_name') ?: 'autologin';
+        $lifetime = (int)($this->config->item('autologin_cookie_lifetime') ?: 86400 * 30);
+        $this->clearBrowserAutologin($cookieName, !$this->input->post('autologin'));
+        $this->purgeExpiredAutologin($lifetime);
+
         if ($this->input->post('autologin')) {
             $vericode = array('$', '/', '.');
 
@@ -135,7 +144,9 @@ class Auth extends Common
 
             $cookie_value = $hash;
 
-            set_cookie('autologin', $cookie_value, 2592000); // 30일간 저장
+            $this->trimUserAutologin(element('user_id', (array) $userData));
+
+            set_cookie($cookieName, $cookie_value, $lifetime);
         }
 
         $this->startUserSession($userData);
@@ -149,6 +160,46 @@ class Auth extends Common
                 'autologin' => isset($cookie_value),
             ],
         ]);
+    }
+
+    /**
+     * 요청에 자동 로그인 쿠키가 있으면 그 행을 지운다. $deleteCookie 면 쿠키도 (자동 로그인을 끄고 로그인한 경우)
+     */
+    protected function clearBrowserAutologin(string $cookieName, bool $deleteCookie): void
+    {
+        $key = get_cookie($cookieName);
+        if(!$key) return;
+
+        $this->Model_User_Autologin->delData(['aul_key' => $key]);
+        if($deleteCookie) delete_cookie($cookieName);
+    }
+
+    /**
+     * 기간(autologin_cookie_lifetime)이 지난 행을 모든 사용자에서 지운다. 쿠키로 다시 오지 않는 브라우저의 행이 남지 않도록
+     */
+    protected function purgeExpiredAutologin(int $lifetime): void
+    {
+        $this->db->group_start()
+            ->where('aul_datetime <', date('Y-m-d H:i:s', ctimestamp() - $lifetime))
+            ->or_where('aul_datetime IS NULL', null, false)
+            ->group_end()
+            ->delete($this->Model_User_Autologin->table);
+    }
+
+    /**
+     * 사용자당 최신 autologin_max_per_user 개(기본 5)만 남긴다. 넘으면 가장 오래된 기기의 자동 로그인이 풀린다
+     */
+    protected function trimUserAutologin($userId): void
+    {
+        $max = (int)($this->config->item('autologin_max_per_user') ?: 5);
+        $ids = array_column($this->db->select('aul_id')
+            ->where('user_id', $userId)
+            ->order_by('aul_datetime', 'DESC')
+            ->order_by('aul_id', 'DESC')
+            ->get($this->Model_User_Autologin->table)->result_array(), 'aul_id');
+
+        $old = array_slice($ids, $max);
+        if(count($old)) $this->db->where('user_id', $userId)->where_in('aul_id', $old)->delete($this->Model_User_Autologin->table);
     }
 
     public function signup_post()
