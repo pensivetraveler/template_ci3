@@ -369,7 +369,7 @@ $config['encryption_key'] = '';
 */
 $config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'ci_session';
-$config['sess_expiration'] = 7200;
+$config['sess_expiration'] = 7200; // .env SESS_EXPIRATION 이 있으면 MY_Hooks::loadEnv 가 덮어씀
 $config['sess_save_path'] = 'tbl_user_session';
 $config['sess_expire_on_close'] = FALSE;
 $config['sess_encrypt_cookie'] = TRUE;

@@ -371,9 +371,10 @@ $config['encryption_key'] = '';
 $config['sess_driver'] = 'files';
 $config['sess_cookie_name'] = 'ci_session';
 $config['sess_samesite'] = 'Lax';
-// 세션 유휴 유지 시간(초)·저장 폴더. .env SESS_EXPIRATION / SESS_SAVE_PATH 로 바꿀 수 있음 (없으면 2시간·PHP 기본 위치)
-$config['sess_expiration'] = (int)(getenv('SESS_EXPIRATION') ?: 7200);
-$config['sess_save_path'] = getenv('SESS_SAVE_PATH') ?: NULL;
+// 세션 유휴 유지 시간(초)·저장 폴더. .env SESS_EXPIRATION / SESS_SAVE_PATH 가 있으면 MY_Hooks::loadEnv 가 덮어씀
+// (이 파일은 .env 를 읽기 전에 평가되므로 여기서 getenv 로 읽으면 .env 파일 값이 반영되지 않는다)
+$config['sess_expiration'] = 7200;
+$config['sess_save_path'] = NULL;
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 300;
 $config['sess_regenerate_destroy'] = FALSE;

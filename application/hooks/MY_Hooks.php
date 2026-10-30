@@ -41,6 +41,17 @@ class MY_Hooks
             $key = hex2bin(substr($key, 4));
         }
         $this->config['encryption_key'] = $key;
+
+        // 세션 설정: config.php 는 .env 를 읽기 전에 평가되므로 여기서 덮어쓴다 (세션 라이브러리는 이후에 로드됨)
+        $sessExpiration = getenv('SESS_EXPIRATION');
+        if ($sessExpiration !== false && ctype_digit($sessExpiration) && (int)$sessExpiration > 0) {
+            $this->config['sess_expiration'] = (int)$sessExpiration;
+        }
+        // 저장 폴더는 files 드라이버일 때만 (database 드라이버의 sess_save_path 는 테이블 이름)
+        $sessSavePath = getenv('SESS_SAVE_PATH');
+        if ($sessSavePath !== false && $sessSavePath !== '' && ($this->config['sess_driver'] ?? 'files') === 'files') {
+            $this->config['sess_save_path'] = $sessSavePath;
+        }
     }
 
     public function systemOfInspection()
