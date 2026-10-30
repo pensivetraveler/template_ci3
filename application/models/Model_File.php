@@ -19,4 +19,37 @@ class Model_File extends Model_Common
 	public bool    $isCreatedDt = true;
 	public bool    $isCreatedId = true;
 	public bool    $isUpdatedDt = false;
+
+	/**
+	 * file_link 는 저장소 키(예: public/uploads/…)로 저장하고, 읽을 때 지금 서버 기준 주소로 바꿔 돌려준다 (get_file_url).
+	 * 예전에 저장한 전체 주소는 그대로 (docs/migrations/2026-10-30-file-link-relative.sql 로 키로 바꿀 수 있음)
+	 */
+	function getData($select = [], $dto = [])
+	{
+		$result = parent::getData($select, $dto);
+		if (is_array($select) && count($select) === 1) {
+			return $this->isFileLinkSelect($select[0]) && $result !== null ? get_file_url($result) : $result;
+		}
+		return $this->withFileUrl($result);
+	}
+
+	function getList($select = [], $dto = [], $filter = [])
+	{
+		$result = parent::getList($select, $dto, $filter);
+		if (is_array($select) && count($select) === 1) {
+			return $this->isFileLinkSelect($select[0]) ? array_map('get_file_url', $result) : $result;
+		}
+		return array_map([$this, 'withFileUrl'], $result);
+	}
+
+	protected function withFileUrl($row)
+	{
+		if (is_object($row) && property_exists($row, 'file_link')) $row->file_link = get_file_url($row->file_link);
+		return $row;
+	}
+
+	protected function isFileLinkSelect($column): bool
+	{
+		return is_string($column) && preg_match('/(^|\.)file_link$/', trim($column)) === 1;
+	}
 }

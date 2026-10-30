@@ -56,7 +56,7 @@ class File_system
 
                         $data = $this->CI->upload->data();
                         $key = $this->CI->Model_File->addData(array_merge($data,
-                            ['file_link' => get_filepath_from_link($data['full_path'])]
+                            ['file_link' => get_file_key_from_path($data['full_path'])]
                         ), false);
                         if (!$key) throw new Exception('FILE DB Error', WRITE_FILEDB_FAIL);
 

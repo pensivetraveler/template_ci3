@@ -22,3 +22,8 @@
   - 게시판: `reply`(템플릿 코드가 쓰지 않음, 답변 여부는 관리자 댓글로 계산), `article_prefer`(좋아요·싫어요, 모델 없음 — cwspecial 에 있음)
   - 그 밖: `message`, `language_code`, `log_email`, `sys_version`, `sys_version_current`, `uuid_token`
 - 게시판 표(2026-10-29): playtalktalk 의 article·article_attachment·article_read 구조에서 프로젝트 전용 컬럼(program_id·stage_id)을 빼고, 템플릿 코드가 쓰는 `open_yn`(공개 여부)·`article_read.read_dt`를 더했다. board·comment 는 SQL 이 없어 모델과 API(`Comments` depth 0 댓글·1 답글)에 맞춰 설계
+
+## 값 형식
+
+- `tbl_file.file_link`(2026-10-30~): 전체 주소가 아니라 저장소 키(예: `public/uploads/articles/2026/a.png`)를 저장한다. API·화면에는 `Model_File`이 읽을 때 지금 서버 기준 주소(로컬 `base_url`, S3 CDN)로 바꿔 준다(`get_file_url`). 예전에 저장한 전체 주소(`http(s)://…`)는 그대로 쓰이고, `../migrations/2026-10-30-file-link-relative.sql`로 로컬 파일 행을 키로 바꿀 수 있다.
+- `tbl_file.full_path`: 아직 서버 절대 경로(로컬 `/var/www/html/public/…`) 또는 `s3://버킷/키`. 배포 경로가 바뀌면 로컬 파일 다운로드·삭제가 실패할 수 있다(TODO).

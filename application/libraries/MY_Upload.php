@@ -42,7 +42,8 @@ class MY_Upload extends CI_Upload
 			$data['full_path'] = $this->storedUri;
 			$data['file_path'] = dirname($this->storedUri) . '/';
 		}
-		$data['file_link'] = get_filepath_from_link($data['full_path']);
+		// 전체 주소가 아닌 저장소 키로 (주소는 Model_File 이 읽을 때 get_file_url 로 만든다)
+		$data['file_link'] = get_file_key_from_path($data['full_path']);
 
 		if (!empty($index)) return $data[$index] ?? NULL;
 		return $data;
