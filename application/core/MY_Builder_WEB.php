@@ -41,6 +41,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
     public bool $isSystemAdmin = false;
     public array $errors = [];
     public bool $methodNotInRoute = false;
+    /**
+     * route methods 에 없어도 부를 수 있는 공통 메서드 (화면의 기준 메서드 설정·메뉴 권한을 빌려 씀).
+     * downloader: 상세·수정 폼 첨부, 목록 download 셀의 {CURRENT_URI}/downloader/{file_id}
+     */
+    protected array $commonMethods = ['downloader'];
     protected bool $tokenExpired = false;
 
 
@@ -194,6 +199,15 @@ class MY_Builder_WEB extends MY_Controller_WEB
         ];
 
         $this->viewApp($data);
+    }
+
+    /**
+     * 파일 다운로드. 파일이 없거나 번호가 잘못되면 빈 화면 대신 알림 후 이전 화면으로
+     */
+    public function downloader($key = 0)
+    {
+        $result = parent::downloader($key);
+        if($result !== true) alert(lang('File Not Found'));
     }
 
     protected function checkIdentifierExist($key = 0)
@@ -518,6 +532,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
         $config = $this->routeConfig['methods'] ?? $this->config->get("method_config", [], false);
         if(empty($config)) return;
+
+        if(!array_key_exists($method, $config) && empty($data) && in_array($method, $this->commonMethods, true)) {
+            // 공통 메서드: 기준 화면 설정으로 (권한은 setupPlatformPage 가 그 화면 기준으로 확인)
+            $method = $this->routeConfig['properties']['baseMethod'];
+        }
 
         if(!array_key_exists($method, $config) && empty($data)) {
             if($method === 'index') {

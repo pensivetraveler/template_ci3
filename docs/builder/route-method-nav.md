@@ -197,7 +197,8 @@ route_config[class]                    (가장 우선)
 - `MY_Builder_WEB::setMethodConfig()`:
   - 대상 method는 요청 method. `index`면 `baseMethod`를 쓴다.
   - `routeConfig['methods']`에서 찾고, 없으면 소문자로 다시 찾는다.
-  - 목록에 없는 method면 `trigger_error` 후 생성자 안에서 `$this->index()`를 호출한다(이 시점엔 로그인 확인 전이라 `allowNoLogin=false` route는 `noLoginRedirect`로 간다).
+  - 목록에 없는 method면 오류 로그를 남기고 `methodNotInRoute`를 켠다 → `_remap()`이 로그인 검사 뒤 route 첫 화면으로 보낸다.
+  - 예외: `MY_Builder_WEB::$commonMethods`(기본 `['downloader']`)는 methods 에 없어도 부를 수 있다. 기준 메서드(baseMethod) 설정과 그 화면의 로그인·메뉴 권한 검사를 그대로 쓴다. 파일 다운로드 주소는 `{CURRENT_URI}/downloader/{file_id}`(화면 주소 기준), 파일이 없으면 "파일을 찾을 수 없습니다" 알림 후 이전 화면.
   - `category`가 없으면 `'base'`로 보고 적은 내용 위에 기본값을 채운다(로그에 경고). 2026-10-26 전에는 내용을 버리고 `method_base_config`를 그대로 썼다.
   - `category === 'action'`(화면 없는 메서드, 예: 파일 다운로드)이면 category별 레이어링은 하지 않고 `method_base_config`로 빈 키만 채운다. `mode`를 지정하지 않으면 `read`가 된다.
   - 그 외에는 `BuilderCommonTrait::fillMethodConfigProperties()`를 거친다.

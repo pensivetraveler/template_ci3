@@ -947,7 +947,7 @@ function setFormListItemFile(field, item, identifier = '') {
         `;
         return output;
     }else{
-        const url = common.BASE_URI+'/common';
+        const url = common.CURRENT_URI;
         return `
         <div class="form-list-item d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
             <div class="badge text-body text-truncate">
@@ -962,7 +962,7 @@ function setFormListItemFile(field, item, identifier = '') {
 }
 
 function setFormListItemThumbnail(field, item, identifier = '') {
-    const url = common.BASE_URI+'/common';
+    const url = common.CURRENT_URI;
     const fullItem = JSON.stringify(item).replace(/"/g, "'");
     return `
         <div class="form-list-item d-flex align-items-start flex-column justify-content-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
@@ -985,7 +985,7 @@ function setFormListItemThumbnail(field, item, identifier = '') {
 }
 
 function setFormListItemPreview(field, item, identifier = '') {
-    const url = location.origin+location.pathname;
+    const url = common.CURRENT_URI;
     const fullItem = JSON.stringify(item).replace(/"/g, "'");
     return `
         <div class="form-list-item d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">

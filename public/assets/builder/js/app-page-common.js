@@ -136,9 +136,9 @@ function checkDuplicate(button) {
     }
 }
 
+// 다운로드는 화면 주소(CURRENT_URI)의 downloader (수정·상세 페이지 주소 뒤에 붙이면 그 화면의 하위 경로가 됨)
 function downloadFile(fileId) {
-    const url = location.origin+location.pathname;
-    location.href = url+'/downloader/'+fileId;
+    location.href = `${common.CURRENT_URI}/downloader/${encodeURIComponent(fileId)}`;
 }
 
 function deleteFile(btn, type = '') {

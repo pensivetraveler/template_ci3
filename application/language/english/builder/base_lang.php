@@ -122,3 +122,4 @@ $lang['What is System Config'] = 'What is System Config ?';
 $lang['View Record'] = 'View Record';
 $lang['Close'] = 'Close';
 $lang['Open In New Window'] = 'Open In New Window';
+$lang['File Not Found'] = 'File Not Found.';
