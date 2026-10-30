@@ -346,6 +346,7 @@ remove($key, $data, $bool=true)
 | `checkModifyIdData($idData, $model)` | 수정 where가 식별자(AI면 identifier, 아니면 primaryKeyList 전체)를 모두 갖췄는지 확인, 아니면 400 | 3-4 참고 |
 | `validate($data, $model, $validate, $configName, $exceptRequiredKeys)` | 폼 규칙 + 필수값 검사. 다른 config로 검사할 때 직접 호출 | 실패 시 응답 후 exit |
 | `validateFormRules($configName = '', $data = [])` | `form_*_config` 규칙 검사(422) | [form.md](form.md) 9-2 |
+| `validateOptionValues($data, $allowStored = false)` | 선택형 필드 값이 선택지에 있는지(422). beforePost·beforePut·beforePatch 가 부름 | [form.md](form.md) 6-3 |
 | `checkUniqueExist($dto, $model)` / `checkDuplicate($unique, $model, $dto, $isIncludeDeleted)` | 고유값 검사 | 409로 응답 |
 | `checkDataExist($data, $model, $exit)` / `checkCnt()` | `getCnt() > 0` | `$data`는 `['where'=>…]` 형태 |
 | `uploadFileInList($dto, $model)` | `model->fileList` 기준 업로드 → file_id | 업로드 설정 탐색은 [form.md](form.md) 10장 |

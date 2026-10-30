@@ -85,7 +85,7 @@
 ### 버그
 - [x] (2026-10-29 게시글 관리 화면 검증 중 발견·수정) 페이지 폼의 quill 편집기가 늘 `toolbarDefault is not defined`(head.php 에서 app-page-preset.js 가 주석) → quill 자산과 함께 로드. 빈 값이면 편집기에 "undefined". 상세 화면에 댓글만 있으면 FormValidation 이 없어 댓글 스크립트 중단. `Model_Article_Attachment` notNullList 가 비어 첨부 INSERT 때 article_id·file_id 가 빠짐. 댓글 목록이 내용·작성자를 이스케이프 없이 innerHTML
 - [ ] (2026-10-29 발견) `tbl_file.file_link` 에 `http://호스트:포트/…` 절대 주소를 저장(`get_filepath_from_link`) — 도메인·하위 경로가 바뀌면 기존 파일 주소가 깨짐. 상대 경로로 저장할지 검토
-- [ ] (2026-10-29 게시판 관리 화면 검증 중 발견) 일반 등록·수정(POST·PUT·PATCH)은 select 선택지 값을 검사하지 않음 — 엑셀 가져오기(`validateExcelData`)에만 있음. 화면 밖에서 아무 코드나 저장 가능(예: board_cd=XXX999). 지금은 `api/Boards::checkBoardCode`처럼 엔티티에서 확인, 공통 검사로 옮길지 검토
+- [x] (2026-10-30: `validateOptionValues` 공통 검사, 엑셀과 같은 기준 `getValidatableOptionValues`, `option_attributes.validate=false`로 끔, 수정 때 저장된 값 통과. 엔티티 고유 규칙은 엔티티에 남김) (2026-10-29 게시판 관리 화면 검증 중 발견) 일반 등록·수정(POST·PUT·PATCH)은 select 선택지 값을 검사하지 않음 — 엑셀 가져오기(`validateExcelData`)에만 있음. 화면 밖에서 아무 코드나 저장 가능(예: board_cd=XXX999). 지금은 `api/Boards::checkBoardCode`처럼 엔티티에서 확인, 공통 검사로 옮길지 검토
 - [x] (2026-10-28, bizsoft #빌더-49 관찰) `MY_Builder_API::setData`가 문자열 컬럼(`strList`)에서 `empty($value)`로 '0'·0까지 ''로 바꿔, 환경값 화면에서 토큰 유효 시간 0(만료 없음)을 저장할 수 없었음 → 숫자 값은 남기고 null·''·false·[]만 ''로
 - [ ] `user_autologin` 행이 계정마다 쌓임(bizsoft dev 계정 23행): `destroyUserData`는 지금 쿠키의 행만 지우고, 쿠키를 지우지 않고 버린 브라우저·만료된 행은 남음 — 만료 행 정리(로그인 때 같은 user_id의 오래된 행 삭제 등) 검토
 - [x] (2026-10-28 결정 ①: 목록은 읽기만 — 행 없는 메뉴는 보임 0·000000으로 계산해 표시, 실제 권한도 접근 불가 유지. "기본 권한으로 채우기" 버튼(fillDefault_post), 수정 때 행이 없으면 먼저 만듦, 템플릿 MenuAuth의 partner_auth truncate를 trimPartnerAuth로) 메뉴 권한·파트너 권한 목록(GET)이 기본 권한 행을 INSERT 함 — 조회가 쓰기를 하고 요청 트랜잭션 밖이며 동시 조회 시 중복 행 가능. 기본 행 생성을 등급·파트너 생성 때나 명시적 초기화(POST)로 옮길지 결정 (2026-10-28 우선 등급·파트너 값 검증만 추가)
@@ -353,7 +353,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] (2026-10-26 C-2-1: 이미 API도 누적 병합으로 맞춰져 있음 확인) `MY_Builder_WEB::setFormData`(group_attributes 첫 항목부터 누적) vs `MY_Builder_API::validateFormRules`(마지막 항목만) 그룹 속성 해석 불일치 (헬퍼 하나로 통일)
 - [x] (2026-10-29: id·data-field·applyFrmValues 를 필드 기준으로, setDropzone 자동 업로드 끔·'true'/'false' 불리언 처리) (2026-10-26 C-4-5: 게시판 기능 정리 때 함께 — 보류) `views/builder/layout/form_base_custom_dropzone-full.php`, `app-page-form.js::applyFrmValuesByCategory` id `thumbnail-dropzone-wrapper`, data-field `thumbnail` 하드코딩 (field 기반으로 일반화)
 - [ ] (2026-10-26 C-4-1 보류 결정 — 묶는 방식(envelope_name)이 실제로 필요할 때 ①뷰 name ②검증 규칙의 이름 참조(matches[password] 등 `[name="..."]`로 찾음) ③서버 저장 경로를 함께 맞춤. 영향 검증: 템플릿 15·bizsoft 14건 모두 envelope_name=false라 name=field, 현재 영향 없음. reply_list는 쓰는 설정 없음, bizsoft carousel_simple은 envelope이지만 name을 쓰지 않는 JS 뷰) 그룹 뷰(`addr_daum`/`new_password`/`reply_list`/`repeater_*`)와 custom 뷰가 `get_group_field_name` 대신 `$item['field']`를 name으로 사용 (envelope/repeater name 규칙이 `form_side_group_base`에서만 적용)
-- [ ] 일반 등록·수정은 선택형 값이 옵션에 있는지 검사하지 않음 (bizsoft 확인: company_cd=COM999 저장됨, 엑셀 가져오기만 검사)
+- [x] (2026-10-30 위 항목과 같이 해결) 일반 등록·수정은 선택형 값이 옵션에 있는지 검사하지 않음 (bizsoft 확인: company_cd=COM999 저장됨, 엑셀 가져오기만 검사)
 - [ ] `setData`가 NULL 값을 ''로 바꿔 저장 (bizsoft 복제 검증에서 관찰, 영향 작음)
 - [x] (2026-10-26 C-4-2 결정: 의도된 동작 — 옵션 설정이 없으면 default 더미를 쓰는 것이 설계, 바꾸지 않음) `MY_form_helper.php::form_options_by_field` 설정에 옵션이 없으면 `Option 1/2` 더미로 대체 (설정 누락이 가려짐 — 빈 배열 + 경고)
 - [ ] `MY_Builder_WEB::prepareListData` formExist=false일 때 `allows`에 없는 action을 `$actions`에서 제거하지만 뷰/JS는 `LIST_ACTIONS`만 사용 (죽은 코드)

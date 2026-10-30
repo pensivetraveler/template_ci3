@@ -454,6 +454,7 @@ class MY_Builder_API extends MY_Controller_API
 
         // form 규칙은 한 번만 검증하고(전에는 파이프라인 모델 수만큼 같은 규칙을 다시 돌림), 모델별 필수값·고유값만 모델마다
         $this->validateFormRules('', $data);
+        $this->validateOptionValues($data);
         foreach ($this->getModelPipeline() as $modelName) {
             if (property_exists($this, $modelName)) {
                 $exceptRequiredKeys = $this->getGeneratedForeignKeyFields($this->{$modelName}, $modelName);
@@ -516,6 +517,7 @@ class MY_Builder_API extends MY_Controller_API
 
         // form 규칙은 한 번만 검증하고(전에는 파이프라인 모델 수만큼 같은 규칙을 다시 돌림), 모델별 필수값·고유값만 모델마다
         $this->validateFormRules('', $data);
+        $this->validateOptionValues($data, true);
         foreach ($this->getModelPipeline() as $modelName) {
             if (property_exists($this, $modelName)) {
                 $exceptRequiredKeys = $this->getGeneratedForeignKeyFields($this->{$modelName}, $modelName);
@@ -546,7 +548,10 @@ class MY_Builder_API extends MY_Controller_API
 
         list($key, $data) = parent::beforePatch($key);
 
-        if(is_array($data) && count($data)) $this->validatePatchFormRules($data);
+        if(is_array($data) && count($data)) {
+            $this->validatePatchFormRules($data);
+            $this->validateOptionValues($data, true);
+        }
 
         $data = $this->sanitizeRichTextFields($data);
 
@@ -569,6 +574,85 @@ class MY_Builder_API extends MY_Controller_API
         if(count($this->formConfig)) $this->validateFormRules('', $data);
 
         $this->formConfig = $formConfig;
+    }
+
+    /**
+     * 선택형 필드(select·radio·checkbox) 값이 선택지에 있는지 검사한다 (등록·수정·부분 수정, form 규칙 검사 뒤).
+     * - 요청에 값이 있는 기본 그룹 필드만. 빈 값은 required 규칙이 맡는다
+     * - $allowStored: 수정이면 지금 저장된 값은 통과 (선택지가 사용 중인 것만이라 그 사이 빠진 값으로 저장이 막히지 않도록)
+     * 검사 대상·제외 기준은 getValidatableOptionValues()
+     */
+    protected function validateOptionValues($data, bool $allowStored = false): void
+    {
+        if(!is_array($data) || !count($data) || is_empty($this->formConfig)) return;
+
+        $fieldConfig = array_values(array_filter($this->formConfig, function ($item) use ($data) {
+            $group = $item['group'] ?? '';
+            return isset($item['field']) && array_key_exists($item['field'], $data) && (!$group || $group === 'base');
+        }));
+
+        $stored = null;
+        $errors = [];
+        foreach ($this->getValidatableOptionValues($fieldConfig) as $field => [$values, $seperator, $label]) {
+            $value = $data[$field];
+            if($value === null) continue;
+            $list = is_array($value) ? $value : explode($seperator, (string)$value);
+
+            foreach ($list as $one) {
+                $one = is_scalar($one) ? trim((string)$one) : null;
+                if($one === '' || ($one !== null && in_array($one, $values, true))) continue;
+
+                if($one !== null && $allowStored && count($this->idData) && property_exists($this, 'Model') && $this->Model) {
+                    if($stored === null) $stored = (array)($this->Model->getDataWhere([], $this->idData) ?: []);
+                    $storedValues = array_map('trim', explode($seperator, (string)($stored[$field] ?? '')));
+                    if(in_array($one, $storedValues, true)) continue;
+                }
+
+                $errors[] = [
+                    'location' => __METHOD__,
+                    'param' => $field,
+                    'value' => $one,
+                    'type' => 'in_list',
+                    'msg' => $this->josa->__conv(lang(str_replace('lang:', '', $label))."{은} 선택할 수 있는 값이 아닙니다."),
+                ];
+                break;
+            }
+        }
+
+        if(count($errors)) {
+            $this->responseError($errors, [
+                'data' => $data,
+            ], RestController::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    /**
+     * 선택지를 검사할 필드와 선택지 값: [필드 => [값 목록(문자열), 구분자, label]]
+     * 서버가 선택지를 알 수 없거나 믿을 수 없는 필드는 뺀다:
+     *   option_type 이 없음·none·blank·api·script(브라우저가 채움), 옵션 설정이 없어 기본 더미(Option 1/2)가 되는 field·static,
+     *   선택지가 빈 필드, option_attributes.validate === false (직접 입력도 받는 select 등)
+     * 일반 등록·수정(validateOptionValues)과 엑셀 가져오기(validateExcelData)가 같이 쓴다
+     */
+    protected function getValidatableOptionValues(array $fieldConfig): array
+    {
+        $result = [];
+        foreach ($fieldConfig as $item) {
+            if(!isset($item['field']) || !in_array($item['type'] ?? '', ['select', 'radio', 'checkbox'], true)) continue;
+
+            $attr = $item['option_attributes'] ?? [];
+            if(!is_array($attr) || !count($attr) || ($attr['validate'] ?? true) === false) continue;
+
+            $type = $attr['option_type'] ?? '';
+            if($type === '' || in_array($type, ['none', 'blank', 'api', 'script'], true)) continue;
+            if($type === 'field' && is_empty(config_item('options')[$item['field']] ?? [])) continue;
+            if($type === 'static' && is_empty($attr['option_data'] ?? [])) continue;
+
+            $options = $this->getOptions($item['field'], $attr);
+            if(!is_array($options) || !count($options)) continue;
+
+            $result[$item['field']] = [array_map('strval', array_keys($options)), $attr['seperator'] ?? ',', $item['label'] ?? $item['field']];
+        }
+        return $result;
     }
 
     protected function afterPatch($key, $data = [])
@@ -2132,13 +2216,8 @@ class MY_Builder_API extends MY_Controller_API
         }, $fieldConfig);
         $labels = array_column($fieldConfig, 'label', 'field');
 
-        // 선택형 필드는 선택지 값만 받는다 (form option_attributes)
-        $optionValues = [];
-        foreach ($fieldConfig as $item) {
-            if(is_empty($item, 'option_attributes')) continue;
-            $options = $this->getOptions($item['field'], $item['option_attributes']);
-            if(is_array($options) && count($options)) $optionValues[$item['field']] = [array_map('strval', array_keys($options)), $item['option_attributes']['seperator'] ?? ','];
-        }
+        // 선택형 필드는 선택지 값만 받는다 (일반 등록·수정과 같은 기준)
+        $optionValues = $this->getValidatableOptionValues($fieldConfig);
 
         $errors = [];
         $rows = [];

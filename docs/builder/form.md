@@ -109,6 +109,7 @@
 | `form_attributes` | array | 2-2 기본값 | 커스텀 동작 속성 → `data-*` (5-2) | `get_admin_form_attributes()` |
 | `option_attributes` | array | `[]` | 옵션 로딩 설정 (6장). 비어있으면 옵션을 로딩하지 않음 | `setFormColumn()` |
 | `option_attributes.option_field` | string | field | 옵션 조회 키를 field 대신 지정 | `setFormColumn()` |
+| `option_attributes.validate` | bool | `true` | false 면 저장할 때 선택지 값 검사를 하지 않음 (6-3) | `MY_Builder_API::getValidatableOptionValues()` |
 | `group` | string | `'base'` | `'base'` 가 아니면 같은 이름끼리 하나의 그룹 블록으로 렌더링 (7장) | `setFormData()`, `restructure_admin_form_data()` |
 | `group_attributes` | array | `[]` | 그룹 설정 (7장). 같은 그룹 안에서 뒤 항목 값이 앞 항목 값에 누적 병합 | `setFormData()` |
 | `list` | bool | `false` | 리스트 컬럼 노출 → [list-filter.md](list-filter.md) | `MY_Builder_API::setProperties()` |
@@ -339,7 +340,17 @@ JS 가 직접 읽는 attributes:
 >   - `render.callback`: 옵션마다 `window[이름](option, params ?? node)` — `false`면 그 옵션을 빼고, 문자열이면 라벨로 씀
 > - 체크박스 구분자 `option_attributes.seperator` 는 읽히지 않아 항상 `,` 다(`MY_Builder_API::setData()`, `applyFrmValuesByCategory()`).
 
-### 6-3. 동적 옵션 (JS, `app-page-form.js`)
+### 6-3. 저장할 때 선택지 값 검사 (`MY_Builder_API::validateOptionValues()`)
+
+등록·수정·부분 수정(POST·PUT·PATCH)은 form 규칙 검사 뒤에 선택형 필드 값이 선택지에 있는지 확인한다. 없으면 422(`type: in_list`, "{label}은 선택할 수 있는 값이 아닙니다."). 엑셀 가져오기도 같은 기준(`getValidatableOptionValues()`).
+
+- 대상: `type`이 `select`·`radio`·`checkbox`이고, 요청에 값이 있고, 기본 그룹(`group`이 없거나 `base`)인 필드. 빈 값은 `required` 규칙이 맡는다. 다중 값은 배열이나 `seperator` 문자열을 하나씩 본다.
+- 제외(서버가 선택지를 알 수 없거나 믿을 수 없음): `option_attributes`가 비었거나 `option_type`이 `''`·`none`·`blank`·`api`·`script`, 옵션 설정이 없어 더미(Option 1/2)가 되는 `field`·`static`, 선택지가 빈 필드.
+- `option_attributes.validate => false`: 그 필드는 검사하지 않는다(직접 입력도 받는 select 등).
+- 수정(PUT·PATCH)은 지금 저장된 값이면 통과한다 — 선택지가 "사용 중인 것만"이라 그 사이 빠진 값 때문에 저장이 막히지 않게.
+- 선택지에 없는 값만 막는다. 그 밖의 엔티티 규칙(예: 게시판의 BRD000 제외, 게시글의 게시판 존재)은 엔티티 API 훅에서 따로 확인한다.
+
+### 6-4. 동적 옵션 (JS, `app-page-form.js`)
 
 - `setDynamicSelectOptions(selector, params)`: `GET {url | BASE_URI/add_uri | API_URI/options}?_mode=option&{form_field}={value}[&render=]` → `prepareSelectOptions(target, json.data)`.
 - `prepareSelectOptions(node, data)`: 객체 `{value:text}` 와 배열 `[{id,text}]` 를 모두 받는다. `data-original-value` 가 옵션에 있으면 선택을 복원하고 selectpicker 를 리빌드한다.

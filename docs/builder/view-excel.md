@@ -203,7 +203,7 @@
 `validateExcelData()` 검사:
 - 받는 필드 외 키는 버리고, 값은 문자열로 trim, `defaultList`로 빈 값을 채운다. 한 요청 최대 `$excelChunkLimit`(500)행.
 - 받는 필드의 form `rules`로 검증한다. 등록이므로 `required_mod[...add...]`는 `required`로 바꿔 적용한다.
-- 선택형 필드(form `option_attributes`)는 선택지 값만 받는다(다중 값은 `seperator`로 나눠 각각 검사).
+- 선택형 필드는 선택지 값만 받는다(다중 값은 `seperator`로 나눠 각각 검사). 대상·제외 기준은 일반 등록·수정과 같다(`getValidatableOptionValues()`, [form.md](form.md) 6-3).
 - 모델 `notNullList` 중 받는 필드(또는 defaultList)가 비면 필수 오류.
 - `uniqueKeyList`는 DB 중복과 같은 요청 안 중복을 모두 오류로 본다.
 - 같은 행·필드의 오류는 한 번만 넣는다.
