@@ -293,8 +293,8 @@ $(function () {
 	bindListCellEvents();
 
 	// 행 버튼은 document 에 위임한다: 반응형 상세 모달은 .dataTables_wrapper 밖에 그려진다
-	// 모달 안의 버튼을 누르면 모달을 먼저 닫는다 (사이드 폼을 가리거나 지운 행이 남지 않도록)
-	$(document).on('click', '.dtr-bs-modal .view-record, .dtr-bs-modal .edit-record, .dtr-bs-modal .delete-record, .dtr-bs-modal .duplicate-record', function() {
+	// 모달 안의 버튼을 누르면 모달을 먼저 닫는다 (사이드 폼을 가리거나 지운 행이 남지 않도록). 모달 상세(.view-modal)도 같다
+	$(document).on('click', '.dtr-bs-modal .view-record, .dtr-bs-modal .edit-record, .dtr-bs-modal .delete-record, .dtr-bs-modal .duplicate-record, .view-modal .edit-record, .view-modal .delete-record', function() {
 		const modalEl = this.closest('.modal');
 		if(modalEl && window.bootstrap && bootstrap.Modal.getInstance(modalEl)) bootstrap.Modal.getInstance(modalEl).hide();
 		else if(modalEl) $(modalEl).modal('hide');
@@ -1229,10 +1229,42 @@ function afterSelectColumnChange(idData, field, value) {
 	});
 }
 
+/**
+ * 목록의 모달 상세 보기 (list method properties.viewConfig → view_modal.php)
+ * 수정·삭제 버튼에 행 식별자를 넣어 목록의 .edit-record·.delete-record 처리를 그대로 쓴다
+ */
 function openViewModal(dataId, modalId = '') {
-	console.log(dataId)
-	const data = getData(dataId);
-	console.log(data)
+	const modalEl = document.getElementById(modalId || 'viewModal');
+	if(!modalEl || typeof applyViewData !== 'function') {
+		console.warn('openViewModal : view modal is not defined (list properties.viewConfig)');
+		return;
+	}
+
+	if(dataId === null || typeof dataId !== 'object') dataId = {[common.IDENTIFIER[0]]: dataId};
+
+	const data = applyViewData(dataId, modalEl.querySelector('.modal-body'));
+	if(!data) {
+		showAlert({type: 'warning', text: getLocale('Data Not Exist', common.LOCALE)});
+		return;
+	}
+
+	const actions = Array.isArray(common.LIST_ACTIONS) ? common.LIST_ACTIONS : [];
+	let canEdit = actions.includes('edit') && !!(common.FORM_EXIST || common.PAGE_EDIT_URI);
+	let canDelete = actions.includes('delete');
+	// 작성자만 수정·삭제할 수 있는 화면(list properties.checkOwner)
+	if((canEdit || canDelete) && common.VIEW_CHECK_OWNER && !isMyData(dataId, false)) {
+		canEdit = false;
+		canDelete = false;
+	}
+
+	modalEl.querySelectorAll('.edit-record, .delete-record').forEach((button) => {
+		// getRedirectActionData 가 jQuery data 로 읽는다
+		Object.keys(dataId).forEach((key) => $(button).data(key, dataId[key]));
+		const show = button.classList.contains('edit-record') ? canEdit : canDelete;
+		button.classList.toggle('d-none', !show);
+	});
+
+	bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 function afterCheckboxColumnChange(idData, field, value) {

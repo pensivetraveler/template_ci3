@@ -119,3 +119,5 @@ $lang['Delete Big Cd'] = '카테고리 삭제';
 $lang['You Should Delete Codes In The Category'] = '카테고리 내 등록된 코드를 먼저 삭제해주세요.';
 $lang['What is System Code'] = '시스템 코드란 ?';
 $lang['What is System Config'] = '환경값 설정이란 ?';
+$lang['View Record'] = '상세 보기';
+$lang['Close'] = '닫기';

@@ -257,7 +257,8 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
 | `properties.formSubType` | string | `'base'` | 사이드 폼 class `form-subtype-{x}`(`form_side.php`) |
 | `properties.formStyle` | string | `'base'` | JS `FORM_STYLE`, offcanvas `data-form-style`. **미구현** — JS에서 읽지 않음 |
 | `properties.filterConfig` | string | `''` | `filter_{x}_config`. 비면 `filter_{class}_{method}_config` 등 → JS `FILTER_COLUMNS`. 상세: [list-filter.md](list-filter.md) |
-| `properties.viewConfig` | string | (정의 없음) | list에서 값이 있으면 `PAGE_VIEW_URI`를 비운다(모달 조회 유도). 기본값 정의는 없다 |
+| `properties.viewConfig` | bool\|string | (정의 없음) | list에서 값이 있으면 모달 상세를 켠다: `PAGE_VIEW_URI`를 비우고 `VIEW_COLUMNS`(id `view-{필드}`)·`view_modal.php`·app-page-view.js 를 붙인다. 문자열이면 `view_{값}_config`를 먼저 찾는다. [view-excel.md](view-excel.md) "목록에서 모달로 보기" |
+| `properties.checkOwner` | bool | (정의 없음) | list 모달 상세에서 true 면 내가 만든 데이터일 때만 수정·삭제 버튼 |
 | `properties.isComments` | bool | `false` | view 페이지에서 `app-page-comment.js`와 댓글 뷰 로드(`prepareViewData()`) |
 | `properties.perform` | string | – | 컨트롤러에 해당 PHP 메서드가 **없을 때** 대신 실행할 메서드명(`_remap()`) |
 | `properties.redirectUri` | string | – | 컨트롤러에 해당 메서드가 없을 때 `perform` 뒤 `base_url(redirectUri)`로 이동(`_remap()`) |

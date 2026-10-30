@@ -4,6 +4,7 @@
  * - 값은 textContent 로 넣는다 (응답 값이 HTML 로 해석되지 않도록)
  * - 선택형 필드(options 가 있는 필드)는 값 대신 라벨을, 파일 필드는 다운로드 링크를 보여 준다
  * - appPlugins.view[필드] 가 함수면 기본 표시 대신 그 함수를 부른다: (element, value, data, column)
+ * - 상세 페이지(#view-container)와 목록의 모달 상세(view_modal.php, app-page-list.js openViewModal)가 함께 쓴다
  */
 
 function createViewFileLink(item) {
@@ -72,12 +73,15 @@ function renderViewValue(element, column, value) {
 	}
 }
 
-function applyViewData(dataId) {
+/**
+ * 데이터를 불러와 container 안의 요소에 채운다. 채운 데이터를 돌려준다 (없으면 null)
+ */
+function applyViewData(dataId, container = document.getElementById('view-container')) {
+	if(!container) return null;
 	const data = getData(dataId, {
 		_mode : 'view',
 	});
-	const container = document.getElementById('view-container');
-	if(!container || !data) return;
+	if(!data) return null;
 
 	const columns = isArray(common.VIEW_COLUMNS) ? common.VIEW_COLUMNS : [];
 	const plugins = (typeof appPlugins !== 'undefined' && appPlugins.view) ? appPlugins.view : {};
@@ -99,7 +103,10 @@ function applyViewData(dataId) {
 			// 대표 이미지는 배경으로 표시
 			if(isArray(value) && value.length && value[0].file_link) {
 				element.style.backgroundImage = `url("${encodeURI(value[0].file_link)}")`;
+				element.classList.remove('none');
 			}else{
+				// 모달은 같은 요소를 다시 쓰므로 이전 값을 지운다
+				element.style.backgroundImage = '';
 				element.classList.add('none');
 			}
 			return;
@@ -120,10 +127,13 @@ function applyViewData(dataId) {
 		renderViewValue(element, {field: key}, data[key]);
 	});
 
-	if(document.querySelector('.view-form')){
-		const form = document.querySelector('.view-form');
-
-		preparePlugins(form)
+	const form = container.querySelector('.view-form');
+	if(form){
+		// 모달은 열 때마다 다시 채우므로 플러그인 준비는 한 번만 (폼 자산이 없는 화면이면 건너뜀)
+		if(typeof preparePlugins === 'function' && !form.dataset.pluginsReady) {
+			preparePlugins(form);
+			form.dataset.pluginsReady = '1';
+		}
 
 		form.dispatchEvent(
 			new CustomEvent('fetchViewData', {
@@ -134,10 +144,11 @@ function applyViewData(dataId) {
 			}),
 		);
 
-		refreshPlugins(form);
+		if(typeof refreshPlugins === 'function') refreshPlugins(form);
 	}
 
 	document.body.setAttribute('data-onload', true);
+	return data;
 }
 
 function setButtonsDisplay() {
@@ -152,6 +163,9 @@ function setButtonsDisplay() {
 }
 
 $(function() {
+	// 상세 페이지에서만 (목록의 모달 상세는 openViewModal 이 부른다)
+	if(!document.getElementById('view-container')) return;
+
 	applyViewData(common.KEY);
 
 	setButtonsDisplay();

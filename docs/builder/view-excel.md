@@ -24,7 +24,8 @@
 | 구분 | 파일 | 역할 |
 |---|---|---|
 | WEB | `MY_Builder_WEB::view()`, `isDetailView()`, `prepareViewData()`, `setViewColumns()`, `setJSVariables()` | 상세 화면 여부 판단, 표시할 컬럼(`VIEW_COLUMNS`) 준비, 버튼 권한 |
-| 뷰 | `views/builder/layout/view.php` + `view_{subtype}.php` (`base`, `grid`, `modal`) | 화면 틀. 값 자리는 `<span id="{필드}">` |
+| 뷰 | `views/builder/layout/view.php` + `view_{subtype}.php` (`base`, `grid`) | 화면 틀. 값 자리는 `<span id="{필드}">` |
+| 모달 뷰 | `views/builder/layout/view_modal.php` | 목록 화면의 모달 상세(아래 "목록에서 모달로 보기"). 값 자리는 `<span id="view-{필드}">` |
 | JS | `public/assets/builder/js/app-page-view.js` | API에서 단건을 받아 값 채우기, 목록·수정·삭제 버튼 |
 | API | `MY_Builder_API::view()`, `transformView()`, `api/Common::transformView()` | `GET {API_URI}/{식별자}?_mode=view` 응답 |
 
@@ -53,7 +54,7 @@
 | `category => 'view'`, `type => 'base'` | 설정 기반 상세 화면 (`isDetailView()`). `VIEW_COLUMNS`를 만들고 `app-page-view.js`를 붙인다 |
 | `category => 'view'`, 그 밖의 type (`dashboard`, `statistics` 등) | 전용 화면. 컨트롤러와 전용 뷰(`{flag}/{class}/{method}.php` 또는 route 기본 메서드면 `{class}/index.php`)가 그린다 |
 
-- `subtype`은 화면 틀이다: `base`(라벨·값 한 줄씩), `grid`(12칸 행, 항목 `colspan`), `modal`(헤더 없는 틀).
+- `subtype`은 화면 틀이다: `base`(라벨·값 한 줄씩), `grid`(12칸 행, 항목 `colspan`). `view_modal.php`는 Bootstrap 모달이라 상세 페이지 틀로 쓰지 않는다(목록의 모달 상세 전용).
 - `{flag}/{class}/view.php` 같은 전용 뷰 파일이 있으면 공통 틀(`builder/layout/view.php`)보다 먼저 쓴다.
 
 ### 4. 표시할 컬럼 (`setViewColumns()`)
@@ -94,7 +95,28 @@
 
 > **주의**
 > - 수정을 목록의 사이드 폼으로 하는 화면은 수정 페이지(`edit` 메서드)가 없으므로 상세 화면의 수정 버튼이 나오지 않는다.
-> - 모달형 상세(`openViewModal()`)는 아직 미구현이다. 목록 `properties.viewConfig`를 쓰면 `PAGE_VIEW_URI`가 만들어지지 않고 모달 스텁이 불린다.
+
+### 목록에서 모달로 보기
+
+상세 페이지 없이 목록에서 행을 모달로 본다. 목록 메서드에 두 가지를 켠다.
+
+```php
+'list' => [
+    'actions' => ['view' => true],
+    'properties' => [
+        'formExist' => true,      // 수정은 옆 폼으로 (없으면 수정 페이지 PAGE_EDIT_URI)
+        'viewConfig' => true,     // 또는 문자열: view_{값}_config 를 먼저 찾음
+        'checkOwner' => false,    // true 면 내가 만든 데이터일 때만 수정·삭제 버튼
+    ],
+],
+```
+
+- 필드: `view_{값}_config` → `view_{class}_list_config` → `view_{class}_config` → `view_list_config`, 모두 없으면 폼 설정(`formConfig`)의 필드를 읽기 전용으로 보여 준다(상세 페이지와 같은 규칙).
+- 옆 폼과 같은 페이지에 그리므로 요소 id 는 `view-{필드}`이다. `appPlugins.view[필드]`는 그대로 필드 이름으로 쓴다.
+- `viewConfig`가 있으면 `PAGE_VIEW_URI`는 비고, 보기 버튼·`onclick.kind: view` 셀은 `openViewModal()`(app-page-list.js)을 부른다. 값 채우기는 상세 페이지와 같은 `applyViewData()`(app-page-view.js).
+- 모달 버튼: 수정(목록 `edit` 액션이 있고 옆 폼 또는 수정 페이지가 있을 때), 삭제(목록 `delete` 액션), 닫기. 수정·삭제는 목록의 `.edit-record`·`.delete-record` 처리를 그대로 쓰고, 누르면 모달을 먼저 닫는다.
+- 댓글(`isComments`)은 모달에서 지원하지 않는다. 게시글처럼 댓글이 있는 상세는 상세 페이지로 본다.
+- 예: 게시판 관리(`admin/boards`).
 
 ## Part 2. Excel 가져오기 설정
 

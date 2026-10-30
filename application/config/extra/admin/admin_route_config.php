@@ -167,7 +167,7 @@ $config['route_config'] = [
             ],
         ],
     ],
-    // 게시판 관리: 게시판(tbl_board) 목록 + 옆 폼으로 등록·수정 (카테고리와 같은 방식)
+    // 게시판 관리: 게시판(tbl_board) 목록 + 옆 폼으로 등록·수정 (카테고리와 같은 방식), 조회는 모달 상세
     'boards' => [
         'category' => 'page',
         'type' => 'page',
@@ -184,11 +184,13 @@ $config['route_config'] = [
                     'excel' => false,
                 ],
                 'actions' => [
-                    'view' => false,
+                    'view' => true,
                     'excel' => false,
                 ],
                 'properties' => [
                     'formExist' => true,
+                    // view 설정이 없으면 폼 설정의 필드를 읽기 전용으로 보여 준다
+                    'viewConfig' => true,
                 ],
             ],
         ],

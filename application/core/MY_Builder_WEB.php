@@ -258,6 +258,25 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $data['actions'] = array_values($data['actions']);
         }
 
+        // 모달 상세 보기 (setJSVariables 가 VIEW_COLUMNS 를 만들었을 때)
+        $data['viewExist'] = false;
+        if(!empty($this->methodConfig['properties']['viewConfig'])) {
+            $data['viewExist'] = true;
+            $data['viewType'] = 'modal';
+            $data['viewData'] = reformat_form_data_by_type($this->jsVars['VIEW_COLUMNS'], 'page', 'modal');
+
+            // 입력 요소가 있으면 폼 자산이 필요 (옆 폼이 있으면 이미 붙음)
+            if(!$data['formExist'] && count(array_filter($this->viewColumns, function($item) {
+                return !in_array($item['type'], ['view', 'hidden', 'common'], true);
+            }))) {
+                $this->addFormScripts();
+            }
+
+            $this->addJS['tail'][] = [
+                base_url('public/assets/builder/js/app-page-view.js'),
+            ];
+        }
+
         if(!array_key_exists('subPage', $data))
             $data['subPage'] = 'builder/layout/list';
 
@@ -575,6 +594,17 @@ class MY_Builder_WEB extends MY_Controller_WEB
                         'FORM_REGEXP' => $this->config->item('regexp'),
                         'FORM_TYPE' => $methodConfig['properties']['formType'],
                         'FORM_STYLE' => $methodConfig['properties']['formStyle'],
+                    ]);
+                }
+
+                // 목록에서 모달로 상세 보기: properties.viewConfig 가 true 면 기본 view 설정, 문자열이면 view_{값}_config 를 먼저 찾는다
+                // 옆 폼과 같은 페이지에 그리므로 요소 id 에 view- 를 붙인다
+                if(!empty($methodConfig['properties']['viewConfig'])) {
+                    $viewConfig = $methodConfig['properties']['viewConfig'];
+                    $this->addJsVars([
+                        'VIEW_COLUMNS' => $this->setViewColumns(null, is_string($viewConfig) ? $viewConfig : null, 'view-'),
+                        'VIEW_TYPE' => 'modal',
+                        'VIEW_CHECK_OWNER' => (bool)($methodConfig['properties']['checkOwner'] ?? false),
                     ]);
                 }
                 break;
@@ -922,14 +952,14 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }, $this->filterConfig['filters']);
     }
 
-    protected function setViewColumns($name = null): array
+    protected function setViewColumns($name = null, $add = null, string $idPrefix = ''): array
     {
         $config = [];
         if(isset($name)) {
             $config = $this->config->get($name, []);
         }else{
-            // view 설정: resourceConfig → view_{class}_view_config → view_{class}_config 순
-            $config = $this->resourceLoader->entityConfig($this->setConfigList('view', $this->methodConfig['resourceConfig'] ?: null), [], false);
+            // view 설정: resourceConfig(또는 $add) → view_{class}_{method}_config → view_{class}_config 순
+            $config = $this->resourceLoader->entityConfig($this->setConfigList('view', $add ?? ($this->methodConfig['resourceConfig'] ?: null)), [], false);
             if(empty($config)) {
                 // view 설정이 없으면 form 설정의 필드를 읽기 전용(view)으로 보여 준다
                 $config = array_values(array_map(function($item) {
@@ -945,7 +975,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
         }
 
         if(!empty($config)) {
-            $config = array_map(function ($item) {
+            $config = array_map(function ($item) use ($idPrefix) {
                 if(isset($item['subtype']) && $item['subtype'] === 'identifier') $item['type'] = 'hidden';
                 if(!isset($item['category'])) $item['category'] = 'base';
                 if(!isset($item['type'])) $item['type'] = 'view';
@@ -953,7 +983,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
                 if($item['type'] === 'common') return $item;
 
-                $item['id'] = $item['field'];
+                $item['id'] = $idPrefix.$item['field'];
                 // 뷰 템플릿은 lang($item['label']) 로 출력하므로 'lang:' 접두어를 뗀다 (form 설정은 setFormColumn 이 이미 뗌)
                 if(isset($item['label']) && is_string($item['label']) && sscanf($item['label'], 'lang:%s', $line) === 1) $item['label'] = $line;
                 if($item['type'] === 'hidden'){

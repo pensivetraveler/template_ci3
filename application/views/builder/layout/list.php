@@ -51,6 +51,8 @@
 			<!--/ Modal to add new record -->
 			<?php endif; ?>
 
+			<?php if($viewExist ?? false) builder_view("{$platformName}/layout/view_modal"); ?>
+
 		</div>
 	</div>
 </div>
