@@ -335,7 +335,8 @@ $config['rest_keys_table'] = 'user_token';
 |   ) ;
 |  |
 */
-$config['rest_enable_keys'] = ENVIRONMENT !== 'development';
+// .env REST_STRICT=true 면 개발 환경에서도 운영과 같게 검사 (로컬 검증용)
+$config['rest_enable_keys'] = ENVIRONMENT !== 'development' || filter_var(getenv('REST_STRICT'), FILTER_VALIDATE_BOOLEAN);
 //$config['rest_enable_keys'] = true;
 
 /*
@@ -598,7 +599,7 @@ $config['rest_ignore_http_accept'] = false;
 | Hint: This is good for production environments
 |
 */
-$config['rest_ajax_only'] = ENVIRONMENT !== 'development';
+$config['rest_ajax_only'] = ENVIRONMENT !== 'development' || filter_var(getenv('REST_STRICT'), FILTER_VALIDATE_BOOLEAN);
 
 /*
 |--------------------------------------------------------------------------

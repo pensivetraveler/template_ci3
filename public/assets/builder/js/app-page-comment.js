@@ -84,9 +84,6 @@ function setCommentList(comments) {
 function getCommentList() {
 	executeAjax({
 		url : common.API_BASE_URI + 'comments',
-        headers : {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
 		method : 'get',
 		data : {
 			article_id: document.getElementById('formComment').article_id.value,
@@ -272,9 +269,6 @@ $(function() {
 					if (result.isConfirmed) {
 						executeAjax({
 							url: common.API_BASE_URI + 'comments/'+formComment.comment_id.value,
-                            headers: {
-                                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-                            },
 							method: 'delete',
 							after : {
 								callback: showAlert,

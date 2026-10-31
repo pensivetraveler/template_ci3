@@ -198,9 +198,6 @@ function preparePlugins(form) {
 
                     executeAjax({
                         url : getUrlWithIdentifiers(common.API_URI + '/reorder', common.KEY, {type: type}),
-                        headers : {
-                            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-                        },
                         method : 'patch',
                         data : {
                             file_ids : fileIds,
@@ -454,9 +451,6 @@ function fetchFrmValues(form = null, key = {}, params = {}) {
         data: {
             _mode : 'form',
             ...params,
-        },
-        headers: {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
         },
         success: function(response, textStatus, jqXHR) {
             data = isObject(response.data)?response.data:response.data[0];
@@ -1207,7 +1201,7 @@ function setDynamicSelectOptions(selector, params) {
 
     // 2) AJAX로 method 리스트를 가져온다
     // API 키 검사가 켜진 환경에서도 받도록 Authorization 헤더를 붙인다
-    $.ajax({url, data, dataType: 'json', headers: {'Authorization': common.HOOK_PHPTOJS_VAR_TOKEN}})
+    $.ajax({url, data, dataType: 'json'})
         .done(function(json) {
             if (!json || !Object.hasOwn(json, 'data'))
                 console.warn('data가 반환되지 않음', json);
@@ -1226,7 +1220,7 @@ function reloadSelect2(selector, url, preselectedIds = [], template = {id:'id',t
     $sel.val(null);
     $sel.empty(); // 옵션 싹 비움
 
-    $.ajax({url, dataType: 'json', headers: {'Authorization': common.HOOK_PHPTOJS_VAR_TOKEN}}).done(function (json) {
+    $.ajax({url, dataType: 'json'}).done(function (json) {
         const rows = json.data || [];
         rows.forEach(function (row) {
             const id   = row[template.id];
@@ -1590,9 +1584,6 @@ function loadOptionSources(form) {
             executeAjax({
                 url: url,
                 method: node.getAttribute('data-option-method') === 'post' ? 'post' : 'get',
-                headers: {
-                    'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-                },
                 data: Object.assign({_mode: 'option'}, params, Object.keys(render).length ? {render: render} : {}),
                 success: function(json) {
                     prepareSelectOptions(node, normalizeOptionResponse(json && json.data ? json.data : []));

@@ -110,9 +110,6 @@ function checkDuplicate(button) {
             if(status === 'Valid') {
                 executeAjax({
                     url: common.API_URI + '/checkDuplicate',
-                    headers: {
-                        'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-                    },
                     data: {
                         field: fieldName,
                         value: input.value,
@@ -152,9 +149,6 @@ function deleteFile(btn, type = '') {
 
     executeAjax({
         url : common.API_URI + '/deleteFile/' + identifier + (type ? '?type='+type : ''),
-        headers : {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
         method : 'patch',
         data : item,
         success: function(response) {
@@ -189,9 +183,6 @@ function deleteRepeater(repeater, deleteElement) {
 
     executeAjax({
         url : common.API_URI + '/deleteRepeater/' + identifier,
-        headers : {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
         method : 'patch',
         data : data,
         success: function(response) {
@@ -221,9 +212,6 @@ function getData(key = null, params = {}) {
     executeAjax({
         async: false,
         url : getUrlWithIdentifiers(common.API_URI, key, dataParams),
-        headers: {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
         dataType: 'json',
         success: function (response, textStatus, jqXHR) {
             data = response.data[0];
@@ -263,9 +251,6 @@ function deleteData(dataId = null, callback = {}) {
 
             executeAjax({
                 url: getUrlWithIdentifiers(common.API_URI, dataId, common.API_PARAMS),
-                headers: {
-                    'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-                },
                 method: 'delete',
                 after : {
                     callback: showAlert,
@@ -286,9 +271,6 @@ function isMyData(dataId, showError = true) {
     executeAjax({
         async: false,
         url: getUrlWithIdentifiers(common.API_URI + '/isMyData', dataId),
-        headers: {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
         dataType: 'json',
         success: function (response, textStatus, jqXHR) {
             result = true;
@@ -310,9 +292,6 @@ function logout() {
     executeAjax({
         async: false,
         url: common.API_BASE_URI + '/auth/logout',
-        headers: {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
         method: 'post',
         dataType: 'json',
         success: function (response, textStatus, jqXHR) {
@@ -396,9 +375,6 @@ function prepareExports(kind, filterData = null) {
             filters: filterData
         },
         url : getUrlWithIdentifiers(common.API_URI+'/prepareExports', {}, common.API_PARAMS),
-        headers: {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
         success: function(response, textStatus, jqXHR) {
             // 파일명은 URL 인코딩해서 넘긴다
             const filename = encodeURIComponent(response.data[0].filename);

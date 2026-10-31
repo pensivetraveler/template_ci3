@@ -1,3 +1,18 @@
+/**
+ * API 인증 헤더. 토큰을 쓰는 곳은 여기 한 곳이다 (rest_enable_keys 가 켜진 환경에서 세션 쿠키와 함께 검사됨)
+ * jQuery 요청은 아래 prefilter 가 붙이고, fetch 는 이 값을 직접 넣는다
+ */
+function getApiAuthHeaders() {
+	const token = typeof common !== 'undefined' ? common.HOOK_PHPTOJS_VAR_TOKEN : '';
+	return token ? {'Authorization': token} : {};
+}
+
+// 같은 출처 요청에만 붙인다 (외부 주소로 토큰을 보내지 않도록)
+$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+	if(options.crossDomain) return;
+	Object.entries(getApiAuthHeaders()).forEach(([name, value]) => jqXHR.setRequestHeader(name, value));
+});
+
 const appPlugins = {
 	list: {
 		datatable: {

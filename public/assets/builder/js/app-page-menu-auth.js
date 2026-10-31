@@ -32,9 +32,6 @@ function fillDefaultAuth(btn, params = null) {
         executeAjax({
             url: common.API_URI + '/fillDefault',
             method: 'post',
-            headers : {
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-            },
             data: {[field]: value},
             success: function(response) {
                 const filled = response.data && response.data[0] ? response.data[0].filled : 0;
@@ -53,9 +50,6 @@ function resetMenuAuthDB() {
     executeAjax({
         url: common.API_URI + '/' + 'reset',
         method: 'post',
-        headers : {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
         success: function(response) {
             showAlert({
                 type: 'success',

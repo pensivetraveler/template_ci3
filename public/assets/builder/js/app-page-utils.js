@@ -658,9 +658,6 @@ function setDropzoneExistingFile(inst, item, fieldName) {
         e.stopImmediatePropagation();
         executeAjax({
             url : getUrlWithIdentifiers(common.API_URI + '/deleteFile', common.KEY, {type: fieldName}),
-            headers : {
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-            },
             method : 'patch',
             data : {
                 file_id : mockFile.file_id,

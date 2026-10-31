@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
+                ...getApiAuthHeaders(),
             }
         })
             .then(response => response.json())
@@ -295,9 +295,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         executeAjax({
             url: common.API_URI + '/' + 'saveAll',
-            headers: {
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-            },
             method: 'post',
             data: JSON.stringify(menuOrder),
             dataType: 'json',
@@ -391,9 +388,6 @@ document.addEventListener('DOMContentLoaded', function() {
         executeAjax({
             url: common.API_URI + '/' + 'reset',
             method: 'post',
-            headers: {
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-            },
             success: function(response) {
                 showAlert({
                     type: 'success',
@@ -411,9 +405,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         executeAjax({
             url: common.API_URI + '/' + 'caching',
-            headers: {
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-            },
             success: function(response) {
                 showAlert({
                     type: 'success',
@@ -430,9 +421,6 @@ document.addEventListener('DOMContentLoaded', function() {
         executeAjax({
             url: common.API_URI + '/syncFromConfig',
             method: 'post',
-            headers: {
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-            },
             success: function(response) {
                 const added = Array.isArray(response.data) ? response.data : [];
                 const box = document.createElement('div');
@@ -460,9 +448,6 @@ document.addEventListener('DOMContentLoaded', function() {
         executeAjax({
             url: common.API_URI + '/recalcBaseAuth',
             method: 'post',
-            headers: {
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-            },
             success: function(response) {
                 const changed = Array.isArray(response.data) ? response.data : [];
                 // 메뉴 이름은 텍스트 노드로 넣는다 (html 로 해석되지 않게)
@@ -491,9 +476,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         executeAjax({
             url: common.API_URI + '/' + 'generateMenuCode',
-            headers: {
-                'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-            },
             success: function(response) {
                 showAlert({
                     type: 'success',

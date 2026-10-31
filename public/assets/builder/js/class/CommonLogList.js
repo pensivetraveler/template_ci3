@@ -3,9 +3,8 @@ class CommonLogList {
         const defaultApiUri = typeof common !== 'undefined' ? common.API_URI : '';
         const defaultApiParams = typeof common !== 'undefined' ? common.API_PARAMS : {};
         const defaultLocale = typeof common !== 'undefined' ? common.LOCALE : null;
-        const defaultApiHeaders = typeof common !== 'undefined' ? {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        } : {};
+        // 인증 헤더는 $.ajaxPrefilter(builder-common.js)가 붙인다
+        const defaultApiHeaders = {};
 
         this.options = {
             root: document,

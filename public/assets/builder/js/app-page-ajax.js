@@ -134,9 +134,6 @@ function submitAjax(selector, options = {}, queryString = false, test = false) {
 	options = Object.assign({
 		url : url,
 		method: 'post',
-		headers: {
-			'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-		},
 		contentType: false, // jQuery가 contentType을 자동으로 설정하지 않도록 함
 		processData: false, // jQuery가 데이터를 처리하지 않도록 함
 		data: formData,

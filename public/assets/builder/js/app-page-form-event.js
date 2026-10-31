@@ -175,9 +175,6 @@ $(function() {
     //         $.ajax({
     //             url: `${common.API_URI}/auth/dupCheck`,
     //             data: {key: params.key, value: value},
-    //             headers: {
-    //                 'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-    //             },
     //             method: 'get',
     //             dataType: 'json',
     //             success: function(json) {

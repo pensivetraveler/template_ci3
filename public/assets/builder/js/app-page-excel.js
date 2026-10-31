@@ -71,9 +71,6 @@ function getEditableColumns(tableSelector, excludeIndices = [0]) {
 function resetExcelFile() {
 	executeAjax({
 		url: common.API_URI + '/deleteExcelFile',
-        headers : {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
 		method: "PATCH",
 		data: {
 			class: document.body.getAttribute('data-class'),
@@ -103,9 +100,6 @@ async function validateData(dataArray, chunkSize = 50) {
 			await $.ajax({
 				url: common.API_URI + '/validateExcel',
 				type: "POST",
-				headers: {
-					'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-				},
 				data: JSON.stringify(chunk),
 				contentType: "application/json",
 			});
@@ -128,9 +122,6 @@ async function submitData(dataArray, chunkSize = 50) {
 				url: common.API_URI + '/uploadExcel',
 				type: 'POST',
 				dataType: 'json',
-				headers: {
-					'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-				},
 				contentType: 'application/json',
 				data: JSON.stringify(items.map(item => item.data)),
 			});

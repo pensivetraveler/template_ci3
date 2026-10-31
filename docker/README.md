@@ -35,3 +35,7 @@ docker compose -f docker/docker-compose.yml exec -T db mariadb -utemplate -ptemp
 - 저장소 전체를 `/var/www/html`에 마운트하므로 코드 수정은 바로 반영된다.
 - PHP 7.4 이미지의 기반 Debian bullseye는 지원이 끝나 `archive.debian.org`를 쓴다(`php/Dockerfile`).
 - 업로드 파일은 저장소의 `public/uploads/`(커밋하지 않음)에 쌓인다.
+
+## 운영과 같은 API 검사로 시험
+
+개발 환경은 API 토큰·AJAX 전용 검사가 꺼져 있다. `docker/.env.docker`에 `REST_STRICT=true`를 넣고 web 컨테이너를 재시작하면 운영처럼 검사한다(파일 하나를 마운트해 재시작해야 반영됨).

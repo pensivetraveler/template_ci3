@@ -47,9 +47,6 @@ $(function () {
             paging: common.LIST_PAGING,
             ajax: getAjaxOptions({
                 url: common.API_URI,
-                headers: {
-                    'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-                },
                 data: function(data) {
                     const req = {
                         _mode : 'list',
@@ -322,9 +319,6 @@ $(function () {
 		executeAjax({
 			url: getUrlWithIdentifiers(common.API_URI + '/' + 'duplicate', getRedirectActionData(this, common.IDENTIFIER)),
 			method: 'post',
-			headers: {
-				'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-			},
 			success: function(response) {
 				showAlert({
 					type: 'success',
@@ -1025,9 +1019,6 @@ function deleteSelectedRecords() {
 			executeAjax({
 				async: false,
 				url: getUrlWithIdentifiers(common.API_URI, Object.keys(idData).length === 1 ? Object.values(idData)[0] : idData, common.API_PARAMS),
-				headers: {
-					'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-				},
 				method: 'delete',
 				success: function() { done++; },
 				error: function() { failed++; },
@@ -1215,9 +1206,6 @@ function getListActions(btns, full, identifiers = []) {
 function afterSelectColumnChange(idData, field, value) {
     executeAjax({
 		url: getUrlWithIdentifiers(common.API_URI, idData),
-        headers : {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
 		method: 'patch',
 		data: { [field]: value },
 		success: function (response) {
@@ -1341,9 +1329,6 @@ function openViewModal(dataId, modalId = '') {
 function afterCheckboxColumnChange(idData, field, value) {
     executeAjax({
 		url: getUrlWithIdentifiers(common.API_URI, idData),
-        headers : {
-            'Authorization' : common.HOOK_PHPTOJS_VAR_TOKEN,
-        },
 		method: 'patch',
 		data: { [field]: value },
 		success: function (response) {
