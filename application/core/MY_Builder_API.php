@@ -84,6 +84,9 @@ class MY_Builder_API extends MY_Controller_API
             $this->flag = $this->uri->segment(1);
         }
 
+        // 메뉴 권한을 검사하지 않는 플랫폼(/api/* 등)은 permission.public 으로 연 API 만 받는다 (설정: api_method_config)
+        if(!in_array($this->flag, $this->permissionFlags, true) && empty($this->apiMethodFeature['permission']['public'])) show_404();
+
         // builder_method_config: 메뉴 기본 권한 계산(getMenuRouteConfigs → fillMethodConfigProperties)이 method 기본값을 쓴다.
         // 플랫폼 설정보다 먼저 불러야 하므로 여기서 (WEB 과 같은 순서)
         // builder_nav_config: 메뉴 설정을 DB 와 맞출 때(MenuList::syncFromConfig_post) nav 항목 기본값을 쓴다
@@ -800,6 +803,7 @@ class MY_Builder_API extends MY_Controller_API
         $dto = $this->beforeAdd($dto);
 
         $this->checkDataScopeValues($dto, true);
+        $this->checkSystemUserValue($dto);
 
         $dto = $this->executeAdd($dto, $bool);
 
@@ -875,6 +879,7 @@ class MY_Builder_API extends MY_Controller_API
         $dto = $this->beforeModify($key, $dto);
 
         $this->checkDataScopeValues($dto, false);
+        $this->checkSystemUserValue($dto);
 
         $dto = $this->executeModify($key, $dto, $bool);
 
@@ -969,6 +974,9 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function loggingUserlog()
     {
+        // 로그인 전 요청(회원가입)은 남길 사용자가 없다
+        if(!$this->session->userdata('user_id')) return;
+
         $class = $this->router->class;
         $method = $this->router->method;
         $restMethod = $this->input->method();
@@ -1148,7 +1156,7 @@ class MY_Builder_API extends MY_Controller_API
             if(is_empty($item, 'group')) $item['group'] = 'base';
             return $item;
         }, array_filter($config, function ($item) {
-            return $item['type'] !== 'common';
+            return ($item['type'] ?? '') !== 'common';
         }));
         // MY_Builder_WEB::setFormData 와 같이 그룹 항목의 group_attributes 를 순서대로 누적 병합
         $groups = [];
@@ -2332,7 +2340,10 @@ class MY_Builder_API extends MY_Controller_API
         }, $data);
 
         // 데이터 범위 밖 값이 있으면 저장하지 않음
-        foreach ($rows as $row) $this->checkDataScopeValues($row, true);
+        foreach ($rows as $row) {
+            $this->checkDataScopeValues($row, true);
+            $this->checkSystemUserValue($row);
+        }
 
         if($this->Model->addList($rows) === false) {
             $this->response([
@@ -2576,6 +2587,7 @@ class MY_Builder_API extends MY_Controller_API
         $dto = $this->beforeDuplicate($dto, $data);
         $dto = $this->beforeAdd($dto);
         $this->checkDataScopeValues($dto, true);
+        $this->checkSystemUserValue($dto);
         $this->executeAdd($dto, false, $this->Model);
 
         $this->afterDuplicate($this->idData, $data);
@@ -2795,9 +2807,9 @@ class MY_Builder_API extends MY_Controller_API
 
     /**
      * 요청이 메뉴 권한에 맞는지 검사한다. 맞지 않으면 403.
-     *  1. 시스템 관리자, 로그인 전 요청(auth none 엔드포인트), permission.check === false → 통과
+     *  1. 시스템 관리자, 로그인 전 요청(auth none 엔드포인트), permission.check === false, permission.public → 통과
      *  2. permission.super 또는 연결된 메뉴가 isSuper → 시스템 관리자만
-     *  3. 메뉴와 연결되지 않은 API → 로그인만 (통과)
+     *  3. 메뉴와 연결되지 않은 API → 관리자 등급(is_admin)만
      *  4. CACHING_MENU=false(권한 데이터 없음) 또는 메뉴 isAuth=false → 통과 (화면과 같음)
      *  5. 메뉴 권한 행이 없거나 숨김 → 403, 요청 권한 자리(create·read·update·delete·export·import)가 꺼져 있으면 403
      *     권한 자리가 'read|update' 처럼 여럿이면 하나만 켜져 있어도 통과, '' 이면 메뉴 표시(is_show)만 확인
@@ -2809,13 +2821,17 @@ class MY_Builder_API extends MY_Controller_API
 
         $permission = $this->apiMethodFeature['permission'] ?? [];
         if(array_key_exists('check', $permission) && $permission['check'] === false) return;
+        if(!empty($permission['public'])) return;
         if(!$this->session->userdata('user_id')) return;
         if($this->session->userdata('is_sys_admin')) return;
 
         if(!empty($permission['super'])) $this->denyApiPermission('super');
 
         $menu = $this->findApiMenu($permission['menu'] ?? null, $object);
-        if(!count($menu)) return;
+        if(!count($menu)) {
+            if(!$this->session->userdata('is_admin')) $this->denyApiPermission('admin');
+            return;
+        }
         if(!empty($menu['isSuper'])) $this->denyApiPermission('super');
         if(!env('CACHING_MENU')) return;
         if(array_key_exists('isAuth', $menu) && !$menu['isAuth']) return;
@@ -2861,7 +2877,8 @@ class MY_Builder_API extends MY_Controller_API
 
     /**
      * API 에 연결된 메뉴 항목(nav 설정의 항목 배열). 없으면 [].
-     * 같은 class 가 여러 메뉴면 method 가 같은 항목 → method 없는(index) 항목 순
+     * 같은 class 가 여러 메뉴면 method 가 같은 항목 → method 없는(index) 항목 순.
+     * URL 대소문자로 메뉴 연결을 피하지 못하도록 class 는 대소문자 없이 비교한다
      */
     protected function findApiMenu(?string $spec, string $object): array
     {
@@ -2875,7 +2892,7 @@ class MY_Builder_API extends MY_Controller_API
         $items = [];
         $walk = function ($menu) use (&$walk, &$items, $class) {
             foreach ($menu as $item) {
-                if(($item['class'] ?? '') === $class) $items[] = $item;
+                if(strcasecmp($item['class'] ?? '', $class) === 0) $items[] = $item;
                 if(!empty($item['subMenu'])) $walk($item['subMenu']);
             }
         };
@@ -2912,6 +2929,16 @@ class MY_Builder_API extends MY_Controller_API
             ],
         ]);
         return is_object($auth) ? $auth : null;
+    }
+
+    /**
+     * 시스템 관리자 등급(USR000)은 시스템 관리자만 지정할 수 있다 (등록·수정·복제·엑셀 값)
+     */
+    protected function checkSystemUserValue(array $dto): void
+    {
+        if(($dto[USER_CD_COLUMN_NAME] ?? '') !== 'USR000') return;
+        if($this->session->userdata('is_sys_admin')) return;
+        $this->denyApiPermission('super');
     }
 
     protected function denyApiPermission(string $reason): void

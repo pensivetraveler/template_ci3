@@ -729,7 +729,7 @@ $config['api_method_config'] = [
 | `limit` / `time` | int / 초(기본 3600) | `time` 초 동안 허용할 요청 수(`rest_enable_limits`) | 〃 → `_check_limit()` |
 | `level` | int | 필요한 API 키 레벨 | 〃 |
 | `resource` | 엔티티 설정 이름 | 이 API가 쓸 form·list·view 설정 이름(생략하면 API 클래스명). 화면이 route `resourceConfig`로 다른 설정을 쓰면 같은 값을 준다(예: `users` → `myinfo`) | `MY_Builder_API::__construct()` |
-| `permission` | `menu`·`mode`·`super`·`check` | 메뉴 권한 검사(`/admin/api/*`). `menu`: 연결할 메뉴 `class` 또는 `class/method`(생략하면 API 클래스명), `mode`: 검사할 권한 자리, `super`: 시스템 관리자만, `check: false`: 검사 생략 | `MY_Builder_API::checkApiPermission()` |
+| `permission` | `menu`·`mode`·`super`·`check`·`public` | 메뉴 권한 검사(`/admin/api/*`). `menu`: 연결할 메뉴 `class` 또는 `class/method`(생략하면 API 클래스명), `mode`: 검사할 권한 자리, `super`: 시스템 관리자만, `check: false`: 검사 생략, `public: true`: `/api/*`에도 열고 검사 생략 | `MY_Builder_API::checkApiPermission()` |
 
 - 파일 위치: `custom_routes.php`의 `api_folders`에 있는 폴더마다 `config/extra/{폴더}/{폴더}_method_config.php`(`$config['{폴더}_method_config']`)를 둔다. 기본 `api` 폴더는 `config/extra/api/api_method_config.php`. API 폴더의 컨트롤러는 모두 `MY_Controller_API`를 상속하므로(빌더 기능이 필요하면 `MY_Builder_API`) 빌더를 쓰지 않는 API에도 적용된다.
 - 읽는 곳: `MY_Controller_API::applyApiMethodAuth()`(부모 생성자 전), `applyApiMethodFeatures()`(부모 생성자 후). 현재 요청에 적용된 값은 `$this->apiMethodFeature`에 있다.
@@ -743,11 +743,17 @@ $config['api_method_config'] = [
 
 `MY_Builder_API::_remap()`이 요청마다 부른다. 적용 플랫폼은 `$permissionFlags`(기본 `['admin']`, 즉 `/admin/api/*`).
 
+그 밖의 플랫폼(`/api/*` 등)은 `permission.public => true`로 연 API만 받고 나머지는 404다 (`MY_Builder_API::__construct()`). 템플릿에서 열린 API는 `auth`·`setup`뿐이다. 같은 컨트롤러가 두 경로로 열리므로, 공개하면 메뉴 권한 없이 호출된다는 점을 확인하고 연다.
+
+- 시스템 관리자 등급(`USR000`)은 시스템 관리자만 지정할 수 있다 (`checkSystemUserValue()`: 등록·수정·복제·엑셀 값, 위반은 403 `reason=super`).
+- 회원가입은 `.env SIGNUP_USER_CD`가 있을 때만 `/api/auth/signup`으로 받고, 등급은 요청 값 대신 이 값으로 저장한다. 비어 있으면 404, `/admin/api/auth/signup`은 항상 404. 관리자 등급(`USR000`~`USR002`)을 넣지 않는다.
+- 메뉴와 API 설정은 URL 대소문자와 관계없이 찾는다 (`/admin/api/SysCfg`도 같은 검사).
+
 | 순서 | 조건 | 결과 |
 |---|---|---|
-| 1 | 시스템 관리자, 로그인 전 요청(auth `none` 엔드포인트), `permission.check === false` | 통과 |
+| 1 | 시스템 관리자, 로그인 전 요청(auth `none` 엔드포인트), `permission.check === false`, `permission.public` | 통과 |
 | 2 | `permission.super`, 또는 연결된 메뉴가 `isSuper` | 시스템 관리자가 아니면 403 |
-| 3 | 연결된 메뉴 없음 | 통과(로그인만) |
+| 3 | 연결된 메뉴 없음 | 관리자 등급(`is_admin`)만, 아니면 403 |
 | 4 | `CACHING_MENU=false`, 또는 메뉴 `isAuth=false` | 통과(화면과 같음) |
 | 5 | 메뉴 권한 행 없음·숨김 | 403 |
 | 6 | 요청 권한 자리가 꺼짐(여럿이면 모두 꺼짐) | 403 |

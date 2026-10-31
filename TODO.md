@@ -106,6 +106,12 @@
 - [x] `app-page-utils.js` `replaceValidationMessage` 중복 정의 (2026-10-26 하나로)
 - [x] `MY_Model::orderBy` 정의되지 않은 `$defaultOrderBy`, `querySql`의 `strpos(...) !== -1` (추가: orderBy는 재귀 호출 인자(`$table`) 누락으로 `defaultOrderBy` 프로퍼티가 전혀 적용되지 않음, querySql은 UPDATE/DELETE도 `insert_id()` 반환) → `$this->orderBy($table, $this->defaultOrderBy)`로 수정, querySql은 SQL이 INSERT로 시작할 때만 `insert_id()` (2026-10-25)
 
+### 인가 (2026-11-01 발견)
+- [x] 로그인 없이 `POST /admin/api/auth/signup`에 `user_cd=USR000`을 보내면 운영 모드에서 시스템 관리자가 만들어짐 (bizsoft 세션이 코드에서 발견, 개발 모드는 우연한 오류로 500) → `.env SIGNUP_USER_CD`가 있을 때만 `/api/auth/signup`으로 받고 등급 고정, 기본 404, 시도 횟수 제한
+- [ ] `tbl_user.approve_yn`: 가입 때 N 으로 넣지만 로그인이 확인하지 않음. 승인 절차가 필요한 프로젝트가 생기면 넣을 것
+- [ ] `web_form_config`의 `form_signup_config`에 예전 프로젝트 필드(`code`·`grade`, 없는 `student` 표 검사)가 남아 있어 가입을 켜면 필수값·500 → 가입을 쓰는 프로젝트가 생기면 정리
+- [ ] `PUT /api/boards/999999`처럼 없는 행 수정이 200 "수정되었습니다"를 돌려줌 (2026-11-01 관찰, `/admin/api/*`도 같은 경로로 보임)
+
 ### 구조
 - [ ] `MY_Builder_API`(약 2000줄), `MY_Builder_WEB`(약 1300줄) 기능별 분리 (Validator, Exporter, 권한 서비스)
 - [ ] 환경별 config 중복 제거 (development/production 차이 3줄뿐, 세션 테이블명 차이 의도 확인)
@@ -128,7 +134,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 ### 보안
 - [x] `builder_api_helper.php::reformat_get_data` + `MY_Model::select` GET `select[]` 값이 그대로 `getList()` select로 들어가고, `parse_select_column()`의 `alias_expr` 분기가 `db->select("{expr} as {alias}", false)`(escape 없음)로 실행된다. `?select[]=(SELECT password FROM user LIMIT 1) as x` 같은 서브쿼리 주입 가능 (모든 builder GET 목록·`prepareExports_get`, 로그인 사용자 누구나) → `reformat_request_select()`로 요청 select는 단순 컬럼명만 허용 (식·별칭·테이블 접두어 제거)
 - [x] `MY_Builder_API::executeModify`/`setModData` 기본 흐름이 where를 `$this->idData`가 아니라 바디에서 계산한다. non-AI 모델은 바디에 PK가 없으면 where `[]` → `UPDATE` 테이블 전체 (PATCH 인라인 수정, query string으로만 PK를 준 PUT/POST). AI 모델은 identifier가 없으면 Notice + `IS NULL`로 무변경 (MenuAuth/PartnerAuth가 우회 오버라이드 중) → 메인 Model은 `$this->idData`로 수정, `checkModifyIdData()`가 식별자 누락 시 400, `Model_Common::validateWhereCondition()`이 빈 WHERE의 수정·삭제를 거부
-- [ ] (2026-10-31: 코드상 `checkApiPermission`(2026-10-25)이 해결한 것으로 보임. 로컬에 메뉴 데이터가 없어 일반 계정으로 시험하지 못함 — 운영 데이터로 확인 필요) `MY_Builder_API` 전반 API 인가가 rest_config `session`(user_id 존재)뿐이다. admin WEB의 `user_cd`/`IS_ADMIN` 검사가 API엔 없고, `flag !== 'admin'` 검사(SysCode, MenuAuth, MenuList, PartnerAuth, SysCfg)는 URL 첫 세그먼트라 `/admin/api/...`로 호출하면 통과 (일반 로그인 사용자가 관리자·권한·코드 CRUD 가능)
+- [x] (2026-11-01: 로컬 시험으로 `/admin/api/*`는 차단, `/api/*`와 URL 대소문자(`/admin/api/SysCfg`)는 우회됨을 확인 → `/api/*`는 `permission.public`만 열고 404, 메뉴·설정을 대소문자 없이 찾음, 메뉴 없는 API는 `is_admin`만, USR000 지정은 시스템 관리자만) `MY_Builder_API` 전반 API 인가가 rest_config `session`(user_id 존재)뿐이다. admin WEB의 `user_cd`/`IS_ADMIN` 검사가 API엔 없고, `flag !== 'admin'` 검사(SysCode, MenuAuth, MenuList, PartnerAuth, SysCfg)는 URL 첫 세그먼트라 `/admin/api/...`로 호출하면 통과 (일반 로그인 사용자가 관리자·권한·코드 CRUD 가능)
 - [x] `Model_Common::getSelectList` / `Model_Administrator::getList`·`Model_Partner::getList`(join select `'*'`) 기본 select에 `password` 해시, `user_api_key`가 포함되어 Users/Administrators/Partners 목록·상세 응답으로 그대로 나간다 (자격증명 노출) → `MY_Builder_API::$hiddenResponseFields`(password)는 모든 응답, `$hiddenListFields`(user_api_key 등)는 목록 응답에서 제거 (2026-10-25)
 - [x] `MY_Builder_API::deleteFile_patch` body `file_id`만으로 `delFileData()` 실행, 엔티티 소속·작성자 확인 없음 (임의 파일 삭제). `type` 파라미터는 필수인데 쓰이지 않음 (2026-10-25 TODO 2장에서 수정)
 - [x] `MY_Builder_API::duplicate_get` 권한 확인 없이 모든 엔티티에서 GET 한 번으로 INSERT 실행 (아래 버그와 결합) → `duplicate_post`로 변경, 원본은 URL 식별자(`checkIdentifierExist`)로 조회. 권한 검사는 2장 API 권한에서 (2026-10-25)

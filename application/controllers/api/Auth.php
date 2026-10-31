@@ -204,6 +204,10 @@ class Auth extends Common
 
     public function signup_post()
     {
+        // 설정한 프로젝트의 공개 경로에서만 받는다. 관리자 경로로는 가입하지 않는다
+        $userCd = $this->config->item('signup_user_cd');
+        if(!$userCd || in_array($this->flag, $this->permissionFlags, true)) show_404();
+
         $this->validateFormRules('form_signup_config');
 
         // user_id 는 AUTO_INCREMENT 라 기본값을 넣지 않는다
@@ -216,6 +220,7 @@ class Auth extends Common
         // beforePost() 는 [$key, $data] 를 돌려준다. 저장은 파이프라인(executeAdd)을 거쳐 비밀번호 해시·FK 채우기를 적용
         // (예전 코드는 정의되지 않은 Model_Child 를 사용해 회원가입이 동작하지 않았다)
         list(, $dto) = $this->beforePost(0);
+        $dto[USER_CD_COLUMN_NAME] = $userCd; // 등급은 요청 값을 쓰지 않는다
         $this->executeAdd($dto, false);
 
         $this->loggingUserlog();

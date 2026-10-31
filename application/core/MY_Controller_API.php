@@ -26,7 +26,7 @@ class MY_Controller_API extends RestController
 
         $this->applyApiMethodFeatures();
 
-        if($this->router->class === 'common') redirect('/welcome');
+        if(strcasecmp($this->router->class, 'common') === 0) redirect('/welcome');
 
         $this->lang->load('status_code', $this->config->item('language'));
 
@@ -81,7 +81,11 @@ class MY_Controller_API extends RestController
         // 없는 메서드는 RestController 가 index_{http} 로 처리하므로 설정도 index 기준으로 찾는다
         $featureMethod = method_exists($this, "{$method}_{$http}") ? $method : 'index';
 
-        $classConfig = ($config->item($methodConfigName) ?: [])[$class] ?? [];
+        // URL 대소문자로 설정을 피하지 못하도록 API 이름은 대소문자 없이 찾는다
+        $classConfig = [];
+        foreach (($config->item($methodConfigName) ?: []) as $name => $item) {
+            if(strcasecmp((string)$name, $class) === 0) $classConfig = $item;
+        }
         $this->apiMethodFeature = $this->resolveApiMethodFeature($classConfig, $featureMethod, $http);
         $this->apiMethodFeature['_method'] = $featureMethod;
 

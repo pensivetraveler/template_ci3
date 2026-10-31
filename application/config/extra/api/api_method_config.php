@@ -29,11 +29,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |   level      : 필요한 API 키 레벨
 |   permission : 메뉴 권한 검사 (MY_Builder_API::checkApiPermission, /admin/api/* 에만 적용)
 |     menu  : 대응하는 메뉴 'class' 또는 'class/method' (예: 'system/sysCfg'). 생략하면 API 클래스명과 같은 메뉴
-|             (같은 class 메뉴가 여럿이면 API 메서드와 같은 method 메뉴). 메뉴와 연결되지 않으면 로그인만 확인
+|             (같은 class 메뉴가 여럿이면 API 메서드와 같은 method 메뉴). 메뉴와 연결되지 않으면 관리자 등급(is_admin)만
 |     mode  : 검사할 권한 자리. create | read | update | delete | export | import (생략하면 요청으로 판단:
 |             GET 조회, 식별자 없는 POST 등록, 식별자 있는 POST·PUT·PATCH 수정, DELETE 삭제, 내보내기 export, 엑셀 import)
 |     super : true 면 시스템 관리자만 허용 (연결된 메뉴가 isSuper 여도 같음)
 |     check : false 면 권한 검사 생략 (로그인만 확인)
+|     public: true 면 메뉴 권한을 검사하지 않는 플랫폼(/api/* 등)에도 연다. 없으면 그 경로는 404.
+|             관리자 경로(/admin/api/*)에서도 권한 검사를 건너뛴다
 |   resource   : 이 API 가 쓸 엔티티 설정 이름 (form·list·view, MY_Builder_API). 생략하면 API 클래스명.
 |                화면이 route 의 resourceConfig 로 다른 설정을 쓰면 API 도 같은 값을 준다 (예: users → myinfo)
 |
@@ -46,10 +48,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |   ],
 */
 
+// 회원가입으로 만들 회원 등급. 비어 있으면 회원가입을 받지 않는다(404). 관리자 등급(USR000·USR001·USR002)을 넣지 말 것
+$config['signup_user_cd'] = getenv('SIGNUP_USER_CD') ?: '';
+
 $config['api_method_config'] = [
     // 시스템 설정 화면(route system 의 메서드)이 쓰는 API → 메뉴 system/{메서드} (isSuper 메뉴라 시스템 관리자만)
     // 내 정보 화면(myinfo route, resourceConfig 'myinfo')이 쓰는 API → 같은 form 설정으로 서버 검증
-    'users'    => ['*' => ['*' => ['resource' => 'myinfo']]],
+    // 메뉴가 없고 일반 등급도 쓰므로 권한 검사 생략 (본인 제한은 api/Users)
+    'users'    => ['*' => ['*' => ['resource' => 'myinfo', 'permission' => ['check' => false]]]],
     'sysCfg'   => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCfg']]]],
     'sysCode'  => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCode']]]],
     'menuList' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuList']]]],
@@ -57,13 +63,14 @@ $config['api_method_config'] = [
 
     // 인증·회원 API: 로그인 전에 쓰는 엔드포인트는 auth none, 키·로그 생략
     'auth' => [
+        '*'             => ['*' => ['permission' => ['public' => true]]],
         'dupCheck'      => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
         'idCheck'       => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
         'emailCheck'    => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
         // 로그인·아이디/비밀번호 찾기: IP 별 60초에 10회 (무차별 대입 방지, RestController user_limits).
         // log 는 끈 채 둔다 — rest_logs 는 요청 파라미터를 그대로 저장해 비밀번호가 남는다
         'login'         => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
-        'signup'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
+        'signup'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         'findId'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         'findPassword'  => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         'passwordCheck' => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
@@ -75,6 +82,7 @@ $config['api_method_config'] = [
     // 설치 API: 설치 전에는 로그인할 계정이 없어 auth none (전에는 세션 인증을 요구해 빈 DB 에서 설치할 수 없었음).
     // 설치가 끝나면(표와 USR000 이 있으면) Setup 생성자가 403, addTables 는 production 에서 403. 비밀번호를 받으므로 log 끔
     'setup' => [
+        '*'             => ['*' => ['permission' => ['public' => true]]],
         'addSystemUser' => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         'addTables'     => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
     ],
