@@ -116,7 +116,8 @@ function executeAjax(obj = {}, test = false) {
 		form.submit();
 		form.remove();
 	}else{
-		$.ajax(options);
+		// 호출부가 끝나기를 기다릴 수 있게 돌려준다 (await 는 실패 응답에서 예외가 난다)
+		return $.ajax(options);
 	}
 }
 
@@ -181,6 +182,6 @@ function submitAjax(selector, options = {}, queryString = false, test = false) {
 			buttons.forEach((button) => { button.disabled = false; });
 			if(typeof complete === 'function') complete.apply(this, args);
 		};
-		executeAjax(options);
+		return executeAjax(options);
 	}
 }
