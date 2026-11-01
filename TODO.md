@@ -145,7 +145,7 @@
 ### 정리
 - [x] (2026-10-30 제거) (2026-10-29 게시판 정리 중 발견) `Model_Article::getDashboardArticleList` 부르는 곳 없음, 없는 표 `tbl_article_prefer`·고정 `board_id` 3을 씀(예전 프로젝트 대시보드용) — 지울지 확인 필요
 - [ ] 미사용 파일: `player.bak.php`, `player_original.php`, `player_swarmcloud.php`, 로드되지 않는 JS, 빈 `admin/js` stub (추가: 저장소 루트 `app-page-list.js`·`bakj.app-page-list.js` 사본, 정의되지 않은 `classed`를 참조하는 미사용 `app-page-list.js::renderButtonColumn`)
-- [ ] vendor: jQuery 3벌(1.11/2.1/3.7), SweetAlert 1·2 공존 → 정리, `package.json` 도입
+- [x] (2026-11-01: 화면이 쓰는 것은 builder/vendor 의 jQuery·SweetAlert2 한 벌씩. 안 쓰는 base/js/jquery 폴더 삭제, package.json 은 ESLint 와 함께 도입) vendor: jQuery 3벌(1.11/2.1/3.7), SweetAlert 1·2 공존 → 정리, `package.json` 도입
 - [x] (2026-11-01: 1.30, PHP 7.4 지원하는 마지막 계열) PHPExcel → PhpSpreadsheet (추가: `MY_Builder_WEB::getExcelSample`의 `Excel_lib`)
 - [ ] 기본 컨트롤러 `Welcome` 교체
 - [x] (2026-11-01: PHPUnit 도입, scripts/test.sh, tests/app/README.md) 프로젝트 테스트(PHPUnit)
