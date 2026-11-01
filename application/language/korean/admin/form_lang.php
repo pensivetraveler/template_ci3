@@ -121,6 +121,11 @@ $lang['company'] = [
     'company_memo' => '비고',
 ];
 
+$lang['partner'] = [
+    'partner_id' => '파트너',
+    'company_ids' => '소속 업체',
+];
+
 $lang['category'] = [
     'category_id' => '카테고리',
     'category_name' => '카테고리 노출명',

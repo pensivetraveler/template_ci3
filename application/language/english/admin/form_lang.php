@@ -121,6 +121,11 @@ $lang['company'] = [
     'company_memo' => 'Memo',
 ];
 
+$lang['partner'] = [
+    'partner_id' => 'Partner',
+    'company_ids' => 'Companies',
+];
+
 $lang['category'] = [
     'category_id' => 'Category',
     'category_name' => 'Category Name',

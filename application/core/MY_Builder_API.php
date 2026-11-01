@@ -1690,7 +1690,7 @@ class MY_Builder_API extends MY_Controller_API
         if(count($model->uniqueKeyList) > 0){
             foreach ($model->uniqueKeyList as $key) {
                 if(array_search($key, array_column($this->formConfig, 'field')) === false) continue;
-                if(!$modeAdd && !array_key_exists($key, $dto)) continue;
+                if(!array_key_exists($key, $dto)) continue;
 
                 $idx = array_search($key, array_column($this->formConfig, 'field'));
                 $config = $this->formConfig[$idx];

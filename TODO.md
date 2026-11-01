@@ -129,6 +129,7 @@
 - [ ] `api/Common::message_read_patch` 없는 메시지도 성공 응답 (modify 를 거치지 않는 전용 경로, 2026-11-01 코드로 확인, 위험 작음)
 - [x] (2026-11-01: auth none 을 빼 비로그인 401, IP 별 300초 5회 제한) `api/Auth::passwordCheck_post` 로그인하지 않은 요청이 500 (세션 사용자 행이 없어 Notice, 2026-11-01 관찰, 수정 전 코드도 같음). `/admin/api/auth/passwordCheck` 도 auth none 이라 같을 것으로 보임
 - [x] (2026-11-01: 컬럼 추가, 연결 표는 필요해지면 검토) `/admin/api/partners` 목록이 500: `Model_Partner` nullList 의 company_ids 컬럼이 템플릿 tbl_partner 에 없음 (2026-11-01 로컬 관찰, 이번 변경과 무관. bizsoft 파트너 시험은 통과)
+- [x] (2026-11-01 사용자 결정: varchar(255) 까지만, 넘으면 422) `tbl_partner.company_ids` 60자에서 값이 조용히 잘림 (20개 이상 담당 가능)
 - [ ] `MenuAuth` 없는 menu_id 로 PATCH 하면 `ensureAuthRow`가 고아 권한 행을 만들고 200 (PartnerAuth 도 같은 구조로 보임, 2026-11-01 관찰)
 
 ### 구조
