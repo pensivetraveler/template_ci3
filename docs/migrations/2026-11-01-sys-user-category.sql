@@ -11,6 +11,11 @@ INSERT IGNORE INTO tbl_sys_cfg (cmb_cfg, big_cfg, sml_cfg, cfg_name, cfg_type, c
 SELECT 'SYS_USER_000', 'SYS_USER', '000', '회원·인증', 'text', NOW(), user_id
 FROM tbl_user WHERE user_cd = 'USR000' ORDER BY user_id LIMIT 1;
 
+-- 이미 옮긴 뒤 옛 마이그레이션을 다시 실행해 USER·SYS_AUTH 행이 되살아났으면 지운다 (옮겨 둔 값을 유지)
+DELETE old FROM tbl_sys_cfg old
+JOIN tbl_sys_cfg moved ON moved.cmb_cfg = CONCAT('SYS_USER_', old.sml_cfg)
+WHERE old.big_cfg IN ('USER', 'SYS_AUTH') AND old.sml_cfg <> '000';
+
 UPDATE tbl_sys_cfg SET cmb_cfg = CONCAT('SYS_USER_', sml_cfg), big_cfg = 'SYS_USER'
 WHERE big_cfg IN ('USER', 'SYS_AUTH') AND sml_cfg <> '000';
 

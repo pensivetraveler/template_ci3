@@ -1,4 +1,4 @@
--- (키 이름은 다음 마이그레이션 2026-11-01-sys-user-category.sql 에서 SYS_USER_* 로 바뀐다. 이어서 실행한다.)
+-- (키 이름은 다음 마이그레이션 2026-11-01-sys-user-category.sql 에서 SYS_USER_* 로 바뀐다. 이어서 실행한다. 다시 실행했으면 그 마이그레이션도 다시 실행한다.)
 -- 회원 설정 값을 환경값 설정의 USER 카테고리로 옮기고 회원 설정(system/userCfg) 메뉴를 없앤다.
 -- 코드를 반영한 뒤, 2026-11-01-sys-cfg-category.sql 다음에 실행한다. 저장 위치(big_cfg = USER)는 그대로라 이미 저장한 값은 바뀌지 않는다.
 -- 다시 실행해도 된다. 메뉴 캐시를 쓰면 실행 뒤 application/cache/menu_done 을 지운다.
