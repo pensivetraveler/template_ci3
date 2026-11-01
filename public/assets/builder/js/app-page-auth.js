@@ -121,7 +121,7 @@ $(function() {
 						let val = data.result[key];
 						showAlert({
 							type: 'success',
-							html: `데이터가 조회되었습니다.<br><p class="text-danger mt-2 mb-0">(${getLocale('user.'+key, common.LOCALE)} : ${val})</p>`,
+							html: `데이터가 조회되었습니다.<br><p class="text-danger mt-2 mb-0">(${getLocale('user.'+key, common.LOCALE)} : ${escapeHtml(val)})</p>`,
 							callback: redirect,
 							params: data.redirect_to??common.REDIRECT_URI??null,
 						})

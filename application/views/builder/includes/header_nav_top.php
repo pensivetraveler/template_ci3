@@ -310,15 +310,15 @@
 			<li class="nav-item navbar-dropdown dropdown-user dropdown">
 				<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
 					<div class="avatar avatar-online bg-primary rounded-circle d-flex justify-content-center align-items-center">
-						<span class="text-white"><?=mb_substr($headerData['name'],0,1)?></span>
+						<span class="text-white"><?=html_escape(mb_substr($headerData['name'],0,1))?></span>
 					</div>
 				</a>
 				<ul class="dropdown-menu dropdown-menu-end">
 					<li>
 						<a class="dropdown-item" href="<?=base_url('/admin/myInfo')?>">
 							<div class="d-flex justify-content-between">
-								<span class="fw-medium d-block small"><?=$headerData['name']?></span>
-								<small class="text-muted"><?=$headerData['id']?></small>
+								<span class="fw-medium d-block small"><?=html_escape($headerData['name'])?></span>
+								<small class="text-muted"><?=html_escape($headerData['id'])?></small>
 							</div>
 						</a>
 					</li>

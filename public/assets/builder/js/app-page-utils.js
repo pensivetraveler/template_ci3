@@ -1,4 +1,12 @@
 /**
+ * 값을 HTML 글자로 이스케이프한다 (HTML 문자열·속성에 사용자 값을 넣을 때)
+ */
+function escapeHtml(value) {
+    const entities = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'};
+    return String(value ?? '').replace(/[&<>"']/g, (char) => entities[char]);
+}
+
+/**
  * GetLocale
  *
  * Fetches a language variable

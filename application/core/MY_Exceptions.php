@@ -46,7 +46,8 @@ class MY_Exceptions extends CI_Exceptions
                 $this->config->config['error_occurs'] = true;
                 $this->config->config['error_views_path'] = get_error_views_path();
             }
-            return parent::show_error($heading, $message, $template, $status_code);
+            // 메시지에 요청 값·SQL 이 섞일 수 있어 글자로 출력한다
+            return parent::show_error(html_escape($heading), html_escape($message), $template, $status_code);
         }
     }
 

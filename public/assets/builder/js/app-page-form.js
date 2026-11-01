@@ -913,18 +913,18 @@ function setFormListItem(selector, data, field) {
 }
 
 function setFormListItemFile(field, item, identifier = '') {
-    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    const fullItem = escapeHtml(JSON.stringify(item).replace(/"/g, "'"));
     const articleId = item.article_id ?? '';
     const fileId = item.file_id;
     if(Object.hasOwn(field.form_attributes, 'list_sorter') && field.form_attributes.list_sorter) {
         let output = `
-            <li class="form-list-item list-group-item d-flex justify-content-between align-items-center px-2" data-identifier-val="${identifier}" data-full-item="${fullItem}" data-article-id="${articleId}" data-file-id="${fileId}">
+            <li class="form-list-item list-group-item d-flex justify-content-between align-items-center px-2" data-identifier-val="${escapeHtml(identifier)}" data-full-item="${fullItem}" data-article-id="${escapeHtml(articleId)}" data-file-id="${escapeHtml(fileId)}">
                 <div class="d-flex justify-content-between align-items-center pe-4">
                     <i class="drag-handle cursor-move ri-menu-line align-text-bottom me-2"></i>
-                    <span class="not-draggable">${item.orig_name}</span>
+                    <span class="not-draggable">${escapeHtml(item.orig_name)}</span>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                    <button class="btn btn-primary waves-effect p-1" type="button" onclick="downloadFile(${fileId})">
+                    <button class="btn btn-primary waves-effect p-1" type="button" onclick="downloadFile(${Number(fileId)})">
                         <i class="ri-file-download-line ri-16px align-middle"></i>
                     </button>
         `;
@@ -943,11 +943,11 @@ function setFormListItemFile(field, item, identifier = '') {
     }else{
         const url = common.CURRENT_URI;
         return `
-        <div class="form-list-item d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
+        <div class="form-list-item d-flex align-items-center" data-identifier-val="${escapeHtml(identifier)}" data-full-item="${fullItem}">
             <div class="badge text-body text-truncate">
-                <a href="${url}/downloader/${fileId}">
+                <a href="${url}/downloader/${escapeHtml(fileId)}">
                     <i class="ri-file-download-fill ri-16px align-middle"></i>
-                    <span class="h6 mb-0 align-middle">${item.orig_name}</span>
+                    <span class="h6 mb-0 align-middle">${escapeHtml(item.orig_name)}</span>
                 </a>
             </div>
         </div>
@@ -957,14 +957,14 @@ function setFormListItemFile(field, item, identifier = '') {
 
 function setFormListItemThumbnail(field, item, identifier = '') {
     const url = common.CURRENT_URI;
-    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    const fullItem = escapeHtml(JSON.stringify(item).replace(/"/g, "'"));
     return `
-        <div class="form-list-item d-flex align-items-start flex-column justify-content-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
+        <div class="form-list-item d-flex align-items-start flex-column justify-content-center" data-identifier-val="${escapeHtml(identifier)}" data-full-item="${fullItem}">
             <div class="d-flex align-items-center justify-content-between w-100 mb-2">
                 <div class="badge text-body text-truncate">
-                    <a href="${url}/downloader/${item.file_id}">
+                    <a href="${url}/downloader/${escapeHtml(item.file_id)}">
                         <i class="ri-file-download-fill ri-16px align-middle"></i>
-                        <span class="h6 mb-0 align-middle">${item.orig_name}</span>
+                        <span class="h6 mb-0 align-middle">${escapeHtml(item.orig_name)}</span>
                     </a>
                 </div>
                 <button class="btn btn-danger waves-effect p-1" type="button" onclick="deleteFile(this, '${field.form_attributes.list_delete || field.field}')">
@@ -972,7 +972,7 @@ function setFormListItemThumbnail(field, item, identifier = '') {
                 </button>
             </div>
             <div class="border rounded-3 overflow-hidden">
-                <img src="${item.file_link}" alt="${item.orig_name}" class="mw-100 not-draggable" draggable="false">
+                <img src="${escapeHtml(item.file_link)}" alt="${escapeHtml(item.orig_name)}" class="mw-100 not-draggable" draggable="false">
             </div>
         </div>
     `;
@@ -980,13 +980,13 @@ function setFormListItemThumbnail(field, item, identifier = '') {
 
 function setFormListItemPreview(field, item, identifier = '') {
     const url = common.CURRENT_URI;
-    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    const fullItem = escapeHtml(JSON.stringify(item).replace(/"/g, "'"));
     return `
-        <div class="form-list-item d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
+        <div class="form-list-item d-flex align-items-center" data-identifier-val="${escapeHtml(identifier)}" data-full-item="${fullItem}">
             <div class="badge text-body text-truncate">
-                <a href="${url}/downloader/${item.file_id}">
+                <a href="${url}/downloader/${escapeHtml(item.file_id)}">
                     <i class="ri-file-download-fill ri-16px align-middle"></i>
-                    <span class="h6 mb-0 align-middle">${item.orig_name}</span>
+                    <span class="h6 mb-0 align-middle">${escapeHtml(item.orig_name)}</span>
                 </a>
             </div>
         </div>
@@ -995,13 +995,13 @@ function setFormListItemPreview(field, item, identifier = '') {
 
 function setFormListItemYoutube(field, item, identifier = '') {
     const url = location.origin+location.pathname;
-    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    const fullItem = escapeHtml(JSON.stringify(item).replace(/"/g, "'"));
     return `
-        <div class="d-flex align-items-center" data-identifier-val="${identifier}" data-full-item="${fullItem}">
+        <div class="d-flex align-items-center" data-identifier-val="${escapeHtml(identifier)}" data-full-item="${fullItem}">
             <div class="badge text-body text-truncate">
-                <a href="#" role="button" data-bs-toggle="modal" data-bs-target="#youTubeModal" data-value="${item}">
+                <a href="#" role="button" data-bs-toggle="modal" data-bs-target="#youTubeModal" data-value="${escapeHtml(item)}">
                     <i class="ri-link mt-0 ri-16px align-middle"></i>
-                    <span class="h6 mb-0 align-middle">https://youtu.be/${item}</span>
+                    <span class="h6 mb-0 align-middle">https://youtu.be/${escapeHtml(item)}</span>
                 </a>
             </div>
         </div>
@@ -1010,11 +1010,11 @@ function setFormListItemYoutube(field, item, identifier = '') {
 
 function setFormListItemReplyList(field, item, identifier = '') {
     const url = location.origin+location.pathname;
-    const fullItem = JSON.stringify(item).replace(/"/g, "'");
+    const fullItem = escapeHtml(JSON.stringify(item).replace(/"/g, "'"));
     return `
-        <li class="form-list-item mb-1 ps-0 p-2" data-identifier-val="${identifier}" data-full-item="${fullItem}">
-            <p class="h6 mb-1">${item.content}</p>
-            <p class="text-end mb-0">${item.created_id} ${item.created_dt}</p>
+        <li class="form-list-item mb-1 ps-0 p-2" data-identifier-val="${escapeHtml(identifier)}" data-full-item="${fullItem}">
+            <p class="h6 mb-1">${escapeHtml(item.content)}</p>
+            <p class="text-end mb-0">${escapeHtml(item.created_id)} ${escapeHtml(item.created_dt)}</p>
         </li>
     `;
 }

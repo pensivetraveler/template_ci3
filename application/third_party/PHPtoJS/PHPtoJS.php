@@ -147,7 +147,7 @@ class PHPtoJS
     protected function transformArray($value)
     {
         if (is_array($value)) {
-            return json_encode($value);
+            return json_encode($value, JSON_HEX_TAG);
         }
     }
 
@@ -199,7 +199,7 @@ class PHPtoJS
                 throw new Exception('The provided object needs a __toString() method.');
             }
 
-            return "'{$value}'";
+            return "'{$this->escape((string)$value)}'";
         }
     }
 
@@ -224,7 +224,12 @@ class PHPtoJS
      */
     protected function escape($value)
     {
-        return str_replace(["\\", "'"], ["\\\\", "\'"], $value);
+        // <script> 안에 그대로 출력되므로 태그·줄바꿈이 문자열을 벗어나지 않게 한다
+        return str_replace(
+            ["\\", "'", "<", ">", "\r", "\n", "\u{2028}", "\u{2029}"],
+            ["\\\\", "\'", "\\x3C", "\\x3E", "\\r", "\\n", "\\u2028", "\\u2029"],
+            $value
+        );
     }
 
     /**

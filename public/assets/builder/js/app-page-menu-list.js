@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
             code.classList.add('badge', 'me-2');
             if (item.code) {
                 code.classList.add('bg-gray');
-                code.innerHTML = `${item.code}`;
+                code.textContent = item.code;
             } else {
                 code.classList.add('bg-danger');
                 code.innerHTML = `<span class="d-none d-inline d-md-inline">${getLocale('MenuCode')}</span> ${getLocale('Unregistered')}`;

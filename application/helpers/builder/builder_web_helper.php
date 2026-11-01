@@ -25,7 +25,7 @@ if ( ! function_exists('get_breadcrumbs'))
         foreach ($title_list as $i=>$title) {
             $active = $i === count($title_list)-1 ? 'active' : '';
             $html .= "<li class='breadcrumb-item {$active}'>";
-            $title = $CI->lang->line('nav.'.$title);
+            $title = html_escape($CI->lang->line('nav.'.$title));
             if($i !== count($title_list)-1) {
                 $html .= "<a href='javascript:void(0);' class='pe-2'>{$title}</a><i class='breadcrumb-icon icon-base ri ri-arrow-right-s-line align-middle'></i>";
             }else{

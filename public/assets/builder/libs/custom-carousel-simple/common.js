@@ -163,7 +163,7 @@
         const targetSelfChecked = !data.linkTarget || data.linkTarget === '_self' ? 'checked' : '';
 
         li.innerHTML = `
-            <input type="hidden" name="${field}[${nameIdx}][carousel_id]" value="${data.carousel_id || ''}">
+            <input type="hidden" name="${field}[${nameIdx}][carousel_id]" value="">
             <input type="hidden" name="${field}[${nameIdx}][carousel_srt]" value="${nextIdx}">
             <input type="hidden" name="${field}[${nameIdx}][carousel_pos]" value="${position}">
             <input type="file" name="${field}[${nameIdx}][carousel_img]" class="d-none">
@@ -174,8 +174,7 @@
                         <i class="ri-draggable ri-18px"></i>
                     </span>
         
-                    <div class="custom-carousel-item-img rounded-2 border border-input"
-                         style="background-image:url(${data.imageUrl || ''})">
+                    <div class="custom-carousel-item-img rounded-2 border border-input">
                     </div>
                 </div>
         
@@ -188,7 +187,7 @@
             </div>
             
             <div class="ps-10 mt-2 d-flex align-items-center justify-content-start">
-                <input type="text" name="${field}[${nameIdx}][link_url]" class="form-control w-50 py-2 px-3 fs-small" placeholder="링크를 입력하세요" value="${data.linkUrl || ''}" data-detect-changed="false">
+                <input type="text" name="${field}[${nameIdx}][link_url]" class="form-control w-50 py-2 px-3 fs-small" placeholder="링크를 입력하세요" value="" data-detect-changed="false">
                 
                 <div class="d-flex align-items-xxl-center flex-column flex-xxl-row ms-4">
                     <div class="form-check me-xxl-2 mb-0 small">
@@ -202,6 +201,11 @@
                 </div>
             </div>
         `;
+
+        // 서버에서 온 값은 HTML 문자열에 넣지 않고 속성으로 넣는다
+        li.querySelector(`input[name="${field}[${nameIdx}][carousel_id]"]`).value = data.carousel_id || '';
+        li.querySelector(`input[name="${field}[${nameIdx}][link_url]"]`).value = data.linkUrl || '';
+        if(data.imageUrl) li.querySelector('.custom-carousel-item-img').style.backgroundImage = `url(${JSON.stringify(String(data.imageUrl))})`;
 
         return li;
     };
