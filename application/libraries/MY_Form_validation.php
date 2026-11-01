@@ -378,6 +378,11 @@ class MY_Form_validation extends CI_Form_validation
         }
     }
 
+    public function alpha_uppercase($value): bool
+    {
+        return (bool)preg_match('/^[A-Z]+$/', (string)$value);
+    }
+
     public function concat($value, $params)
     {
         $exploded = explode('|', $params);

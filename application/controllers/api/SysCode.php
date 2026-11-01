@@ -21,6 +21,28 @@ class SysCode extends Common
         if($this->flag !== 'admin') show_404();
     }
 
+    /**
+     * 소구분 000 은 카테고리다. 새 big_cd 를 직접 입력하므로 카테고리 폼 규칙으로 검증한다
+     */
+    private function useBigCodeForm(): void
+    {
+        if($this->input->post_put('sml_cd') === '000') {
+            $this->formConfig = $this->resolveFormConfig($this->resourceLoader->entityConfig('form_big_code_config', [], false));
+        }
+    }
+
+    protected function beforePost($key = 0, $model = null): array
+    {
+        $this->useBigCodeForm();
+        return parent::beforePost($key, $model);
+    }
+
+    protected function beforePut($key = 0, $model = null): array
+    {
+        $this->useBigCodeForm();
+        return parent::beforePut($key, $model);
+    }
+
     protected function beforeList($data): array
     {
         $data['whereNot'] = ['sml_cd' => '000'];

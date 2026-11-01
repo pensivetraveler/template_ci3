@@ -175,7 +175,7 @@ $(function () {
                 showAlert({
                     type: 'success',
                     title: 'Complete',
-                    text: formRecord['_mode'].value === 'edit' ? 'Your Data Is Updated' : 'Registered Successfully',
+                    text: formBigCd['_mode'].value === 'edit' ? 'Your Data Is Updated' : 'Registered Successfully',
                     callback: reload,
                 });
             },

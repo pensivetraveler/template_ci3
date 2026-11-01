@@ -1497,15 +1497,7 @@ class MY_Builder_API extends MY_Controller_API
             $this->listConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_list_base'), $item);
             }, $this->resourceLoader->entityConfig($this->listConfigName, [], false));
-            // 화면과 같은 해석(setFormColumn: form·option·list attributes 기본값, option_field 옵션).
-            // 서버 검증은 원래 label('lang:' 접두어)·rules·errors 로 한다 (setFormColumn 은 화면용으로 바꿈)
-            $this->formConfig = array_map(function ($item) {
-                $merged = array_merge($this->config->get('builder_form_base'), $item);
-                if(($merged['type'] ?? '') === 'common' || !isset($merged['field'])) return $merged;
-                $column = $this->setFormColumn($item);
-                foreach (['label', 'rules', 'errors', 'subtype'] as $key) $column[$key] = $merged[$key] ?? null;
-                return $column;
-            }, $this->resourceLoader->entityConfig($this->formConfigName, [], false));
+            $this->formConfig = $this->resolveFormConfig($this->resourceLoader->entityConfig($this->formConfigName, [], false));
             $this->viewConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_view_base'), $item);
             }, $this->resourceLoader->entityConfig($this->viewConfigName, [], false));
@@ -1527,6 +1519,21 @@ class MY_Builder_API extends MY_Controller_API
 
             // form 설정이 없는 엔티티(MenuAuth 등)도 POST를 받으므로 막지 않는다 (서버 form rules 검증만 생략됨)
         }
+    }
+
+    /**
+     * 화면과 같은 해석(setFormColumn: form·option·list attributes 기본값, option_field 등)을 거친 form 설정.
+     * 서버 검증은 원래 label('lang:' 접두어)·rules·errors 로 한다 (setFormColumn 은 이 값들을 화면용으로 바꾼다)
+     */
+    protected function resolveFormConfig(array $config): array
+    {
+        return array_map(function ($item) {
+            $merged = array_merge($this->config->get('builder_form_base'), $item);
+            if(($merged['type'] ?? '') === 'common' || !isset($merged['field'])) return $merged;
+            $column = $this->setFormColumn($item);
+            foreach (['label', 'rules', 'errors', 'subtype'] as $key) $column[$key] = $merged[$key] ?? null;
+            return $column;
+        }, $config);
     }
 
     protected function checkIdentifierExist($key = 0, $strict = false, $model = null): array
