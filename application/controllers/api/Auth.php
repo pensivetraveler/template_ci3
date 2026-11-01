@@ -452,7 +452,7 @@ class Auth extends Common
             'where' => ['user_id' => $this->session->userdata('user_id'),]
         ]);
 
-        if(!custom_password_verify($params['password'], $userData->password, PASSWORD_DECRYPTABLE)){
+        if(!$userData || !custom_password_verify($params['password'], $userData->password, PASSWORD_DECRYPTABLE)){
             $this->response([
                 'code' => PASSWORD_IS_NOT_MATCHED,
             ]);

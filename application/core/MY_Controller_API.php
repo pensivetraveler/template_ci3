@@ -103,7 +103,7 @@ class MY_Controller_API extends RestController
      */
     protected function applyApiMethodFeatures(): void
     {
-        $features = array_intersect_key($this->apiMethodFeature, array_flip(['key', 'log', 'limit', 'time', 'level']));
+        $features = array_intersect_key($this->apiMethodFeature, array_flip(['key', 'log', 'limit', 'time', 'level', 'limit_always']));
         if(!count($features)) return;
 
         $controllerMethod = $this->apiMethodFeature['_method'].'_'.strtolower($this->input->method());

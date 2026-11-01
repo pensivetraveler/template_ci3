@@ -27,6 +27,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |   limit      : time 초 동안 허용할 요청 수 (rest_enable_limits)
 |   time       : limit 기준 시간(초). 기본 3600
 |   level      : 필요한 API 키 레벨
+|   limit_always : true 면 로그인 토큰(ignore_limits)도 limit 을 지킨다
 |   permission : 메뉴 권한 검사 (MY_Builder_API::checkApiPermission, /admin/api/* 에만 적용)
 |     menu  : 대응하는 메뉴 'class' 또는 'class/method' (예: 'system/sysCfg'). 생략하면 API 클래스명과 같은 메뉴
 |             (같은 class 메뉴가 여럿이면 API 메서드와 같은 method 메뉴). 메뉴와 연결되지 않으면 관리자 등급(is_admin)만
@@ -83,8 +84,9 @@ $config['api_method_config'] = [
         // 비밀번호 찾기·재설정은 계정을 바꿀 수 있어 IP 별 300초에 5회
         'findPassword'  => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 5, 'time' => 300]],
         'resetPassword' => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 5, 'time' => 300]],
-        'passwordCheck' => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
         // 로그인 상태에서 쓰는 엔드포인트: 인증은 rest_auth(session) 그대로
+        // 비밀번호 확인은 대입을 막도록 IP 별 300초에 5회
+        'passwordCheck' => ['post' => ['key' => false, 'log' => false, 'limit' => 5, 'time' => 300, 'limit_always' => true]],
         'withdraw'      => ['post' => ['key' => false, 'log' => false]],
         'logout'        => ['post' => ['key' => false, 'log' => false]],
     ],

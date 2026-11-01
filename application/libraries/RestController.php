@@ -1181,7 +1181,8 @@ abstract class RestController extends \MY_Controller {
     protected function _check_limit($controller_method)
     {
         // They are special, or it might not even have a limit
-        if (empty($this->rest->ignore_limits) === FALSE)
+        // 로그인 토큰은 ignore_limits 라 제한을 건너뛴다. limit_always 인 메서드는 그래도 센다
+        if (empty($this->rest->ignore_limits) === FALSE && empty($this->methods[$controller_method]['limit_always']))
         {
             // Everything is fine
             return TRUE;
