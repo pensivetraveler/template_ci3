@@ -803,7 +803,7 @@ class MY_Builder_API extends MY_Controller_API
         $dto = $this->beforeAdd($dto);
 
         $this->checkDataScopeValues($dto, true);
-        $this->checkSystemUserValue($dto);
+        $this->checkUserGradeValue($dto);
 
         $dto = $this->executeAdd($dto, $bool);
 
@@ -879,7 +879,8 @@ class MY_Builder_API extends MY_Controller_API
         $dto = $this->beforeModify($key, $dto);
 
         $this->checkDataScopeValues($dto, false);
-        $this->checkSystemUserValue($dto);
+        $this->checkUserGradeTarget();
+        $this->checkUserGradeValue($dto);
 
         $dto = $this->executeModify($key, $dto, $bool);
 
@@ -894,15 +895,20 @@ class MY_Builder_API extends MY_Controller_API
     protected function executeModify($key, $dto, $bool, $model = null): array
     {
         if(is_null($model)) {
+            // 부모·자식 행은 요청 본문이 아니라 메인 행이 가리키는 행만 수정한다 (본문 user_id 로 다른 회원을 고칠 수 없게)
+            $baseRow = property_exists($this, 'Model_Parent') || property_exists($this, 'Model_Child') ? $this->getDeleteBaseRow() : null;
+
             foreach ($this->getModelPipeline() as $modelName) {
                 if(property_exists($this, $modelName)) {
                     list($params, $idData) = $this->setModData($dto, $this->{$modelName});
                     // 메인 Model은 요청 본문이 아니라 checkIdentifierExist()가 URL·쿼리로 확인한 식별자로 수정 대상을 정함
                     if($modelName === 'Model' && count($this->idData)) $idData = $this->idData;
+                    if($modelName !== 'Model' && $baseRow) $idData = $this->makeDeleteIdData($this->{$modelName}, $baseRow);
                     $this->checkModifyIdData($idData, $this->{$modelName});
-                    // 식별자 컬럼 자체는 SET에서 빼서 수정 대상 행의 키가 바뀌지 않게 함
-                    $params = array_diff_key($params, $idData);
-                    $this->modData($params, $idData, $bool, $this->{$modelName});
+                    // 식별자 컬럼 자체는 SET에서 빼서 수정 대상 행의 키가 바뀌지 않게 함. 앞 모델을 가리키는 키도 바꾸지 않음
+                    $params = array_diff_key($params, $idData, array_flip($this->getGeneratedForeignKeyFields($this->{$modelName}, $modelName)));
+                    // 이 표에서 바꿀 값이 없으면 건너뜀 (관리자 표처럼 키만 있는 메인 표)
+                    if(count($params)) $this->modData($params, $idData, $bool, $this->{$modelName});
                 }
             }
         }else{
@@ -926,6 +932,8 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function remove($key, $data, $bool)
     {
+        $this->checkUserGradeTarget();
+
         $data = $this->beforeRemove($key, $data);
 
         $data = $this->executeRemove($key, $data, $bool);
@@ -2342,7 +2350,7 @@ class MY_Builder_API extends MY_Controller_API
         // 데이터 범위 밖 값이 있으면 저장하지 않음
         foreach ($rows as $row) {
             $this->checkDataScopeValues($row, true);
-            $this->checkSystemUserValue($row);
+            $this->checkUserGradeValue($row);
         }
 
         if($this->Model->addList($rows) === false) {
@@ -2587,7 +2595,7 @@ class MY_Builder_API extends MY_Controller_API
         $dto = $this->beforeDuplicate($dto, $data);
         $dto = $this->beforeAdd($dto);
         $this->checkDataScopeValues($dto, true);
-        $this->checkSystemUserValue($dto);
+        $this->checkUserGradeValue($dto);
         $this->executeAdd($dto, false, $this->Model);
 
         $this->afterDuplicate($this->idData, $data);
@@ -2932,13 +2940,30 @@ class MY_Builder_API extends MY_Controller_API
     }
 
     /**
-     * 시스템 관리자 등급(USR000)은 시스템 관리자만 지정할 수 있다 (등록·수정·복제·엑셀 값)
+     * 자기보다 높은 회원 등급은 저장할 수 없다 (등록·수정·복제·엑셀 값). 코드 숫자가 작을수록 높다. 시스템 관리자는 제한 없음
      */
-    protected function checkSystemUserValue(array $dto): void
+    protected function checkUserGradeValue(array $dto): void
     {
-        if(($dto[USER_CD_COLUMN_NAME] ?? '') !== 'USR000') return;
-        if($this->session->userdata('is_sys_admin')) return;
-        $this->denyApiPermission('super');
+        $grade = (string)($dto[USER_CD_COLUMN_NAME] ?? '');
+        if($grade === '' || $this->session->userdata('is_sys_admin')) return;
+        if(strcmp($grade, (string)$this->session->userdata('user_cd')) < 0) $this->denyApiPermission('grade');
+    }
+
+    /**
+     * 자기보다 높은 등급의 회원 행은 수정·삭제할 수 없다 (회원 등급 컬럼이 있는 엔티티만)
+     */
+    protected function checkUserGradeTarget(): void
+    {
+        if(!count($this->idData) || $this->session->userdata('is_sys_admin')) return;
+
+        $models = array_filter([$this->Model, $this->Model_Parent ?? null]);
+        $hasGrade = array_filter($models, function ($model) {
+            return in_array(USER_CD_COLUMN_NAME, array_merge($model->notNullList, $model->nullList), true);
+        });
+        if(!count($hasGrade)) return;
+
+        $row = $this->Model->getDataWhere([], $this->idData);
+        if(is_object($row)) $this->checkUserGradeValue((array)$row);
     }
 
     protected function denyApiPermission(string $reason): void
