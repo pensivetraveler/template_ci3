@@ -51,6 +51,7 @@ CREATE TABLE `tbl_administrator` (
 CREATE TABLE `tbl_partner` (
   `partner_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'auto_increment',
   `user_id` bigint(20) unsigned NOT NULL COMMENT 'User Key (tbl_user.user_id)',
+  `company_ids` varchar(60) DEFAULT NULL COMMENT '소속 업체 (쉼표로 구분한 tbl_company.company_id)',
   PRIMARY KEY (`partner_id`,`user_id`),
   KEY `FK_tbl_user_TO_tbl_partner_1` (`user_id`),
   CONSTRAINT `FK_tbl_user_TO_tbl_partner_1` FOREIGN KEY (`user_id`) REFERENCES `tbl_user` (`user_id`)
