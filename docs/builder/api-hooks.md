@@ -750,6 +750,7 @@ $config['api_method_config'] = [
 - 본문의 식별자·부모 키가 비어 있지 않은데 수정 대상과 다르면 검증 전에 403 `reason=body_key` (`checkBodyKeys()`). 등록은 부모 키를 받지 않는다. `is_unique`가 이 값으로 자기 행을 제외하므로, 그대로 두면 다른 회원의 `id`로 바꿀 수 있기 때문이다.
 - 업로드 설정에 `'private' => true`를 넣은 필드는 `application/uploads/{화면}/{연도}/`에 저장하고, `file_link`는 `{플랫폼}/{화면}/downloader/{file_id}`로 응답한다. 받으려면 로그인, 올린 화면과 같은 주소, 그 화면 읽기 권한이 필요하고, 행 단위 소유 확인은 화면 컨트롤러에서 `canDownloadFile($file)`을 재정의한다. S3를 쓰면 CDN에서 `application/uploads` 경로를 막아야 하고, nginx는 `application/` 차단을 서버 설정에 넣어야 한다. 이미 올린 파일은 옮기지 않는다.
 - 가입 필드와 비밀번호 찾기 방식은 시스템 > 회원 설정(`tbl_sys_cfg` `big_cfg=USER`)에서 정한다. 이메일을 쓰지 않으면 비밀번호 찾기, 전화번호를 쓰지 않으면 아이디 찾기가 404다. 재설정은 `MAIL_HOST`와 `APP_URL`이 있으면 메일 링크(`APP_URL` 기준), 없으면 재설정 화면으로 바로 보내고 시스템 관리자는 제외한다. 값을 정하지 않으면 복호화 가능한 행은 일부를 가린 비밀번호, 아니면 "관리자에게 문의"다.
+- 이름에 `password`가 들어간 필드와 `token`·`secret`·`api_key`·`authorization`은 요청 로그(`tbl_rest_logs`)와 오류 응답에서 가린다 (`is_sensitive_field()`). 다른 민감 필드가 있으면 이 함수에 추가한다.
 - `/api/auth/*`는 `.env WEB_AUTH_API`를 켠 프로젝트만 받고, 끄면 404다 (`permission.web`). `/admin/api/auth/*`와 가입은 이 값과 관계없다.
 - 회원가입은 `.env SIGNUP_USER_CD`가 있을 때만 `/api/auth/signup`으로 받고, 등급은 요청 값 대신 이 값으로 저장한다. 받는 값은 `form_signup_config`의 아이디·비밀번호·이름·이메일·전화번호이고, 템플릿에 가입 화면은 없다. 비어 있으면 404, `/admin/api/auth/signup`은 항상 404. 관리자 등급(`USR000`~`USR002`)을 넣지 않는다.
 - 메뉴와 API 설정은 URL 대소문자와 관계없이 찾는다 (`/admin/api/SysCfg`도 같은 검사).

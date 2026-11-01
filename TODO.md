@@ -123,7 +123,7 @@
     - 2026-11-01 확인: `docs/schema/schema.sql`의 tbl_user 에 approve_yn 컬럼이 없음 (코드에서 넣어도 저장 안 되는 것으로 보임)
     - 사용자 구상(2026-11-01, 당장 반영 아님): tbl_sys_cfg 에 사용자 관련 대구분을 두고 APPROVE_YN 을 소구분으로 넣어, 켜져 있으면 가입 때 USR000·USR001 에게 승인을 요청. 사용자 관련 환경설정값을 같은 방식으로 모음
 - [ ] 가입 검증 오류 문구에 라벨 대신 `user.password` 같은 언어 키가 그대로 나옴 (2026-11-01 관찰, `/api/auth/signup`)
-- [ ] 검증 실패(422) 응답 data 에 보낸 비밀번호가 그대로 담김 (2026-11-01 가입에서 관찰, 공통 동작인지 확인 필요)
+- [x] (2026-11-01: 공통 동작이었음. 요청 로그 tbl_rest_logs 에도 평문 저장되던 것을 함께 가림. 기존 행은 docs/migrations/2026-11-01-rest-logs-mask-password.sql) 검증 실패(422) 응답 data 에 보낸 비밀번호가 그대로 담김
 - [x] (2026-11-01: 옛 필드·user_cd 필드 삭제, 등급을 검증 전에 넣음, 비밀번호 required) `web_form_config`의 `form_signup_config`에 예전 프로젝트 필드(`code`·`grade`, 없는 `student` 표 검사)가 남아 있어 가입을 켜면 필수값·500 → 가입을 쓰는 프로젝트가 생기면 정리
 - [x] (2026-11-01: modify 에서 beforeModify 다음에 행을 확인해 404. 삭제된 행이 실제로 수정되던 것도 같이 막힘) `PUT /api/boards/999999`처럼 없는 행 수정이 200 "수정되었습니다"를 돌려줌 (2026-11-01 관찰, `/admin/api/*`도 같은 경로로 보임)
 - [ ] `api/Common::message_read_patch` 없는 메시지도 성공 응답 (modify 를 거치지 않는 전용 경로, 2026-11-01 코드로 확인, 위험 작음)

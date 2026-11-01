@@ -324,11 +324,17 @@ class MY_Controller_API extends RestController
             ], $error)];
         }
 
+        // 보낸 비밀번호 등을 오류 응답으로 되돌려주지 않는다. 엑셀 오류의 value 는 행 번호라 그대로
+        $errors = array_map(function ($item) {
+            if(is_array($item) && is_string($item['value'] ?? null) && is_sensitive_field($item['param'] ?? '')) $item['value'] = null;
+            return $item;
+        }, $errors);
+
         if(!is_empty($response, 'code')) $http_code = null;
         $this->response([
             'code' => $response['code'] ?? null,
             'msg' => $response['msg'] ?? null,
-            'data' => $response['data'] ?? [],
+            'data' => mask_sensitive_fields($response['data'] ?? []),
             'errors' => $errors,
         ], $http_code);
     }

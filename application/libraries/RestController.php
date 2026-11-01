@@ -1157,7 +1157,8 @@ abstract class RestController extends \MY_Controller {
                 $this->config->item('rest_logs_table'), [
                 'uri' => $this->uri->uri_string(),
                 'method' => $this->request->method,
-                'params' => $this->_args ? ($this->config->item('rest_logs_json_params') === TRUE ? json_encode($this->_args) : serialize($this->_args)) : NULL,
+                // 요청 로그에 비밀번호·토큰이 평문으로 남지 않게 가린다
+                'params' => $this->_args ? ($this->config->item('rest_logs_json_params') === TRUE ? json_encode(mask_sensitive_fields($this->_args)) : serialize(mask_sensitive_fields($this->_args))) : NULL,
                 'api_key' => isset($this->rest->key) ? $this->rest->key : '',
                 'ip_address' => $this->input->ip_address(),
                 'time' => time(),

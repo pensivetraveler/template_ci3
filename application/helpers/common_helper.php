@@ -265,6 +265,36 @@ if ( ! function_usable('recursive_ksort')) {
     }
 }
 
+if ( ! function_exists('is_sensitive_field'))
+{
+    /**
+     * 로그·오류 응답에 값을 남기면 안 되는 필드 (password 가 들어간 이름, 토큰·키류)
+     */
+    function is_sensitive_field($name): bool
+    {
+        $name = strtolower((string)$name);
+        return strpos($name, 'password') !== false
+            || (bool)preg_match('/(^|[_\[])(token|secret|api_key|authorization)($|[_\]])/', $name);
+    }
+}
+
+if ( ! function_exists('mask_sensitive_fields'))
+{
+    /**
+     * 민감한 필드의 값을 *** 로 바꾼다. 중첩 배열·객체까지
+     */
+    function mask_sensitive_fields($data)
+    {
+        if (is_object($data)) $data = (array)$data;
+        if (!is_array($data)) return $data;
+
+        foreach ($data as $key => $value) {
+            $data[$key] = is_string($key) && is_sensitive_field($key) ? '***' : mask_sensitive_fields($value);
+        }
+        return $data;
+    }
+}
+
 if ( ! function_exists('user_cfg'))
 {
     /**
