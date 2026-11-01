@@ -204,6 +204,17 @@ class PasswordFindTest extends ApiTestCase
         $this->assertSame(200, $edited->status, $edited->body);
         $this->assertSame('N', TestDb::value("SELECT cfg_val FROM tbl_sys_cfg WHERE cmb_cfg = 'TEST_DD_ONE'"));
 
+        // 값은 선택지 중 하나만. 보내지 않은 칸은 저장된 값으로 본다
+        $url = '/admin/api/sysCfg?cmb_cfg=TEST_DD_ONE';
+        $base = ['cmb_cfg' => 'TEST_DD_ONE', 'big_cfg' => 'TEST_DD', 'sml_cfg' => 'ONE', 'cfg_name' => '값', 'cfg_type' => 'dropdown'];
+        $this->assertSame(400, $sys->request('POST', $url, $base + ['cfg_val' => 'X'])->status, '없는 값');
+        $this->assertSame(400, $sys->request('POST', $url, $base + ['cfg_val' => ''])->status, '비움 선택지 없음');
+        $this->assertSame(400, $sys->request('POST', $url, $base + ['cfg_options' => 'Y|사용'])->status, '저장된 값 N 이 선택지에서 빠짐');
+        $this->assertSame(200, $sys->request('POST', $url, $base + ['cfg_options' => "|비움\nY|사용", 'cfg_val' => ''])->status, '비움 선택지');
+
+        $page = $sys->request('GET', '/admin/system/sysCfg');
+        $this->assertStringContainsString('value="비움"', $page->body, '탭에는 표시명');
+
         $this->assertSame(200, $sys->request('DELETE', '/admin/api/sysCfg/TEST_DD_ONE')->status);
         $this->assertSame(200, $sys->request('DELETE', '/admin/api/sysCfg/TEST_DD_000')->status);
     }

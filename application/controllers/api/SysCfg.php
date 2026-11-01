@@ -89,16 +89,7 @@ class SysCfg extends Common
      */
     private function checkCfgValue($key, array $data): void
     {
-        if(($data['cfg_type'] ?? '') === 'dropdown') {
-            // 수정 화면은 바뀐 칸만 보내므로, 선택지를 보내지 않았으면 저장된 값으로 본다
-            $options = $data['cfg_options'] ?? null;
-            $cmbCfg = (string)($this->idData['cmb_cfg'] ?? $key);
-            if($options === null && $cmbCfg !== '' && $cmbCfg !== '0') {
-                $row = $this->Model->getData([], ['where' => ['cmb_cfg' => $cmbCfg]]);
-                $options = $row ? $row->cfg_options : null;
-            }
-            if(trim((string)$options) === '') $this->cfgError('cfg_options', '', '드롭다운은 선택지를 입력하세요.');
-        }
+        $this->checkDropdownValue($key, $data);
 
         if(!array_key_exists('cfg_val', $data)) return;
 
@@ -124,6 +115,25 @@ class SysCfg extends Common
             case 'SYS_USER_LOG_KEEP_DAYS' :
                 if(!ctype_digit($value)) $this->cfgError('cfg_val', $value, '로그 보관 기간은 0 이상의 정수(일)로 입력하세요.');
                 break;
+        }
+    }
+
+    /**
+     * 드롭다운은 선택지가 있어야 하고 값은 선택지 중 하나여야 한다. 수정 화면은 바뀐 칸만 보내므로 보내지 않은 칸은 저장된 값으로 본다
+     */
+    private function checkDropdownValue($key, array $data): void
+    {
+        $cmbCfg = (string)($this->idData['cmb_cfg'] ?? $key);
+        $row = $cmbCfg !== '' && $cmbCfg !== '0' ? $this->Model->getData([], ['where' => ['cmb_cfg' => $cmbCfg]]) : null;
+
+        if(($data['cfg_type'] ?? ($row->cfg_type ?? '')) !== 'dropdown') return;
+
+        $options = Model_Sys_Cfg::parseOptions($data['cfg_options'] ?? ($row->cfg_options ?? ''));
+        if(!count($options)) $this->cfgError('cfg_options', '', '드롭다운은 선택지를 입력하세요.');
+
+        $value = trim((string)($data['cfg_val'] ?? ($row->cfg_val ?? '')));
+        if(!array_key_exists($value, $options)) {
+            $this->cfgError('cfg_val', $value, '환경설정 값은 선택지 중 하나여야 합니다.');
         }
     }
 

@@ -89,6 +89,7 @@ $lang['Caching'] = 'Caching Menu';
 $lang['Import Menus From Config'] = 'Import Menus From Config';
 $lang['Fill Default Auth'] = 'Fill Default Auth';
 $lang['Menus without saved auth will get the default auth.'] = 'Menus without saved auth will get the default auth. Saved menus are not changed.';
+$lang['Select'] = 'Select';
 $lang['Select a target first'] = 'Select a grade or partner first.';
 $lang['Filled'] = 'Filled menus';
 $lang['Add Row'] = 'Add';

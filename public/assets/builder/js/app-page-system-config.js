@@ -1,5 +1,48 @@
 let fv, offCanvasEl, fvBigCfg, offCanvasBigCfg;
 
+/**
+ * 드롭다운 선택지(한 줄에 하나, 값|표시명)를 [값, 표시명] 목록으로. 규칙은 Model_Sys_Cfg::parseOptions 와 같다
+ */
+function parseCfgOptions(text) {
+    return String(text ?? '').split(/\r\n|\r|\n/).map(line => line.trim()).filter(line => line.length).map(line => {
+        const index = line.indexOf('|');
+        if(index < 0) return [line, line];
+        const value = line.slice(0, index).trim();
+        return [value, line.slice(index + 1).trim() || value];
+    });
+}
+
+/**
+ * 유형이 드롭다운이면 값 입력칸을 숨기고 선택 상자를 보여 준다. 고른 값은 입력칸에 넣어 저장 흐름은 그대로 쓴다
+ */
+function syncCfgValControl(form) {
+    const input = form['cfg_val'];
+    form.querySelector('#cfgValSelect')?.remove();
+    input.style.display = '';
+    if($(form['cfg_type']).val() !== 'dropdown') return;
+
+    const select = document.createElement('select');
+    select.id = 'cfgValSelect';
+    select.className = 'form-select';
+    const options = parseCfgOptions(form['cfg_options'].value);
+    const disabled = (common.CFG_DISABLED_OPTIONS ?? {})[form['cmb_cfg']?.value] ?? [];
+    if(!options.some(([value]) => value === '')) select.add(new Option(getLocale('Select', common.LOCALE), ''));
+    options.forEach(([value, label]) => {
+        const option = new Option(label, value);
+        option.disabled = disabled.includes(value);
+        select.add(option);
+    });
+    select.value = options.some(([value]) => value === input.value) ? input.value : '';
+    select.addEventListener('change', function () {
+        input.value = select.value;
+        input.dispatchEvent(new Event('input', {bubbles: true}));
+        input.dispatchEvent(new Event('change', {bubbles: true}));
+    });
+    // d-none 을 쓰면 테마 CSS 가 뒤따르는 라벨까지 숨긴다
+    input.style.display = 'none';
+    input.after(select);
+}
+
 $(function () {
     const formSelector = '#formRecord';
     const offCanvasElement = document.querySelector('#offcanvasRecord');
@@ -30,6 +73,7 @@ $(function () {
     offCanvasElement.addEventListener('hidden.bs.offcanvas', function(e) {
         resetFrmInputs(document.querySelector(formSelector), common.FORM_DATA);
         fv.resetForm(true);
+        syncCfgValControl(formRecord);
 
         if ($('[data-repeater-item]').length) {
             $('[data-repeater-item]').each(function (i, v) {
@@ -62,10 +106,14 @@ $(function () {
         if(formRecord._mode.value !== 'edit') offCanvasEl.show();
     });
 
+    $(formRecord['cfg_type']).on('change', () => syncCfgValControl(formRecord));
+    $(formRecord['cfg_options']).on('input', () => syncCfgValControl(formRecord));
+
     formRecord.addEventListener("fetchFrmValues", (e) => {
         readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
         applyFrmValues(formRecord, record, common.FORM_DATA);
         refreshPlugins(formRecord);
+        syncCfgValControl(formRecord);
         offCanvasEl.show();
     });
 

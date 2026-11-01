@@ -30,9 +30,32 @@ class Model_Sys_Cfg extends Model_Common
     {
         return array_reduce($this->getList($select, $dto), function ($carry, $item) {
             if($item->sml_cfg === self::CATEGORY_SML) return $carry;
-            $carry[$item->big_cfg][] = (array)$item;
+            $row = (array)$item;
+            $row['cfg_val_label'] = $row['cfg_val'];
+            if(($row['cfg_type'] ?? '') === 'dropdown') {
+                $row['cfg_val_label'] = self::parseOptions($row['cfg_options'] ?? '')[(string)$row['cfg_val']] ?? $row['cfg_val'];
+            }
+            $carry[$item->big_cfg][] = $row;
             return $carry;
         });
+    }
+
+    /**
+     * 드롭다운 선택지(한 줄에 하나, 값|표시명)를 [값 => 표시명] 으로. 표시명이 없으면 값을 쓰고, |표시명 은 값을 비우는 선택지다
+     * 화면(app-page-system-config.js parseCfgOptions)도 같은 규칙으로 읽는다
+     */
+    public static function parseOptions(?string $text): array
+    {
+        $options = [];
+        foreach (preg_split('/\r\n|\r|\n/', (string)$text) as $line) {
+            $line = trim($line);
+            if($line === '') continue;
+            $parts = explode('|', $line, 2);
+            $value = trim($parts[0]);
+            $label = trim($parts[1] ?? '');
+            $options[$value] = $label === '' ? $value : $label;
+        }
+        return $options;
     }
 
     /**

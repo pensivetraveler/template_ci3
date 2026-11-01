@@ -36,6 +36,8 @@ class System extends Common
             'API_URI' => $this->apiUri.'sysCfg',
             'FORM_REGEXP' => $this->config->item('regexp'),
             'EXTRA_FORMDATA' => $bigCfgFormData,
+            // 복호화할 수 없는 저장 방식에서는 비밀번호 표시를 고를 수 없다 (서버 검사는 SysCfg::checkCfgValue)
+            'CFG_DISABLED_OPTIONS' => PASSWORD_DECRYPTABLE ? [] : ['SYS_USER_PASSWORD_FIND_MODE' => ['show']],
         ]);
 
         $this->viewApp($data);
