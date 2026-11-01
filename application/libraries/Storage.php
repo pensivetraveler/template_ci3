@@ -96,7 +96,9 @@ class Storage
             return $content === false ? null : $content;
         }
 
-        $cached = $this->cacheGet('body:' . $key);
+        // 비공개 파일은 Redis 에 두지 않는다
+        $cacheable = private_file_class($key) === null;
+        $cached = $cacheable ? $this->cacheGet('body:' . $key) : null;
         if ($cached !== null) return $cached;
 
         try {
@@ -105,7 +107,7 @@ class Storage
                 'Key' => $this->s3Key($key),
             ]);
             $content = (string)$result['Body'];
-            if (strlen($content) <= self::CACHE_MAX_BYTES) {
+            if ($cacheable && strlen($content) <= self::CACHE_MAX_BYTES) {
                 $this->cacheSet('body:' . $key, $content);
                 $this->cacheSet('ver:' . $key, trim((string)$result['ETag'], '"'));
             }

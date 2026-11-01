@@ -118,7 +118,8 @@ class File_system
         if (!$key) return $response;
 
         $data = $this->CI->Model_File->getDataWhere([], ['file_id' => $key]);
-        if (!$data) return $response;
+        // 비공개 파일은 권한을 확인하는 컨트롤러의 downloader 로만 받는다
+        if (!$data || private_file_class($data->full_path) !== null) return $response;
 
         $this->CI->load->library('storage');
         $content = $this->CI->storage->read($this->CI->storage->keyFromUri($data->full_path));

@@ -57,7 +57,15 @@ class Model_File extends Model_Common
 
 	protected function withFileUrl($row)
 	{
-		if (is_object($row) && property_exists($row, 'file_link')) $row->file_link = get_file_url($row->file_link);
+		if (is_object($row) && property_exists($row, 'file_link')) {
+			$class = private_file_class($row->file_link);
+			if ($class !== null && property_exists($row, 'file_id')) {
+				$CI =& get_instance();
+				$row->file_link = base_url(($CI->flag ?? 'admin').'/'.$class.'/downloader/'.$row->file_id);
+			} else {
+				$row->file_link = get_file_url($row->file_link);
+			}
+		}
 		return $row;
 	}
 

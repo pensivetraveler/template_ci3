@@ -41,7 +41,7 @@
 - [x] 내보내기·가져오기 권한도 같은 검사(export·import 자리)
 - [x] 화면 권한 검사를 API 기준과 맞춤 (`MY_Builder_WEB::setupPlatformPage`·`getPageAuthMode`, 2026-10-25): 목록은 메뉴 표시만, 상세 read|update, 등록 create, 수정 update, 엑셀 import(mode 없으면 method 이름으로), 메뉴가 가리키는 화면(메뉴 method·기준 화면)은 메뉴 표시만(표시 = 첫 화면 열람, bizsoft 트래픽 로그·IP 접근 관리처럼 `000000` 보기 전용 메뉴 유지), 그 안의 화면은 `000000`이어도 검사. `menu_auth.scope_cd`는 읽기만 하고 쓰는 곳 없음(데이터 범위와 연결할지 나중에 결정)
 - [x] 파일 삭제 소유 확인 (`deleteFile_patch`, 2026-10-25): `type`이 모델 파일 필드여야 하고(아니면 엔티티 `deleteOtherFile()`, 없으면 400), 그 행 컬럼에 file_id가 있어야 삭제(아니면 404), 삭제 후 행 컬럼에서 file_id 제거. 게시글 첨부는 `Articles::deleteOtherFile`. 카테고리 아이콘 `list_delete`가 `thumbnail`로 잘못 지정돼 있던 것 수정
-- [ ] (2026-10-28 결정: 업로드는 공개 주소(public/uploads·S3 CDN)가 설계 — 비공개가 필요한 프로젝트가 생기면 필드별 비공개 저장소 옵션(서명된 URL·권한 확인 다운로드)을 추가) 파일 다운로드(`downloader/{file_id}`)도 소속 확인 없음. 단 파일이 웹에서 바로 열리는 `public/uploads/`에 있어 다운로드만 막아도 주소로 열림 → 저장 위치를 웹 밖으로 옮기는 작업과 함께 결정
+- [x] (2026-11-01: 업로드 설정 private 로 필드별 비공개 저장 추가, S3 는 미시험) (2026-10-28 결정: 업로드는 공개 주소(public/uploads·S3 CDN)가 설계 — 비공개가 필요한 프로젝트가 생기면 필드별 비공개 저장소 옵션(서명된 URL·권한 확인 다운로드)을 추가) 파일 다운로드(`downloader/{file_id}`)도 소속 확인 없음. 단 파일이 웹에서 바로 열리는 `public/uploads/`에 있어 다운로드만 막아도 주소로 열림 → 저장 위치를 웹 밖으로 옮기는 작업과 함께 결정
 - [x] `users` API 본인 제한 (`api/Users.php`, 2026-10-25): 시스템 관리자가 아니면 목록·이름 있는 GET 허용(목록이 필요하다는 결정), 단건 조회·수정은 본인만, 수정 때 등급·상태·아이디·API 키(`$selfProtectedFields`)는 저장 안 함, 등록·삭제·이름 있는 쓰기 403. 비밀번호 변경은 내 정보에서 계속 허용
 - [x] 데이터 범위 공통 장치 `getDataScope()`·`$scopeFields` (2026-10-25): 목록·내보내기 조건, 식별자 지정 행(단건·수정·삭제)·등록/수정 값·엑셀 행 검사, 범위 밖 404 (결정: 404 / bizsoft는 프레임 계열만 / 엔티티 속성으로 지정). 발견: 내보내기는 `beforeList`를 거치지 않아 목록 범위가 적용되지 않았음
 

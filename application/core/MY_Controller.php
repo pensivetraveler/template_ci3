@@ -120,12 +120,13 @@ class MY_Controller extends CI_Controller
         if (is_null($_files)) $_files = $_FILES;
 
         if (array_key_exists($name, $_files) && $_files[$name] && $_files[$name]['name']) {
-            $uploadPath = 'public/uploads/' . $this->router->class . '/' . date('Y') . '/';
+            $config = $this->config->item($name . '_upload_config') ?: $this->config->item('base_upload_config');
+            $uploadPath = (empty($config['private']) ? 'public/uploads/' : 'application/uploads/') . $this->router->class . '/' . date('Y') . '/';
             if (!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
 
             $this->upload->initialize(
                 array_merge(
-                    $this->config->item($name . '_upload_config') ?: $this->config->item('base_upload_config'),
+                    $config,
                     [
                         'upload_path' => $uploadPath,
                     ]
@@ -197,6 +198,14 @@ class MY_Controller extends CI_Controller
         return $response;
     }
 
+    /**
+     * 비공개 파일 다운로드 허용 여부. 화면 권한을 아는 컨트롤러(MY_Builder_WEB)만 허용한다
+     */
+    protected function canAccessPrivateFile($file, string $class): bool
+    {
+        return false;
+    }
+
     public function downloader($key = 0)
     {
         $response = [
@@ -210,6 +219,9 @@ class MY_Controller extends CI_Controller
 
         $data = $this->Model_File->getDataWhere([], ['file_id' => $key]);
         if (!$data) return $response;
+
+        $privateClass = private_file_class($data->full_path);
+        if ($privateClass !== null && !$this->canAccessPrivateFile($data, $privateClass)) return $response;
 
         $this->load->library('storage');
         $content = $this->storage->read($this->storage->keyFromUri($data->full_path));

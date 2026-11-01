@@ -1425,8 +1425,7 @@ class MY_Builder_API extends MY_Controller_API
         if(is_null($model)) $model = $this->Model;
         $key = null;
         try {
-            $uploadPath = 'public/uploads/'.$this->router->class.'/'.date('Y').'/';
-            if(!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
+            $uploadDir = $this->router->class.'/'.date('Y').'/';
 
             $files = $_FILES;
             foreach ($model->fileList as $key) {
@@ -1437,6 +1436,10 @@ class MY_Builder_API extends MY_Controller_API
 
                     if(!array_key_exists('allowed_types', $config))
                         throw new Exception('Upload config is not defined : '.$key, UPLOAD_FILE_FAIL);
+
+                    // 업로드 설정 private: 웹으로 바로 열리지 않는 곳에 두고 downloader 로만 받는다
+                    $uploadPath = (empty($config['private']) ? 'public/uploads/' : 'application/uploads/').$uploadDir;
+                    if(!make_directory($uploadPath)) throw new Exception($this->upload->display_errors(), CREATE_FOLDER_FAIL);
 
                     $this->upload->initialize(
                         array_merge(

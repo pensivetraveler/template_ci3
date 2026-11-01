@@ -27,6 +27,18 @@ if ( ! function_exists('get_file_key_from_path'))
     }
 }
 
+if ( ! function_exists('private_file_class'))
+{
+    /**
+     * 비공개 업로드(application/uploads/{화면}/…, 업로드 설정 private)면 그 화면 이름, 아니면 null.
+     * 비공개 파일은 저장소 주소를 내주지 않고 {플랫폼}/{화면}/downloader/{file_id} 로만 받는다
+     */
+    function private_file_class($path): ?string
+    {
+        return preg_match('#(^|/)application/uploads/([^/]+)/#', str_replace('\\', '/', (string)$path), $matches) ? $matches[2] : null;
+    }
+}
+
 if ( ! function_exists('get_file_url'))
 {
     /**
@@ -37,6 +49,7 @@ if ( ! function_exists('get_file_url'))
     {
         $link = (string)$link;
         if ($link === '' || preg_match('#^(https?:)?//#i', $link)) return $link;
+        if (private_file_class($link) !== null) return '';
 
         $ci =& get_instance();
         $ci->load->library('storage');

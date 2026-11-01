@@ -206,6 +206,24 @@ class MY_Builder_WEB extends MY_Controller_WEB
     /**
      * 파일 다운로드. 파일이 없거나 번호가 잘못되면 빈 화면 대신 알림 후 이전 화면으로
      */
+    /**
+     * 비공개 파일은 올린 화면의 주소로, 로그인한 사용자 중 그 화면 읽기 권한이 있어야 받는다
+     */
+    protected function canAccessPrivateFile($file, string $class): bool
+    {
+        if(!$this->isLoggedIn || strcasecmp($class, $this->router->class) !== 0) return false;
+        if(!$this->isSystemAdmin && !is_auth_avaliable('read', $this->pageAuth)) return false;
+        return $this->canDownloadFile($file);
+    }
+
+    /**
+     * 행 단위 소유 확인이 필요한 화면은 재정의한다 (file_id 와 행의 연결은 엔티티마다 다르다)
+     */
+    protected function canDownloadFile($file): bool
+    {
+        return true;
+    }
+
     public function downloader($key = 0)
     {
         $result = parent::downloader($key);
