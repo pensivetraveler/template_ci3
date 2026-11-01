@@ -129,7 +129,7 @@ trait BuilderColumnsTrait
         $rules = preg_split('/\|(?![^\[]*\])/', $item['rules']);
 
         if($matches = preg_grep('/^required$/', $rules)) {
-            $item['attributes']['required'] = $matches[1]??$matches[0];
+            $item['attributes']['required'] = reset($matches);
         }
 
         if($matches = preg_grep('/^required_mod\[(.*?)\]$/', $rules)) {

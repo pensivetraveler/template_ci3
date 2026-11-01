@@ -97,7 +97,7 @@
 - [x] (2026-10-28: 원인 — Model_User_Token 저장 가능 컬럼에 created_dt가 없어 수정 때 걸러짐 → nullList에 추가) `MY_Controller::setToken`이 토큰을 바꿀 때 `created_dt`를 now로 넣지만 저장되지 않는 것으로 보임(bizsoft dev 토큰 created_dt가 첫 발급 값 그대로, #빌더-44 관찰, 원인 미확인 — getValidSetData가 감사 컬럼을 거르는지 확인) → 토큰 교체 시각을 알 수 없고 토큰 유효기간을 둘 수 없음
 - [x] (2026-11-01: concat 규칙을 빈 값에도 실행해 422 — 화면이 검증 중에 값을 채우므로 required 는 쓰지 않음. 비교 필드가 없는 부분 PATCH 도 422, reorderList 방어) sysCode 등록에서 cmb_cd를 빼고 보내면 cmb_cd=''로 행이 들어가고 `BuilderCommonTrait::reorderList`에서 Undefined index → 500 (bizsoft #빌더-41 관찰, 화면은 cmb_cd를 보내서 영향 없음) — cmb_cd 필수 검증·reorderList 방어 필요
 - [ ] 시스템 코드 화면 카테고리 등록이 늘 422: 새 big_cd 가 validateOptionValues(form_sys_code_config 의 big_cd 선택지)에 걸림 (2026-11-01 관찰, 수정 전 코드도 같음)
-- [ ] `BuilderColumnsTrait::setColumnErrors` required 가 rules 의 세 번째 이후에 있으면 Undefined offset (`$matches[1]??$matches[0]`) → 500 (2026-11-01 관찰, 지금 그런 설정은 없음)
+- [x] (2026-11-01: reset($matches) 로 수정) `BuilderColumnsTrait::setColumnErrors` required 가 rules 의 세 번째 이후에 있으면 Undefined offset (`$matches[1]??$matches[0]`) → 500 (2026-11-01 관찰, 지금 그런 설정은 없음)
 - [x] 자동 로그인이 한 번도 동작하지 않음 (2026-10-26, 결함 A): hook이 세션에 user_id만 넣어 `checkLoggedIn`이 token 없음으로 보고 `destroyUserData()`가 세션·autologin 쿠키를 지움 → `MY_Controller::loginWithAutologinCookie`(MY_Builder_WEB 생성자)·`startUserSession`(Auth::login과 공통)으로 옮김
 - [x] 자동 로그인 체크박스가 제출 때 풀림 (결함 B, 2026-10-26): 스크립트 로드 중 체크한 것을 `app-page-auth.js`의 `resetFrmInputs()`가 지움(bizsoft #빌더-31 trace 확인) → 로그인 계열 화면에서 초기화 호출 제거
 - [x] 같은 계정 동시 로그인 → 한 곳만 허용으로 결정(2026-10-26). 토큰은 회원당 하나 그대로, 화면도 `isSessionTokenCurrent()`로 확인해 바뀌었으면 로그아웃
