@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -26,7 +18,18 @@ return /******/ (function() { // webpackBootstrap
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   Shepherd: function() { return /* reexport default from dynamic */ shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0___default.a; }\n/* harmony export */ });\n/* harmony import */ var shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! shepherd.js/dist/js/shepherd */ \"./node_modules/shepherd.js/dist/js/shepherd.js\");\n/* harmony import */ var shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0__);\n\ntry {\n  window.Shepherd = (shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0___default());\n} catch (e) {}\n\n\n//# sourceURL=webpack://Materialize/./libs/shepherd/shepherd.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Shepherd: function() { return /* reexport default from dynamic */ shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0___default.a; }
+/* harmony export */ });
+/* harmony import */ var shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! shepherd.js/dist/js/shepherd */ "./node_modules/shepherd.js/dist/js/shepherd.js");
+/* harmony import */ var shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0__);
+
+try {
+  window.Shepherd = (shepherd_js_dist_js_shepherd__WEBPACK_IMPORTED_MODULE_0___default());
+} catch (e) {}
+}
 
 /***/ }),
 
@@ -36,7 +39,5024 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \******************************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;function _callSuper(t, o, e) { return o = _getPrototypeOf(o), _possibleConstructorReturn(t, _isNativeReflectConstruct() ? Reflect.construct(o, e || [], _getPrototypeOf(t).constructor) : o.apply(t, e)); }\nfunction _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === \"object\" || typeof call === \"function\")) { return call; } else if (call !== void 0) { throw new TypeError(\"Derived constructors may only return object or undefined\"); } return _assertThisInitialized(self); }\nfunction _isNativeReflectConstruct() { try { var t = !Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); } catch (t) {} return (_isNativeReflectConstruct = function _isNativeReflectConstruct() { return !!t; })(); }\nfunction _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }\nfunction _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return self; }\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function\"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, \"prototype\", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }\nfunction _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }\nfunction _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }\nfunction _nonIterableRest() { throw new TypeError(\"Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\nfunction _iterableToArrayLimit(r, l) { var t = null == r ? null : \"undefined\" != typeof Symbol && r[Symbol.iterator] || r[\"@@iterator\"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }\nfunction _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }\nfunction _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }\nfunction _nonIterableSpread() { throw new TypeError(\"Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\nfunction _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === \"string\") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === \"Object\" && o.constructor) n = o.constructor.name; if (n === \"Map\" || n === \"Set\") return Array.from(o); if (n === \"Arguments\" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }\nfunction _iterableToArray(iter) { if (typeof Symbol !== \"undefined\" && iter[Symbol.iterator] != null || iter[\"@@iterator\"] != null) return Array.from(iter); }\nfunction _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }\nfunction _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }\nfunction _regeneratorRuntime() { \"use strict\"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = \"function\" == typeof Symbol ? Symbol : {}, a = i.iterator || \"@@iterator\", c = i.asyncIterator || \"@@asyncIterator\", u = i.toStringTag || \"@@toStringTag\"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, \"\"); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, \"_invoke\", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: \"normal\", arg: t.call(e, r) }; } catch (t) { return { type: \"throw\", arg: t }; } } e.wrap = wrap; var h = \"suspendedStart\", l = \"suspendedYield\", f = \"executing\", s = \"completed\", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { [\"next\", \"throw\", \"return\"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if (\"throw\" !== c.type) { var u = c.arg, h = u.value; return h && \"object\" == _typeof(h) && n.call(h, \"__await\") ? e.resolve(h.__await).then(function (t) { invoke(\"next\", t, i, a); }, function (t) { invoke(\"throw\", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke(\"throw\", t, i, a); }); } a(c.arg); } var r; o(this, \"_invoke\", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error(\"Generator is already running\"); if (o === s) { if (\"throw\" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if (\"next\" === n.method) n.sent = n._sent = n.arg;else if (\"throw\" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else \"return\" === n.method && n.abrupt(\"return\", n.arg); o = f; var p = tryCatch(e, r, n); if (\"normal\" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } \"throw\" === p.type && (o = s, n.method = \"throw\", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, \"throw\" === n && e.iterator.return && (r.method = \"return\", r.arg = t, maybeInvokeDelegate(e, r), \"throw\" === r.method) || \"return\" !== n && (r.method = \"throw\", r.arg = new TypeError(\"The iterator does not provide a '\" + n + \"' method\")), y; var i = tryCatch(o, e.iterator, r.arg); if (\"throw\" === i.type) return r.method = \"throw\", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, \"return\" !== r.method && (r.method = \"next\", r.arg = t), r.delegate = null, y) : a : (r.method = \"throw\", r.arg = new TypeError(\"iterator result is not an object\"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = \"normal\", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: \"root\" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || \"\" === e) { var r = e[a]; if (r) return r.call(e); if (\"function\" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + \" is not iterable\"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, \"constructor\", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, \"constructor\", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, \"GeneratorFunction\"), e.isGeneratorFunction = function (t) { var e = \"function\" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || \"GeneratorFunction\" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, \"GeneratorFunction\")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, \"Generator\"), define(g, a, function () { return this; }), define(g, \"toString\", function () { return \"[object Generator]\"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = \"next\", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) \"t\" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if (\"throw\" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = \"throw\", a.arg = e, r.next = n, o && (r.method = \"next\", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if (\"root\" === i.tryLoc) return handle(\"end\"); if (i.tryLoc <= this.prev) { var c = n.call(i, \"catchLoc\"), u = n.call(i, \"finallyLoc\"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error(\"try statement without catch or finally\"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, \"finallyLoc\") && this.prev < o.finallyLoc) { var i = o; break; } } i && (\"break\" === t || \"continue\" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = \"next\", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if (\"throw\" === t.type) throw t.arg; return \"break\" === t.type || \"continue\" === t.type ? this.next = t.arg : \"return\" === t.type ? (this.rval = this.arg = t.arg, this.method = \"return\", this.next = \"end\") : \"normal\" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if (\"throw\" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error(\"illegal catch attempt\"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, \"next\" === this.method && (this.arg = t), y; } }, e; }\nfunction _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\nfunction asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }\nfunction _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, \"next\", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, \"throw\", err); } _next(undefined); }); }; }\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\nfunction _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }\nfunction _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, \"prototype\", { writable: false }); return Constructor; }\nfunction _toPropertyKey(t) { var i = _toPrimitive(t, \"string\"); return \"symbol\" == _typeof(i) ? i : String(i); }\nfunction _toPrimitive(t, r) { if (\"object\" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || \"default\"); if (\"object\" != _typeof(i)) return i; throw new TypeError(\"@@toPrimitive must return a primitive value.\"); } return (\"string\" === r ? String : Number)(t); }\nfunction _typeof(o) { \"@babel/helpers - typeof\"; return _typeof = \"function\" == typeof Symbol && \"symbol\" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && \"function\" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? \"symbol\" : typeof o; }, _typeof(o); }\n/*! shepherd.js 11.2.0 */\n\n(function (global, factory) {\n  ( false ? 0 : _typeof(exports)) === 'object' && \"object\" !== 'undefined' ? module.exports = factory() :  true ? !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),\n\t\t__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?\n\t\t(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :\n\t\t__WEBPACK_AMD_DEFINE_FACTORY__),\n\t\t__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : (0);\n})(this, function () {\n  'use strict';\n\n  var isMergeableObject = function isMergeableObject(value) {\n    return isNonNullObject(value) && !isSpecial(value);\n  };\n  function isNonNullObject(value) {\n    return !!value && _typeof(value) === 'object';\n  }\n  function isSpecial(value) {\n    var stringValue = Object.prototype.toString.call(value);\n    return stringValue === '[object RegExp]' || stringValue === '[object Date]' || isReactElement(value);\n  }\n\n  // see https://github.com/facebook/react/blob/b5ac963fb791d1298e7f396236383bc955f916c1/src/isomorphic/classic/element/ReactElement.js#L21-L25\n  var canUseSymbol = typeof Symbol === 'function' && Symbol.for;\n  var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for('react.element') : 0xeac7;\n  function isReactElement(value) {\n    return value.$$typeof === REACT_ELEMENT_TYPE;\n  }\n  function emptyTarget(val) {\n    return Array.isArray(val) ? [] : {};\n  }\n  function cloneUnlessOtherwiseSpecified(value, options) {\n    return options.clone !== false && options.isMergeableObject(value) ? deepmerge(emptyTarget(value), value, options) : value;\n  }\n  function defaultArrayMerge(target, source, options) {\n    return target.concat(source).map(function (element) {\n      return cloneUnlessOtherwiseSpecified(element, options);\n    });\n  }\n  function getMergeFunction(key, options) {\n    if (!options.customMerge) {\n      return deepmerge;\n    }\n    var customMerge = options.customMerge(key);\n    return typeof customMerge === 'function' ? customMerge : deepmerge;\n  }\n  function getEnumerableOwnPropertySymbols(target) {\n    return Object.getOwnPropertySymbols ? Object.getOwnPropertySymbols(target).filter(function (symbol) {\n      return Object.propertyIsEnumerable.call(target, symbol);\n    }) : [];\n  }\n  function getKeys(target) {\n    return Object.keys(target).concat(getEnumerableOwnPropertySymbols(target));\n  }\n  function propertyIsOnObject(object, property) {\n    try {\n      return property in object;\n    } catch (_) {\n      return false;\n    }\n  }\n\n  // Protects from prototype poisoning and unexpected merging up the prototype chain.\n  function propertyIsUnsafe(target, key) {\n    return propertyIsOnObject(target, key) // Properties are safe to merge if they don't exist in the target yet,\n    && !(Object.hasOwnProperty.call(target, key) // unsafe if they exist up the prototype chain,\n    && Object.propertyIsEnumerable.call(target, key)); // and also unsafe if they're nonenumerable.\n  }\n  function mergeObject(target, source, options) {\n    var destination = {};\n    if (options.isMergeableObject(target)) {\n      getKeys(target).forEach(function (key) {\n        destination[key] = cloneUnlessOtherwiseSpecified(target[key], options);\n      });\n    }\n    getKeys(source).forEach(function (key) {\n      if (propertyIsUnsafe(target, key)) {\n        return;\n      }\n      if (propertyIsOnObject(target, key) && options.isMergeableObject(source[key])) {\n        destination[key] = getMergeFunction(key, options)(target[key], source[key], options);\n      } else {\n        destination[key] = cloneUnlessOtherwiseSpecified(source[key], options);\n      }\n    });\n    return destination;\n  }\n  function deepmerge(target, source, options) {\n    options = options || {};\n    options.arrayMerge = options.arrayMerge || defaultArrayMerge;\n    options.isMergeableObject = options.isMergeableObject || isMergeableObject;\n    // cloneUnlessOtherwiseSpecified is added to `options` so that custom arrayMerge()\n    // implementations can use it. The caller may not replace it.\n    options.cloneUnlessOtherwiseSpecified = cloneUnlessOtherwiseSpecified;\n    var sourceIsArray = Array.isArray(source);\n    var targetIsArray = Array.isArray(target);\n    var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;\n    if (!sourceAndTargetTypesMatch) {\n      return cloneUnlessOtherwiseSpecified(source, options);\n    } else if (sourceIsArray) {\n      return options.arrayMerge(target, source, options);\n    } else {\n      return mergeObject(target, source, options);\n    }\n  }\n  deepmerge.all = function deepmergeAll(array, options) {\n    if (!Array.isArray(array)) {\n      throw new Error('first argument should be an array');\n    }\n    return array.reduce(function (prev, next) {\n      return deepmerge(prev, next, options);\n    }, {});\n  };\n  var deepmerge_1 = deepmerge;\n  var cjs = deepmerge_1;\n\n  /**\n   * Checks if `value` is classified as an `Element`.\n   * @param {*} value The param to check if it is an Element\n   */\n  function isElement$1(value) {\n    return value instanceof Element;\n  }\n\n  /**\n   * Checks if `value` is classified as an `HTMLElement`.\n   * @param {*} value The param to check if it is an HTMLElement\n   */\n  function isHTMLElement$1(value) {\n    return value instanceof HTMLElement;\n  }\n\n  /**\n   * Checks if `value` is classified as a `Function` object.\n   * @param {*} value The param to check if it is a function\n   */\n  function isFunction(value) {\n    return typeof value === 'function';\n  }\n\n  /**\n   * Checks if `value` is classified as a `String` object.\n   * @param {*} value The param to check if it is a string\n   */\n  function isString(value) {\n    return typeof value === 'string';\n  }\n\n  /**\n   * Checks if `value` is undefined.\n   * @param {*} value The param to check if it is undefined\n   */\n  function isUndefined(value) {\n    return value === undefined;\n  }\n  var Evented = /*#__PURE__*/function () {\n    function Evented() {\n      _classCallCheck(this, Evented);\n    }\n    _createClass(Evented, [{\n      key: \"on\",\n      value: function on(event, handler, ctx) {\n        var once = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;\n        if (isUndefined(this.bindings)) {\n          this.bindings = {};\n        }\n        if (isUndefined(this.bindings[event])) {\n          this.bindings[event] = [];\n        }\n        this.bindings[event].push({\n          handler: handler,\n          ctx: ctx,\n          once: once\n        });\n        return this;\n      }\n    }, {\n      key: \"once\",\n      value: function once(event, handler, ctx) {\n        return this.on(event, handler, ctx, true);\n      }\n    }, {\n      key: \"off\",\n      value: function off(event, handler) {\n        var _this = this;\n        if (isUndefined(this.bindings) || isUndefined(this.bindings[event])) {\n          return this;\n        }\n        if (isUndefined(handler)) {\n          delete this.bindings[event];\n        } else {\n          this.bindings[event].forEach(function (binding, index) {\n            if (binding.handler === handler) {\n              _this.bindings[event].splice(index, 1);\n            }\n          });\n        }\n        return this;\n      }\n    }, {\n      key: \"trigger\",\n      value: function trigger(event) {\n        var _this2 = this;\n        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {\n          args[_key - 1] = arguments[_key];\n        }\n        if (!isUndefined(this.bindings) && this.bindings[event]) {\n          this.bindings[event].forEach(function (binding, index) {\n            var ctx = binding.ctx,\n              handler = binding.handler,\n              once = binding.once;\n            var context = ctx || _this2;\n            handler.apply(context, args);\n            if (once) {\n              _this2.bindings[event].splice(index, 1);\n            }\n          });\n        }\n        return this;\n      }\n    }]);\n    return Evented;\n  }();\n  /**\n   * Binds all the methods on a JS Class to the `this` context of the class.\n   * Adapted from https://github.com/sindresorhus/auto-bind\n   * @param {object} self The `this` context of the class\n   * @return {object} The `this` context of the class\n   */\n  function autoBind(self) {\n    var keys = Object.getOwnPropertyNames(self.constructor.prototype);\n    for (var i = 0; i < keys.length; i++) {\n      var key = keys[i];\n      var val = self[key];\n      if (key !== 'constructor' && typeof val === 'function') {\n        self[key] = val.bind(self);\n      }\n    }\n    return self;\n  }\n\n  /**\n   * Sets up the handler to determine if we should advance the tour\n   * @param {string} selector\n   * @param {Step} step The step instance\n   * @return {Function}\n   * @private\n   */\n  function _setupAdvanceOnHandler(selector, step) {\n    return function (event) {\n      if (step.isOpen()) {\n        var targetIsEl = step.el && event.currentTarget === step.el;\n        var targetIsSelector = !isUndefined(selector) && event.currentTarget.matches(selector);\n        if (targetIsSelector || targetIsEl) {\n          step.tour.next();\n        }\n      }\n    };\n  }\n\n  /**\n   * Bind the event handler for advanceOn\n   * @param {Step} step The step instance\n   */\n  function bindAdvance(step) {\n    // An empty selector matches the step element\n    var _ref2 = step.options.advanceOn || {},\n      event = _ref2.event,\n      selector = _ref2.selector;\n    if (event) {\n      var handler = _setupAdvanceOnHandler(selector, step);\n\n      // TODO: this should also bind/unbind on show/hide\n      var el;\n      try {\n        el = document.querySelector(selector);\n      } catch (e) {\n        // TODO\n      }\n      if (!isUndefined(selector) && !el) {\n        return console.error(\"No element was found for the selector supplied to advanceOn: \".concat(selector));\n      } else if (el) {\n        el.addEventListener(event, handler);\n        step.on('destroy', function () {\n          return el.removeEventListener(event, handler);\n        });\n      } else {\n        document.body.addEventListener(event, handler, true);\n        step.on('destroy', function () {\n          return document.body.removeEventListener(event, handler, true);\n        });\n      }\n    } else {\n      return console.error('advanceOn was defined, but no event name was passed.');\n    }\n  }\n\n  /**\n   * Ensure class prefix ends in `-`\n   * @param {string} prefix The prefix to prepend to the class names generated by nano-css\n   * @return {string} The prefix ending in `-`\n   */\n  function normalizePrefix(prefix) {\n    if (!isString(prefix) || prefix === '') {\n      return '';\n    }\n    return prefix.charAt(prefix.length - 1) !== '-' ? \"\".concat(prefix, \"-\") : prefix;\n  }\n\n  /**\n   * Resolves attachTo options, converting element option value to a qualified HTMLElement.\n   * @param {Step} step The step instance\n   * @returns {{}|{element, on}}\n   * `element` is a qualified HTML Element\n   * `on` is a string position value\n   */\n  function parseAttachTo(step) {\n    var options = step.options.attachTo || {};\n    var returnOpts = Object.assign({}, options);\n    if (isFunction(returnOpts.element)) {\n      // Bind the callback to step so that it has access to the object, to enable running additional logic\n      returnOpts.element = returnOpts.element.call(step);\n    }\n    if (isString(returnOpts.element)) {\n      // Can't override the element in user opts reference because we can't\n      // guarantee that the element will exist in the future.\n      try {\n        returnOpts.element = document.querySelector(returnOpts.element);\n      } catch (e) {\n        // TODO\n      }\n      if (!returnOpts.element) {\n        console.error(\"The element for this Shepherd step was not found \".concat(options.element));\n      }\n    }\n    return returnOpts;\n  }\n\n  /**\n   * Checks if the step should be centered or not. Does not trigger attachTo.element evaluation, making it a pure\n   * alternative for the deprecated step.isCentered() method.\n   * @param resolvedAttachToOptions\n   * @returns {boolean}\n   */\n  function shouldCenterStep(resolvedAttachToOptions) {\n    if (resolvedAttachToOptions === undefined || resolvedAttachToOptions === null) {\n      return true;\n    }\n    return !resolvedAttachToOptions.element || !resolvedAttachToOptions.on;\n  }\n\n  /**\n   * Create a unique id for steps, tours, modals, etc\n   * @return {string}\n   */\n  function uuid() {\n    var d = Date.now();\n    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {\n      var r = (d + Math.random() * 16) % 16 | 0;\n      d = Math.floor(d / 16);\n      return (c == 'x' ? r : r & 0x3 | 0x8).toString(16);\n    });\n  }\n  function _extends() {\n    _extends = Object.assign ? Object.assign.bind() : function (target) {\n      for (var i = 1; i < arguments.length; i++) {\n        var source = arguments[i];\n        for (var key in source) {\n          if (Object.prototype.hasOwnProperty.call(source, key)) {\n            target[key] = source[key];\n          }\n        }\n      }\n      return target;\n    };\n    return _extends.apply(this, arguments);\n  }\n  function _objectWithoutPropertiesLoose(source, excluded) {\n    if (source == null) return {};\n    var target = {};\n    var sourceKeys = Object.keys(source);\n    var key, i;\n    for (i = 0; i < sourceKeys.length; i++) {\n      key = sourceKeys[i];\n      if (excluded.indexOf(key) >= 0) continue;\n      target[key] = source[key];\n    }\n    return target;\n  }\n  var min = Math.min;\n  var max = Math.max;\n  var round = Math.round;\n  var floor = Math.floor;\n  var createCoords = function createCoords(v) {\n    return {\n      x: v,\n      y: v\n    };\n  };\n  var oppositeSideMap = {\n    left: 'right',\n    right: 'left',\n    bottom: 'top',\n    top: 'bottom'\n  };\n  var oppositeAlignmentMap = {\n    start: 'end',\n    end: 'start'\n  };\n  function clamp(start, value, end) {\n    return max(start, min(value, end));\n  }\n  function evaluate(value, param) {\n    return typeof value === 'function' ? value(param) : value;\n  }\n  function getSide(placement) {\n    return placement.split('-')[0];\n  }\n  function getAlignment(placement) {\n    return placement.split('-')[1];\n  }\n  function getOppositeAxis(axis) {\n    return axis === 'x' ? 'y' : 'x';\n  }\n  function getAxisLength(axis) {\n    return axis === 'y' ? 'height' : 'width';\n  }\n  function getSideAxis(placement) {\n    return ['top', 'bottom'].includes(getSide(placement)) ? 'y' : 'x';\n  }\n  function getAlignmentAxis(placement) {\n    return getOppositeAxis(getSideAxis(placement));\n  }\n  function getAlignmentSides(placement, rects, rtl) {\n    if (rtl === void 0) {\n      rtl = false;\n    }\n    var alignment = getAlignment(placement);\n    var alignmentAxis = getAlignmentAxis(placement);\n    var length = getAxisLength(alignmentAxis);\n    var mainAlignmentSide = alignmentAxis === 'x' ? alignment === (rtl ? 'end' : 'start') ? 'right' : 'left' : alignment === 'start' ? 'bottom' : 'top';\n    if (rects.reference[length] > rects.floating[length]) {\n      mainAlignmentSide = getOppositePlacement(mainAlignmentSide);\n    }\n    return [mainAlignmentSide, getOppositePlacement(mainAlignmentSide)];\n  }\n  function getExpandedPlacements(placement) {\n    var oppositePlacement = getOppositePlacement(placement);\n    return [getOppositeAlignmentPlacement(placement), oppositePlacement, getOppositeAlignmentPlacement(oppositePlacement)];\n  }\n  function getOppositeAlignmentPlacement(placement) {\n    return placement.replace(/start|end/g, function (alignment) {\n      return oppositeAlignmentMap[alignment];\n    });\n  }\n  function getSideList(side, isStart, rtl) {\n    var lr = ['left', 'right'];\n    var rl = ['right', 'left'];\n    var tb = ['top', 'bottom'];\n    var bt = ['bottom', 'top'];\n    switch (side) {\n      case 'top':\n      case 'bottom':\n        if (rtl) return isStart ? rl : lr;\n        return isStart ? lr : rl;\n      case 'left':\n      case 'right':\n        return isStart ? tb : bt;\n      default:\n        return [];\n    }\n  }\n  function getOppositeAxisPlacements(placement, flipAlignment, direction, rtl) {\n    var alignment = getAlignment(placement);\n    var list = getSideList(getSide(placement), direction === 'start', rtl);\n    if (alignment) {\n      list = list.map(function (side) {\n        return side + \"-\" + alignment;\n      });\n      if (flipAlignment) {\n        list = list.concat(list.map(getOppositeAlignmentPlacement));\n      }\n    }\n    return list;\n  }\n  function getOppositePlacement(placement) {\n    return placement.replace(/left|right|bottom|top/g, function (side) {\n      return oppositeSideMap[side];\n    });\n  }\n  function expandPaddingObject(padding) {\n    return _extends({\n      top: 0,\n      right: 0,\n      bottom: 0,\n      left: 0\n    }, padding);\n  }\n  function getPaddingObject(padding) {\n    return typeof padding !== 'number' ? expandPaddingObject(padding) : {\n      top: padding,\n      right: padding,\n      bottom: padding,\n      left: padding\n    };\n  }\n  function rectToClientRect(rect) {\n    return _extends({}, rect, {\n      top: rect.y,\n      left: rect.x,\n      right: rect.x + rect.width,\n      bottom: rect.y + rect.height\n    });\n  }\n  var _excluded2 = [\"mainAxis\", \"crossAxis\", \"fallbackPlacements\", \"fallbackStrategy\", \"fallbackAxisSideDirection\", \"flipAlignment\"],\n    _excluded4 = [\"mainAxis\", \"crossAxis\", \"limiter\"];\n  function computeCoordsFromPlacement(_ref, placement, rtl) {\n    var reference = _ref.reference,\n      floating = _ref.floating;\n    var sideAxis = getSideAxis(placement);\n    var alignmentAxis = getAlignmentAxis(placement);\n    var alignLength = getAxisLength(alignmentAxis);\n    var side = getSide(placement);\n    var isVertical = sideAxis === 'y';\n    var commonX = reference.x + reference.width / 2 - floating.width / 2;\n    var commonY = reference.y + reference.height / 2 - floating.height / 2;\n    var commonAlign = reference[alignLength] / 2 - floating[alignLength] / 2;\n    var coords;\n    switch (side) {\n      case 'top':\n        coords = {\n          x: commonX,\n          y: reference.y - floating.height\n        };\n        break;\n      case 'bottom':\n        coords = {\n          x: commonX,\n          y: reference.y + reference.height\n        };\n        break;\n      case 'right':\n        coords = {\n          x: reference.x + reference.width,\n          y: commonY\n        };\n        break;\n      case 'left':\n        coords = {\n          x: reference.x - floating.width,\n          y: commonY\n        };\n        break;\n      default:\n        coords = {\n          x: reference.x,\n          y: reference.y\n        };\n    }\n    switch (getAlignment(placement)) {\n      case 'start':\n        coords[alignmentAxis] -= commonAlign * (rtl && isVertical ? -1 : 1);\n        break;\n      case 'end':\n        coords[alignmentAxis] += commonAlign * (rtl && isVertical ? -1 : 1);\n        break;\n    }\n    return coords;\n  }\n\n  /**\n   * Computes the `x` and `y` coordinates that will place the floating element\n   * next to a reference element when it is given a certain positioning strategy.\n   *\n   * This export does not have any `platform` interface logic. You will need to\n   * write one for the platform you are using Floating UI with.\n   */\n  var computePosition$1 = /*#__PURE__*/function () {\n    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(reference, floating, config) {\n      var _config$placement, placement, _config$strategy, strategy, _config$middleware, middleware, platform, validMiddleware, rtl, rects, _computeCoordsFromPla, x, y, statefulPlacement, middlewareData, resetCount, i, _validMiddleware$i, name, fn, _yield$fn, nextX, nextY, data, reset, _computeCoordsFromPla2;\n      return _regeneratorRuntime().wrap(function _callee$(_context) {\n        while (1) switch (_context.prev = _context.next) {\n          case 0:\n            _config$placement = config.placement, placement = _config$placement === void 0 ? 'bottom' : _config$placement, _config$strategy = config.strategy, strategy = _config$strategy === void 0 ? 'absolute' : _config$strategy, _config$middleware = config.middleware, middleware = _config$middleware === void 0 ? [] : _config$middleware, platform = config.platform;\n            validMiddleware = middleware.filter(Boolean);\n            _context.next = 4;\n            return platform.isRTL == null ? void 0 : platform.isRTL(floating);\n          case 4:\n            rtl = _context.sent;\n            _context.next = 7;\n            return platform.getElementRects({\n              reference: reference,\n              floating: floating,\n              strategy: strategy\n            });\n          case 7:\n            rects = _context.sent;\n            _computeCoordsFromPla = computeCoordsFromPlacement(rects, placement, rtl), x = _computeCoordsFromPla.x, y = _computeCoordsFromPla.y;\n            statefulPlacement = placement;\n            middlewareData = {};\n            resetCount = 0;\n            i = 0;\n          case 13:\n            if (!(i < validMiddleware.length)) {\n              _context.next = 46;\n              break;\n            }\n            _validMiddleware$i = validMiddleware[i], name = _validMiddleware$i.name, fn = _validMiddleware$i.fn;\n            _context.next = 17;\n            return fn({\n              x: x,\n              y: y,\n              initialPlacement: placement,\n              placement: statefulPlacement,\n              strategy: strategy,\n              middlewareData: middlewareData,\n              rects: rects,\n              platform: platform,\n              elements: {\n                reference: reference,\n                floating: floating\n              }\n            });\n          case 17:\n            _yield$fn = _context.sent;\n            nextX = _yield$fn.x;\n            nextY = _yield$fn.y;\n            data = _yield$fn.data;\n            reset = _yield$fn.reset;\n            x = nextX != null ? nextX : x;\n            y = nextY != null ? nextY : y;\n            middlewareData = _extends({}, middlewareData, _defineProperty({}, name, _extends({}, middlewareData[name], data)));\n            if (!(reset && resetCount <= 50)) {\n              _context.next = 43;\n              break;\n            }\n            resetCount++;\n            if (!(_typeof(reset) === 'object')) {\n              _context.next = 41;\n              break;\n            }\n            if (reset.placement) {\n              statefulPlacement = reset.placement;\n            }\n            if (!reset.rects) {\n              _context.next = 38;\n              break;\n            }\n            if (!(reset.rects === true)) {\n              _context.next = 36;\n              break;\n            }\n            _context.next = 33;\n            return platform.getElementRects({\n              reference: reference,\n              floating: floating,\n              strategy: strategy\n            });\n          case 33:\n            _context.t0 = _context.sent;\n            _context.next = 37;\n            break;\n          case 36:\n            _context.t0 = reset.rects;\n          case 37:\n            rects = _context.t0;\n          case 38:\n            _computeCoordsFromPla2 = computeCoordsFromPlacement(rects, statefulPlacement, rtl);\n            x = _computeCoordsFromPla2.x;\n            y = _computeCoordsFromPla2.y;\n          case 41:\n            i = -1;\n            return _context.abrupt(\"continue\", 43);\n          case 43:\n            i++;\n            _context.next = 13;\n            break;\n          case 46:\n            return _context.abrupt(\"return\", {\n              x: x,\n              y: y,\n              placement: statefulPlacement,\n              strategy: strategy,\n              middlewareData: middlewareData\n            });\n          case 47:\n          case \"end\":\n            return _context.stop();\n        }\n      }, _callee);\n    }));\n    return function computePosition$1(_x, _x2, _x3) {\n      return _ref3.apply(this, arguments);\n    };\n  }();\n\n  /**\n   * Resolves with an object of overflow side offsets that determine how much the\n   * element is overflowing a given clipping boundary on each side.\n   * - positive = overflowing the boundary by that number of pixels\n   * - negative = how many pixels left before it will overflow\n   * - 0 = lies flush with the boundary\n   * @see https://floating-ui.com/docs/detectOverflow\n   */\n  function detectOverflow(_x4, _x5) {\n    return _detectOverflow.apply(this, arguments);\n  }\n  /**\n   * Provides data to position an inner element of the floating element so that it\n   * appears centered to the reference element.\n   * @see https://floating-ui.com/docs/arrow\n   */\n  function _detectOverflow() {\n    _detectOverflow = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(state, options) {\n      var _await$platform$isEle, x, y, platform, rects, elements, strategy, _evaluate3, _evaluate3$boundary, boundary, _evaluate3$rootBounda, rootBoundary, _evaluate3$elementCon, elementContext, _evaluate3$altBoundar, altBoundary, _evaluate3$padding, padding, paddingObject, altContext, element, clippingClientRect, rect, offsetParent, offsetScale, elementClientRect;\n      return _regeneratorRuntime().wrap(function _callee7$(_context7) {\n        while (1) switch (_context7.prev = _context7.next) {\n          case 0:\n            if (options === void 0) {\n              options = {};\n            }\n            x = state.x, y = state.y, platform = state.platform, rects = state.rects, elements = state.elements, strategy = state.strategy;\n            _evaluate3 = evaluate(options, state), _evaluate3$boundary = _evaluate3.boundary, boundary = _evaluate3$boundary === void 0 ? 'clippingAncestors' : _evaluate3$boundary, _evaluate3$rootBounda = _evaluate3.rootBoundary, rootBoundary = _evaluate3$rootBounda === void 0 ? 'viewport' : _evaluate3$rootBounda, _evaluate3$elementCon = _evaluate3.elementContext, elementContext = _evaluate3$elementCon === void 0 ? 'floating' : _evaluate3$elementCon, _evaluate3$altBoundar = _evaluate3.altBoundary, altBoundary = _evaluate3$altBoundar === void 0 ? false : _evaluate3$altBoundar, _evaluate3$padding = _evaluate3.padding, padding = _evaluate3$padding === void 0 ? 0 : _evaluate3$padding;\n            paddingObject = getPaddingObject(padding);\n            altContext = elementContext === 'floating' ? 'reference' : 'floating';\n            element = elements[altBoundary ? altContext : elementContext];\n            _context7.t0 = rectToClientRect;\n            _context7.t1 = platform;\n            _context7.next = 10;\n            return platform.isElement == null ? void 0 : platform.isElement(element);\n          case 10:\n            _context7.t2 = _await$platform$isEle = _context7.sent;\n            if (!(_context7.t2 != null)) {\n              _context7.next = 15;\n              break;\n            }\n            _context7.t3 = _await$platform$isEle;\n            _context7.next = 16;\n            break;\n          case 15:\n            _context7.t3 = true;\n          case 16:\n            if (!_context7.t3) {\n              _context7.next = 20;\n              break;\n            }\n            _context7.t4 = element;\n            _context7.next = 26;\n            break;\n          case 20:\n            _context7.t5 = element.contextElement;\n            if (_context7.t5) {\n              _context7.next = 25;\n              break;\n            }\n            _context7.next = 24;\n            return platform.getDocumentElement == null ? void 0 : platform.getDocumentElement(elements.floating);\n          case 24:\n            _context7.t5 = _context7.sent;\n          case 25:\n            _context7.t4 = _context7.t5;\n          case 26:\n            _context7.t6 = _context7.t4;\n            _context7.t7 = boundary;\n            _context7.t8 = rootBoundary;\n            _context7.t9 = strategy;\n            _context7.t10 = {\n              element: _context7.t6,\n              boundary: _context7.t7,\n              rootBoundary: _context7.t8,\n              strategy: _context7.t9\n            };\n            _context7.next = 33;\n            return _context7.t1.getClippingRect.call(_context7.t1, _context7.t10);\n          case 33:\n            _context7.t11 = _context7.sent;\n            clippingClientRect = (0, _context7.t0)(_context7.t11);\n            rect = elementContext === 'floating' ? _extends({}, rects.floating, {\n              x: x,\n              y: y\n            }) : rects.reference;\n            _context7.next = 38;\n            return platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(elements.floating);\n          case 38:\n            offsetParent = _context7.sent;\n            _context7.next = 41;\n            return platform.isElement == null ? void 0 : platform.isElement(offsetParent);\n          case 41:\n            if (!_context7.sent) {\n              _context7.next = 50;\n              break;\n            }\n            _context7.next = 44;\n            return platform.getScale == null ? void 0 : platform.getScale(offsetParent);\n          case 44:\n            _context7.t13 = _context7.sent;\n            if (_context7.t13) {\n              _context7.next = 47;\n              break;\n            }\n            _context7.t13 = {\n              x: 1,\n              y: 1\n            };\n          case 47:\n            _context7.t12 = _context7.t13;\n            _context7.next = 51;\n            break;\n          case 50:\n            _context7.t12 = {\n              x: 1,\n              y: 1\n            };\n          case 51:\n            offsetScale = _context7.t12;\n            _context7.t14 = rectToClientRect;\n            if (!platform.convertOffsetParentRelativeRectToViewportRelativeRect) {\n              _context7.next = 59;\n              break;\n            }\n            _context7.next = 56;\n            return platform.convertOffsetParentRelativeRectToViewportRelativeRect({\n              rect: rect,\n              offsetParent: offsetParent,\n              strategy: strategy\n            });\n          case 56:\n            _context7.t15 = _context7.sent;\n            _context7.next = 60;\n            break;\n          case 59:\n            _context7.t15 = rect;\n          case 60:\n            _context7.t16 = _context7.t15;\n            elementClientRect = (0, _context7.t14)(_context7.t16);\n            return _context7.abrupt(\"return\", {\n              top: (clippingClientRect.top - elementClientRect.top + paddingObject.top) / offsetScale.y,\n              bottom: (elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom) / offsetScale.y,\n              left: (clippingClientRect.left - elementClientRect.left + paddingObject.left) / offsetScale.x,\n              right: (elementClientRect.right - clippingClientRect.right + paddingObject.right) / offsetScale.x\n            });\n          case 63:\n          case \"end\":\n            return _context7.stop();\n        }\n      }, _callee7);\n    }));\n    return _detectOverflow.apply(this, arguments);\n  }\n  var arrow = function arrow(options) {\n    return {\n      name: 'arrow',\n      options: options,\n      fn: function fn(state) {\n        return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {\n          var x, y, placement, rects, platform, elements, _ref4, element, _ref4$padding, padding, paddingObject, coords, axis, length, arrowDimensions, isYAxis, minProp, maxProp, clientProp, endDiff, startDiff, arrowOffsetParent, clientSize, centerToReference, largestPossiblePadding, minPadding, maxPadding, min$1, max, center, offset, shouldAddOffset, alignmentOffset;\n          return _regeneratorRuntime().wrap(function _callee2$(_context2) {\n            while (1) switch (_context2.prev = _context2.next) {\n              case 0:\n                x = state.x, y = state.y, placement = state.placement, rects = state.rects, platform = state.platform, elements = state.elements; // Since `element` is required, we don't Partial<> the type.\n                _ref4 = evaluate(options, state) || {}, element = _ref4.element, _ref4$padding = _ref4.padding, padding = _ref4$padding === void 0 ? 0 : _ref4$padding;\n                if (!(element == null)) {\n                  _context2.next = 4;\n                  break;\n                }\n                return _context2.abrupt(\"return\", {});\n              case 4:\n                paddingObject = getPaddingObject(padding);\n                coords = {\n                  x: x,\n                  y: y\n                };\n                axis = getAlignmentAxis(placement);\n                length = getAxisLength(axis);\n                _context2.next = 10;\n                return platform.getDimensions(element);\n              case 10:\n                arrowDimensions = _context2.sent;\n                isYAxis = axis === 'y';\n                minProp = isYAxis ? 'top' : 'left';\n                maxProp = isYAxis ? 'bottom' : 'right';\n                clientProp = isYAxis ? 'clientHeight' : 'clientWidth';\n                endDiff = rects.reference[length] + rects.reference[axis] - coords[axis] - rects.floating[length];\n                startDiff = coords[axis] - rects.reference[axis];\n                _context2.next = 19;\n                return platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(element);\n              case 19:\n                arrowOffsetParent = _context2.sent;\n                clientSize = arrowOffsetParent ? arrowOffsetParent[clientProp] : 0; // DOM platform can return `window` as the `offsetParent`.\n                _context2.t0 = !clientSize;\n                if (_context2.t0) {\n                  _context2.next = 26;\n                  break;\n                }\n                _context2.next = 25;\n                return platform.isElement == null ? void 0 : platform.isElement(arrowOffsetParent);\n              case 25:\n                _context2.t0 = !_context2.sent;\n              case 26:\n                if (!_context2.t0) {\n                  _context2.next = 28;\n                  break;\n                }\n                clientSize = elements.floating[clientProp] || rects.floating[length];\n              case 28:\n                centerToReference = endDiff / 2 - startDiff / 2; // If the padding is large enough that it causes the arrow to no longer be\n                // centered, modify the padding so that it is centered.\n                largestPossiblePadding = clientSize / 2 - arrowDimensions[length] / 2 - 1;\n                minPadding = min(paddingObject[minProp], largestPossiblePadding);\n                maxPadding = min(paddingObject[maxProp], largestPossiblePadding); // Make sure the arrow doesn't overflow the floating element if the center\n                // point is outside the floating element's bounds.\n                min$1 = minPadding;\n                max = clientSize - arrowDimensions[length] - maxPadding;\n                center = clientSize / 2 - arrowDimensions[length] / 2 + centerToReference;\n                offset = clamp(min$1, center, max); // If the reference is small enough that the arrow's padding causes it to\n                // to point to nothing for an aligned placement, adjust the offset of the\n                // floating element itself. This stops `shift()` from taking action, but can\n                // be worked around by calling it again after the `arrow()` if desired.\n                shouldAddOffset = getAlignment(placement) != null && center != offset && rects.reference[length] / 2 - (center < min$1 ? minPadding : maxPadding) - arrowDimensions[length] / 2 < 0;\n                alignmentOffset = shouldAddOffset ? center < min$1 ? min$1 - center : max - center : 0;\n                return _context2.abrupt(\"return\", _defineProperty(_defineProperty({}, axis, coords[axis] - alignmentOffset), \"data\", _defineProperty(_defineProperty({}, axis, offset), \"centerOffset\", center - offset + alignmentOffset)));\n              case 39:\n              case \"end\":\n                return _context2.stop();\n            }\n          }, _callee2);\n        }))();\n      }\n    };\n  };\n\n  /**\n   * Optimizes the visibility of the floating element by flipping the `placement`\n   * in order to keep it in view when the preferred placement(s) will overflow the\n   * clipping boundary. Alternative to `autoPlacement`.\n   * @see https://floating-ui.com/docs/flip\n   */\n  var flip = function flip(options) {\n    if (options === void 0) {\n      options = {};\n    }\n    return {\n      name: 'flip',\n      options: options,\n      fn: function fn(state) {\n        return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {\n          var _middlewareData$flip, placement, middlewareData, rects, initialPlacement, platform, elements, _evaluate2, _evaluate2$mainAxis, checkMainAxis, _evaluate2$crossAxis, checkCrossAxis, specifiedFallbackPlacements, _evaluate2$fallbackSt, fallbackStrategy, _evaluate2$fallbackAx, fallbackAxisSideDirection, _evaluate2$flipAlignm, flipAlignment, detectOverflowOptions, side, isBasePlacement, rtl, fallbackPlacements, placements, overflow, overflows, overflowsData, sides, _middlewareData$flip2, _overflowsData$filter, nextIndex, nextPlacement, resetPlacement, _overflowsData$map$so, _placement;\n          return _regeneratorRuntime().wrap(function _callee3$(_context3) {\n            while (1) switch (_context3.prev = _context3.next) {\n              case 0:\n                placement = state.placement, middlewareData = state.middlewareData, rects = state.rects, initialPlacement = state.initialPlacement, platform = state.platform, elements = state.elements;\n                _evaluate2 = evaluate(options, state), _evaluate2$mainAxis = _evaluate2.mainAxis, checkMainAxis = _evaluate2$mainAxis === void 0 ? true : _evaluate2$mainAxis, _evaluate2$crossAxis = _evaluate2.crossAxis, checkCrossAxis = _evaluate2$crossAxis === void 0 ? true : _evaluate2$crossAxis, specifiedFallbackPlacements = _evaluate2.fallbackPlacements, _evaluate2$fallbackSt = _evaluate2.fallbackStrategy, fallbackStrategy = _evaluate2$fallbackSt === void 0 ? 'bestFit' : _evaluate2$fallbackSt, _evaluate2$fallbackAx = _evaluate2.fallbackAxisSideDirection, fallbackAxisSideDirection = _evaluate2$fallbackAx === void 0 ? 'none' : _evaluate2$fallbackAx, _evaluate2$flipAlignm = _evaluate2.flipAlignment, flipAlignment = _evaluate2$flipAlignm === void 0 ? true : _evaluate2$flipAlignm, detectOverflowOptions = _objectWithoutPropertiesLoose(_evaluate2, _excluded2);\n                side = getSide(placement);\n                isBasePlacement = getSide(initialPlacement) === initialPlacement;\n                _context3.next = 6;\n                return platform.isRTL == null ? void 0 : platform.isRTL(elements.floating);\n              case 6:\n                rtl = _context3.sent;\n                fallbackPlacements = specifiedFallbackPlacements || (isBasePlacement || !flipAlignment ? [getOppositePlacement(initialPlacement)] : getExpandedPlacements(initialPlacement));\n                if (!specifiedFallbackPlacements && fallbackAxisSideDirection !== 'none') {\n                  fallbackPlacements.push.apply(fallbackPlacements, _toConsumableArray(getOppositeAxisPlacements(initialPlacement, flipAlignment, fallbackAxisSideDirection, rtl)));\n                }\n                placements = [initialPlacement].concat(_toConsumableArray(fallbackPlacements));\n                _context3.next = 12;\n                return detectOverflow(state, detectOverflowOptions);\n              case 12:\n                overflow = _context3.sent;\n                overflows = [];\n                overflowsData = ((_middlewareData$flip = middlewareData.flip) == null ? void 0 : _middlewareData$flip.overflows) || [];\n                if (checkMainAxis) {\n                  overflows.push(overflow[side]);\n                }\n                if (checkCrossAxis) {\n                  sides = getAlignmentSides(placement, rects, rtl);\n                  overflows.push(overflow[sides[0]], overflow[sides[1]]);\n                }\n                overflowsData = [].concat(_toConsumableArray(overflowsData), [{\n                  placement: placement,\n                  overflows: overflows\n                }]);\n\n                // One or more sides is overflowing.\n                if (overflows.every(function (side) {\n                  return side <= 0;\n                })) {\n                  _context3.next = 35;\n                  break;\n                }\n                nextIndex = (((_middlewareData$flip2 = middlewareData.flip) == null ? void 0 : _middlewareData$flip2.index) || 0) + 1;\n                nextPlacement = placements[nextIndex];\n                if (!nextPlacement) {\n                  _context3.next = 23;\n                  break;\n                }\n                return _context3.abrupt(\"return\", {\n                  data: {\n                    index: nextIndex,\n                    overflows: overflowsData\n                  },\n                  reset: {\n                    placement: nextPlacement\n                  }\n                });\n              case 23:\n                // First, find the candidates that fit on the mainAxis side of overflow,\n                // then find the placement that fits the best on the main crossAxis side.\n                resetPlacement = (_overflowsData$filter = overflowsData.filter(function (d) {\n                  return d.overflows[0] <= 0;\n                }).sort(function (a, b) {\n                  return a.overflows[1] - b.overflows[1];\n                })[0]) == null ? void 0 : _overflowsData$filter.placement; // Otherwise fallback.\n                if (resetPlacement) {\n                  _context3.next = 33;\n                  break;\n                }\n                _context3.t0 = fallbackStrategy;\n                _context3.next = _context3.t0 === 'bestFit' ? 28 : _context3.t0 === 'initialPlacement' ? 31 : 33;\n                break;\n              case 28:\n                _placement = (_overflowsData$map$so = overflowsData.map(function (d) {\n                  return [d.placement, d.overflows.filter(function (overflow) {\n                    return overflow > 0;\n                  }).reduce(function (acc, overflow) {\n                    return acc + overflow;\n                  }, 0)];\n                }).sort(function (a, b) {\n                  return a[1] - b[1];\n                })[0]) == null ? void 0 : _overflowsData$map$so[0];\n                if (_placement) {\n                  resetPlacement = _placement;\n                }\n                return _context3.abrupt(\"break\", 33);\n              case 31:\n                resetPlacement = initialPlacement;\n                return _context3.abrupt(\"break\", 33);\n              case 33:\n                if (!(placement !== resetPlacement)) {\n                  _context3.next = 35;\n                  break;\n                }\n                return _context3.abrupt(\"return\", {\n                  reset: {\n                    placement: resetPlacement\n                  }\n                });\n              case 35:\n                return _context3.abrupt(\"return\", {});\n              case 36:\n              case \"end\":\n                return _context3.stop();\n            }\n          }, _callee3);\n        }))();\n      }\n    };\n  };\n\n  /**\n   * Optimizes the visibility of the floating element by shifting it in order to\n   * keep it in view when it will overflow the clipping boundary.\n   * @see https://floating-ui.com/docs/shift\n   */\n  var shift = function shift(options) {\n    if (options === void 0) {\n      options = {};\n    }\n    return {\n      name: 'shift',\n      options: options,\n      fn: function fn(state) {\n        return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {\n          var x, y, placement, _evaluate4, _evaluate4$mainAxis, checkMainAxis, _evaluate4$crossAxis, checkCrossAxis, _evaluate4$limiter, limiter, detectOverflowOptions, coords, overflow, crossAxis, mainAxis, mainAxisCoord, crossAxisCoord, minSide, maxSide, _min, _max, _minSide, _maxSide, _min2, _max2, limitedCoords;\n          return _regeneratorRuntime().wrap(function _callee4$(_context4) {\n            while (1) switch (_context4.prev = _context4.next) {\n              case 0:\n                x = state.x, y = state.y, placement = state.placement;\n                _evaluate4 = evaluate(options, state), _evaluate4$mainAxis = _evaluate4.mainAxis, checkMainAxis = _evaluate4$mainAxis === void 0 ? true : _evaluate4$mainAxis, _evaluate4$crossAxis = _evaluate4.crossAxis, checkCrossAxis = _evaluate4$crossAxis === void 0 ? false : _evaluate4$crossAxis, _evaluate4$limiter = _evaluate4.limiter, limiter = _evaluate4$limiter === void 0 ? {\n                  fn: function fn(_ref) {\n                    var x = _ref.x,\n                      y = _ref.y;\n                    return {\n                      x: x,\n                      y: y\n                    };\n                  }\n                } : _evaluate4$limiter, detectOverflowOptions = _objectWithoutPropertiesLoose(_evaluate4, _excluded4);\n                coords = {\n                  x: x,\n                  y: y\n                };\n                _context4.next = 5;\n                return detectOverflow(state, detectOverflowOptions);\n              case 5:\n                overflow = _context4.sent;\n                crossAxis = getSideAxis(getSide(placement));\n                mainAxis = getOppositeAxis(crossAxis);\n                mainAxisCoord = coords[mainAxis];\n                crossAxisCoord = coords[crossAxis];\n                if (checkMainAxis) {\n                  minSide = mainAxis === 'y' ? 'top' : 'left';\n                  maxSide = mainAxis === 'y' ? 'bottom' : 'right';\n                  _min = mainAxisCoord + overflow[minSide];\n                  _max = mainAxisCoord - overflow[maxSide];\n                  mainAxisCoord = clamp(_min, mainAxisCoord, _max);\n                }\n                if (checkCrossAxis) {\n                  _minSide = crossAxis === 'y' ? 'top' : 'left';\n                  _maxSide = crossAxis === 'y' ? 'bottom' : 'right';\n                  _min2 = crossAxisCoord + overflow[_minSide];\n                  _max2 = crossAxisCoord - overflow[_maxSide];\n                  crossAxisCoord = clamp(_min2, crossAxisCoord, _max2);\n                }\n                limitedCoords = limiter.fn(_extends({}, state, _defineProperty(_defineProperty({}, mainAxis, mainAxisCoord), crossAxis, crossAxisCoord)));\n                return _context4.abrupt(\"return\", _extends({}, limitedCoords, {\n                  data: {\n                    x: limitedCoords.x - x,\n                    y: limitedCoords.y - y\n                  }\n                }));\n              case 14:\n              case \"end\":\n                return _context4.stop();\n            }\n          }, _callee4);\n        }))();\n      }\n    };\n  };\n  /**\n   * Built-in `limiter` that will stop `shift()` at a certain point.\n   */\n  var limitShift = function limitShift(options) {\n    if (options === void 0) {\n      options = {};\n    }\n    return {\n      options: options,\n      fn: function fn(state) {\n        var x = state.x,\n          y = state.y,\n          placement = state.placement,\n          rects = state.rects,\n          middlewareData = state.middlewareData;\n        var _evaluate = evaluate(options, state),\n          _evaluate$offset = _evaluate.offset,\n          offset = _evaluate$offset === void 0 ? 0 : _evaluate$offset,\n          _evaluate$mainAxis = _evaluate.mainAxis,\n          checkMainAxis = _evaluate$mainAxis === void 0 ? true : _evaluate$mainAxis,\n          _evaluate$crossAxis = _evaluate.crossAxis,\n          checkCrossAxis = _evaluate$crossAxis === void 0 ? true : _evaluate$crossAxis;\n        var coords = {\n          x: x,\n          y: y\n        };\n        var crossAxis = getSideAxis(placement);\n        var mainAxis = getOppositeAxis(crossAxis);\n        var mainAxisCoord = coords[mainAxis];\n        var crossAxisCoord = coords[crossAxis];\n        var rawOffset = evaluate(offset, state);\n        var computedOffset = typeof rawOffset === 'number' ? {\n          mainAxis: rawOffset,\n          crossAxis: 0\n        } : _extends({\n          mainAxis: 0,\n          crossAxis: 0\n        }, rawOffset);\n        if (checkMainAxis) {\n          var len = mainAxis === 'y' ? 'height' : 'width';\n          var limitMin = rects.reference[mainAxis] - rects.floating[len] + computedOffset.mainAxis;\n          var limitMax = rects.reference[mainAxis] + rects.reference[len] - computedOffset.mainAxis;\n          if (mainAxisCoord < limitMin) {\n            mainAxisCoord = limitMin;\n          } else if (mainAxisCoord > limitMax) {\n            mainAxisCoord = limitMax;\n          }\n        }\n        if (checkCrossAxis) {\n          var _middlewareData$offse, _middlewareData$offse2;\n          var _len2 = mainAxis === 'y' ? 'width' : 'height';\n          var isOriginSide = ['top', 'left'].includes(getSide(placement));\n          var _limitMin = rects.reference[crossAxis] - rects.floating[_len2] + (isOriginSide ? ((_middlewareData$offse = middlewareData.offset) == null ? void 0 : _middlewareData$offse[crossAxis]) || 0 : 0) + (isOriginSide ? 0 : computedOffset.crossAxis);\n          var _limitMax = rects.reference[crossAxis] + rects.reference[_len2] + (isOriginSide ? 0 : ((_middlewareData$offse2 = middlewareData.offset) == null ? void 0 : _middlewareData$offse2[crossAxis]) || 0) - (isOriginSide ? computedOffset.crossAxis : 0);\n          if (crossAxisCoord < _limitMin) {\n            crossAxisCoord = _limitMin;\n          } else if (crossAxisCoord > _limitMax) {\n            crossAxisCoord = _limitMax;\n          }\n        }\n        return _defineProperty(_defineProperty({}, mainAxis, mainAxisCoord), crossAxis, crossAxisCoord);\n      }\n    };\n  };\n  function getNodeName(node) {\n    if (isNode(node)) {\n      return (node.nodeName || '').toLowerCase();\n    }\n    // Mocked nodes in testing environments may not be instances of Node. By\n    // returning `#document` an infinite loop won't occur.\n    // https://github.com/floating-ui/floating-ui/issues/2317\n    return '#document';\n  }\n  function getWindow(node) {\n    var _node$ownerDocument;\n    return (node == null ? void 0 : (_node$ownerDocument = node.ownerDocument) == null ? void 0 : _node$ownerDocument.defaultView) || window;\n  }\n  function getDocumentElement(node) {\n    var _ref;\n    return (_ref = (isNode(node) ? node.ownerDocument : node.document) || window.document) == null ? void 0 : _ref.documentElement;\n  }\n  function isNode(value) {\n    return value instanceof Node || value instanceof getWindow(value).Node;\n  }\n  function isElement(value) {\n    return value instanceof Element || value instanceof getWindow(value).Element;\n  }\n  function isHTMLElement(value) {\n    return value instanceof HTMLElement || value instanceof getWindow(value).HTMLElement;\n  }\n  function isShadowRoot(value) {\n    // Browsers without `ShadowRoot` support.\n    if (typeof ShadowRoot === 'undefined') {\n      return false;\n    }\n    return value instanceof ShadowRoot || value instanceof getWindow(value).ShadowRoot;\n  }\n  function isOverflowElement(element) {\n    var _getComputedStyle = getComputedStyle(element),\n      overflow = _getComputedStyle.overflow,\n      overflowX = _getComputedStyle.overflowX,\n      overflowY = _getComputedStyle.overflowY,\n      display = _getComputedStyle.display;\n    return /auto|scroll|overlay|hidden|clip/.test(overflow + overflowY + overflowX) && !['inline', 'contents'].includes(display);\n  }\n  function isTableElement(element) {\n    return ['table', 'td', 'th'].includes(getNodeName(element));\n  }\n  function isContainingBlock(element) {\n    var webkit = isWebKit();\n    var css = getComputedStyle(element);\n\n    // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block\n    return css.transform !== 'none' || css.perspective !== 'none' || (css.containerType ? css.containerType !== 'normal' : false) || !webkit && (css.backdropFilter ? css.backdropFilter !== 'none' : false) || !webkit && (css.filter ? css.filter !== 'none' : false) || ['transform', 'perspective', 'filter'].some(function (value) {\n      return (css.willChange || '').includes(value);\n    }) || ['paint', 'layout', 'strict', 'content'].some(function (value) {\n      return (css.contain || '').includes(value);\n    });\n  }\n  function getContainingBlock(element) {\n    var currentNode = getParentNode(element);\n    while (isHTMLElement(currentNode) && !isLastTraversableNode(currentNode)) {\n      if (isContainingBlock(currentNode)) {\n        return currentNode;\n      } else {\n        currentNode = getParentNode(currentNode);\n      }\n    }\n    return null;\n  }\n  function isWebKit() {\n    if (typeof CSS === 'undefined' || !CSS.supports) return false;\n    return CSS.supports('-webkit-backdrop-filter', 'none');\n  }\n  function isLastTraversableNode(node) {\n    return ['html', 'body', '#document'].includes(getNodeName(node));\n  }\n  function getComputedStyle(element) {\n    return getWindow(element).getComputedStyle(element);\n  }\n  function getNodeScroll(element) {\n    if (isElement(element)) {\n      return {\n        scrollLeft: element.scrollLeft,\n        scrollTop: element.scrollTop\n      };\n    }\n    return {\n      scrollLeft: element.pageXOffset,\n      scrollTop: element.pageYOffset\n    };\n  }\n  function getParentNode(node) {\n    if (getNodeName(node) === 'html') {\n      return node;\n    }\n    var result =\n    // Step into the shadow DOM of the parent of a slotted node.\n    node.assignedSlot ||\n    // DOM Element detected.\n    node.parentNode ||\n    // ShadowRoot detected.\n    isShadowRoot(node) && node.host ||\n    // Fallback.\n    getDocumentElement(node);\n    return isShadowRoot(result) ? result.host : result;\n  }\n  function getNearestOverflowAncestor(node) {\n    var parentNode = getParentNode(node);\n    if (isLastTraversableNode(parentNode)) {\n      return node.ownerDocument ? node.ownerDocument.body : node.body;\n    }\n    if (isHTMLElement(parentNode) && isOverflowElement(parentNode)) {\n      return parentNode;\n    }\n    return getNearestOverflowAncestor(parentNode);\n  }\n  function getOverflowAncestors(node, list) {\n    var _node$ownerDocument2;\n    if (list === void 0) {\n      list = [];\n    }\n    var scrollableAncestor = getNearestOverflowAncestor(node);\n    var isBody = scrollableAncestor === ((_node$ownerDocument2 = node.ownerDocument) == null ? void 0 : _node$ownerDocument2.body);\n    var win = getWindow(scrollableAncestor);\n    if (isBody) {\n      return list.concat(win, win.visualViewport || [], isOverflowElement(scrollableAncestor) ? scrollableAncestor : []);\n    }\n    return list.concat(scrollableAncestor, getOverflowAncestors(scrollableAncestor));\n  }\n  function getCssDimensions(element) {\n    var css = getComputedStyle(element);\n    // In testing environments, the `width` and `height` properties are empty\n    // strings for SVG elements, returning NaN. Fallback to `0` in this case.\n    var width = parseFloat(css.width) || 0;\n    var height = parseFloat(css.height) || 0;\n    var hasOffset = isHTMLElement(element);\n    var offsetWidth = hasOffset ? element.offsetWidth : width;\n    var offsetHeight = hasOffset ? element.offsetHeight : height;\n    var shouldFallback = round(width) !== offsetWidth || round(height) !== offsetHeight;\n    if (shouldFallback) {\n      width = offsetWidth;\n      height = offsetHeight;\n    }\n    return {\n      width: width,\n      height: height,\n      $: shouldFallback\n    };\n  }\n  function unwrapElement(element) {\n    return !isElement(element) ? element.contextElement : element;\n  }\n  function getScale(element) {\n    var domElement = unwrapElement(element);\n    if (!isHTMLElement(domElement)) {\n      return createCoords(1);\n    }\n    var rect = domElement.getBoundingClientRect();\n    var _getCssDimensions = getCssDimensions(domElement),\n      width = _getCssDimensions.width,\n      height = _getCssDimensions.height,\n      $ = _getCssDimensions.$;\n    var x = ($ ? round(rect.width) : rect.width) / width;\n    var y = ($ ? round(rect.height) : rect.height) / height;\n\n    // 0, NaN, or Infinity should always fallback to 1.\n\n    if (!x || !Number.isFinite(x)) {\n      x = 1;\n    }\n    if (!y || !Number.isFinite(y)) {\n      y = 1;\n    }\n    return {\n      x: x,\n      y: y\n    };\n  }\n  var noOffsets = /*#__PURE__*/createCoords(0);\n  function getVisualOffsets(element) {\n    var win = getWindow(element);\n    if (!isWebKit() || !win.visualViewport) {\n      return noOffsets;\n    }\n    return {\n      x: win.visualViewport.offsetLeft,\n      y: win.visualViewport.offsetTop\n    };\n  }\n  function shouldAddVisualOffsets(element, isFixed, floatingOffsetParent) {\n    if (isFixed === void 0) {\n      isFixed = false;\n    }\n    if (!floatingOffsetParent || isFixed && floatingOffsetParent !== getWindow(element)) {\n      return false;\n    }\n    return isFixed;\n  }\n  function getBoundingClientRect(element, includeScale, isFixedStrategy, offsetParent) {\n    if (includeScale === void 0) {\n      includeScale = false;\n    }\n    if (isFixedStrategy === void 0) {\n      isFixedStrategy = false;\n    }\n    var clientRect = element.getBoundingClientRect();\n    var domElement = unwrapElement(element);\n    var scale = createCoords(1);\n    if (includeScale) {\n      if (offsetParent) {\n        if (isElement(offsetParent)) {\n          scale = getScale(offsetParent);\n        }\n      } else {\n        scale = getScale(element);\n      }\n    }\n    var visualOffsets = shouldAddVisualOffsets(domElement, isFixedStrategy, offsetParent) ? getVisualOffsets(domElement) : createCoords(0);\n    var x = (clientRect.left + visualOffsets.x) / scale.x;\n    var y = (clientRect.top + visualOffsets.y) / scale.y;\n    var width = clientRect.width / scale.x;\n    var height = clientRect.height / scale.y;\n    if (domElement) {\n      var win = getWindow(domElement);\n      var offsetWin = offsetParent && isElement(offsetParent) ? getWindow(offsetParent) : offsetParent;\n      var currentIFrame = win.frameElement;\n      while (currentIFrame && offsetParent && offsetWin !== win) {\n        var iframeScale = getScale(currentIFrame);\n        var iframeRect = currentIFrame.getBoundingClientRect();\n        var css = getComputedStyle(currentIFrame);\n        var left = iframeRect.left + (currentIFrame.clientLeft + parseFloat(css.paddingLeft)) * iframeScale.x;\n        var top = iframeRect.top + (currentIFrame.clientTop + parseFloat(css.paddingTop)) * iframeScale.y;\n        x *= iframeScale.x;\n        y *= iframeScale.y;\n        width *= iframeScale.x;\n        height *= iframeScale.y;\n        x += left;\n        y += top;\n        currentIFrame = getWindow(currentIFrame).frameElement;\n      }\n    }\n    return rectToClientRect({\n      width: width,\n      height: height,\n      x: x,\n      y: y\n    });\n  }\n  function convertOffsetParentRelativeRectToViewportRelativeRect(_ref) {\n    var rect = _ref.rect,\n      offsetParent = _ref.offsetParent,\n      strategy = _ref.strategy;\n    var isOffsetParentAnElement = isHTMLElement(offsetParent);\n    var documentElement = getDocumentElement(offsetParent);\n    if (offsetParent === documentElement) {\n      return rect;\n    }\n    var scroll = {\n      scrollLeft: 0,\n      scrollTop: 0\n    };\n    var scale = createCoords(1);\n    var offsets = createCoords(0);\n    if (isOffsetParentAnElement || !isOffsetParentAnElement && strategy !== 'fixed') {\n      if (getNodeName(offsetParent) !== 'body' || isOverflowElement(documentElement)) {\n        scroll = getNodeScroll(offsetParent);\n      }\n      if (isHTMLElement(offsetParent)) {\n        var offsetRect = getBoundingClientRect(offsetParent);\n        scale = getScale(offsetParent);\n        offsets.x = offsetRect.x + offsetParent.clientLeft;\n        offsets.y = offsetRect.y + offsetParent.clientTop;\n      }\n    }\n    return {\n      width: rect.width * scale.x,\n      height: rect.height * scale.y,\n      x: rect.x * scale.x - scroll.scrollLeft * scale.x + offsets.x,\n      y: rect.y * scale.y - scroll.scrollTop * scale.y + offsets.y\n    };\n  }\n  function getClientRects(element) {\n    return Array.from(element.getClientRects());\n  }\n  function getWindowScrollBarX(element) {\n    // If <html> has a CSS width greater than the viewport, then this will be\n    // incorrect for RTL.\n    return getBoundingClientRect(getDocumentElement(element)).left + getNodeScroll(element).scrollLeft;\n  }\n\n  // Gets the entire size of the scrollable document area, even extending outside\n  // of the `<html>` and `<body>` rect bounds if horizontally scrollable.\n  function getDocumentRect(element) {\n    var html = getDocumentElement(element);\n    var scroll = getNodeScroll(element);\n    var body = element.ownerDocument.body;\n    var width = max(html.scrollWidth, html.clientWidth, body.scrollWidth, body.clientWidth);\n    var height = max(html.scrollHeight, html.clientHeight, body.scrollHeight, body.clientHeight);\n    var x = -scroll.scrollLeft + getWindowScrollBarX(element);\n    var y = -scroll.scrollTop;\n    if (getComputedStyle(body).direction === 'rtl') {\n      x += max(html.clientWidth, body.clientWidth) - width;\n    }\n    return {\n      width: width,\n      height: height,\n      x: x,\n      y: y\n    };\n  }\n  function getViewportRect(element, strategy) {\n    var win = getWindow(element);\n    var html = getDocumentElement(element);\n    var visualViewport = win.visualViewport;\n    var width = html.clientWidth;\n    var height = html.clientHeight;\n    var x = 0;\n    var y = 0;\n    if (visualViewport) {\n      width = visualViewport.width;\n      height = visualViewport.height;\n      var visualViewportBased = isWebKit();\n      if (!visualViewportBased || visualViewportBased && strategy === 'fixed') {\n        x = visualViewport.offsetLeft;\n        y = visualViewport.offsetTop;\n      }\n    }\n    return {\n      width: width,\n      height: height,\n      x: x,\n      y: y\n    };\n  }\n\n  // Returns the inner client rect, subtracting scrollbars if present.\n  function getInnerBoundingClientRect(element, strategy) {\n    var clientRect = getBoundingClientRect(element, true, strategy === 'fixed');\n    var top = clientRect.top + element.clientTop;\n    var left = clientRect.left + element.clientLeft;\n    var scale = isHTMLElement(element) ? getScale(element) : createCoords(1);\n    var width = element.clientWidth * scale.x;\n    var height = element.clientHeight * scale.y;\n    var x = left * scale.x;\n    var y = top * scale.y;\n    return {\n      width: width,\n      height: height,\n      x: x,\n      y: y\n    };\n  }\n  function getClientRectFromClippingAncestor(element, clippingAncestor, strategy) {\n    var rect;\n    if (clippingAncestor === 'viewport') {\n      rect = getViewportRect(element, strategy);\n    } else if (clippingAncestor === 'document') {\n      rect = getDocumentRect(getDocumentElement(element));\n    } else if (isElement(clippingAncestor)) {\n      rect = getInnerBoundingClientRect(clippingAncestor, strategy);\n    } else {\n      var visualOffsets = getVisualOffsets(element);\n      rect = _extends({}, clippingAncestor, {\n        x: clippingAncestor.x - visualOffsets.x,\n        y: clippingAncestor.y - visualOffsets.y\n      });\n    }\n    return rectToClientRect(rect);\n  }\n  function hasFixedPositionAncestor(element, stopNode) {\n    var parentNode = getParentNode(element);\n    if (parentNode === stopNode || !isElement(parentNode) || isLastTraversableNode(parentNode)) {\n      return false;\n    }\n    return getComputedStyle(parentNode).position === 'fixed' || hasFixedPositionAncestor(parentNode, stopNode);\n  }\n\n  // A \"clipping ancestor\" is an `overflow` element with the characteristic of\n  // clipping (or hiding) child elements. This returns all clipping ancestors\n  // of the given element up the tree.\n  function getClippingElementAncestors(element, cache) {\n    var cachedResult = cache.get(element);\n    if (cachedResult) {\n      return cachedResult;\n    }\n    var result = getOverflowAncestors(element).filter(function (el) {\n      return isElement(el) && getNodeName(el) !== 'body';\n    });\n    var currentContainingBlockComputedStyle = null;\n    var elementIsFixed = getComputedStyle(element).position === 'fixed';\n    var currentNode = elementIsFixed ? getParentNode(element) : element;\n\n    // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block\n    while (isElement(currentNode) && !isLastTraversableNode(currentNode)) {\n      var computedStyle = getComputedStyle(currentNode);\n      var currentNodeIsContaining = isContainingBlock(currentNode);\n      if (!currentNodeIsContaining && computedStyle.position === 'fixed') {\n        currentContainingBlockComputedStyle = null;\n      }\n      var shouldDropCurrentNode = elementIsFixed ? !currentNodeIsContaining && !currentContainingBlockComputedStyle : !currentNodeIsContaining && computedStyle.position === 'static' && !!currentContainingBlockComputedStyle && ['absolute', 'fixed'].includes(currentContainingBlockComputedStyle.position) || isOverflowElement(currentNode) && !currentNodeIsContaining && hasFixedPositionAncestor(element, currentNode);\n      if (shouldDropCurrentNode) {\n        // Drop non-containing blocks.\n        result = result.filter(function (ancestor) {\n          return ancestor !== currentNode;\n        });\n      } else {\n        // Record last containing block for next iteration.\n        currentContainingBlockComputedStyle = computedStyle;\n      }\n      currentNode = getParentNode(currentNode);\n    }\n    cache.set(element, result);\n    return result;\n  }\n\n  // Gets the maximum area that the element is visible in due to any number of\n  // clipping ancestors.\n  function getClippingRect(_ref) {\n    var element = _ref.element,\n      boundary = _ref.boundary,\n      rootBoundary = _ref.rootBoundary,\n      strategy = _ref.strategy;\n    var elementClippingAncestors = boundary === 'clippingAncestors' ? getClippingElementAncestors(element, this._c) : [].concat(boundary);\n    var clippingAncestors = [].concat(_toConsumableArray(elementClippingAncestors), [rootBoundary]);\n    var firstClippingAncestor = clippingAncestors[0];\n    var clippingRect = clippingAncestors.reduce(function (accRect, clippingAncestor) {\n      var rect = getClientRectFromClippingAncestor(element, clippingAncestor, strategy);\n      accRect.top = max(rect.top, accRect.top);\n      accRect.right = min(rect.right, accRect.right);\n      accRect.bottom = min(rect.bottom, accRect.bottom);\n      accRect.left = max(rect.left, accRect.left);\n      return accRect;\n    }, getClientRectFromClippingAncestor(element, firstClippingAncestor, strategy));\n    return {\n      width: clippingRect.right - clippingRect.left,\n      height: clippingRect.bottom - clippingRect.top,\n      x: clippingRect.left,\n      y: clippingRect.top\n    };\n  }\n  function getDimensions(element) {\n    return getCssDimensions(element);\n  }\n  function getRectRelativeToOffsetParent(element, offsetParent, strategy) {\n    var isOffsetParentAnElement = isHTMLElement(offsetParent);\n    var documentElement = getDocumentElement(offsetParent);\n    var isFixed = strategy === 'fixed';\n    var rect = getBoundingClientRect(element, true, isFixed, offsetParent);\n    var scroll = {\n      scrollLeft: 0,\n      scrollTop: 0\n    };\n    var offsets = createCoords(0);\n    if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {\n      if (getNodeName(offsetParent) !== 'body' || isOverflowElement(documentElement)) {\n        scroll = getNodeScroll(offsetParent);\n      }\n      if (isOffsetParentAnElement) {\n        var offsetRect = getBoundingClientRect(offsetParent, true, isFixed, offsetParent);\n        offsets.x = offsetRect.x + offsetParent.clientLeft;\n        offsets.y = offsetRect.y + offsetParent.clientTop;\n      } else if (documentElement) {\n        offsets.x = getWindowScrollBarX(documentElement);\n      }\n    }\n    return {\n      x: rect.left + scroll.scrollLeft - offsets.x,\n      y: rect.top + scroll.scrollTop - offsets.y,\n      width: rect.width,\n      height: rect.height\n    };\n  }\n  function getTrueOffsetParent(element, polyfill) {\n    if (!isHTMLElement(element) || getComputedStyle(element).position === 'fixed') {\n      return null;\n    }\n    if (polyfill) {\n      return polyfill(element);\n    }\n    return element.offsetParent;\n  }\n\n  // Gets the closest ancestor positioned element. Handles some edge cases,\n  // such as table ancestors and cross browser bugs.\n  function getOffsetParent(element, polyfill) {\n    var window = getWindow(element);\n    if (!isHTMLElement(element)) {\n      return window;\n    }\n    var offsetParent = getTrueOffsetParent(element, polyfill);\n    while (offsetParent && isTableElement(offsetParent) && getComputedStyle(offsetParent).position === 'static') {\n      offsetParent = getTrueOffsetParent(offsetParent, polyfill);\n    }\n    if (offsetParent && (getNodeName(offsetParent) === 'html' || getNodeName(offsetParent) === 'body' && getComputedStyle(offsetParent).position === 'static' && !isContainingBlock(offsetParent))) {\n      return window;\n    }\n    return offsetParent || getContainingBlock(element) || window;\n  }\n  var getElementRects = /*#__PURE__*/function () {\n    var _getElementRects = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(_ref) {\n      var reference, floating, strategy, getOffsetParentFn, getDimensionsFn;\n      return _regeneratorRuntime().wrap(function _callee5$(_context5) {\n        while (1) switch (_context5.prev = _context5.next) {\n          case 0:\n            reference = _ref.reference, floating = _ref.floating, strategy = _ref.strategy;\n            getOffsetParentFn = this.getOffsetParent || getOffsetParent;\n            getDimensionsFn = this.getDimensions;\n            _context5.t0 = getRectRelativeToOffsetParent;\n            _context5.t1 = reference;\n            _context5.next = 7;\n            return getOffsetParentFn(floating);\n          case 7:\n            _context5.t2 = _context5.sent;\n            _context5.t3 = strategy;\n            _context5.t4 = (0, _context5.t0)(_context5.t1, _context5.t2, _context5.t3);\n            _context5.t5 = _extends;\n            _context5.t6 = {\n              x: 0,\n              y: 0\n            };\n            _context5.next = 14;\n            return getDimensionsFn(floating);\n          case 14:\n            _context5.t7 = _context5.sent;\n            _context5.t8 = (0, _context5.t5)(_context5.t6, _context5.t7);\n            return _context5.abrupt(\"return\", {\n              reference: _context5.t4,\n              floating: _context5.t8\n            });\n          case 17:\n          case \"end\":\n            return _context5.stop();\n        }\n      }, _callee5, this);\n    }));\n    function getElementRects(_x6) {\n      return _getElementRects.apply(this, arguments);\n    }\n    return getElementRects;\n  }();\n  function isRTL(element) {\n    return getComputedStyle(element).direction === 'rtl';\n  }\n  var platform = {\n    convertOffsetParentRelativeRectToViewportRelativeRect: convertOffsetParentRelativeRectToViewportRelativeRect,\n    getDocumentElement: getDocumentElement,\n    getClippingRect: getClippingRect,\n    getOffsetParent: getOffsetParent,\n    getElementRects: getElementRects,\n    getClientRects: getClientRects,\n    getDimensions: getDimensions,\n    getScale: getScale,\n    isElement: isElement,\n    isRTL: isRTL\n  };\n\n  // https://samthor.au/2021/observing-dom/\n  function observeMove(element, onMove) {\n    var io = null;\n    var timeoutId;\n    var root = getDocumentElement(element);\n    function cleanup() {\n      clearTimeout(timeoutId);\n      io && io.disconnect();\n      io = null;\n    }\n    function refresh(skip, threshold) {\n      if (skip === void 0) {\n        skip = false;\n      }\n      if (threshold === void 0) {\n        threshold = 1;\n      }\n      cleanup();\n      var _element$getBoundingC = element.getBoundingClientRect(),\n        left = _element$getBoundingC.left,\n        top = _element$getBoundingC.top,\n        width = _element$getBoundingC.width,\n        height = _element$getBoundingC.height;\n      if (!skip) {\n        onMove();\n      }\n      if (!width || !height) {\n        return;\n      }\n      var insetTop = floor(top);\n      var insetRight = floor(root.clientWidth - (left + width));\n      var insetBottom = floor(root.clientHeight - (top + height));\n      var insetLeft = floor(left);\n      var rootMargin = -insetTop + \"px \" + -insetRight + \"px \" + -insetBottom + \"px \" + -insetLeft + \"px\";\n      var options = {\n        rootMargin: rootMargin,\n        threshold: max(0, min(1, threshold)) || 1\n      };\n      var isFirstUpdate = true;\n      function handleObserve(entries) {\n        var ratio = entries[0].intersectionRatio;\n        if (ratio !== threshold) {\n          if (!isFirstUpdate) {\n            return refresh();\n          }\n          if (!ratio) {\n            timeoutId = setTimeout(function () {\n              refresh(false, 1e-7);\n            }, 100);\n          } else {\n            refresh(false, ratio);\n          }\n        }\n        isFirstUpdate = false;\n      }\n\n      // Older browsers don't support a `document` as the root and will throw an\n      // error.\n      try {\n        io = new IntersectionObserver(handleObserve, _extends({}, options, {\n          // Handle <iframe>s\n          root: root.ownerDocument\n        }));\n      } catch (e) {\n        io = new IntersectionObserver(handleObserve, options);\n      }\n      io.observe(element);\n    }\n    refresh(true);\n    return cleanup;\n  }\n\n  /**\n   * Automatically updates the position of the floating element when necessary.\n   * Should only be called when the floating element is mounted on the DOM or\n   * visible on the screen.\n   * @returns cleanup function that should be invoked when the floating element is\n   * removed from the DOM or hidden from the screen.\n   * @see https://floating-ui.com/docs/autoUpdate\n   */\n  function autoUpdate(reference, floating, update, options) {\n    if (options === void 0) {\n      options = {};\n    }\n    var _options = options,\n      _options$ancestorScro = _options.ancestorScroll,\n      ancestorScroll = _options$ancestorScro === void 0 ? true : _options$ancestorScro,\n      _options$ancestorResi = _options.ancestorResize,\n      ancestorResize = _options$ancestorResi === void 0 ? true : _options$ancestorResi,\n      _options$elementResiz = _options.elementResize,\n      elementResize = _options$elementResiz === void 0 ? typeof ResizeObserver === 'function' : _options$elementResiz,\n      _options$layoutShift = _options.layoutShift,\n      layoutShift = _options$layoutShift === void 0 ? typeof IntersectionObserver === 'function' : _options$layoutShift,\n      _options$animationFra = _options.animationFrame,\n      animationFrame = _options$animationFra === void 0 ? false : _options$animationFra;\n    var referenceEl = unwrapElement(reference);\n    var ancestors = ancestorScroll || ancestorResize ? [].concat(_toConsumableArray(referenceEl ? getOverflowAncestors(referenceEl) : []), _toConsumableArray(getOverflowAncestors(floating))) : [];\n    ancestors.forEach(function (ancestor) {\n      ancestorScroll && ancestor.addEventListener('scroll', update, {\n        passive: true\n      });\n      ancestorResize && ancestor.addEventListener('resize', update);\n    });\n    var cleanupIo = referenceEl && layoutShift ? observeMove(referenceEl, update) : null;\n    var reobserveFrame = -1;\n    var resizeObserver = null;\n    if (elementResize) {\n      resizeObserver = new ResizeObserver(function (_ref) {\n        var _ref7 = _slicedToArray(_ref, 1),\n          firstEntry = _ref7[0];\n        if (firstEntry && firstEntry.target === referenceEl && resizeObserver) {\n          // Prevent update loops when using the `size` middleware.\n          // https://github.com/floating-ui/floating-ui/issues/1740\n          resizeObserver.unobserve(floating);\n          cancelAnimationFrame(reobserveFrame);\n          reobserveFrame = requestAnimationFrame(function () {\n            resizeObserver && resizeObserver.observe(floating);\n          });\n        }\n        update();\n      });\n      if (referenceEl && !animationFrame) {\n        resizeObserver.observe(referenceEl);\n      }\n      resizeObserver.observe(floating);\n    }\n    var frameId;\n    var prevRefRect = animationFrame ? getBoundingClientRect(reference) : null;\n    if (animationFrame) {\n      frameLoop();\n    }\n    function frameLoop() {\n      var nextRefRect = getBoundingClientRect(reference);\n      if (prevRefRect && (nextRefRect.x !== prevRefRect.x || nextRefRect.y !== prevRefRect.y || nextRefRect.width !== prevRefRect.width || nextRefRect.height !== prevRefRect.height)) {\n        update();\n      }\n      prevRefRect = nextRefRect;\n      frameId = requestAnimationFrame(frameLoop);\n    }\n    update();\n    return function () {\n      ancestors.forEach(function (ancestor) {\n        ancestorScroll && ancestor.removeEventListener('scroll', update);\n        ancestorResize && ancestor.removeEventListener('resize', update);\n      });\n      cleanupIo && cleanupIo();\n      resizeObserver && resizeObserver.disconnect();\n      resizeObserver = null;\n      if (animationFrame) {\n        cancelAnimationFrame(frameId);\n      }\n    };\n  }\n\n  /**\n   * Computes the `x` and `y` coordinates that will place the floating element\n   * next to a reference element when it is given a certain CSS positioning\n   * strategy.\n   */\n  var computePosition = function computePosition(reference, floating, options) {\n    // This caches the expensive `getClippingElementAncestors` function so that\n    // multiple lifecycle resets re-use the same result. It only lives for a\n    // single call. If other functions become expensive, we can add them as well.\n    var cache = new Map();\n    var mergedOptions = _extends({\n      platform: platform\n    }, options);\n    var platformWithCache = _extends({}, mergedOptions.platform, {\n      _c: cache\n    });\n    return computePosition$1(reference, floating, _extends({}, mergedOptions, {\n      platform: platformWithCache\n    }));\n  };\n\n  /**\n   * Floating UI Options\n   *\n   * @typedef {object} FloatingUIOptions\n   */\n\n  /**\n   * Determines options for the tooltip and initializes event listeners.\n   *\n   * @param {Step} step The step instance\n   *\n   * @return {FloatingUIOptions}\n   */\n  function setupTooltip(step) {\n    if (step.cleanup) {\n      step.cleanup();\n    }\n    var attachToOptions = step._getResolvedAttachToOptions();\n    var target = attachToOptions.element;\n    var floatingUIOptions = getFloatingUIOptions(attachToOptions, step);\n    var shouldCenter = shouldCenterStep(attachToOptions);\n    if (shouldCenter) {\n      target = document.body;\n      var content = step.shepherdElementComponent.getElement();\n      content.classList.add('shepherd-centered');\n    }\n    step.cleanup = autoUpdate(target, step.el, function () {\n      // The element might have already been removed by the end of the tour.\n      if (!step.el) {\n        step.cleanup();\n        return;\n      }\n      setPosition(target, step, floatingUIOptions, shouldCenter);\n    });\n    step.target = attachToOptions.element;\n    return floatingUIOptions;\n  }\n\n  /**\n   * Merge tooltip options handling nested keys.\n   *\n   * @param tourOptions - The default tour options.\n   * @param options - Step specific options.\n   *\n   * @return {floatingUIOptions: FloatingUIOptions}\n   */\n  function mergeTooltipConfig(tourOptions, options) {\n    return {\n      floatingUIOptions: cjs(tourOptions.floatingUIOptions || {}, options.floatingUIOptions || {})\n    };\n  }\n\n  /**\n   * Cleanup function called when the step is closed/destroyed.\n   *\n   * @param {Step} step\n   */\n  function destroyTooltip(step) {\n    if (step.cleanup) {\n      step.cleanup();\n    }\n    step.cleanup = null;\n  }\n\n  /**\n   *\n   * @return {Promise<*>}\n   */\n  function setPosition(target, step, floatingUIOptions, shouldCenter) {\n    return computePosition(target, step.el, floatingUIOptions).then(floatingUIposition(step, shouldCenter))\n    // Wait before forcing focus.\n    .then(function (step) {\n      return new Promise(function (resolve) {\n        setTimeout(function () {\n          return resolve(step);\n        }, 300);\n      });\n    })\n    // Replaces focusAfterRender modifier.\n    .then(function (step) {\n      if (step && step.el) {\n        step.el.focus({\n          preventScroll: true\n        });\n      }\n    });\n  }\n\n  /**\n   *\n   * @param step\n   * @param shouldCenter\n   * @return {function({x: *, y: *, placement: *, middlewareData: *}): Promise<unknown>}\n   */\n  function floatingUIposition(step, shouldCenter) {\n    return function (_ref8) {\n      var x = _ref8.x,\n        y = _ref8.y,\n        placement = _ref8.placement,\n        middlewareData = _ref8.middlewareData;\n      if (!step.el) {\n        return step;\n      }\n      if (shouldCenter) {\n        Object.assign(step.el.style, {\n          position: 'fixed',\n          left: '50%',\n          top: '50%',\n          transform: 'translate(-50%, -50%)'\n        });\n      } else {\n        Object.assign(step.el.style, {\n          position: 'absolute',\n          left: \"\".concat(x, \"px\"),\n          top: \"\".concat(y, \"px\")\n        });\n      }\n      step.el.dataset.popperPlacement = placement;\n      placeArrow(step.el, middlewareData);\n      return step;\n    };\n  }\n\n  /**\n   *\n   * @param el\n   * @param middlewareData\n   */\n  function placeArrow(el, middlewareData) {\n    var arrowEl = el.querySelector('.shepherd-arrow');\n    if (arrowEl && middlewareData.arrow) {\n      var _middlewareData$arrow = middlewareData.arrow,\n        arrowX = _middlewareData$arrow.x,\n        arrowY = _middlewareData$arrow.y;\n      Object.assign(arrowEl.style, {\n        left: arrowX != null ? \"\".concat(arrowX, \"px\") : '',\n        top: arrowY != null ? \"\".concat(arrowY, \"px\") : ''\n      });\n    }\n  }\n\n  /**\n   * Gets the `Floating UI` options from a set of base `attachTo` options\n   * @param attachToOptions\n   * @param {Step} step The step instance\n   * @return {Object}\n   * @private\n   */\n  function getFloatingUIOptions(attachToOptions, step) {\n    var options = {\n      strategy: 'absolute',\n      middleware: []\n    };\n    var arrowEl = addArrow(step);\n    var shouldCenter = shouldCenterStep(attachToOptions);\n    if (!shouldCenter) {\n      options.middleware.push(flip(),\n      // Replicate PopperJS default behavior.\n      shift({\n        limiter: limitShift(),\n        crossAxis: true\n      }));\n      if (arrowEl) {\n        options.middleware.push(arrow({\n          element: arrowEl\n        }));\n      }\n      options.placement = attachToOptions.on;\n    }\n    return cjs(step.options.floatingUIOptions || {}, options);\n  }\n\n  /**\n   * @param {Step} step\n   * @return {HTMLElement|false|null}\n   */\n  function addArrow(step) {\n    if (step.options.arrow && step.el) {\n      return step.el.querySelector('.shepherd-arrow');\n    }\n    return false;\n  }\n  function noop() {}\n  function assign(tar, src) {\n    // @ts-ignore\n    for (var k in src) tar[k] = src[k];\n    return tar;\n  }\n  function run(fn) {\n    return fn();\n  }\n  function blank_object() {\n    return Object.create(null);\n  }\n  function run_all(fns) {\n    fns.forEach(run);\n  }\n  function is_function(thing) {\n    return typeof thing === 'function';\n  }\n  function safe_not_equal(a, b) {\n    return a != a ? b == b : a !== b || a && _typeof(a) === 'object' || typeof a === 'function';\n  }\n  function is_empty(obj) {\n    return Object.keys(obj).length === 0;\n  }\n  function append(target, node) {\n    target.appendChild(node);\n  }\n  function insert(target, node, anchor) {\n    target.insertBefore(node, anchor || null);\n  }\n  function detach(node) {\n    if (node.parentNode) {\n      node.parentNode.removeChild(node);\n    }\n  }\n  function destroy_each(iterations, detaching) {\n    for (var i = 0; i < iterations.length; i += 1) {\n      if (iterations[i]) iterations[i].d(detaching);\n    }\n  }\n  function element(name) {\n    return document.createElement(name);\n  }\n  function svg_element(name) {\n    return document.createElementNS('http://www.w3.org/2000/svg', name);\n  }\n  function text(data) {\n    return document.createTextNode(data);\n  }\n  function space() {\n    return text(' ');\n  }\n  function empty() {\n    return text('');\n  }\n  function listen(node, event, handler, options) {\n    node.addEventListener(event, handler, options);\n    return function () {\n      return node.removeEventListener(event, handler, options);\n    };\n  }\n  function attr(node, attribute, value) {\n    if (value == null) node.removeAttribute(attribute);else if (node.getAttribute(attribute) !== value) node.setAttribute(attribute, value);\n  }\n  /**\n   * List of attributes that should always be set through the attr method,\n   * because updating them through the property setter doesn't work reliably.\n   * In the example of `width`/`height`, the problem is that the setter only\n   * accepts numeric values, but the attribute can also be set to a string like `50%`.\n   * If this list becomes too big, rethink this approach.\n   */\n  var always_set_through_set_attribute = ['width', 'height'];\n  function set_attributes(node, attributes) {\n    // @ts-ignore\n    var descriptors = Object.getOwnPropertyDescriptors(node.__proto__);\n    for (var key in attributes) {\n      if (attributes[key] == null) {\n        node.removeAttribute(key);\n      } else if (key === 'style') {\n        node.style.cssText = attributes[key];\n      } else if (key === '__value') {\n        node.value = node[key] = attributes[key];\n      } else if (descriptors[key] && descriptors[key].set && always_set_through_set_attribute.indexOf(key) === -1) {\n        node[key] = attributes[key];\n      } else {\n        attr(node, key, attributes[key]);\n      }\n    }\n  }\n  function children(element) {\n    return Array.from(element.childNodes);\n  }\n  function toggle_class(element, name, toggle) {\n    element.classList[toggle ? 'add' : 'remove'](name);\n  }\n  var current_component;\n  function set_current_component(component) {\n    current_component = component;\n  }\n  function get_current_component() {\n    if (!current_component) throw new Error('Function called outside component initialization');\n    return current_component;\n  }\n  /**\n   * The `onMount` function schedules a callback to run as soon as the component has been mounted to the DOM.\n   * It must be called during the component's initialisation (but doesn't need to live *inside* the component;\n   * it can be called from an external module).\n   *\n   * `onMount` does not run inside a [server-side component](/docs#run-time-server-side-component-api).\n   *\n   * https://svelte.dev/docs#run-time-svelte-onmount\n   */\n  function onMount(fn) {\n    get_current_component().$$.on_mount.push(fn);\n  }\n  /**\n   * Schedules a callback to run immediately after the component has been updated.\n   *\n   * The first time the callback runs will be after the initial `onMount`\n   */\n  function afterUpdate(fn) {\n    get_current_component().$$.after_update.push(fn);\n  }\n  var dirty_components = [];\n  var binding_callbacks = [];\n  var render_callbacks = [];\n  var flush_callbacks = [];\n  var resolved_promise = /* @__PURE__ */Promise.resolve();\n  var update_scheduled = false;\n  function schedule_update() {\n    if (!update_scheduled) {\n      update_scheduled = true;\n      resolved_promise.then(flush);\n    }\n  }\n  function add_render_callback(fn) {\n    render_callbacks.push(fn);\n  }\n  // flush() calls callbacks in this order:\n  // 1. All beforeUpdate callbacks, in order: parents before children\n  // 2. All bind:this callbacks, in reverse order: children before parents.\n  // 3. All afterUpdate callbacks, in order: parents before children. EXCEPT\n  //    for afterUpdates called during the initial onMount, which are called in\n  //    reverse order: children before parents.\n  // Since callbacks might update component values, which could trigger another\n  // call to flush(), the following steps guard against this:\n  // 1. During beforeUpdate, any updated components will be added to the\n  //    dirty_components array and will cause a reentrant call to flush(). Because\n  //    the flush index is kept outside the function, the reentrant call will pick\n  //    up where the earlier call left off and go through all dirty components. The\n  //    current_component value is saved and restored so that the reentrant call will\n  //    not interfere with the \"parent\" flush() call.\n  // 2. bind:this callbacks cannot trigger new flush() calls.\n  // 3. During afterUpdate, any updated components will NOT have their afterUpdate\n  //    callback called a second time; the seen_callbacks set, outside the flush()\n  //    function, guarantees this behavior.\n  var seen_callbacks = new Set();\n  var flushidx = 0; // Do *not* move this inside the flush() function\n  function flush() {\n    // Do not reenter flush while dirty components are updated, as this can\n    // result in an infinite loop. Instead, let the inner flush handle it.\n    // Reentrancy is ok afterwards for bindings etc.\n    if (flushidx !== 0) {\n      return;\n    }\n    var saved_component = current_component;\n    do {\n      // first, call beforeUpdate functions\n      // and update components\n      try {\n        while (flushidx < dirty_components.length) {\n          var component = dirty_components[flushidx];\n          flushidx++;\n          set_current_component(component);\n          update(component.$$);\n        }\n      } catch (e) {\n        // reset dirty state to not end up in a deadlocked state and then rethrow\n        dirty_components.length = 0;\n        flushidx = 0;\n        throw e;\n      }\n      set_current_component(null);\n      dirty_components.length = 0;\n      flushidx = 0;\n      while (binding_callbacks.length) binding_callbacks.pop()();\n      // then, once components are updated, call\n      // afterUpdate functions. This may cause\n      // subsequent updates...\n      for (var i = 0; i < render_callbacks.length; i += 1) {\n        var callback = render_callbacks[i];\n        if (!seen_callbacks.has(callback)) {\n          // ...so guard against infinite loops\n          seen_callbacks.add(callback);\n          callback();\n        }\n      }\n      render_callbacks.length = 0;\n    } while (dirty_components.length);\n    while (flush_callbacks.length) {\n      flush_callbacks.pop()();\n    }\n    update_scheduled = false;\n    seen_callbacks.clear();\n    set_current_component(saved_component);\n  }\n  function update($$) {\n    if ($$.fragment !== null) {\n      $$.update();\n      run_all($$.before_update);\n      var dirty = $$.dirty;\n      $$.dirty = [-1];\n      $$.fragment && $$.fragment.p($$.ctx, dirty);\n      $$.after_update.forEach(add_render_callback);\n    }\n  }\n  /**\n   * Useful for example to execute remaining `afterUpdate` callbacks before executing `destroy`.\n   */\n  function flush_render_callbacks(fns) {\n    var filtered = [];\n    var targets = [];\n    render_callbacks.forEach(function (c) {\n      return fns.indexOf(c) === -1 ? filtered.push(c) : targets.push(c);\n    });\n    targets.forEach(function (c) {\n      return c();\n    });\n    render_callbacks = filtered;\n  }\n  var outroing = new Set();\n  var outros;\n  function group_outros() {\n    outros = {\n      r: 0,\n      c: [],\n      p: outros // parent group\n    };\n  }\n  function check_outros() {\n    if (!outros.r) {\n      run_all(outros.c);\n    }\n    outros = outros.p;\n  }\n  function transition_in(block, local) {\n    if (block && block.i) {\n      outroing.delete(block);\n      block.i(local);\n    }\n  }\n  function transition_out(block, local, detach, callback) {\n    if (block && block.o) {\n      if (outroing.has(block)) return;\n      outroing.add(block);\n      outros.c.push(function () {\n        outroing.delete(block);\n        if (callback) {\n          if (detach) block.d(1);\n          callback();\n        }\n      });\n      block.o(local);\n    } else if (callback) {\n      callback();\n    }\n  }\n  function get_spread_update(levels, updates) {\n    var update = {};\n    var to_null_out = {};\n    var accounted_for = {\n      $$scope: 1\n    };\n    var i = levels.length;\n    while (i--) {\n      var o = levels[i];\n      var n = updates[i];\n      if (n) {\n        for (var key in o) {\n          if (!(key in n)) to_null_out[key] = 1;\n        }\n        for (var _key2 in n) {\n          if (!accounted_for[_key2]) {\n            update[_key2] = n[_key2];\n            accounted_for[_key2] = 1;\n          }\n        }\n        levels[i] = n;\n      } else {\n        for (var _key3 in o) {\n          accounted_for[_key3] = 1;\n        }\n      }\n    }\n    for (var _key4 in to_null_out) {\n      if (!(_key4 in update)) update[_key4] = undefined;\n    }\n    return update;\n  }\n  function create_component(block) {\n    block && block.c();\n  }\n  function mount_component(component, target, anchor, customElement) {\n    var _component$$$ = component.$$,\n      fragment = _component$$$.fragment,\n      after_update = _component$$$.after_update;\n    fragment && fragment.m(target, anchor);\n    if (!customElement) {\n      // onMount happens before the initial afterUpdate\n      add_render_callback(function () {\n        var new_on_destroy = component.$$.on_mount.map(run).filter(is_function);\n        // if the component was destroyed immediately\n        // it will update the `$$.on_destroy` reference to `null`.\n        // the destructured on_destroy may still reference to the old array\n        if (component.$$.on_destroy) {\n          var _component$$$$on_dest;\n          (_component$$$$on_dest = component.$$.on_destroy).push.apply(_component$$$$on_dest, _toConsumableArray(new_on_destroy));\n        } else {\n          // Edge case - component was destroyed immediately,\n          // most likely as a result of a binding initialising\n          run_all(new_on_destroy);\n        }\n        component.$$.on_mount = [];\n      });\n    }\n    after_update.forEach(add_render_callback);\n  }\n  function destroy_component(component, detaching) {\n    var $$ = component.$$;\n    if ($$.fragment !== null) {\n      flush_render_callbacks($$.after_update);\n      run_all($$.on_destroy);\n      $$.fragment && $$.fragment.d(detaching);\n      // TODO null out other refs, including component.$$ (but need to\n      // preserve final state?)\n      $$.on_destroy = $$.fragment = null;\n      $$.ctx = [];\n    }\n  }\n  function make_dirty(component, i) {\n    if (component.$$.dirty[0] === -1) {\n      dirty_components.push(component);\n      schedule_update();\n      component.$$.dirty.fill(0);\n    }\n    component.$$.dirty[i / 31 | 0] |= 1 << i % 31;\n  }\n  function init(component, options, instance, create_fragment, not_equal, props, append_styles) {\n    var dirty = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : [-1];\n    var parent_component = current_component;\n    set_current_component(component);\n    var $$ = component.$$ = {\n      fragment: null,\n      ctx: [],\n      // state\n      props: props,\n      update: noop,\n      not_equal: not_equal,\n      bound: blank_object(),\n      // lifecycle\n      on_mount: [],\n      on_destroy: [],\n      on_disconnect: [],\n      before_update: [],\n      after_update: [],\n      context: new Map(options.context || (parent_component ? parent_component.$$.context : [])),\n      // everything else\n      callbacks: blank_object(),\n      dirty: dirty,\n      skip_bound: false,\n      root: options.target || parent_component.$$.root\n    };\n    append_styles && append_styles($$.root);\n    var ready = false;\n    $$.ctx = instance ? instance(component, options.props || {}, function (i, ret) {\n      var value = (arguments.length <= 2 ? 0 : arguments.length - 2) ? arguments.length <= 2 ? undefined : arguments[2] : ret;\n      if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {\n        if (!$$.skip_bound && $$.bound[i]) $$.bound[i](value);\n        if (ready) make_dirty(component, i);\n      }\n      return ret;\n    }) : [];\n    $$.update();\n    ready = true;\n    run_all($$.before_update);\n    // `false` as a special case of no DOM component\n    $$.fragment = create_fragment ? create_fragment($$.ctx) : false;\n    if (options.target) {\n      if (options.hydrate) {\n        var nodes = children(options.target);\n        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion\n        $$.fragment && $$.fragment.l(nodes);\n        nodes.forEach(detach);\n      } else {\n        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion\n        $$.fragment && $$.fragment.c();\n      }\n      if (options.intro) transition_in(component.$$.fragment);\n      mount_component(component, options.target, options.anchor, options.customElement);\n      flush();\n    }\n    set_current_component(parent_component);\n  }\n  /**\n   * Base class for Svelte components. Used when dev=false.\n   */\n  var SvelteComponent = /*#__PURE__*/function () {\n    function SvelteComponent() {\n      _classCallCheck(this, SvelteComponent);\n    }\n    _createClass(SvelteComponent, [{\n      key: \"$destroy\",\n      value: function $destroy() {\n        destroy_component(this, 1);\n        this.$destroy = noop;\n      }\n    }, {\n      key: \"$on\",\n      value: function $on(type, callback) {\n        if (!is_function(callback)) {\n          return noop;\n        }\n        var callbacks = this.$$.callbacks[type] || (this.$$.callbacks[type] = []);\n        callbacks.push(callback);\n        return function () {\n          var index = callbacks.indexOf(callback);\n          if (index !== -1) callbacks.splice(index, 1);\n        };\n      }\n    }, {\n      key: \"$set\",\n      value: function $set($$props) {\n        if (this.$$set && !is_empty($$props)) {\n          this.$$.skip_bound = true;\n          this.$$set($$props);\n          this.$$.skip_bound = false;\n        }\n      }\n    }]);\n    return SvelteComponent;\n  }();\n  /* src/js/components/shepherd-button.svelte generated by Svelte v3.59.2 */\n  function create_fragment$8(ctx) {\n    var button;\n    var button_aria_label_value;\n    var button_class_value;\n    var mounted;\n    var dispose;\n    return {\n      c: function c() {\n        button = element(\"button\");\n        attr(button, \"aria-label\", button_aria_label_value = /*label*/ctx[3] ? /*label*/ctx[3] : null);\n        attr(button, \"class\", button_class_value = \"\".concat( /*classes*/ctx[1] || '', \" shepherd-button \").concat( /*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''));\n        button.disabled = /*disabled*/ctx[2];\n        attr(button, \"tabindex\", \"0\");\n      },\n      m: function m(target, anchor) {\n        insert(target, button, anchor);\n        button.innerHTML = /*text*/ctx[5];\n        if (!mounted) {\n          dispose = listen(button, \"click\", function () {\n            if (is_function( /*action*/ctx[0])) /*action*/ctx[0].apply(this, arguments);\n          });\n          mounted = true;\n        }\n      },\n      p: function p(new_ctx, _ref9) {\n        var _ref10 = _slicedToArray(_ref9, 1),\n          dirty = _ref10[0];\n        ctx = new_ctx;\n        if (dirty & /*text*/32) button.innerHTML = /*text*/ctx[5];\n        if (dirty & /*label*/8 && button_aria_label_value !== (button_aria_label_value = /*label*/ctx[3] ? /*label*/ctx[3] : null)) {\n          attr(button, \"aria-label\", button_aria_label_value);\n        }\n        if (dirty & /*classes, secondary*/18 && button_class_value !== (button_class_value = \"\".concat( /*classes*/ctx[1] || '', \" shepherd-button \").concat( /*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''))) {\n          attr(button, \"class\", button_class_value);\n        }\n        if (dirty & /*disabled*/4) {\n          button.disabled = /*disabled*/ctx[2];\n        }\n      },\n      i: noop,\n      o: noop,\n      d: function d(detaching) {\n        if (detaching) detach(button);\n        mounted = false;\n        dispose();\n      }\n    };\n  }\n  function instance$8($$self, $$props, $$invalidate) {\n    var config = $$props.config,\n      step = $$props.step;\n    var action, classes, disabled, label, secondary, text;\n    function getConfigOption(option) {\n      if (isFunction(option)) {\n        return option = option.call(step);\n      }\n      return option;\n    }\n    $$self.$$set = function ($$props) {\n      if ('config' in $$props) $$invalidate(6, config = $$props.config);\n      if ('step' in $$props) $$invalidate(7, step = $$props.step);\n    };\n    $$self.$$.update = function () {\n      if ($$self.$$.dirty & /*config, step*/192) {\n        {\n          $$invalidate(0, action = config.action ? config.action.bind(step.tour) : null);\n          $$invalidate(1, classes = config.classes);\n          $$invalidate(2, disabled = config.disabled ? getConfigOption(config.disabled) : false);\n          $$invalidate(3, label = config.label ? getConfigOption(config.label) : null);\n          $$invalidate(4, secondary = config.secondary);\n          $$invalidate(5, text = config.text ? getConfigOption(config.text) : null);\n        }\n      }\n    };\n    return [action, classes, disabled, label, secondary, text, config, step];\n  }\n  var Shepherd_button = /*#__PURE__*/function (_SvelteComponent) {\n    _inherits(Shepherd_button, _SvelteComponent);\n    function Shepherd_button(options) {\n      var _this3;\n      _classCallCheck(this, Shepherd_button);\n      _this3 = _callSuper(this, Shepherd_button);\n      init(_assertThisInitialized(_this3), options, instance$8, create_fragment$8, safe_not_equal, {\n        config: 6,\n        step: 7\n      });\n      return _this3;\n    }\n    return _createClass(Shepherd_button);\n  }(SvelteComponent);\n  /* src/js/components/shepherd-footer.svelte generated by Svelte v3.59.2 */\n  function get_each_context(ctx, list, i) {\n    var child_ctx = ctx.slice();\n    child_ctx[2] = list[i];\n    return child_ctx;\n  }\n\n  // (24:4) {#if buttons}\n  function create_if_block$3(ctx) {\n    var each_1_anchor;\n    var current;\n    var each_value = /*buttons*/ctx[1];\n    var each_blocks = [];\n    for (var i = 0; i < each_value.length; i += 1) {\n      each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));\n    }\n    var out = function out(i) {\n      return transition_out(each_blocks[i], 1, 1, function () {\n        each_blocks[i] = null;\n      });\n    };\n    return {\n      c: function c() {\n        for (var _i = 0; _i < each_blocks.length; _i += 1) {\n          each_blocks[_i].c();\n        }\n        each_1_anchor = empty();\n      },\n      m: function m(target, anchor) {\n        for (var _i2 = 0; _i2 < each_blocks.length; _i2 += 1) {\n          if (each_blocks[_i2]) {\n            each_blocks[_i2].m(target, anchor);\n          }\n        }\n        insert(target, each_1_anchor, anchor);\n        current = true;\n      },\n      p: function p(ctx, dirty) {\n        if (dirty & /*buttons, step*/3) {\n          each_value = /*buttons*/ctx[1];\n          var _i3;\n          for (_i3 = 0; _i3 < each_value.length; _i3 += 1) {\n            var child_ctx = get_each_context(ctx, each_value, _i3);\n            if (each_blocks[_i3]) {\n              each_blocks[_i3].p(child_ctx, dirty);\n              transition_in(each_blocks[_i3], 1);\n            } else {\n              each_blocks[_i3] = create_each_block(child_ctx);\n              each_blocks[_i3].c();\n              transition_in(each_blocks[_i3], 1);\n              each_blocks[_i3].m(each_1_anchor.parentNode, each_1_anchor);\n            }\n          }\n          group_outros();\n          for (_i3 = each_value.length; _i3 < each_blocks.length; _i3 += 1) {\n            out(_i3);\n          }\n          check_outros();\n        }\n      },\n      i: function i(local) {\n        if (current) return;\n        for (var _i4 = 0; _i4 < each_value.length; _i4 += 1) {\n          transition_in(each_blocks[_i4]);\n        }\n        current = true;\n      },\n      o: function o(local) {\n        each_blocks = each_blocks.filter(Boolean);\n        for (var _i5 = 0; _i5 < each_blocks.length; _i5 += 1) {\n          transition_out(each_blocks[_i5]);\n        }\n        current = false;\n      },\n      d: function d(detaching) {\n        destroy_each(each_blocks, detaching);\n        if (detaching) detach(each_1_anchor);\n      }\n    };\n  }\n\n  // (25:8) {#each buttons as config}\n  function create_each_block(ctx) {\n    var shepherdbutton;\n    var current;\n    shepherdbutton = new Shepherd_button({\n      props: {\n        config: /*config*/ctx[2],\n        step: /*step*/ctx[0]\n      }\n    });\n    return {\n      c: function c() {\n        create_component(shepherdbutton.$$.fragment);\n      },\n      m: function m(target, anchor) {\n        mount_component(shepherdbutton, target, anchor);\n        current = true;\n      },\n      p: function p(ctx, dirty) {\n        var shepherdbutton_changes = {};\n        if (dirty & /*buttons*/2) shepherdbutton_changes.config = /*config*/ctx[2];\n        if (dirty & /*step*/1) shepherdbutton_changes.step = /*step*/ctx[0];\n        shepherdbutton.$set(shepherdbutton_changes);\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(shepherdbutton.$$.fragment, local);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(shepherdbutton.$$.fragment, local);\n        current = false;\n      },\n      d: function d(detaching) {\n        destroy_component(shepherdbutton, detaching);\n      }\n    };\n  }\n  function create_fragment$7(ctx) {\n    var footer;\n    var current;\n    var if_block = /*buttons*/ctx[1] && create_if_block$3(ctx);\n    return {\n      c: function c() {\n        footer = element(\"footer\");\n        if (if_block) if_block.c();\n        attr(footer, \"class\", \"shepherd-footer\");\n      },\n      m: function m(target, anchor) {\n        insert(target, footer, anchor);\n        if (if_block) if_block.m(footer, null);\n        current = true;\n      },\n      p: function p(ctx, _ref11) {\n        var _ref12 = _slicedToArray(_ref11, 1),\n          dirty = _ref12[0];\n        if ( /*buttons*/ctx[1]) {\n          if (if_block) {\n            if_block.p(ctx, dirty);\n            if (dirty & /*buttons*/2) {\n              transition_in(if_block, 1);\n            }\n          } else {\n            if_block = create_if_block$3(ctx);\n            if_block.c();\n            transition_in(if_block, 1);\n            if_block.m(footer, null);\n          }\n        } else if (if_block) {\n          group_outros();\n          transition_out(if_block, 1, 1, function () {\n            if_block = null;\n          });\n          check_outros();\n        }\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(if_block);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(if_block);\n        current = false;\n      },\n      d: function d(detaching) {\n        if (detaching) detach(footer);\n        if (if_block) if_block.d();\n      }\n    };\n  }\n  function instance$7($$self, $$props, $$invalidate) {\n    var buttons;\n    var step = $$props.step;\n    $$self.$$set = function ($$props) {\n      if ('step' in $$props) $$invalidate(0, step = $$props.step);\n    };\n    $$self.$$.update = function () {\n      if ($$self.$$.dirty & /*step*/1) {\n        $$invalidate(1, buttons = step.options.buttons);\n      }\n    };\n    return [step, buttons];\n  }\n  var Shepherd_footer = /*#__PURE__*/function (_SvelteComponent2) {\n    _inherits(Shepherd_footer, _SvelteComponent2);\n    function Shepherd_footer(options) {\n      var _this4;\n      _classCallCheck(this, Shepherd_footer);\n      _this4 = _callSuper(this, Shepherd_footer);\n      init(_assertThisInitialized(_this4), options, instance$7, create_fragment$7, safe_not_equal, {\n        step: 0\n      });\n      return _this4;\n    }\n    return _createClass(Shepherd_footer);\n  }(SvelteComponent);\n  /* src/js/components/shepherd-cancel-icon.svelte generated by Svelte v3.59.2 */\n  function create_fragment$6(ctx) {\n    var button;\n    var span;\n    var button_aria_label_value;\n    var mounted;\n    var dispose;\n    return {\n      c: function c() {\n        button = element(\"button\");\n        span = element(\"span\");\n        span.textContent = \"×\";\n        attr(span, \"aria-hidden\", \"true\");\n        attr(button, \"aria-label\", button_aria_label_value = /*cancelIcon*/ctx[0].label ? /*cancelIcon*/ctx[0].label : 'Close Tour');\n        attr(button, \"class\", \"shepherd-cancel-icon\");\n        attr(button, \"type\", \"button\");\n      },\n      m: function m(target, anchor) {\n        insert(target, button, anchor);\n        append(button, span);\n        if (!mounted) {\n          dispose = listen(button, \"click\", /*handleCancelClick*/ctx[1]);\n          mounted = true;\n        }\n      },\n      p: function p(ctx, _ref13) {\n        var _ref14 = _slicedToArray(_ref13, 1),\n          dirty = _ref14[0];\n        if (dirty & /*cancelIcon*/1 && button_aria_label_value !== (button_aria_label_value = /*cancelIcon*/ctx[0].label ? /*cancelIcon*/ctx[0].label : 'Close Tour')) {\n          attr(button, \"aria-label\", button_aria_label_value);\n        }\n      },\n      i: noop,\n      o: noop,\n      d: function d(detaching) {\n        if (detaching) detach(button);\n        mounted = false;\n        dispose();\n      }\n    };\n  }\n  function instance$6($$self, $$props, $$invalidate) {\n    var cancelIcon = $$props.cancelIcon,\n      step = $$props.step;\n\n    /**\n    * Add a click listener to the cancel link that cancels the tour\n    */\n    var handleCancelClick = function handleCancelClick(e) {\n      e.preventDefault();\n      step.cancel();\n    };\n    $$self.$$set = function ($$props) {\n      if ('cancelIcon' in $$props) $$invalidate(0, cancelIcon = $$props.cancelIcon);\n      if ('step' in $$props) $$invalidate(2, step = $$props.step);\n    };\n    return [cancelIcon, handleCancelClick, step];\n  }\n  var Shepherd_cancel_icon = /*#__PURE__*/function (_SvelteComponent3) {\n    _inherits(Shepherd_cancel_icon, _SvelteComponent3);\n    function Shepherd_cancel_icon(options) {\n      var _this5;\n      _classCallCheck(this, Shepherd_cancel_icon);\n      _this5 = _callSuper(this, Shepherd_cancel_icon);\n      init(_assertThisInitialized(_this5), options, instance$6, create_fragment$6, safe_not_equal, {\n        cancelIcon: 0,\n        step: 2\n      });\n      return _this5;\n    }\n    return _createClass(Shepherd_cancel_icon);\n  }(SvelteComponent);\n  /* src/js/components/shepherd-title.svelte generated by Svelte v3.59.2 */\n  function create_fragment$5(ctx) {\n    var h3;\n    return {\n      c: function c() {\n        h3 = element(\"h3\");\n        attr(h3, \"id\", /*labelId*/ctx[1]);\n        attr(h3, \"class\", \"shepherd-title\");\n      },\n      m: function m(target, anchor) {\n        insert(target, h3, anchor);\n        /*h3_binding*/\n        ctx[3](h3);\n      },\n      p: function p(ctx, _ref15) {\n        var _ref16 = _slicedToArray(_ref15, 1),\n          dirty = _ref16[0];\n        if (dirty & /*labelId*/2) {\n          attr(h3, \"id\", /*labelId*/ctx[1]);\n        }\n      },\n      i: noop,\n      o: noop,\n      d: function d(detaching) {\n        if (detaching) detach(h3);\n        /*h3_binding*/\n        ctx[3](null);\n      }\n    };\n  }\n  function instance$5($$self, $$props, $$invalidate) {\n    var labelId = $$props.labelId,\n      element = $$props.element,\n      title = $$props.title;\n    afterUpdate(function () {\n      if (isFunction(title)) {\n        $$invalidate(2, title = title());\n      }\n      $$invalidate(0, element.innerHTML = title, element);\n    });\n    function h3_binding($$value) {\n      binding_callbacks[$$value ? 'unshift' : 'push'](function () {\n        element = $$value;\n        $$invalidate(0, element);\n      });\n    }\n    $$self.$$set = function ($$props) {\n      if ('labelId' in $$props) $$invalidate(1, labelId = $$props.labelId);\n      if ('element' in $$props) $$invalidate(0, element = $$props.element);\n      if ('title' in $$props) $$invalidate(2, title = $$props.title);\n    };\n    return [element, labelId, title, h3_binding];\n  }\n  var Shepherd_title = /*#__PURE__*/function (_SvelteComponent4) {\n    _inherits(Shepherd_title, _SvelteComponent4);\n    function Shepherd_title(options) {\n      var _this6;\n      _classCallCheck(this, Shepherd_title);\n      _this6 = _callSuper(this, Shepherd_title);\n      init(_assertThisInitialized(_this6), options, instance$5, create_fragment$5, safe_not_equal, {\n        labelId: 1,\n        element: 0,\n        title: 2\n      });\n      return _this6;\n    }\n    return _createClass(Shepherd_title);\n  }(SvelteComponent);\n  /* src/js/components/shepherd-header.svelte generated by Svelte v3.59.2 */\n  function create_if_block_1$1(ctx) {\n    var shepherdtitle;\n    var current;\n    shepherdtitle = new Shepherd_title({\n      props: {\n        labelId: /*labelId*/ctx[0],\n        title: /*title*/ctx[2]\n      }\n    });\n    return {\n      c: function c() {\n        create_component(shepherdtitle.$$.fragment);\n      },\n      m: function m(target, anchor) {\n        mount_component(shepherdtitle, target, anchor);\n        current = true;\n      },\n      p: function p(ctx, dirty) {\n        var shepherdtitle_changes = {};\n        if (dirty & /*labelId*/1) shepherdtitle_changes.labelId = /*labelId*/ctx[0];\n        if (dirty & /*title*/4) shepherdtitle_changes.title = /*title*/ctx[2];\n        shepherdtitle.$set(shepherdtitle_changes);\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(shepherdtitle.$$.fragment, local);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(shepherdtitle.$$.fragment, local);\n        current = false;\n      },\n      d: function d(detaching) {\n        destroy_component(shepherdtitle, detaching);\n      }\n    };\n  }\n\n  // (39:4) {#if cancelIcon && cancelIcon.enabled}\n  function create_if_block$2(ctx) {\n    var shepherdcancelicon;\n    var current;\n    shepherdcancelicon = new Shepherd_cancel_icon({\n      props: {\n        cancelIcon: /*cancelIcon*/ctx[3],\n        step: /*step*/ctx[1]\n      }\n    });\n    return {\n      c: function c() {\n        create_component(shepherdcancelicon.$$.fragment);\n      },\n      m: function m(target, anchor) {\n        mount_component(shepherdcancelicon, target, anchor);\n        current = true;\n      },\n      p: function p(ctx, dirty) {\n        var shepherdcancelicon_changes = {};\n        if (dirty & /*cancelIcon*/8) shepherdcancelicon_changes.cancelIcon = /*cancelIcon*/ctx[3];\n        if (dirty & /*step*/2) shepherdcancelicon_changes.step = /*step*/ctx[1];\n        shepherdcancelicon.$set(shepherdcancelicon_changes);\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(shepherdcancelicon.$$.fragment, local);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(shepherdcancelicon.$$.fragment, local);\n        current = false;\n      },\n      d: function d(detaching) {\n        destroy_component(shepherdcancelicon, detaching);\n      }\n    };\n  }\n  function create_fragment$4(ctx) {\n    var header;\n    var t;\n    var current;\n    var if_block0 = /*title*/ctx[2] && create_if_block_1$1(ctx);\n    var if_block1 = /*cancelIcon*/ctx[3] && /*cancelIcon*/ctx[3].enabled && create_if_block$2(ctx);\n    return {\n      c: function c() {\n        header = element(\"header\");\n        if (if_block0) if_block0.c();\n        t = space();\n        if (if_block1) if_block1.c();\n        attr(header, \"class\", \"shepherd-header\");\n      },\n      m: function m(target, anchor) {\n        insert(target, header, anchor);\n        if (if_block0) if_block0.m(header, null);\n        append(header, t);\n        if (if_block1) if_block1.m(header, null);\n        current = true;\n      },\n      p: function p(ctx, _ref17) {\n        var _ref18 = _slicedToArray(_ref17, 1),\n          dirty = _ref18[0];\n        if ( /*title*/ctx[2]) {\n          if (if_block0) {\n            if_block0.p(ctx, dirty);\n            if (dirty & /*title*/4) {\n              transition_in(if_block0, 1);\n            }\n          } else {\n            if_block0 = create_if_block_1$1(ctx);\n            if_block0.c();\n            transition_in(if_block0, 1);\n            if_block0.m(header, t);\n          }\n        } else if (if_block0) {\n          group_outros();\n          transition_out(if_block0, 1, 1, function () {\n            if_block0 = null;\n          });\n          check_outros();\n        }\n        if ( /*cancelIcon*/ctx[3] && /*cancelIcon*/ctx[3].enabled) {\n          if (if_block1) {\n            if_block1.p(ctx, dirty);\n            if (dirty & /*cancelIcon*/8) {\n              transition_in(if_block1, 1);\n            }\n          } else {\n            if_block1 = create_if_block$2(ctx);\n            if_block1.c();\n            transition_in(if_block1, 1);\n            if_block1.m(header, null);\n          }\n        } else if (if_block1) {\n          group_outros();\n          transition_out(if_block1, 1, 1, function () {\n            if_block1 = null;\n          });\n          check_outros();\n        }\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(if_block0);\n        transition_in(if_block1);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(if_block0);\n        transition_out(if_block1);\n        current = false;\n      },\n      d: function d(detaching) {\n        if (detaching) detach(header);\n        if (if_block0) if_block0.d();\n        if (if_block1) if_block1.d();\n      }\n    };\n  }\n  function instance$4($$self, $$props, $$invalidate) {\n    var labelId = $$props.labelId,\n      step = $$props.step;\n    var title, cancelIcon;\n    $$self.$$set = function ($$props) {\n      if ('labelId' in $$props) $$invalidate(0, labelId = $$props.labelId);\n      if ('step' in $$props) $$invalidate(1, step = $$props.step);\n    };\n    $$self.$$.update = function () {\n      if ($$self.$$.dirty & /*step*/2) {\n        {\n          $$invalidate(2, title = step.options.title);\n          $$invalidate(3, cancelIcon = step.options.cancelIcon);\n        }\n      }\n    };\n    return [labelId, step, title, cancelIcon];\n  }\n  var Shepherd_header = /*#__PURE__*/function (_SvelteComponent5) {\n    _inherits(Shepherd_header, _SvelteComponent5);\n    function Shepherd_header(options) {\n      var _this7;\n      _classCallCheck(this, Shepherd_header);\n      _this7 = _callSuper(this, Shepherd_header);\n      init(_assertThisInitialized(_this7), options, instance$4, create_fragment$4, safe_not_equal, {\n        labelId: 0,\n        step: 1\n      });\n      return _this7;\n    }\n    return _createClass(Shepherd_header);\n  }(SvelteComponent);\n  /* src/js/components/shepherd-text.svelte generated by Svelte v3.59.2 */\n  function create_fragment$3(ctx) {\n    var div;\n    return {\n      c: function c() {\n        div = element(\"div\");\n        attr(div, \"class\", \"shepherd-text\");\n        attr(div, \"id\", /*descriptionId*/ctx[1]);\n      },\n      m: function m(target, anchor) {\n        insert(target, div, anchor);\n        /*div_binding*/\n        ctx[3](div);\n      },\n      p: function p(ctx, _ref19) {\n        var _ref20 = _slicedToArray(_ref19, 1),\n          dirty = _ref20[0];\n        if (dirty & /*descriptionId*/2) {\n          attr(div, \"id\", /*descriptionId*/ctx[1]);\n        }\n      },\n      i: noop,\n      o: noop,\n      d: function d(detaching) {\n        if (detaching) detach(div);\n        /*div_binding*/\n        ctx[3](null);\n      }\n    };\n  }\n  function instance$3($$self, $$props, $$invalidate) {\n    var descriptionId = $$props.descriptionId,\n      element = $$props.element,\n      step = $$props.step;\n    afterUpdate(function () {\n      var text = step.options.text;\n      if (isFunction(text)) {\n        text = text.call(step);\n      }\n      if (isHTMLElement$1(text)) {\n        element.appendChild(text);\n      } else {\n        $$invalidate(0, element.innerHTML = text, element);\n      }\n    });\n    function div_binding($$value) {\n      binding_callbacks[$$value ? 'unshift' : 'push'](function () {\n        element = $$value;\n        $$invalidate(0, element);\n      });\n    }\n    $$self.$$set = function ($$props) {\n      if ('descriptionId' in $$props) $$invalidate(1, descriptionId = $$props.descriptionId);\n      if ('element' in $$props) $$invalidate(0, element = $$props.element);\n      if ('step' in $$props) $$invalidate(2, step = $$props.step);\n    };\n    return [element, descriptionId, step, div_binding];\n  }\n  var Shepherd_text = /*#__PURE__*/function (_SvelteComponent6) {\n    _inherits(Shepherd_text, _SvelteComponent6);\n    function Shepherd_text(options) {\n      var _this8;\n      _classCallCheck(this, Shepherd_text);\n      _this8 = _callSuper(this, Shepherd_text);\n      init(_assertThisInitialized(_this8), options, instance$3, create_fragment$3, safe_not_equal, {\n        descriptionId: 1,\n        element: 0,\n        step: 2\n      });\n      return _this8;\n    }\n    return _createClass(Shepherd_text);\n  }(SvelteComponent);\n  /* src/js/components/shepherd-content.svelte generated by Svelte v3.59.2 */\n  function create_if_block_2(ctx) {\n    var shepherdheader;\n    var current;\n    shepherdheader = new Shepherd_header({\n      props: {\n        labelId: /*labelId*/ctx[1],\n        step: /*step*/ctx[2]\n      }\n    });\n    return {\n      c: function c() {\n        create_component(shepherdheader.$$.fragment);\n      },\n      m: function m(target, anchor) {\n        mount_component(shepherdheader, target, anchor);\n        current = true;\n      },\n      p: function p(ctx, dirty) {\n        var shepherdheader_changes = {};\n        if (dirty & /*labelId*/2) shepherdheader_changes.labelId = /*labelId*/ctx[1];\n        if (dirty & /*step*/4) shepherdheader_changes.step = /*step*/ctx[2];\n        shepherdheader.$set(shepherdheader_changes);\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(shepherdheader.$$.fragment, local);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(shepherdheader.$$.fragment, local);\n        current = false;\n      },\n      d: function d(detaching) {\n        destroy_component(shepherdheader, detaching);\n      }\n    };\n  }\n\n  // (28:2) {#if !isUndefined(step.options.text)}\n  function create_if_block_1(ctx) {\n    var shepherdtext;\n    var current;\n    shepherdtext = new Shepherd_text({\n      props: {\n        descriptionId: /*descriptionId*/ctx[0],\n        step: /*step*/ctx[2]\n      }\n    });\n    return {\n      c: function c() {\n        create_component(shepherdtext.$$.fragment);\n      },\n      m: function m(target, anchor) {\n        mount_component(shepherdtext, target, anchor);\n        current = true;\n      },\n      p: function p(ctx, dirty) {\n        var shepherdtext_changes = {};\n        if (dirty & /*descriptionId*/1) shepherdtext_changes.descriptionId = /*descriptionId*/ctx[0];\n        if (dirty & /*step*/4) shepherdtext_changes.step = /*step*/ctx[2];\n        shepherdtext.$set(shepherdtext_changes);\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(shepherdtext.$$.fragment, local);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(shepherdtext.$$.fragment, local);\n        current = false;\n      },\n      d: function d(detaching) {\n        destroy_component(shepherdtext, detaching);\n      }\n    };\n  }\n\n  // (35:2) {#if Array.isArray(step.options.buttons) && step.options.buttons.length}\n  function create_if_block$1(ctx) {\n    var shepherdfooter;\n    var current;\n    shepherdfooter = new Shepherd_footer({\n      props: {\n        step: /*step*/ctx[2]\n      }\n    });\n    return {\n      c: function c() {\n        create_component(shepherdfooter.$$.fragment);\n      },\n      m: function m(target, anchor) {\n        mount_component(shepherdfooter, target, anchor);\n        current = true;\n      },\n      p: function p(ctx, dirty) {\n        var shepherdfooter_changes = {};\n        if (dirty & /*step*/4) shepherdfooter_changes.step = /*step*/ctx[2];\n        shepherdfooter.$set(shepherdfooter_changes);\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(shepherdfooter.$$.fragment, local);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(shepherdfooter.$$.fragment, local);\n        current = false;\n      },\n      d: function d(detaching) {\n        destroy_component(shepherdfooter, detaching);\n      }\n    };\n  }\n  function create_fragment$2(ctx) {\n    var div;\n    var show_if_2 = !isUndefined( /*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;\n    var t0;\n    var show_if_1 = !isUndefined( /*step*/ctx[2].options.text);\n    var t1;\n    var show_if = Array.isArray( /*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;\n    var current;\n    var if_block0 = show_if_2 && create_if_block_2(ctx);\n    var if_block1 = show_if_1 && create_if_block_1(ctx);\n    var if_block2 = show_if && create_if_block$1(ctx);\n    return {\n      c: function c() {\n        div = element(\"div\");\n        if (if_block0) if_block0.c();\n        t0 = space();\n        if (if_block1) if_block1.c();\n        t1 = space();\n        if (if_block2) if_block2.c();\n        attr(div, \"class\", \"shepherd-content\");\n      },\n      m: function m(target, anchor) {\n        insert(target, div, anchor);\n        if (if_block0) if_block0.m(div, null);\n        append(div, t0);\n        if (if_block1) if_block1.m(div, null);\n        append(div, t1);\n        if (if_block2) if_block2.m(div, null);\n        current = true;\n      },\n      p: function p(ctx, _ref21) {\n        var _ref22 = _slicedToArray(_ref21, 1),\n          dirty = _ref22[0];\n        if (dirty & /*step*/4) show_if_2 = !isUndefined( /*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;\n        if (show_if_2) {\n          if (if_block0) {\n            if_block0.p(ctx, dirty);\n            if (dirty & /*step*/4) {\n              transition_in(if_block0, 1);\n            }\n          } else {\n            if_block0 = create_if_block_2(ctx);\n            if_block0.c();\n            transition_in(if_block0, 1);\n            if_block0.m(div, t0);\n          }\n        } else if (if_block0) {\n          group_outros();\n          transition_out(if_block0, 1, 1, function () {\n            if_block0 = null;\n          });\n          check_outros();\n        }\n        if (dirty & /*step*/4) show_if_1 = !isUndefined( /*step*/ctx[2].options.text);\n        if (show_if_1) {\n          if (if_block1) {\n            if_block1.p(ctx, dirty);\n            if (dirty & /*step*/4) {\n              transition_in(if_block1, 1);\n            }\n          } else {\n            if_block1 = create_if_block_1(ctx);\n            if_block1.c();\n            transition_in(if_block1, 1);\n            if_block1.m(div, t1);\n          }\n        } else if (if_block1) {\n          group_outros();\n          transition_out(if_block1, 1, 1, function () {\n            if_block1 = null;\n          });\n          check_outros();\n        }\n        if (dirty & /*step*/4) show_if = Array.isArray( /*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;\n        if (show_if) {\n          if (if_block2) {\n            if_block2.p(ctx, dirty);\n            if (dirty & /*step*/4) {\n              transition_in(if_block2, 1);\n            }\n          } else {\n            if_block2 = create_if_block$1(ctx);\n            if_block2.c();\n            transition_in(if_block2, 1);\n            if_block2.m(div, null);\n          }\n        } else if (if_block2) {\n          group_outros();\n          transition_out(if_block2, 1, 1, function () {\n            if_block2 = null;\n          });\n          check_outros();\n        }\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(if_block0);\n        transition_in(if_block1);\n        transition_in(if_block2);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(if_block0);\n        transition_out(if_block1);\n        transition_out(if_block2);\n        current = false;\n      },\n      d: function d(detaching) {\n        if (detaching) detach(div);\n        if (if_block0) if_block0.d();\n        if (if_block1) if_block1.d();\n        if (if_block2) if_block2.d();\n      }\n    };\n  }\n  function instance$2($$self, $$props, $$invalidate) {\n    var descriptionId = $$props.descriptionId,\n      labelId = $$props.labelId,\n      step = $$props.step;\n    $$self.$$set = function ($$props) {\n      if ('descriptionId' in $$props) $$invalidate(0, descriptionId = $$props.descriptionId);\n      if ('labelId' in $$props) $$invalidate(1, labelId = $$props.labelId);\n      if ('step' in $$props) $$invalidate(2, step = $$props.step);\n    };\n    return [descriptionId, labelId, step];\n  }\n  var Shepherd_content = /*#__PURE__*/function (_SvelteComponent7) {\n    _inherits(Shepherd_content, _SvelteComponent7);\n    function Shepherd_content(options) {\n      var _this9;\n      _classCallCheck(this, Shepherd_content);\n      _this9 = _callSuper(this, Shepherd_content);\n      init(_assertThisInitialized(_this9), options, instance$2, create_fragment$2, safe_not_equal, {\n        descriptionId: 0,\n        labelId: 1,\n        step: 2\n      });\n      return _this9;\n    }\n    return _createClass(Shepherd_content);\n  }(SvelteComponent);\n  /* src/js/components/shepherd-element.svelte generated by Svelte v3.59.2 */\n  function create_if_block(ctx) {\n    var div;\n    return {\n      c: function c() {\n        div = element(\"div\");\n        attr(div, \"class\", \"shepherd-arrow\");\n        attr(div, \"data-popper-arrow\", \"\");\n      },\n      m: function m(target, anchor) {\n        insert(target, div, anchor);\n      },\n      d: function d(detaching) {\n        if (detaching) detach(div);\n      }\n    };\n  }\n  function create_fragment$1(ctx) {\n    var div;\n    var t;\n    var shepherdcontent;\n    var div_aria_describedby_value;\n    var div_aria_labelledby_value;\n    var current;\n    var mounted;\n    var dispose;\n    var if_block = /*step*/ctx[4].options.arrow && /*step*/ctx[4].options.attachTo && /*step*/ctx[4].options.attachTo.element && /*step*/ctx[4].options.attachTo.on && create_if_block();\n    shepherdcontent = new Shepherd_content({\n      props: {\n        descriptionId: /*descriptionId*/ctx[2],\n        labelId: /*labelId*/ctx[3],\n        step: /*step*/ctx[4]\n      }\n    });\n    var div_levels = [{\n      \"aria-describedby\": div_aria_describedby_value = !isUndefined( /*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null\n    }, {\n      \"aria-labelledby\": div_aria_labelledby_value = /*step*/ctx[4].options.title ? /*labelId*/ctx[3] : null\n    }, /*dataStepId*/ctx[1], {\n      role: \"dialog\"\n    }, {\n      tabindex: \"0\"\n    }];\n    var div_data = {};\n    for (var i = 0; i < div_levels.length; i += 1) {\n      div_data = assign(div_data, div_levels[i]);\n    }\n    return {\n      c: function c() {\n        div = element(\"div\");\n        if (if_block) if_block.c();\n        t = space();\n        create_component(shepherdcontent.$$.fragment);\n        set_attributes(div, div_data);\n        toggle_class(div, \"shepherd-has-cancel-icon\", /*hasCancelIcon*/ctx[5]);\n        toggle_class(div, \"shepherd-has-title\", /*hasTitle*/ctx[6]);\n        toggle_class(div, \"shepherd-element\", true);\n      },\n      m: function m(target, anchor) {\n        insert(target, div, anchor);\n        if (if_block) if_block.m(div, null);\n        append(div, t);\n        mount_component(shepherdcontent, div, null);\n        /*div_binding*/\n        ctx[13](div);\n        current = true;\n        if (!mounted) {\n          dispose = listen(div, \"keydown\", /*handleKeyDown*/ctx[7]);\n          mounted = true;\n        }\n      },\n      p: function p(ctx, _ref23) {\n        var _ref24 = _slicedToArray(_ref23, 1),\n          dirty = _ref24[0];\n        if ( /*step*/ctx[4].options.arrow && /*step*/ctx[4].options.attachTo && /*step*/ctx[4].options.attachTo.element && /*step*/ctx[4].options.attachTo.on) {\n          if (if_block) ;else {\n            if_block = create_if_block();\n            if_block.c();\n            if_block.m(div, t);\n          }\n        } else if (if_block) {\n          if_block.d(1);\n          if_block = null;\n        }\n        var shepherdcontent_changes = {};\n        if (dirty & /*descriptionId*/4) shepherdcontent_changes.descriptionId = /*descriptionId*/ctx[2];\n        if (dirty & /*labelId*/8) shepherdcontent_changes.labelId = /*labelId*/ctx[3];\n        if (dirty & /*step*/16) shepherdcontent_changes.step = /*step*/ctx[4];\n        shepherdcontent.$set(shepherdcontent_changes);\n        set_attributes(div, div_data = get_spread_update(div_levels, [(!current || dirty & /*step, descriptionId*/20 && div_aria_describedby_value !== (div_aria_describedby_value = !isUndefined( /*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null)) && {\n          \"aria-describedby\": div_aria_describedby_value\n        }, (!current || dirty & /*step, labelId*/24 && div_aria_labelledby_value !== (div_aria_labelledby_value = /*step*/ctx[4].options.title ? /*labelId*/ctx[3] : null)) && {\n          \"aria-labelledby\": div_aria_labelledby_value\n        }, dirty & /*dataStepId*/2 && /*dataStepId*/ctx[1], {\n          role: \"dialog\"\n        }, {\n          tabindex: \"0\"\n        }]));\n        toggle_class(div, \"shepherd-has-cancel-icon\", /*hasCancelIcon*/ctx[5]);\n        toggle_class(div, \"shepherd-has-title\", /*hasTitle*/ctx[6]);\n        toggle_class(div, \"shepherd-element\", true);\n      },\n      i: function i(local) {\n        if (current) return;\n        transition_in(shepherdcontent.$$.fragment, local);\n        current = true;\n      },\n      o: function o(local) {\n        transition_out(shepherdcontent.$$.fragment, local);\n        current = false;\n      },\n      d: function d(detaching) {\n        if (detaching) detach(div);\n        if (if_block) if_block.d();\n        destroy_component(shepherdcontent);\n        /*div_binding*/\n        ctx[13](null);\n        mounted = false;\n        dispose();\n      }\n    };\n  }\n  var KEY_TAB = 9;\n  var KEY_ESC = 27;\n  var LEFT_ARROW = 37;\n  var RIGHT_ARROW = 39;\n  function getClassesArray(classes) {\n    return classes.split(' ').filter(function (className) {\n      return !!className.length;\n    });\n  }\n  function instance$1($$self, $$props, $$invalidate) {\n    var classPrefix = $$props.classPrefix,\n      element = $$props.element,\n      descriptionId = $$props.descriptionId,\n      firstFocusableElement = $$props.firstFocusableElement,\n      focusableElements = $$props.focusableElements,\n      labelId = $$props.labelId,\n      lastFocusableElement = $$props.lastFocusableElement,\n      step = $$props.step,\n      dataStepId = $$props.dataStepId;\n    var hasCancelIcon, hasTitle, classes;\n    var getElement = function getElement() {\n      return element;\n    };\n    onMount(function () {\n      // Get all elements that are focusable\n      $$invalidate(1, dataStepId = _defineProperty({}, \"data-\".concat(classPrefix, \"shepherd-step-id\"), step.id));\n      $$invalidate(9, focusableElements = element.querySelectorAll('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex=\"0\"]'));\n      $$invalidate(8, firstFocusableElement = focusableElements[0]);\n      $$invalidate(10, lastFocusableElement = focusableElements[focusableElements.length - 1]);\n    });\n    afterUpdate(function () {\n      if (classes !== step.options.classes) {\n        updateDynamicClasses();\n      }\n    });\n    function updateDynamicClasses() {\n      removeClasses(classes);\n      classes = step.options.classes;\n      addClasses(classes);\n    }\n    function removeClasses(classes) {\n      if (isString(classes)) {\n        var oldClasses = getClassesArray(classes);\n        if (oldClasses.length) {\n          var _element$classList;\n          (_element$classList = element.classList).remove.apply(_element$classList, _toConsumableArray(oldClasses));\n        }\n      }\n    }\n    function addClasses(classes) {\n      if (isString(classes)) {\n        var newClasses = getClassesArray(classes);\n        if (newClasses.length) {\n          var _element$classList2;\n          (_element$classList2 = element.classList).add.apply(_element$classList2, _toConsumableArray(newClasses));\n        }\n      }\n    }\n\n    /**\n    * Setup keydown events to allow closing the modal with ESC\n    *\n    * Borrowed from this great post! https://bitsofco.de/accessible-modal-dialog/\n    *\n    * @private\n    */\n    var handleKeyDown = function handleKeyDown(e) {\n      var _step = step,\n        tour = _step.tour;\n      switch (e.keyCode) {\n        case KEY_TAB:\n          if (focusableElements.length === 0) {\n            e.preventDefault();\n            break;\n          }\n          // Backward tab\n          if (e.shiftKey) {\n            if (document.activeElement === firstFocusableElement || document.activeElement.classList.contains('shepherd-element')) {\n              e.preventDefault();\n              lastFocusableElement.focus();\n            }\n          } else {\n            if (document.activeElement === lastFocusableElement) {\n              e.preventDefault();\n              firstFocusableElement.focus();\n            }\n          }\n          break;\n        case KEY_ESC:\n          if (tour.options.exitOnEsc) {\n            e.stopPropagation();\n            step.cancel();\n          }\n          break;\n        case LEFT_ARROW:\n          if (tour.options.keyboardNavigation) {\n            e.stopPropagation();\n            tour.back();\n          }\n          break;\n        case RIGHT_ARROW:\n          if (tour.options.keyboardNavigation) {\n            e.stopPropagation();\n            tour.next();\n          }\n          break;\n      }\n    };\n    function div_binding($$value) {\n      binding_callbacks[$$value ? 'unshift' : 'push'](function () {\n        element = $$value;\n        $$invalidate(0, element);\n      });\n    }\n    $$self.$$set = function ($$props) {\n      if ('classPrefix' in $$props) $$invalidate(11, classPrefix = $$props.classPrefix);\n      if ('element' in $$props) $$invalidate(0, element = $$props.element);\n      if ('descriptionId' in $$props) $$invalidate(2, descriptionId = $$props.descriptionId);\n      if ('firstFocusableElement' in $$props) $$invalidate(8, firstFocusableElement = $$props.firstFocusableElement);\n      if ('focusableElements' in $$props) $$invalidate(9, focusableElements = $$props.focusableElements);\n      if ('labelId' in $$props) $$invalidate(3, labelId = $$props.labelId);\n      if ('lastFocusableElement' in $$props) $$invalidate(10, lastFocusableElement = $$props.lastFocusableElement);\n      if ('step' in $$props) $$invalidate(4, step = $$props.step);\n      if ('dataStepId' in $$props) $$invalidate(1, dataStepId = $$props.dataStepId);\n    };\n    $$self.$$.update = function () {\n      if ($$self.$$.dirty & /*step*/16) {\n        {\n          $$invalidate(5, hasCancelIcon = step.options && step.options.cancelIcon && step.options.cancelIcon.enabled);\n          $$invalidate(6, hasTitle = step.options && step.options.title);\n        }\n      }\n    };\n    return [element, dataStepId, descriptionId, labelId, step, hasCancelIcon, hasTitle, handleKeyDown, firstFocusableElement, focusableElements, lastFocusableElement, classPrefix, getElement, div_binding];\n  }\n  var Shepherd_element = /*#__PURE__*/function (_SvelteComponent8) {\n    _inherits(Shepherd_element, _SvelteComponent8);\n    function Shepherd_element(options) {\n      var _this10;\n      _classCallCheck(this, Shepherd_element);\n      _this10 = _callSuper(this, Shepherd_element);\n      init(_assertThisInitialized(_this10), options, instance$1, create_fragment$1, safe_not_equal, {\n        classPrefix: 11,\n        element: 0,\n        descriptionId: 2,\n        firstFocusableElement: 8,\n        focusableElements: 9,\n        labelId: 3,\n        lastFocusableElement: 10,\n        step: 4,\n        dataStepId: 1,\n        getElement: 12\n      });\n      return _this10;\n    }\n    _createClass(Shepherd_element, [{\n      key: \"getElement\",\n      get: function get() {\n        return this.$$.ctx[12];\n      }\n    }]);\n    return Shepherd_element;\n  }(SvelteComponent);\n  /**\n   * A class representing steps to be added to a tour.\n   * @extends {Evented}\n   */\n  var Step = /*#__PURE__*/function (_Evented) {\n    _inherits(Step, _Evented);\n    /**\n     * Create a step\n     * @param {Tour} tour The tour for the step\n     * @param {object} options The options for the step\n     * @param {boolean} options.arrow Whether to display the arrow for the tooltip or not. Defaults to `true`.\n     * @param {object} options.attachTo The element the step should be attached to on the page.\n     * An object with properties `element` and `on`.\n     *\n     * ```js\n     * const step = new Step(tour, {\n     *   attachTo: { element: '.some .selector-path', on: 'left' },\n     *   ...moreOptions\n     * });\n     * ```\n     *\n     * If you don’t specify an `attachTo` the element will appear in the middle of the screen. The same will happen if your `attachTo.element` callback returns `null`, `undefined`, or a selector that does not exist in the DOM.\n     * If you omit the `on` portion of `attachTo`, the element will still be highlighted, but the tooltip will appear\n     * in the middle of the screen, without an arrow pointing to the target.\n     * If the element to highlight does not yet exist while instantiating tour steps, you may use lazy evaluation by supplying a function to `attachTo.element`. The function will be called in the `before-show` phase.\n     * @param {string|HTMLElement|function} options.attachTo.element An element selector string, DOM element, or a function (returning a selector, a DOM element, `null` or `undefined`).\n     * @param {string} options.attachTo.on The optional direction to place the FloatingUI tooltip relative to the element.\n     *   - Possible string values: 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'right', 'right-start', 'right-end', 'left', 'left-start', 'left-end'\n     * @param {Object} options.advanceOn An action on the page which should advance shepherd to the next step.\n     * It should be an object with a string `selector` and an `event` name\n     * ```js\n     * const step = new Step(tour, {\n     *   advanceOn: { selector: '.some .selector-path', event: 'click' },\n     *   ...moreOptions\n     * });\n     * ```\n     * `event` doesn’t have to be an event inside the tour, it can be any event fired on any element on the page.\n     * You can also always manually advance the Tour by calling `myTour.next()`.\n     * @param {function} options.beforeShowPromise A function that returns a promise.\n     * When the promise resolves, the rest of the `show` code for the step will execute.\n     * @param {Object[]} options.buttons An array of buttons to add to the step. These will be rendered in a\n     * footer below the main body text.\n     * @param {function} options.buttons.button.action A function executed when the button is clicked on.\n     * It is automatically bound to the `tour` the step is associated with, so things like `this.next` will\n     * work inside the action.\n     * You can use action to skip steps or navigate to specific steps, with something like:\n     * ```js\n     * action() {\n     *   return this.show('some_step_name');\n     * }\n     * ```\n     * @param {string} options.buttons.button.classes Extra classes to apply to the `<a>`\n     * @param {boolean} options.buttons.button.disabled Should the button be disabled?\n     * @param {string} options.buttons.button.label The aria-label text of the button\n     * @param {boolean} options.buttons.button.secondary If true, a shepherd-button-secondary class is applied to the button\n     * @param {string} options.buttons.button.text The HTML text of the button\n     * @param {boolean} options.canClickTarget A boolean, that when set to false, will set `pointer-events: none` on the target\n     * @param {object} options.cancelIcon Options for the cancel icon\n     * @param {boolean} options.cancelIcon.enabled Should a cancel “✕” be shown in the header of the step?\n     * @param {string} options.cancelIcon.label The label to add for `aria-label`\n     * @param {string} options.classes A string of extra classes to add to the step's content element.\n     * @param {string} options.highlightClass An extra class to apply to the `attachTo` element when it is\n     * highlighted (that is, when its step is active). You can then target that selector in your CSS.\n     * @param {string} options.id The string to use as the `id` for the step.\n     * @param {number} options.modalOverlayOpeningPadding An amount of padding to add around the modal overlay opening\n     * @param {number | { topLeft: number, bottomLeft: number, bottomRight: number, topRight: number }} options.modalOverlayOpeningRadius An amount of border radius to add around the modal overlay opening\n     * @param {object} options.floatingUIOptions Extra options to pass to FloatingUI\n     * @param {boolean|Object} options.scrollTo Should the element be scrolled to when this step is shown? If true, uses the default `scrollIntoView`,\n     * if an object, passes that object as the params to `scrollIntoView` i.e. `{behavior: 'smooth', block: 'center'}`\n     * @param {function} options.scrollToHandler A function that lets you override the default scrollTo behavior and\n     * define a custom action to do the scrolling, and possibly other logic.\n     * @param {function} options.showOn A function that, when it returns `true`, will show the step.\n     * If it returns false, the step will be skipped.\n     * @param {string} options.text The text in the body of the step. It can be one of three types:\n     * ```\n     * - HTML string\n     * - `HTMLElement` object\n     * - `Function` to be executed when the step is built. It must return one the two options above.\n     * ```\n     * @param {string} options.title The step's title. It becomes an `h3` at the top of the step. It can be one of two types:\n     * ```\n     * - HTML string\n     * - `Function` to be executed when the step is built. It must return HTML string.\n     * ```\n     * @param {object} options.when You can define `show`, `hide`, etc events inside `when`. For example:\n     * ```js\n     * when: {\n     *   show: function() {\n     *     window.scrollTo(0, 0);\n     *   }\n     * }\n     * ```\n     * @return {Step} The newly created Step instance\n     */\n    function Step(tour) {\n      var _this11;\n      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};\n      _classCallCheck(this, Step);\n      _this11 = _callSuper(this, Step, [tour, options]);\n      _this11.tour = tour;\n      _this11.classPrefix = _this11.tour.options ? normalizePrefix(_this11.tour.options.classPrefix) : '';\n      _this11.styles = tour.styles;\n\n      /**\n       * Resolved attachTo options. Due to lazy evaluation, we only resolve the options during `before-show` phase.\n       * Do not use this directly, use the _getResolvedAttachToOptions method instead.\n       * @type {null|{}|{element, to}}\n       * @private\n       */\n      _this11._resolvedAttachTo = null;\n      autoBind(_assertThisInitialized(_this11));\n      _this11._setOptions(options);\n      return _possibleConstructorReturn(_this11, _assertThisInitialized(_this11));\n    }\n\n    /**\n     * Cancel the tour\n     * Triggers the `cancel` event\n     */\n    _createClass(Step, [{\n      key: \"cancel\",\n      value: function cancel() {\n        this.tour.cancel();\n        this.trigger('cancel');\n      }\n\n      /**\n       * Complete the tour\n       * Triggers the `complete` event\n       */\n    }, {\n      key: \"complete\",\n      value: function complete() {\n        this.tour.complete();\n        this.trigger('complete');\n      }\n\n      /**\n       * Remove the step, delete the step's element, and destroy the FloatingUI instance for the step.\n       * Triggers `destroy` event\n       */\n    }, {\n      key: \"destroy\",\n      value: function destroy() {\n        destroyTooltip(this);\n        if (isHTMLElement$1(this.el)) {\n          this.el.remove();\n          this.el = null;\n        }\n        this._updateStepTargetOnHide();\n        this.trigger('destroy');\n      }\n\n      /**\n       * Returns the tour for the step\n       * @return {Tour} The tour instance\n       */\n    }, {\n      key: \"getTour\",\n      value: function getTour() {\n        return this.tour;\n      }\n\n      /**\n       * Hide the step\n       */\n    }, {\n      key: \"hide\",\n      value: function hide() {\n        this.tour.modal.hide();\n        this.trigger('before-hide');\n        if (this.el) {\n          this.el.hidden = true;\n        }\n        this._updateStepTargetOnHide();\n        this.trigger('hide');\n      }\n\n      /**\n       * Resolves attachTo options.\n       * @returns {{}|{element, on}}\n       * @private\n       */\n    }, {\n      key: \"_resolveAttachToOptions\",\n      value: function _resolveAttachToOptions() {\n        this._resolvedAttachTo = parseAttachTo(this);\n        return this._resolvedAttachTo;\n      }\n\n      /**\n       * A selector for resolved attachTo options.\n       * @returns {{}|{element, on}}\n       * @private\n       */\n    }, {\n      key: \"_getResolvedAttachToOptions\",\n      value: function _getResolvedAttachToOptions() {\n        if (this._resolvedAttachTo === null) {\n          return this._resolveAttachToOptions();\n        }\n        return this._resolvedAttachTo;\n      }\n\n      /**\n       * Check if the step is open and visible\n       * @return {boolean} True if the step is open and visible\n       */\n    }, {\n      key: \"isOpen\",\n      value: function isOpen() {\n        return Boolean(this.el && !this.el.hidden);\n      }\n\n      /**\n       * Wraps `_show` and ensures `beforeShowPromise` resolves before calling show\n       * @return {*|Promise}\n       */\n    }, {\n      key: \"show\",\n      value: function show() {\n        var _this12 = this;\n        if (isFunction(this.options.beforeShowPromise)) {\n          return Promise.resolve(this.options.beforeShowPromise()).then(function () {\n            return _this12._show();\n          });\n        }\n        return Promise.resolve(this._show());\n      }\n\n      /**\n       * Updates the options of the step.\n       *\n       * @param {Object} options The options for the step\n       */\n    }, {\n      key: \"updateStepOptions\",\n      value: function updateStepOptions(options) {\n        Object.assign(this.options, options);\n        if (this.shepherdElementComponent) {\n          this.shepherdElementComponent.$set({\n            step: this\n          });\n        }\n      }\n\n      /**\n       * Returns the element for the step\n       * @return {HTMLElement|null|undefined} The element instance. undefined if it has never been shown, null if it has been destroyed\n       */\n    }, {\n      key: \"getElement\",\n      value: function getElement() {\n        return this.el;\n      }\n\n      /**\n       * Returns the target for the step\n       * @return {HTMLElement|null|undefined} The element instance. undefined if it has never been shown, null if query string has not been found\n       */\n    }, {\n      key: \"getTarget\",\n      value: function getTarget() {\n        return this.target;\n      }\n\n      /**\n       * Creates Shepherd element for step based on options\n       *\n       * @return {Element} The DOM element for the step tooltip\n       * @private\n       */\n    }, {\n      key: \"_createTooltipContent\",\n      value: function _createTooltipContent() {\n        var descriptionId = \"\".concat(this.id, \"-description\");\n        var labelId = \"\".concat(this.id, \"-label\");\n        this.shepherdElementComponent = new Shepherd_element({\n          target: this.tour.options.stepsContainer || document.body,\n          props: {\n            classPrefix: this.classPrefix,\n            descriptionId: descriptionId,\n            labelId: labelId,\n            step: this,\n            styles: this.styles\n          }\n        });\n        return this.shepherdElementComponent.getElement();\n      }\n\n      /**\n       * If a custom scrollToHandler is defined, call that, otherwise do the generic\n       * scrollIntoView call.\n       *\n       * @param {boolean|Object} scrollToOptions If true, uses the default `scrollIntoView`,\n       * if an object, passes that object as the params to `scrollIntoView` i.e. `{ behavior: 'smooth', block: 'center' }`\n       * @private\n       */\n    }, {\n      key: \"_scrollTo\",\n      value: function _scrollTo(scrollToOptions) {\n        var _this$_getResolvedAtt = this._getResolvedAttachToOptions(),\n          element = _this$_getResolvedAtt.element;\n        if (isFunction(this.options.scrollToHandler)) {\n          this.options.scrollToHandler(element);\n        } else if (isElement$1(element) && typeof element.scrollIntoView === 'function') {\n          element.scrollIntoView(scrollToOptions);\n        }\n      }\n\n      /**\n       * _getClassOptions gets all possible classes for the step\n       * @param {Object} stepOptions The step specific options\n       * @returns {String} unique string from array of classes\n       * @private\n       */\n    }, {\n      key: \"_getClassOptions\",\n      value: function _getClassOptions(stepOptions) {\n        var defaultStepOptions = this.tour && this.tour.options && this.tour.options.defaultStepOptions;\n        var stepClasses = stepOptions.classes ? stepOptions.classes : '';\n        var defaultStepOptionsClasses = defaultStepOptions && defaultStepOptions.classes ? defaultStepOptions.classes : '';\n        var allClasses = [].concat(_toConsumableArray(stepClasses.split(' ')), _toConsumableArray(defaultStepOptionsClasses.split(' ')));\n        var uniqClasses = new Set(allClasses);\n        return Array.from(uniqClasses).join(' ').trim();\n      }\n\n      /**\n       * Sets the options for the step, maps `when` to events, sets up buttons\n       * @param {Object} options The options for the step\n       * @private\n       */\n    }, {\n      key: \"_setOptions\",\n      value: function _setOptions() {\n        var _this13 = this;\n        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n        var tourOptions = this.tour && this.tour.options && this.tour.options.defaultStepOptions;\n        tourOptions = cjs({}, tourOptions || {});\n        this.options = Object.assign({\n          arrow: true\n        }, tourOptions, options, mergeTooltipConfig(tourOptions, options));\n        var when = this.options.when;\n        this.options.classes = this._getClassOptions(options);\n        this.destroy();\n        this.id = this.options.id || \"step-\".concat(uuid());\n        if (when) {\n          Object.keys(when).forEach(function (event) {\n            _this13.on(event, when[event], _this13);\n          });\n        }\n      }\n\n      /**\n       * Create the element and set up the FloatingUI instance\n       * @private\n       */\n    }, {\n      key: \"_setupElements\",\n      value: function _setupElements() {\n        if (!isUndefined(this.el)) {\n          this.destroy();\n        }\n        this.el = this._createTooltipContent();\n        if (this.options.advanceOn) {\n          bindAdvance(this);\n        }\n\n        // The tooltip implementation details are handled outside of the Step\n        // object.\n        setupTooltip(this);\n      }\n\n      /**\n       * Triggers `before-show`, generates the tooltip DOM content,\n       * sets up a FloatingUI instance for the tooltip, then triggers `show`.\n       * @private\n       */\n    }, {\n      key: \"_show\",\n      value: function _show() {\n        var _this14 = this;\n        this.trigger('before-show');\n\n        // Force resolve to make sure the options are updated on subsequent shows.\n        this._resolveAttachToOptions();\n        this._setupElements();\n        if (!this.tour.modal) {\n          this.tour._setupModal();\n        }\n        this.tour.modal.setupForStep(this);\n        this._styleTargetElementForStep(this);\n        this.el.hidden = false;\n\n        // start scrolling to target before showing the step\n        if (this.options.scrollTo) {\n          setTimeout(function () {\n            _this14._scrollTo(_this14.options.scrollTo);\n          });\n        }\n        this.el.hidden = false;\n        var content = this.shepherdElementComponent.getElement();\n        var target = this.target || document.body;\n        target.classList.add(\"\".concat(this.classPrefix, \"shepherd-enabled\"));\n        target.classList.add(\"\".concat(this.classPrefix, \"shepherd-target\"));\n        content.classList.add('shepherd-enabled');\n        this.trigger('show');\n      }\n\n      /**\n       * Modulates the styles of the passed step's target element, based on the step's options and\n       * the tour's `modal` option, to visually emphasize the element\n       *\n       * @param step The step object that attaches to the element\n       * @private\n       */\n    }, {\n      key: \"_styleTargetElementForStep\",\n      value: function _styleTargetElementForStep(step) {\n        var targetElement = step.target;\n        if (!targetElement) {\n          return;\n        }\n        if (step.options.highlightClass) {\n          targetElement.classList.add(step.options.highlightClass);\n        }\n        targetElement.classList.remove('shepherd-target-click-disabled');\n        if (step.options.canClickTarget === false) {\n          targetElement.classList.add('shepherd-target-click-disabled');\n        }\n      }\n\n      /**\n       * When a step is hidden, remove the highlightClass and 'shepherd-enabled'\n       * and 'shepherd-target' classes\n       * @private\n       */\n    }, {\n      key: \"_updateStepTargetOnHide\",\n      value: function _updateStepTargetOnHide() {\n        var target = this.target || document.body;\n        if (this.options.highlightClass) {\n          target.classList.remove(this.options.highlightClass);\n        }\n        target.classList.remove('shepherd-target-click-disabled', \"\".concat(this.classPrefix, \"shepherd-enabled\"), \"\".concat(this.classPrefix, \"shepherd-target\"));\n      }\n    }]);\n    return Step;\n  }(Evented);\n  /**\n   * Cleanup the steps and set pointerEvents back to 'auto'\n   * @param tour The tour object\n   */\n  function cleanupSteps(tour) {\n    if (tour) {\n      var steps = tour.steps;\n      steps.forEach(function (step) {\n        if (step.options && step.options.canClickTarget === false && step.options.attachTo) {\n          if (step.target instanceof HTMLElement) {\n            step.target.classList.remove('shepherd-target-click-disabled');\n          }\n        }\n      });\n    }\n  }\n\n  /**\n   * Generates the svg path data for a rounded rectangle overlay\n   * @param {Object} dimension - Dimensions of rectangle.\n   * @param {number} width - Width.\n   * @param {number} height - Height.\n   * @param {number} [x=0] - Offset from top left corner in x axis. default 0.\n   * @param {number} [y=0] - Offset from top left corner in y axis. default 0.\n   * @param {number | { topLeft: number, topRight: number, bottomRight: number, bottomLeft: number }} [r=0] - Corner Radius. Keep this smaller than half of width or height.\n   * @returns {string} - Rounded rectangle overlay path data.\n   */\n  function makeOverlayPath(_ref25) {\n    var width = _ref25.width,\n      height = _ref25.height,\n      _ref25$x = _ref25.x,\n      x = _ref25$x === void 0 ? 0 : _ref25$x,\n      _ref25$y = _ref25.y,\n      y = _ref25$y === void 0 ? 0 : _ref25$y,\n      _ref25$r = _ref25.r,\n      r = _ref25$r === void 0 ? 0 : _ref25$r;\n    var _window = window,\n      w = _window.innerWidth,\n      h = _window.innerHeight;\n    var _ref26 = typeof r === 'number' ? {\n        topLeft: r,\n        topRight: r,\n        bottomRight: r,\n        bottomLeft: r\n      } : r,\n      _ref26$topLeft = _ref26.topLeft,\n      topLeft = _ref26$topLeft === void 0 ? 0 : _ref26$topLeft,\n      _ref26$topRight = _ref26.topRight,\n      topRight = _ref26$topRight === void 0 ? 0 : _ref26$topRight,\n      _ref26$bottomRight = _ref26.bottomRight,\n      bottomRight = _ref26$bottomRight === void 0 ? 0 : _ref26$bottomRight,\n      _ref26$bottomLeft = _ref26.bottomLeft,\n      bottomLeft = _ref26$bottomLeft === void 0 ? 0 : _ref26$bottomLeft;\n    return \"M\".concat(w, \",\").concat(h, \"H0V0H\").concat(w, \"V\").concat(h, \"ZM\").concat(x + topLeft, \",\").concat(y, \"a\").concat(topLeft, \",\").concat(topLeft, \",0,0,0-\").concat(topLeft, \",\").concat(topLeft, \"V\").concat(height + y - bottomLeft, \"a\").concat(bottomLeft, \",\").concat(bottomLeft, \",0,0,0,\").concat(bottomLeft, \",\").concat(bottomLeft, \"H\").concat(width + x - bottomRight, \"a\").concat(bottomRight, \",\").concat(bottomRight, \",0,0,0,\").concat(bottomRight, \"-\").concat(bottomRight, \"V\").concat(y + topRight, \"a\").concat(topRight, \",\").concat(topRight, \",0,0,0-\").concat(topRight, \"-\").concat(topRight, \"Z\");\n  }\n\n  /* src/js/components/shepherd-modal.svelte generated by Svelte v3.59.2 */\n  function create_fragment(ctx) {\n    var svg;\n    var path;\n    var svg_class_value;\n    var mounted;\n    var dispose;\n    return {\n      c: function c() {\n        svg = svg_element(\"svg\");\n        path = svg_element(\"path\");\n        attr(path, \"d\", /*pathDefinition*/ctx[2]);\n        attr(svg, \"class\", svg_class_value = \"\".concat( /*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : '', \" shepherd-modal-overlay-container\"));\n      },\n      m: function m(target, anchor) {\n        insert(target, svg, anchor);\n        append(svg, path);\n        /*svg_binding*/\n        ctx[11](svg);\n        if (!mounted) {\n          dispose = listen(svg, \"touchmove\", /*_preventModalOverlayTouch*/ctx[3]);\n          mounted = true;\n        }\n      },\n      p: function p(ctx, _ref27) {\n        var _ref28 = _slicedToArray(_ref27, 1),\n          dirty = _ref28[0];\n        if (dirty & /*pathDefinition*/4) {\n          attr(path, \"d\", /*pathDefinition*/ctx[2]);\n        }\n        if (dirty & /*modalIsVisible*/2 && svg_class_value !== (svg_class_value = \"\".concat( /*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : '', \" shepherd-modal-overlay-container\"))) {\n          attr(svg, \"class\", svg_class_value);\n        }\n      },\n      i: noop,\n      o: noop,\n      d: function d(detaching) {\n        if (detaching) detach(svg);\n        /*svg_binding*/\n        ctx[11](null);\n        mounted = false;\n        dispose();\n      }\n    };\n  }\n  function _getScrollParent(element) {\n    if (!element) {\n      return null;\n    }\n    var isHtmlElement = element instanceof HTMLElement;\n    var overflowY = isHtmlElement && window.getComputedStyle(element).overflowY;\n    var isScrollable = overflowY !== 'hidden' && overflowY !== 'visible';\n    if (isScrollable && element.scrollHeight >= element.clientHeight) {\n      return element;\n    }\n    return _getScrollParent(element.parentElement);\n  }\n\n  /**\n   * Get the visible height of the target element relative to its scrollParent.\n   * If there is no scroll parent, the height of the element is returned.\n   *\n   * @param {HTMLElement} element The target element\n   * @param {HTMLElement} [scrollParent] The scrollable parent element\n   * @returns {{y: number, height: number}}\n   * @private\n   */\n  function _getVisibleHeight(element, scrollParent) {\n    var elementRect = element.getBoundingClientRect();\n    var top = elementRect.y || elementRect.top;\n    var bottom = elementRect.bottom || top + elementRect.height;\n    if (scrollParent) {\n      var scrollRect = scrollParent.getBoundingClientRect();\n      var scrollTop = scrollRect.y || scrollRect.top;\n      var scrollBottom = scrollRect.bottom || scrollTop + scrollRect.height;\n      top = Math.max(top, scrollTop);\n      bottom = Math.min(bottom, scrollBottom);\n    }\n    var height = Math.max(bottom - top, 0); // Default to 0 if height is negative\n    return {\n      y: top,\n      height: height\n    };\n  }\n  function instance($$self, $$props, $$invalidate) {\n    var element = $$props.element,\n      openingProperties = $$props.openingProperties;\n    uuid();\n    var modalIsVisible = false;\n    var rafId = undefined;\n    var pathDefinition;\n    closeModalOpening();\n    var getElement = function getElement() {\n      return element;\n    };\n    function closeModalOpening() {\n      $$invalidate(4, openingProperties = {\n        width: 0,\n        height: 0,\n        x: 0,\n        y: 0,\n        r: 0\n      });\n    }\n    function hide() {\n      $$invalidate(1, modalIsVisible = false);\n\n      // Ensure we cleanup all event listeners when we hide the modal\n      _cleanupStepEventListeners();\n    }\n    function positionModal() {\n      var modalOverlayOpeningPadding = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;\n      var modalOverlayOpeningRadius = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;\n      var scrollParent = arguments.length > 2 ? arguments[2] : undefined;\n      var targetElement = arguments.length > 3 ? arguments[3] : undefined;\n      if (targetElement) {\n        var _getVisibleHeight2 = _getVisibleHeight(targetElement, scrollParent),\n          y = _getVisibleHeight2.y,\n          height = _getVisibleHeight2.height;\n        var _targetElement$getBou = targetElement.getBoundingClientRect(),\n          x = _targetElement$getBou.x,\n          width = _targetElement$getBou.width,\n          left = _targetElement$getBou.left;\n\n        // getBoundingClientRect is not consistent. Some browsers use x and y, while others use left and top\n        $$invalidate(4, openingProperties = {\n          width: width + modalOverlayOpeningPadding * 2,\n          height: height + modalOverlayOpeningPadding * 2,\n          x: (x || left) - modalOverlayOpeningPadding,\n          y: y - modalOverlayOpeningPadding,\n          r: modalOverlayOpeningRadius\n        });\n      } else {\n        closeModalOpening();\n      }\n    }\n    function setupForStep(step) {\n      // Ensure we move listeners from the previous step, before we setup new ones\n      _cleanupStepEventListeners();\n      if (step.tour.options.useModalOverlay) {\n        _styleForStep(step);\n        show();\n      } else {\n        hide();\n      }\n    }\n    function show() {\n      $$invalidate(1, modalIsVisible = true);\n    }\n    var _preventModalBodyTouch = function _preventModalBodyTouch(e) {\n      e.preventDefault();\n    };\n    var _preventModalOverlayTouch = function _preventModalOverlayTouch(e) {\n      e.stopPropagation();\n    };\n\n    /**\n    * Add touchmove event listener\n    * @private\n    */\n    function _addStepEventListeners() {\n      // Prevents window from moving on touch.\n      window.addEventListener('touchmove', _preventModalBodyTouch, {\n        passive: false\n      });\n    }\n\n    /**\n    * Cancel the requestAnimationFrame loop and remove touchmove event listeners\n    * @private\n    */\n    function _cleanupStepEventListeners() {\n      if (rafId) {\n        cancelAnimationFrame(rafId);\n        rafId = undefined;\n      }\n      window.removeEventListener('touchmove', _preventModalBodyTouch, {\n        passive: false\n      });\n    }\n\n    /**\n    * Style the modal for the step\n    * @param {Step} step The step to style the opening for\n    * @private\n    */\n    function _styleForStep(step) {\n      var _step$options = step.options,\n        modalOverlayOpeningPadding = _step$options.modalOverlayOpeningPadding,\n        modalOverlayOpeningRadius = _step$options.modalOverlayOpeningRadius;\n      var scrollParent = _getScrollParent(step.target);\n\n      // Setup recursive function to call requestAnimationFrame to update the modal opening position\n      var rafLoop = function rafLoop() {\n        rafId = undefined;\n        positionModal(modalOverlayOpeningPadding, modalOverlayOpeningRadius, scrollParent, step.target);\n        rafId = requestAnimationFrame(rafLoop);\n      };\n      rafLoop();\n      _addStepEventListeners();\n    }\n    function svg_binding($$value) {\n      binding_callbacks[$$value ? 'unshift' : 'push'](function () {\n        element = $$value;\n        $$invalidate(0, element);\n      });\n    }\n    $$self.$$set = function ($$props) {\n      if ('element' in $$props) $$invalidate(0, element = $$props.element);\n      if ('openingProperties' in $$props) $$invalidate(4, openingProperties = $$props.openingProperties);\n    };\n    $$self.$$.update = function () {\n      if ($$self.$$.dirty & /*openingProperties*/16) {\n        $$invalidate(2, pathDefinition = makeOverlayPath(openingProperties));\n      }\n    };\n    return [element, modalIsVisible, pathDefinition, _preventModalOverlayTouch, openingProperties, getElement, closeModalOpening, hide, positionModal, setupForStep, show, svg_binding];\n  }\n  var Shepherd_modal = /*#__PURE__*/function (_SvelteComponent9) {\n    _inherits(Shepherd_modal, _SvelteComponent9);\n    function Shepherd_modal(options) {\n      var _this15;\n      _classCallCheck(this, Shepherd_modal);\n      _this15 = _callSuper(this, Shepherd_modal);\n      init(_assertThisInitialized(_this15), options, instance, create_fragment, safe_not_equal, {\n        element: 0,\n        openingProperties: 4,\n        getElement: 5,\n        closeModalOpening: 6,\n        hide: 7,\n        positionModal: 8,\n        setupForStep: 9,\n        show: 10\n      });\n      return _this15;\n    }\n    _createClass(Shepherd_modal, [{\n      key: \"getElement\",\n      get: function get() {\n        return this.$$.ctx[5];\n      }\n    }, {\n      key: \"closeModalOpening\",\n      get: function get() {\n        return this.$$.ctx[6];\n      }\n    }, {\n      key: \"hide\",\n      get: function get() {\n        return this.$$.ctx[7];\n      }\n    }, {\n      key: \"positionModal\",\n      get: function get() {\n        return this.$$.ctx[8];\n      }\n    }, {\n      key: \"setupForStep\",\n      get: function get() {\n        return this.$$.ctx[9];\n      }\n    }, {\n      key: \"show\",\n      get: function get() {\n        return this.$$.ctx[10];\n      }\n    }]);\n    return Shepherd_modal;\n  }(SvelteComponent);\n  var Shepherd = new Evented();\n\n  /**\n   * Class representing the site tour\n   * @extends {Evented}\n   */\n  var Tour = /*#__PURE__*/function (_Evented2) {\n    _inherits(Tour, _Evented2);\n    /**\n     * @param {Object} options The options for the tour\n     * @param {boolean | function(): boolean | Promise<boolean> | function(): Promise<boolean>} options.confirmCancel If true, will issue a `window.confirm` before cancelling.\n     * If it is a function(support Async Function), it will be called and wait for the return value, and will only be cancelled if the value returned is true\n     * @param {string} options.confirmCancelMessage The message to display in the `window.confirm` dialog\n     * @param {string} options.classPrefix The prefix to add to the `shepherd-enabled` and `shepherd-target` class names as well as the `data-shepherd-step-id`.\n     * @param {Object} options.defaultStepOptions Default options for Steps ({@link Step#constructor}), created through `addStep`\n     * @param {boolean} options.exitOnEsc Exiting the tour with the escape key will be enabled unless this is explicitly\n     * set to false.\n     * @param {boolean} options.keyboardNavigation Navigating the tour via left and right arrow keys will be enabled\n     * unless this is explicitly set to false.\n     * @param {HTMLElement} options.stepsContainer An optional container element for the steps.\n     * If not set, the steps will be appended to `document.body`.\n     * @param {HTMLElement} options.modalContainer An optional container element for the modal.\n     * If not set, the modal will be appended to `document.body`.\n     * @param {object[] | Step[]} options.steps An array of step options objects or Step instances to initialize the tour with\n     * @param {string} options.tourName An optional \"name\" for the tour. This will be appended to the the tour's\n     * dynamically generated `id` property.\n     * @param {boolean} options.useModalOverlay Whether or not steps should be placed above a darkened\n     * modal overlay. If true, the overlay will create an opening around the target element so that it\n     * can remain interactive\n     * @returns {Tour}\n     */\n    function Tour() {\n      var _this16;\n      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n      _classCallCheck(this, Tour);\n      _this16 = _callSuper(this, Tour, [options]);\n      autoBind(_assertThisInitialized(_this16));\n      var defaultTourOptions = {\n        exitOnEsc: true,\n        keyboardNavigation: true\n      };\n      _this16.options = Object.assign({}, defaultTourOptions, options);\n      _this16.classPrefix = normalizePrefix(_this16.options.classPrefix);\n      _this16.steps = [];\n      _this16.addSteps(_this16.options.steps);\n\n      // Pass these events onto the global Shepherd object\n      var events = ['active', 'cancel', 'complete', 'inactive', 'show', 'start'];\n      events.map(function (event) {\n        (function (e) {\n          _this16.on(e, function (opts) {\n            opts = opts || {};\n            opts.tour = _assertThisInitialized(_this16);\n            Shepherd.trigger(e, opts);\n          });\n        })(event);\n      });\n      _this16._setTourID();\n      return _possibleConstructorReturn(_this16, _assertThisInitialized(_this16));\n    }\n\n    /**\n     * Adds a new step to the tour\n     * @param {Object|Step} options An object containing step options or a Step instance\n     * @param {number} index The optional index to insert the step at. If undefined, the step\n     * is added to the end of the array.\n     * @return {Step} The newly added step\n     */\n    _createClass(Tour, [{\n      key: \"addStep\",\n      value: function addStep(options, index) {\n        var step = options;\n        if (!(step instanceof Step)) {\n          step = new Step(this, step);\n        } else {\n          step.tour = this;\n        }\n        if (!isUndefined(index)) {\n          this.steps.splice(index, 0, step);\n        } else {\n          this.steps.push(step);\n        }\n        return step;\n      }\n\n      /**\n       * Add multiple steps to the tour\n       * @param {Array<object> | Array<Step>} steps The steps to add to the tour\n       */\n    }, {\n      key: \"addSteps\",\n      value: function addSteps(steps) {\n        var _this17 = this;\n        if (Array.isArray(steps)) {\n          steps.forEach(function (step) {\n            _this17.addStep(step);\n          });\n        }\n        return this;\n      }\n\n      /**\n       * Go to the previous step in the tour\n       */\n    }, {\n      key: \"back\",\n      value: function back() {\n        var index = this.steps.indexOf(this.currentStep);\n        this.show(index - 1, false);\n      }\n\n      /**\n       * Calls _done() triggering the 'cancel' event\n       * If `confirmCancel` is true, will show a window.confirm before cancelling\n       * If `confirmCancel` is a function, will call it and wait for the return value,\n       * and only cancel when the value returned is true\n       */\n    }, {\n      key: \"cancel\",\n      value: (function () {\n        var _cancel = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {\n          var confirmCancelIsFunction, cancelMessage, stopTour;\n          return _regeneratorRuntime().wrap(function _callee6$(_context6) {\n            while (1) switch (_context6.prev = _context6.next) {\n              case 0:\n                if (!this.options.confirmCancel) {\n                  _context6.next = 14;\n                  break;\n                }\n                confirmCancelIsFunction = typeof this.options.confirmCancel === 'function';\n                cancelMessage = this.options.confirmCancelMessage || 'Are you sure you want to stop the tour?';\n                if (!confirmCancelIsFunction) {\n                  _context6.next = 9;\n                  break;\n                }\n                _context6.next = 6;\n                return this.options.confirmCancel();\n              case 6:\n                _context6.t0 = _context6.sent;\n                _context6.next = 10;\n                break;\n              case 9:\n                _context6.t0 = window.confirm(cancelMessage);\n              case 10:\n                stopTour = _context6.t0;\n                if (stopTour) {\n                  this._done('cancel');\n                }\n                _context6.next = 15;\n                break;\n              case 14:\n                this._done('cancel');\n              case 15:\n              case \"end\":\n                return _context6.stop();\n            }\n          }, _callee6, this);\n        }));\n        function cancel() {\n          return _cancel.apply(this, arguments);\n        }\n        return cancel;\n      }()\n      /**\n       * Calls _done() triggering the `complete` event\n       */\n      )\n    }, {\n      key: \"complete\",\n      value: function complete() {\n        this._done('complete');\n      }\n\n      /**\n       * Gets the step from a given id\n       * @param {Number|String} id The id of the step to retrieve\n       * @return {Step} The step corresponding to the `id`\n       */\n    }, {\n      key: \"getById\",\n      value: function getById(id) {\n        return this.steps.find(function (step) {\n          return step.id === id;\n        });\n      }\n\n      /**\n       * Gets the current step\n       * @returns {Step|null}\n       */\n    }, {\n      key: \"getCurrentStep\",\n      value: function getCurrentStep() {\n        return this.currentStep;\n      }\n\n      /**\n       * Hide the current step\n       */\n    }, {\n      key: \"hide\",\n      value: function hide() {\n        var currentStep = this.getCurrentStep();\n        if (currentStep) {\n          return currentStep.hide();\n        }\n      }\n\n      /**\n       * Check if the tour is active\n       * @return {boolean}\n       */\n    }, {\n      key: \"isActive\",\n      value: function isActive() {\n        return Shepherd.activeTour === this;\n      }\n\n      /**\n       * Go to the next step in the tour\n       * If we are at the end, call `complete`\n       */\n    }, {\n      key: \"next\",\n      value: function next() {\n        var index = this.steps.indexOf(this.currentStep);\n        if (index === this.steps.length - 1) {\n          this.complete();\n        } else {\n          this.show(index + 1, true);\n        }\n      }\n\n      /**\n       * Removes the step from the tour\n       * @param {String} name The id for the step to remove\n       */\n    }, {\n      key: \"removeStep\",\n      value: function removeStep(name) {\n        var _this18 = this;\n        var current = this.getCurrentStep();\n\n        // Find the step, destroy it and remove it from this.steps\n        this.steps.some(function (step, i) {\n          if (step.id === name) {\n            if (step.isOpen()) {\n              step.hide();\n            }\n            step.destroy();\n            _this18.steps.splice(i, 1);\n            return true;\n          }\n        });\n        if (current && current.id === name) {\n          this.currentStep = undefined;\n\n          // If we have steps left, show the first one, otherwise just cancel the tour\n          this.steps.length ? this.show(0) : this.cancel();\n        }\n      }\n\n      /**\n       * Show a specific step in the tour\n       * @param {Number|String} key The key to look up the step by\n       * @param {Boolean} forward True if we are going forward, false if backward\n       */\n    }, {\n      key: \"show\",\n      value: function show() {\n        var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;\n        var forward = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;\n        var step = isString(key) ? this.getById(key) : this.steps[key];\n        if (step) {\n          this._updateStateBeforeShow();\n          var shouldSkipStep = isFunction(step.options.showOn) && !step.options.showOn();\n\n          // If `showOn` returns false, we want to skip the step, otherwise, show the step like normal\n          if (shouldSkipStep) {\n            this._skipStep(step, forward);\n          } else {\n            this.trigger('show', {\n              step: step,\n              previous: this.currentStep\n            });\n            this.currentStep = step;\n            step.show();\n          }\n        }\n      }\n\n      /**\n       * Start the tour\n       */\n    }, {\n      key: \"start\",\n      value: function start() {\n        this.trigger('start');\n\n        // Save the focused element before the tour opens\n        this.focusedElBeforeOpen = document.activeElement;\n        this.currentStep = null;\n        this._setupModal();\n        this._setupActiveTour();\n        this.next();\n      }\n\n      /**\n       * Called whenever the tour is cancelled or completed, basically anytime we exit the tour\n       * @param {String} event The event name to trigger\n       * @private\n       */\n    }, {\n      key: \"_done\",\n      value: function _done(event) {\n        var index = this.steps.indexOf(this.currentStep);\n        if (Array.isArray(this.steps)) {\n          this.steps.forEach(function (step) {\n            return step.destroy();\n          });\n        }\n        cleanupSteps(this);\n        this.trigger(event, {\n          index: index\n        });\n        Shepherd.activeTour = null;\n        this.trigger('inactive', {\n          tour: this\n        });\n        if (this.modal) {\n          this.modal.hide();\n        }\n        if (event === 'cancel' || event === 'complete') {\n          if (this.modal) {\n            var modalContainer = document.querySelector('.shepherd-modal-overlay-container');\n            if (modalContainer) {\n              modalContainer.remove();\n            }\n          }\n        }\n\n        // Focus the element that was focused before the tour started\n        if (isHTMLElement$1(this.focusedElBeforeOpen)) {\n          this.focusedElBeforeOpen.focus();\n        }\n      }\n\n      /**\n       * Make this tour \"active\"\n       * @private\n       */\n    }, {\n      key: \"_setupActiveTour\",\n      value: function _setupActiveTour() {\n        this.trigger('active', {\n          tour: this\n        });\n        Shepherd.activeTour = this;\n      }\n\n      /**\n       * _setupModal create the modal container and instance\n       * @private\n       */\n    }, {\n      key: \"_setupModal\",\n      value: function _setupModal() {\n        this.modal = new Shepherd_modal({\n          target: this.options.modalContainer || document.body,\n          props: {\n            classPrefix: this.classPrefix,\n            styles: this.styles\n          }\n        });\n      }\n\n      /**\n       * Called when `showOn` evaluates to false, to skip the step or complete the tour if it's the last step\n       * @param {Step} step The step to skip\n       * @param {Boolean} forward True if we are going forward, false if backward\n       * @private\n       */\n    }, {\n      key: \"_skipStep\",\n      value: function _skipStep(step, forward) {\n        var index = this.steps.indexOf(step);\n        if (index === this.steps.length - 1) {\n          this.complete();\n        } else {\n          var nextIndex = forward ? index + 1 : index - 1;\n          this.show(nextIndex, forward);\n        }\n      }\n\n      /**\n       * Before showing, hide the current step and if the tour is not\n       * already active, call `this._setupActiveTour`.\n       * @private\n       */\n    }, {\n      key: \"_updateStateBeforeShow\",\n      value: function _updateStateBeforeShow() {\n        if (this.currentStep) {\n          this.currentStep.hide();\n        }\n        if (!this.isActive()) {\n          this._setupActiveTour();\n        }\n      }\n\n      /**\n       * Sets this.id to `${tourName}--${uuid}`\n       * @private\n       */\n    }, {\n      key: \"_setTourID\",\n      value: function _setTourID() {\n        var tourName = this.options.tourName || 'tour';\n        this.id = \"\".concat(tourName, \"--\").concat(uuid());\n      }\n    }]);\n    return Tour;\n  }(Evented);\n  var isServerSide = typeof window === 'undefined';\n  var NoOp = /*#__PURE__*/_createClass(function NoOp() {\n    _classCallCheck(this, NoOp);\n  });\n  if (isServerSide) {\n    Object.assign(Shepherd, {\n      Tour: NoOp,\n      Step: NoOp\n    });\n  } else {\n    Object.assign(Shepherd, {\n      Tour: Tour,\n      Step: Step\n    });\n  }\n  return Shepherd;\n});\n\n//# sourceURL=webpack://Materialize/./node_modules/shepherd.js/dist/js/shepherd.js?");
+{
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;function _callSuper(t, o, e) { return o = _getPrototypeOf(o), _possibleConstructorReturn(t, _isNativeReflectConstruct() ? Reflect.construct(o, e || [], _getPrototypeOf(t).constructor) : o.apply(t, e)); }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _isNativeReflectConstruct() { try { var t = !Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); } catch (t) {} return (_isNativeReflectConstruct = function _isNativeReflectConstruct() { return !!t; })(); }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+/*! shepherd.js 11.2.0 */
+
+(function (global, factory) {
+  ( false ? 0 : _typeof(exports)) === 'object' && "object" !== 'undefined' ? module.exports = factory() :  true ? !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+		__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+		(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+		__WEBPACK_AMD_DEFINE_FACTORY__),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : (0);
+})(this, function () {
+  'use strict';
+
+  var isMergeableObject = function isMergeableObject(value) {
+    return isNonNullObject(value) && !isSpecial(value);
+  };
+  function isNonNullObject(value) {
+    return !!value && _typeof(value) === 'object';
+  }
+  function isSpecial(value) {
+    var stringValue = Object.prototype.toString.call(value);
+    return stringValue === '[object RegExp]' || stringValue === '[object Date]' || isReactElement(value);
+  }
+
+  // see https://github.com/facebook/react/blob/b5ac963fb791d1298e7f396236383bc955f916c1/src/isomorphic/classic/element/ReactElement.js#L21-L25
+  var canUseSymbol = typeof Symbol === 'function' && Symbol.for;
+  var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for('react.element') : 0xeac7;
+  function isReactElement(value) {
+    return value.$$typeof === REACT_ELEMENT_TYPE;
+  }
+  function emptyTarget(val) {
+    return Array.isArray(val) ? [] : {};
+  }
+  function cloneUnlessOtherwiseSpecified(value, options) {
+    return options.clone !== false && options.isMergeableObject(value) ? deepmerge(emptyTarget(value), value, options) : value;
+  }
+  function defaultArrayMerge(target, source, options) {
+    return target.concat(source).map(function (element) {
+      return cloneUnlessOtherwiseSpecified(element, options);
+    });
+  }
+  function getMergeFunction(key, options) {
+    if (!options.customMerge) {
+      return deepmerge;
+    }
+    var customMerge = options.customMerge(key);
+    return typeof customMerge === 'function' ? customMerge : deepmerge;
+  }
+  function getEnumerableOwnPropertySymbols(target) {
+    return Object.getOwnPropertySymbols ? Object.getOwnPropertySymbols(target).filter(function (symbol) {
+      return Object.propertyIsEnumerable.call(target, symbol);
+    }) : [];
+  }
+  function getKeys(target) {
+    return Object.keys(target).concat(getEnumerableOwnPropertySymbols(target));
+  }
+  function propertyIsOnObject(object, property) {
+    try {
+      return property in object;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // Protects from prototype poisoning and unexpected merging up the prototype chain.
+  function propertyIsUnsafe(target, key) {
+    return propertyIsOnObject(target, key) // Properties are safe to merge if they don't exist in the target yet,
+    && !(Object.hasOwnProperty.call(target, key) // unsafe if they exist up the prototype chain,
+    && Object.propertyIsEnumerable.call(target, key)); // and also unsafe if they're nonenumerable.
+  }
+  function mergeObject(target, source, options) {
+    var destination = {};
+    if (options.isMergeableObject(target)) {
+      getKeys(target).forEach(function (key) {
+        destination[key] = cloneUnlessOtherwiseSpecified(target[key], options);
+      });
+    }
+    getKeys(source).forEach(function (key) {
+      if (propertyIsUnsafe(target, key)) {
+        return;
+      }
+      if (propertyIsOnObject(target, key) && options.isMergeableObject(source[key])) {
+        destination[key] = getMergeFunction(key, options)(target[key], source[key], options);
+      } else {
+        destination[key] = cloneUnlessOtherwiseSpecified(source[key], options);
+      }
+    });
+    return destination;
+  }
+  function deepmerge(target, source, options) {
+    options = options || {};
+    options.arrayMerge = options.arrayMerge || defaultArrayMerge;
+    options.isMergeableObject = options.isMergeableObject || isMergeableObject;
+    // cloneUnlessOtherwiseSpecified is added to `options` so that custom arrayMerge()
+    // implementations can use it. The caller may not replace it.
+    options.cloneUnlessOtherwiseSpecified = cloneUnlessOtherwiseSpecified;
+    var sourceIsArray = Array.isArray(source);
+    var targetIsArray = Array.isArray(target);
+    var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;
+    if (!sourceAndTargetTypesMatch) {
+      return cloneUnlessOtherwiseSpecified(source, options);
+    } else if (sourceIsArray) {
+      return options.arrayMerge(target, source, options);
+    } else {
+      return mergeObject(target, source, options);
+    }
+  }
+  deepmerge.all = function deepmergeAll(array, options) {
+    if (!Array.isArray(array)) {
+      throw new Error('first argument should be an array');
+    }
+    return array.reduce(function (prev, next) {
+      return deepmerge(prev, next, options);
+    }, {});
+  };
+  var deepmerge_1 = deepmerge;
+  var cjs = deepmerge_1;
+
+  /**
+   * Checks if `value` is classified as an `Element`.
+   * @param {*} value The param to check if it is an Element
+   */
+  function isElement$1(value) {
+    return value instanceof Element;
+  }
+
+  /**
+   * Checks if `value` is classified as an `HTMLElement`.
+   * @param {*} value The param to check if it is an HTMLElement
+   */
+  function isHTMLElement$1(value) {
+    return value instanceof HTMLElement;
+  }
+
+  /**
+   * Checks if `value` is classified as a `Function` object.
+   * @param {*} value The param to check if it is a function
+   */
+  function isFunction(value) {
+    return typeof value === 'function';
+  }
+
+  /**
+   * Checks if `value` is classified as a `String` object.
+   * @param {*} value The param to check if it is a string
+   */
+  function isString(value) {
+    return typeof value === 'string';
+  }
+
+  /**
+   * Checks if `value` is undefined.
+   * @param {*} value The param to check if it is undefined
+   */
+  function isUndefined(value) {
+    return value === undefined;
+  }
+  var Evented = /*#__PURE__*/function () {
+    function Evented() {
+      _classCallCheck(this, Evented);
+    }
+    _createClass(Evented, [{
+      key: "on",
+      value: function on(event, handler, ctx) {
+        var once = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+        if (isUndefined(this.bindings)) {
+          this.bindings = {};
+        }
+        if (isUndefined(this.bindings[event])) {
+          this.bindings[event] = [];
+        }
+        this.bindings[event].push({
+          handler: handler,
+          ctx: ctx,
+          once: once
+        });
+        return this;
+      }
+    }, {
+      key: "once",
+      value: function once(event, handler, ctx) {
+        return this.on(event, handler, ctx, true);
+      }
+    }, {
+      key: "off",
+      value: function off(event, handler) {
+        var _this = this;
+        if (isUndefined(this.bindings) || isUndefined(this.bindings[event])) {
+          return this;
+        }
+        if (isUndefined(handler)) {
+          delete this.bindings[event];
+        } else {
+          this.bindings[event].forEach(function (binding, index) {
+            if (binding.handler === handler) {
+              _this.bindings[event].splice(index, 1);
+            }
+          });
+        }
+        return this;
+      }
+    }, {
+      key: "trigger",
+      value: function trigger(event) {
+        var _this2 = this;
+        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+        if (!isUndefined(this.bindings) && this.bindings[event]) {
+          this.bindings[event].forEach(function (binding, index) {
+            var ctx = binding.ctx,
+              handler = binding.handler,
+              once = binding.once;
+            var context = ctx || _this2;
+            handler.apply(context, args);
+            if (once) {
+              _this2.bindings[event].splice(index, 1);
+            }
+          });
+        }
+        return this;
+      }
+    }]);
+    return Evented;
+  }();
+  /**
+   * Binds all the methods on a JS Class to the `this` context of the class.
+   * Adapted from https://github.com/sindresorhus/auto-bind
+   * @param {object} self The `this` context of the class
+   * @return {object} The `this` context of the class
+   */
+  function autoBind(self) {
+    var keys = Object.getOwnPropertyNames(self.constructor.prototype);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var val = self[key];
+      if (key !== 'constructor' && typeof val === 'function') {
+        self[key] = val.bind(self);
+      }
+    }
+    return self;
+  }
+
+  /**
+   * Sets up the handler to determine if we should advance the tour
+   * @param {string} selector
+   * @param {Step} step The step instance
+   * @return {Function}
+   * @private
+   */
+  function _setupAdvanceOnHandler(selector, step) {
+    return function (event) {
+      if (step.isOpen()) {
+        var targetIsEl = step.el && event.currentTarget === step.el;
+        var targetIsSelector = !isUndefined(selector) && event.currentTarget.matches(selector);
+        if (targetIsSelector || targetIsEl) {
+          step.tour.next();
+        }
+      }
+    };
+  }
+
+  /**
+   * Bind the event handler for advanceOn
+   * @param {Step} step The step instance
+   */
+  function bindAdvance(step) {
+    // An empty selector matches the step element
+    var _ref2 = step.options.advanceOn || {},
+      event = _ref2.event,
+      selector = _ref2.selector;
+    if (event) {
+      var handler = _setupAdvanceOnHandler(selector, step);
+
+      // TODO: this should also bind/unbind on show/hide
+      var el;
+      try {
+        el = document.querySelector(selector);
+      } catch (e) {
+        // TODO
+      }
+      if (!isUndefined(selector) && !el) {
+        return console.error("No element was found for the selector supplied to advanceOn: ".concat(selector));
+      } else if (el) {
+        el.addEventListener(event, handler);
+        step.on('destroy', function () {
+          return el.removeEventListener(event, handler);
+        });
+      } else {
+        document.body.addEventListener(event, handler, true);
+        step.on('destroy', function () {
+          return document.body.removeEventListener(event, handler, true);
+        });
+      }
+    } else {
+      return console.error('advanceOn was defined, but no event name was passed.');
+    }
+  }
+
+  /**
+   * Ensure class prefix ends in `-`
+   * @param {string} prefix The prefix to prepend to the class names generated by nano-css
+   * @return {string} The prefix ending in `-`
+   */
+  function normalizePrefix(prefix) {
+    if (!isString(prefix) || prefix === '') {
+      return '';
+    }
+    return prefix.charAt(prefix.length - 1) !== '-' ? "".concat(prefix, "-") : prefix;
+  }
+
+  /**
+   * Resolves attachTo options, converting element option value to a qualified HTMLElement.
+   * @param {Step} step The step instance
+   * @returns {{}|{element, on}}
+   * `element` is a qualified HTML Element
+   * `on` is a string position value
+   */
+  function parseAttachTo(step) {
+    var options = step.options.attachTo || {};
+    var returnOpts = Object.assign({}, options);
+    if (isFunction(returnOpts.element)) {
+      // Bind the callback to step so that it has access to the object, to enable running additional logic
+      returnOpts.element = returnOpts.element.call(step);
+    }
+    if (isString(returnOpts.element)) {
+      // Can't override the element in user opts reference because we can't
+      // guarantee that the element will exist in the future.
+      try {
+        returnOpts.element = document.querySelector(returnOpts.element);
+      } catch (e) {
+        // TODO
+      }
+      if (!returnOpts.element) {
+        console.error("The element for this Shepherd step was not found ".concat(options.element));
+      }
+    }
+    return returnOpts;
+  }
+
+  /**
+   * Checks if the step should be centered or not. Does not trigger attachTo.element evaluation, making it a pure
+   * alternative for the deprecated step.isCentered() method.
+   * @param resolvedAttachToOptions
+   * @returns {boolean}
+   */
+  function shouldCenterStep(resolvedAttachToOptions) {
+    if (resolvedAttachToOptions === undefined || resolvedAttachToOptions === null) {
+      return true;
+    }
+    return !resolvedAttachToOptions.element || !resolvedAttachToOptions.on;
+  }
+
+  /**
+   * Create a unique id for steps, tours, modals, etc
+   * @return {string}
+   */
+  function uuid() {
+    var d = Date.now();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = (d + Math.random() * 16) % 16 | 0;
+      d = Math.floor(d / 16);
+      return (c == 'x' ? r : r & 0x3 | 0x8).toString(16);
+    });
+  }
+  function _extends() {
+    _extends = Object.assign ? Object.assign.bind() : function (target) {
+      for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
+        for (var key in source) {
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+      return target;
+    };
+    return _extends.apply(this, arguments);
+  }
+  function _objectWithoutPropertiesLoose(source, excluded) {
+    if (source == null) return {};
+    var target = {};
+    var sourceKeys = Object.keys(source);
+    var key, i;
+    for (i = 0; i < sourceKeys.length; i++) {
+      key = sourceKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      target[key] = source[key];
+    }
+    return target;
+  }
+  var min = Math.min;
+  var max = Math.max;
+  var round = Math.round;
+  var floor = Math.floor;
+  var createCoords = function createCoords(v) {
+    return {
+      x: v,
+      y: v
+    };
+  };
+  var oppositeSideMap = {
+    left: 'right',
+    right: 'left',
+    bottom: 'top',
+    top: 'bottom'
+  };
+  var oppositeAlignmentMap = {
+    start: 'end',
+    end: 'start'
+  };
+  function clamp(start, value, end) {
+    return max(start, min(value, end));
+  }
+  function evaluate(value, param) {
+    return typeof value === 'function' ? value(param) : value;
+  }
+  function getSide(placement) {
+    return placement.split('-')[0];
+  }
+  function getAlignment(placement) {
+    return placement.split('-')[1];
+  }
+  function getOppositeAxis(axis) {
+    return axis === 'x' ? 'y' : 'x';
+  }
+  function getAxisLength(axis) {
+    return axis === 'y' ? 'height' : 'width';
+  }
+  function getSideAxis(placement) {
+    return ['top', 'bottom'].includes(getSide(placement)) ? 'y' : 'x';
+  }
+  function getAlignmentAxis(placement) {
+    return getOppositeAxis(getSideAxis(placement));
+  }
+  function getAlignmentSides(placement, rects, rtl) {
+    if (rtl === void 0) {
+      rtl = false;
+    }
+    var alignment = getAlignment(placement);
+    var alignmentAxis = getAlignmentAxis(placement);
+    var length = getAxisLength(alignmentAxis);
+    var mainAlignmentSide = alignmentAxis === 'x' ? alignment === (rtl ? 'end' : 'start') ? 'right' : 'left' : alignment === 'start' ? 'bottom' : 'top';
+    if (rects.reference[length] > rects.floating[length]) {
+      mainAlignmentSide = getOppositePlacement(mainAlignmentSide);
+    }
+    return [mainAlignmentSide, getOppositePlacement(mainAlignmentSide)];
+  }
+  function getExpandedPlacements(placement) {
+    var oppositePlacement = getOppositePlacement(placement);
+    return [getOppositeAlignmentPlacement(placement), oppositePlacement, getOppositeAlignmentPlacement(oppositePlacement)];
+  }
+  function getOppositeAlignmentPlacement(placement) {
+    return placement.replace(/start|end/g, function (alignment) {
+      return oppositeAlignmentMap[alignment];
+    });
+  }
+  function getSideList(side, isStart, rtl) {
+    var lr = ['left', 'right'];
+    var rl = ['right', 'left'];
+    var tb = ['top', 'bottom'];
+    var bt = ['bottom', 'top'];
+    switch (side) {
+      case 'top':
+      case 'bottom':
+        if (rtl) return isStart ? rl : lr;
+        return isStart ? lr : rl;
+      case 'left':
+      case 'right':
+        return isStart ? tb : bt;
+      default:
+        return [];
+    }
+  }
+  function getOppositeAxisPlacements(placement, flipAlignment, direction, rtl) {
+    var alignment = getAlignment(placement);
+    var list = getSideList(getSide(placement), direction === 'start', rtl);
+    if (alignment) {
+      list = list.map(function (side) {
+        return side + "-" + alignment;
+      });
+      if (flipAlignment) {
+        list = list.concat(list.map(getOppositeAlignmentPlacement));
+      }
+    }
+    return list;
+  }
+  function getOppositePlacement(placement) {
+    return placement.replace(/left|right|bottom|top/g, function (side) {
+      return oppositeSideMap[side];
+    });
+  }
+  function expandPaddingObject(padding) {
+    return _extends({
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
+    }, padding);
+  }
+  function getPaddingObject(padding) {
+    return typeof padding !== 'number' ? expandPaddingObject(padding) : {
+      top: padding,
+      right: padding,
+      bottom: padding,
+      left: padding
+    };
+  }
+  function rectToClientRect(rect) {
+    return _extends({}, rect, {
+      top: rect.y,
+      left: rect.x,
+      right: rect.x + rect.width,
+      bottom: rect.y + rect.height
+    });
+  }
+  var _excluded2 = ["mainAxis", "crossAxis", "fallbackPlacements", "fallbackStrategy", "fallbackAxisSideDirection", "flipAlignment"],
+    _excluded4 = ["mainAxis", "crossAxis", "limiter"];
+  function computeCoordsFromPlacement(_ref, placement, rtl) {
+    var reference = _ref.reference,
+      floating = _ref.floating;
+    var sideAxis = getSideAxis(placement);
+    var alignmentAxis = getAlignmentAxis(placement);
+    var alignLength = getAxisLength(alignmentAxis);
+    var side = getSide(placement);
+    var isVertical = sideAxis === 'y';
+    var commonX = reference.x + reference.width / 2 - floating.width / 2;
+    var commonY = reference.y + reference.height / 2 - floating.height / 2;
+    var commonAlign = reference[alignLength] / 2 - floating[alignLength] / 2;
+    var coords;
+    switch (side) {
+      case 'top':
+        coords = {
+          x: commonX,
+          y: reference.y - floating.height
+        };
+        break;
+      case 'bottom':
+        coords = {
+          x: commonX,
+          y: reference.y + reference.height
+        };
+        break;
+      case 'right':
+        coords = {
+          x: reference.x + reference.width,
+          y: commonY
+        };
+        break;
+      case 'left':
+        coords = {
+          x: reference.x - floating.width,
+          y: commonY
+        };
+        break;
+      default:
+        coords = {
+          x: reference.x,
+          y: reference.y
+        };
+    }
+    switch (getAlignment(placement)) {
+      case 'start':
+        coords[alignmentAxis] -= commonAlign * (rtl && isVertical ? -1 : 1);
+        break;
+      case 'end':
+        coords[alignmentAxis] += commonAlign * (rtl && isVertical ? -1 : 1);
+        break;
+    }
+    return coords;
+  }
+
+  /**
+   * Computes the `x` and `y` coordinates that will place the floating element
+   * next to a reference element when it is given a certain positioning strategy.
+   *
+   * This export does not have any `platform` interface logic. You will need to
+   * write one for the platform you are using Floating UI with.
+   */
+  var computePosition$1 = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(reference, floating, config) {
+      var _config$placement, placement, _config$strategy, strategy, _config$middleware, middleware, platform, validMiddleware, rtl, rects, _computeCoordsFromPla, x, y, statefulPlacement, middlewareData, resetCount, i, _validMiddleware$i, name, fn, _yield$fn, nextX, nextY, data, reset, _computeCoordsFromPla2;
+      return _regeneratorRuntime().wrap(function _callee$(_context) {
+        while (1) switch (_context.prev = _context.next) {
+          case 0:
+            _config$placement = config.placement, placement = _config$placement === void 0 ? 'bottom' : _config$placement, _config$strategy = config.strategy, strategy = _config$strategy === void 0 ? 'absolute' : _config$strategy, _config$middleware = config.middleware, middleware = _config$middleware === void 0 ? [] : _config$middleware, platform = config.platform;
+            validMiddleware = middleware.filter(Boolean);
+            _context.next = 4;
+            return platform.isRTL == null ? void 0 : platform.isRTL(floating);
+          case 4:
+            rtl = _context.sent;
+            _context.next = 7;
+            return platform.getElementRects({
+              reference: reference,
+              floating: floating,
+              strategy: strategy
+            });
+          case 7:
+            rects = _context.sent;
+            _computeCoordsFromPla = computeCoordsFromPlacement(rects, placement, rtl), x = _computeCoordsFromPla.x, y = _computeCoordsFromPla.y;
+            statefulPlacement = placement;
+            middlewareData = {};
+            resetCount = 0;
+            i = 0;
+          case 13:
+            if (!(i < validMiddleware.length)) {
+              _context.next = 46;
+              break;
+            }
+            _validMiddleware$i = validMiddleware[i], name = _validMiddleware$i.name, fn = _validMiddleware$i.fn;
+            _context.next = 17;
+            return fn({
+              x: x,
+              y: y,
+              initialPlacement: placement,
+              placement: statefulPlacement,
+              strategy: strategy,
+              middlewareData: middlewareData,
+              rects: rects,
+              platform: platform,
+              elements: {
+                reference: reference,
+                floating: floating
+              }
+            });
+          case 17:
+            _yield$fn = _context.sent;
+            nextX = _yield$fn.x;
+            nextY = _yield$fn.y;
+            data = _yield$fn.data;
+            reset = _yield$fn.reset;
+            x = nextX != null ? nextX : x;
+            y = nextY != null ? nextY : y;
+            middlewareData = _extends({}, middlewareData, _defineProperty({}, name, _extends({}, middlewareData[name], data)));
+            if (!(reset && resetCount <= 50)) {
+              _context.next = 43;
+              break;
+            }
+            resetCount++;
+            if (!(_typeof(reset) === 'object')) {
+              _context.next = 41;
+              break;
+            }
+            if (reset.placement) {
+              statefulPlacement = reset.placement;
+            }
+            if (!reset.rects) {
+              _context.next = 38;
+              break;
+            }
+            if (!(reset.rects === true)) {
+              _context.next = 36;
+              break;
+            }
+            _context.next = 33;
+            return platform.getElementRects({
+              reference: reference,
+              floating: floating,
+              strategy: strategy
+            });
+          case 33:
+            _context.t0 = _context.sent;
+            _context.next = 37;
+            break;
+          case 36:
+            _context.t0 = reset.rects;
+          case 37:
+            rects = _context.t0;
+          case 38:
+            _computeCoordsFromPla2 = computeCoordsFromPlacement(rects, statefulPlacement, rtl);
+            x = _computeCoordsFromPla2.x;
+            y = _computeCoordsFromPla2.y;
+          case 41:
+            i = -1;
+            return _context.abrupt("continue", 43);
+          case 43:
+            i++;
+            _context.next = 13;
+            break;
+          case 46:
+            return _context.abrupt("return", {
+              x: x,
+              y: y,
+              placement: statefulPlacement,
+              strategy: strategy,
+              middlewareData: middlewareData
+            });
+          case 47:
+          case "end":
+            return _context.stop();
+        }
+      }, _callee);
+    }));
+    return function computePosition$1(_x, _x2, _x3) {
+      return _ref3.apply(this, arguments);
+    };
+  }();
+
+  /**
+   * Resolves with an object of overflow side offsets that determine how much the
+   * element is overflowing a given clipping boundary on each side.
+   * - positive = overflowing the boundary by that number of pixels
+   * - negative = how many pixels left before it will overflow
+   * - 0 = lies flush with the boundary
+   * @see https://floating-ui.com/docs/detectOverflow
+   */
+  function detectOverflow(_x4, _x5) {
+    return _detectOverflow.apply(this, arguments);
+  }
+  /**
+   * Provides data to position an inner element of the floating element so that it
+   * appears centered to the reference element.
+   * @see https://floating-ui.com/docs/arrow
+   */
+  function _detectOverflow() {
+    _detectOverflow = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(state, options) {
+      var _await$platform$isEle, x, y, platform, rects, elements, strategy, _evaluate3, _evaluate3$boundary, boundary, _evaluate3$rootBounda, rootBoundary, _evaluate3$elementCon, elementContext, _evaluate3$altBoundar, altBoundary, _evaluate3$padding, padding, paddingObject, altContext, element, clippingClientRect, rect, offsetParent, offsetScale, elementClientRect;
+      return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+        while (1) switch (_context7.prev = _context7.next) {
+          case 0:
+            if (options === void 0) {
+              options = {};
+            }
+            x = state.x, y = state.y, platform = state.platform, rects = state.rects, elements = state.elements, strategy = state.strategy;
+            _evaluate3 = evaluate(options, state), _evaluate3$boundary = _evaluate3.boundary, boundary = _evaluate3$boundary === void 0 ? 'clippingAncestors' : _evaluate3$boundary, _evaluate3$rootBounda = _evaluate3.rootBoundary, rootBoundary = _evaluate3$rootBounda === void 0 ? 'viewport' : _evaluate3$rootBounda, _evaluate3$elementCon = _evaluate3.elementContext, elementContext = _evaluate3$elementCon === void 0 ? 'floating' : _evaluate3$elementCon, _evaluate3$altBoundar = _evaluate3.altBoundary, altBoundary = _evaluate3$altBoundar === void 0 ? false : _evaluate3$altBoundar, _evaluate3$padding = _evaluate3.padding, padding = _evaluate3$padding === void 0 ? 0 : _evaluate3$padding;
+            paddingObject = getPaddingObject(padding);
+            altContext = elementContext === 'floating' ? 'reference' : 'floating';
+            element = elements[altBoundary ? altContext : elementContext];
+            _context7.t0 = rectToClientRect;
+            _context7.t1 = platform;
+            _context7.next = 10;
+            return platform.isElement == null ? void 0 : platform.isElement(element);
+          case 10:
+            _context7.t2 = _await$platform$isEle = _context7.sent;
+            if (!(_context7.t2 != null)) {
+              _context7.next = 15;
+              break;
+            }
+            _context7.t3 = _await$platform$isEle;
+            _context7.next = 16;
+            break;
+          case 15:
+            _context7.t3 = true;
+          case 16:
+            if (!_context7.t3) {
+              _context7.next = 20;
+              break;
+            }
+            _context7.t4 = element;
+            _context7.next = 26;
+            break;
+          case 20:
+            _context7.t5 = element.contextElement;
+            if (_context7.t5) {
+              _context7.next = 25;
+              break;
+            }
+            _context7.next = 24;
+            return platform.getDocumentElement == null ? void 0 : platform.getDocumentElement(elements.floating);
+          case 24:
+            _context7.t5 = _context7.sent;
+          case 25:
+            _context7.t4 = _context7.t5;
+          case 26:
+            _context7.t6 = _context7.t4;
+            _context7.t7 = boundary;
+            _context7.t8 = rootBoundary;
+            _context7.t9 = strategy;
+            _context7.t10 = {
+              element: _context7.t6,
+              boundary: _context7.t7,
+              rootBoundary: _context7.t8,
+              strategy: _context7.t9
+            };
+            _context7.next = 33;
+            return _context7.t1.getClippingRect.call(_context7.t1, _context7.t10);
+          case 33:
+            _context7.t11 = _context7.sent;
+            clippingClientRect = (0, _context7.t0)(_context7.t11);
+            rect = elementContext === 'floating' ? _extends({}, rects.floating, {
+              x: x,
+              y: y
+            }) : rects.reference;
+            _context7.next = 38;
+            return platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(elements.floating);
+          case 38:
+            offsetParent = _context7.sent;
+            _context7.next = 41;
+            return platform.isElement == null ? void 0 : platform.isElement(offsetParent);
+          case 41:
+            if (!_context7.sent) {
+              _context7.next = 50;
+              break;
+            }
+            _context7.next = 44;
+            return platform.getScale == null ? void 0 : platform.getScale(offsetParent);
+          case 44:
+            _context7.t13 = _context7.sent;
+            if (_context7.t13) {
+              _context7.next = 47;
+              break;
+            }
+            _context7.t13 = {
+              x: 1,
+              y: 1
+            };
+          case 47:
+            _context7.t12 = _context7.t13;
+            _context7.next = 51;
+            break;
+          case 50:
+            _context7.t12 = {
+              x: 1,
+              y: 1
+            };
+          case 51:
+            offsetScale = _context7.t12;
+            _context7.t14 = rectToClientRect;
+            if (!platform.convertOffsetParentRelativeRectToViewportRelativeRect) {
+              _context7.next = 59;
+              break;
+            }
+            _context7.next = 56;
+            return platform.convertOffsetParentRelativeRectToViewportRelativeRect({
+              rect: rect,
+              offsetParent: offsetParent,
+              strategy: strategy
+            });
+          case 56:
+            _context7.t15 = _context7.sent;
+            _context7.next = 60;
+            break;
+          case 59:
+            _context7.t15 = rect;
+          case 60:
+            _context7.t16 = _context7.t15;
+            elementClientRect = (0, _context7.t14)(_context7.t16);
+            return _context7.abrupt("return", {
+              top: (clippingClientRect.top - elementClientRect.top + paddingObject.top) / offsetScale.y,
+              bottom: (elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom) / offsetScale.y,
+              left: (clippingClientRect.left - elementClientRect.left + paddingObject.left) / offsetScale.x,
+              right: (elementClientRect.right - clippingClientRect.right + paddingObject.right) / offsetScale.x
+            });
+          case 63:
+          case "end":
+            return _context7.stop();
+        }
+      }, _callee7);
+    }));
+    return _detectOverflow.apply(this, arguments);
+  }
+  var arrow = function arrow(options) {
+    return {
+      name: 'arrow',
+      options: options,
+      fn: function fn(state) {
+        return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+          var x, y, placement, rects, platform, elements, _ref4, element, _ref4$padding, padding, paddingObject, coords, axis, length, arrowDimensions, isYAxis, minProp, maxProp, clientProp, endDiff, startDiff, arrowOffsetParent, clientSize, centerToReference, largestPossiblePadding, minPadding, maxPadding, min$1, max, center, offset, shouldAddOffset, alignmentOffset;
+          return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+            while (1) switch (_context2.prev = _context2.next) {
+              case 0:
+                x = state.x, y = state.y, placement = state.placement, rects = state.rects, platform = state.platform, elements = state.elements; // Since `element` is required, we don't Partial<> the type.
+                _ref4 = evaluate(options, state) || {}, element = _ref4.element, _ref4$padding = _ref4.padding, padding = _ref4$padding === void 0 ? 0 : _ref4$padding;
+                if (!(element == null)) {
+                  _context2.next = 4;
+                  break;
+                }
+                return _context2.abrupt("return", {});
+              case 4:
+                paddingObject = getPaddingObject(padding);
+                coords = {
+                  x: x,
+                  y: y
+                };
+                axis = getAlignmentAxis(placement);
+                length = getAxisLength(axis);
+                _context2.next = 10;
+                return platform.getDimensions(element);
+              case 10:
+                arrowDimensions = _context2.sent;
+                isYAxis = axis === 'y';
+                minProp = isYAxis ? 'top' : 'left';
+                maxProp = isYAxis ? 'bottom' : 'right';
+                clientProp = isYAxis ? 'clientHeight' : 'clientWidth';
+                endDiff = rects.reference[length] + rects.reference[axis] - coords[axis] - rects.floating[length];
+                startDiff = coords[axis] - rects.reference[axis];
+                _context2.next = 19;
+                return platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(element);
+              case 19:
+                arrowOffsetParent = _context2.sent;
+                clientSize = arrowOffsetParent ? arrowOffsetParent[clientProp] : 0; // DOM platform can return `window` as the `offsetParent`.
+                _context2.t0 = !clientSize;
+                if (_context2.t0) {
+                  _context2.next = 26;
+                  break;
+                }
+                _context2.next = 25;
+                return platform.isElement == null ? void 0 : platform.isElement(arrowOffsetParent);
+              case 25:
+                _context2.t0 = !_context2.sent;
+              case 26:
+                if (!_context2.t0) {
+                  _context2.next = 28;
+                  break;
+                }
+                clientSize = elements.floating[clientProp] || rects.floating[length];
+              case 28:
+                centerToReference = endDiff / 2 - startDiff / 2; // If the padding is large enough that it causes the arrow to no longer be
+                // centered, modify the padding so that it is centered.
+                largestPossiblePadding = clientSize / 2 - arrowDimensions[length] / 2 - 1;
+                minPadding = min(paddingObject[minProp], largestPossiblePadding);
+                maxPadding = min(paddingObject[maxProp], largestPossiblePadding); // Make sure the arrow doesn't overflow the floating element if the center
+                // point is outside the floating element's bounds.
+                min$1 = minPadding;
+                max = clientSize - arrowDimensions[length] - maxPadding;
+                center = clientSize / 2 - arrowDimensions[length] / 2 + centerToReference;
+                offset = clamp(min$1, center, max); // If the reference is small enough that the arrow's padding causes it to
+                // to point to nothing for an aligned placement, adjust the offset of the
+                // floating element itself. This stops `shift()` from taking action, but can
+                // be worked around by calling it again after the `arrow()` if desired.
+                shouldAddOffset = getAlignment(placement) != null && center != offset && rects.reference[length] / 2 - (center < min$1 ? minPadding : maxPadding) - arrowDimensions[length] / 2 < 0;
+                alignmentOffset = shouldAddOffset ? center < min$1 ? min$1 - center : max - center : 0;
+                return _context2.abrupt("return", _defineProperty(_defineProperty({}, axis, coords[axis] - alignmentOffset), "data", _defineProperty(_defineProperty({}, axis, offset), "centerOffset", center - offset + alignmentOffset)));
+              case 39:
+              case "end":
+                return _context2.stop();
+            }
+          }, _callee2);
+        }))();
+      }
+    };
+  };
+
+  /**
+   * Optimizes the visibility of the floating element by flipping the `placement`
+   * in order to keep it in view when the preferred placement(s) will overflow the
+   * clipping boundary. Alternative to `autoPlacement`.
+   * @see https://floating-ui.com/docs/flip
+   */
+  var flip = function flip(options) {
+    if (options === void 0) {
+      options = {};
+    }
+    return {
+      name: 'flip',
+      options: options,
+      fn: function fn(state) {
+        return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+          var _middlewareData$flip, placement, middlewareData, rects, initialPlacement, platform, elements, _evaluate2, _evaluate2$mainAxis, checkMainAxis, _evaluate2$crossAxis, checkCrossAxis, specifiedFallbackPlacements, _evaluate2$fallbackSt, fallbackStrategy, _evaluate2$fallbackAx, fallbackAxisSideDirection, _evaluate2$flipAlignm, flipAlignment, detectOverflowOptions, side, isBasePlacement, rtl, fallbackPlacements, placements, overflow, overflows, overflowsData, sides, _middlewareData$flip2, _overflowsData$filter, nextIndex, nextPlacement, resetPlacement, _overflowsData$map$so, _placement;
+          return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+            while (1) switch (_context3.prev = _context3.next) {
+              case 0:
+                placement = state.placement, middlewareData = state.middlewareData, rects = state.rects, initialPlacement = state.initialPlacement, platform = state.platform, elements = state.elements;
+                _evaluate2 = evaluate(options, state), _evaluate2$mainAxis = _evaluate2.mainAxis, checkMainAxis = _evaluate2$mainAxis === void 0 ? true : _evaluate2$mainAxis, _evaluate2$crossAxis = _evaluate2.crossAxis, checkCrossAxis = _evaluate2$crossAxis === void 0 ? true : _evaluate2$crossAxis, specifiedFallbackPlacements = _evaluate2.fallbackPlacements, _evaluate2$fallbackSt = _evaluate2.fallbackStrategy, fallbackStrategy = _evaluate2$fallbackSt === void 0 ? 'bestFit' : _evaluate2$fallbackSt, _evaluate2$fallbackAx = _evaluate2.fallbackAxisSideDirection, fallbackAxisSideDirection = _evaluate2$fallbackAx === void 0 ? 'none' : _evaluate2$fallbackAx, _evaluate2$flipAlignm = _evaluate2.flipAlignment, flipAlignment = _evaluate2$flipAlignm === void 0 ? true : _evaluate2$flipAlignm, detectOverflowOptions = _objectWithoutPropertiesLoose(_evaluate2, _excluded2);
+                side = getSide(placement);
+                isBasePlacement = getSide(initialPlacement) === initialPlacement;
+                _context3.next = 6;
+                return platform.isRTL == null ? void 0 : platform.isRTL(elements.floating);
+              case 6:
+                rtl = _context3.sent;
+                fallbackPlacements = specifiedFallbackPlacements || (isBasePlacement || !flipAlignment ? [getOppositePlacement(initialPlacement)] : getExpandedPlacements(initialPlacement));
+                if (!specifiedFallbackPlacements && fallbackAxisSideDirection !== 'none') {
+                  fallbackPlacements.push.apply(fallbackPlacements, _toConsumableArray(getOppositeAxisPlacements(initialPlacement, flipAlignment, fallbackAxisSideDirection, rtl)));
+                }
+                placements = [initialPlacement].concat(_toConsumableArray(fallbackPlacements));
+                _context3.next = 12;
+                return detectOverflow(state, detectOverflowOptions);
+              case 12:
+                overflow = _context3.sent;
+                overflows = [];
+                overflowsData = ((_middlewareData$flip = middlewareData.flip) == null ? void 0 : _middlewareData$flip.overflows) || [];
+                if (checkMainAxis) {
+                  overflows.push(overflow[side]);
+                }
+                if (checkCrossAxis) {
+                  sides = getAlignmentSides(placement, rects, rtl);
+                  overflows.push(overflow[sides[0]], overflow[sides[1]]);
+                }
+                overflowsData = [].concat(_toConsumableArray(overflowsData), [{
+                  placement: placement,
+                  overflows: overflows
+                }]);
+
+                // One or more sides is overflowing.
+                if (overflows.every(function (side) {
+                  return side <= 0;
+                })) {
+                  _context3.next = 35;
+                  break;
+                }
+                nextIndex = (((_middlewareData$flip2 = middlewareData.flip) == null ? void 0 : _middlewareData$flip2.index) || 0) + 1;
+                nextPlacement = placements[nextIndex];
+                if (!nextPlacement) {
+                  _context3.next = 23;
+                  break;
+                }
+                return _context3.abrupt("return", {
+                  data: {
+                    index: nextIndex,
+                    overflows: overflowsData
+                  },
+                  reset: {
+                    placement: nextPlacement
+                  }
+                });
+              case 23:
+                // First, find the candidates that fit on the mainAxis side of overflow,
+                // then find the placement that fits the best on the main crossAxis side.
+                resetPlacement = (_overflowsData$filter = overflowsData.filter(function (d) {
+                  return d.overflows[0] <= 0;
+                }).sort(function (a, b) {
+                  return a.overflows[1] - b.overflows[1];
+                })[0]) == null ? void 0 : _overflowsData$filter.placement; // Otherwise fallback.
+                if (resetPlacement) {
+                  _context3.next = 33;
+                  break;
+                }
+                _context3.t0 = fallbackStrategy;
+                _context3.next = _context3.t0 === 'bestFit' ? 28 : _context3.t0 === 'initialPlacement' ? 31 : 33;
+                break;
+              case 28:
+                _placement = (_overflowsData$map$so = overflowsData.map(function (d) {
+                  return [d.placement, d.overflows.filter(function (overflow) {
+                    return overflow > 0;
+                  }).reduce(function (acc, overflow) {
+                    return acc + overflow;
+                  }, 0)];
+                }).sort(function (a, b) {
+                  return a[1] - b[1];
+                })[0]) == null ? void 0 : _overflowsData$map$so[0];
+                if (_placement) {
+                  resetPlacement = _placement;
+                }
+                return _context3.abrupt("break", 33);
+              case 31:
+                resetPlacement = initialPlacement;
+                return _context3.abrupt("break", 33);
+              case 33:
+                if (!(placement !== resetPlacement)) {
+                  _context3.next = 35;
+                  break;
+                }
+                return _context3.abrupt("return", {
+                  reset: {
+                    placement: resetPlacement
+                  }
+                });
+              case 35:
+                return _context3.abrupt("return", {});
+              case 36:
+              case "end":
+                return _context3.stop();
+            }
+          }, _callee3);
+        }))();
+      }
+    };
+  };
+
+  /**
+   * Optimizes the visibility of the floating element by shifting it in order to
+   * keep it in view when it will overflow the clipping boundary.
+   * @see https://floating-ui.com/docs/shift
+   */
+  var shift = function shift(options) {
+    if (options === void 0) {
+      options = {};
+    }
+    return {
+      name: 'shift',
+      options: options,
+      fn: function fn(state) {
+        return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+          var x, y, placement, _evaluate4, _evaluate4$mainAxis, checkMainAxis, _evaluate4$crossAxis, checkCrossAxis, _evaluate4$limiter, limiter, detectOverflowOptions, coords, overflow, crossAxis, mainAxis, mainAxisCoord, crossAxisCoord, minSide, maxSide, _min, _max, _minSide, _maxSide, _min2, _max2, limitedCoords;
+          return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+            while (1) switch (_context4.prev = _context4.next) {
+              case 0:
+                x = state.x, y = state.y, placement = state.placement;
+                _evaluate4 = evaluate(options, state), _evaluate4$mainAxis = _evaluate4.mainAxis, checkMainAxis = _evaluate4$mainAxis === void 0 ? true : _evaluate4$mainAxis, _evaluate4$crossAxis = _evaluate4.crossAxis, checkCrossAxis = _evaluate4$crossAxis === void 0 ? false : _evaluate4$crossAxis, _evaluate4$limiter = _evaluate4.limiter, limiter = _evaluate4$limiter === void 0 ? {
+                  fn: function fn(_ref) {
+                    var x = _ref.x,
+                      y = _ref.y;
+                    return {
+                      x: x,
+                      y: y
+                    };
+                  }
+                } : _evaluate4$limiter, detectOverflowOptions = _objectWithoutPropertiesLoose(_evaluate4, _excluded4);
+                coords = {
+                  x: x,
+                  y: y
+                };
+                _context4.next = 5;
+                return detectOverflow(state, detectOverflowOptions);
+              case 5:
+                overflow = _context4.sent;
+                crossAxis = getSideAxis(getSide(placement));
+                mainAxis = getOppositeAxis(crossAxis);
+                mainAxisCoord = coords[mainAxis];
+                crossAxisCoord = coords[crossAxis];
+                if (checkMainAxis) {
+                  minSide = mainAxis === 'y' ? 'top' : 'left';
+                  maxSide = mainAxis === 'y' ? 'bottom' : 'right';
+                  _min = mainAxisCoord + overflow[minSide];
+                  _max = mainAxisCoord - overflow[maxSide];
+                  mainAxisCoord = clamp(_min, mainAxisCoord, _max);
+                }
+                if (checkCrossAxis) {
+                  _minSide = crossAxis === 'y' ? 'top' : 'left';
+                  _maxSide = crossAxis === 'y' ? 'bottom' : 'right';
+                  _min2 = crossAxisCoord + overflow[_minSide];
+                  _max2 = crossAxisCoord - overflow[_maxSide];
+                  crossAxisCoord = clamp(_min2, crossAxisCoord, _max2);
+                }
+                limitedCoords = limiter.fn(_extends({}, state, _defineProperty(_defineProperty({}, mainAxis, mainAxisCoord), crossAxis, crossAxisCoord)));
+                return _context4.abrupt("return", _extends({}, limitedCoords, {
+                  data: {
+                    x: limitedCoords.x - x,
+                    y: limitedCoords.y - y
+                  }
+                }));
+              case 14:
+              case "end":
+                return _context4.stop();
+            }
+          }, _callee4);
+        }))();
+      }
+    };
+  };
+  /**
+   * Built-in `limiter` that will stop `shift()` at a certain point.
+   */
+  var limitShift = function limitShift(options) {
+    if (options === void 0) {
+      options = {};
+    }
+    return {
+      options: options,
+      fn: function fn(state) {
+        var x = state.x,
+          y = state.y,
+          placement = state.placement,
+          rects = state.rects,
+          middlewareData = state.middlewareData;
+        var _evaluate = evaluate(options, state),
+          _evaluate$offset = _evaluate.offset,
+          offset = _evaluate$offset === void 0 ? 0 : _evaluate$offset,
+          _evaluate$mainAxis = _evaluate.mainAxis,
+          checkMainAxis = _evaluate$mainAxis === void 0 ? true : _evaluate$mainAxis,
+          _evaluate$crossAxis = _evaluate.crossAxis,
+          checkCrossAxis = _evaluate$crossAxis === void 0 ? true : _evaluate$crossAxis;
+        var coords = {
+          x: x,
+          y: y
+        };
+        var crossAxis = getSideAxis(placement);
+        var mainAxis = getOppositeAxis(crossAxis);
+        var mainAxisCoord = coords[mainAxis];
+        var crossAxisCoord = coords[crossAxis];
+        var rawOffset = evaluate(offset, state);
+        var computedOffset = typeof rawOffset === 'number' ? {
+          mainAxis: rawOffset,
+          crossAxis: 0
+        } : _extends({
+          mainAxis: 0,
+          crossAxis: 0
+        }, rawOffset);
+        if (checkMainAxis) {
+          var len = mainAxis === 'y' ? 'height' : 'width';
+          var limitMin = rects.reference[mainAxis] - rects.floating[len] + computedOffset.mainAxis;
+          var limitMax = rects.reference[mainAxis] + rects.reference[len] - computedOffset.mainAxis;
+          if (mainAxisCoord < limitMin) {
+            mainAxisCoord = limitMin;
+          } else if (mainAxisCoord > limitMax) {
+            mainAxisCoord = limitMax;
+          }
+        }
+        if (checkCrossAxis) {
+          var _middlewareData$offse, _middlewareData$offse2;
+          var _len2 = mainAxis === 'y' ? 'width' : 'height';
+          var isOriginSide = ['top', 'left'].includes(getSide(placement));
+          var _limitMin = rects.reference[crossAxis] - rects.floating[_len2] + (isOriginSide ? ((_middlewareData$offse = middlewareData.offset) == null ? void 0 : _middlewareData$offse[crossAxis]) || 0 : 0) + (isOriginSide ? 0 : computedOffset.crossAxis);
+          var _limitMax = rects.reference[crossAxis] + rects.reference[_len2] + (isOriginSide ? 0 : ((_middlewareData$offse2 = middlewareData.offset) == null ? void 0 : _middlewareData$offse2[crossAxis]) || 0) - (isOriginSide ? computedOffset.crossAxis : 0);
+          if (crossAxisCoord < _limitMin) {
+            crossAxisCoord = _limitMin;
+          } else if (crossAxisCoord > _limitMax) {
+            crossAxisCoord = _limitMax;
+          }
+        }
+        return _defineProperty(_defineProperty({}, mainAxis, mainAxisCoord), crossAxis, crossAxisCoord);
+      }
+    };
+  };
+  function getNodeName(node) {
+    if (isNode(node)) {
+      return (node.nodeName || '').toLowerCase();
+    }
+    // Mocked nodes in testing environments may not be instances of Node. By
+    // returning `#document` an infinite loop won't occur.
+    // https://github.com/floating-ui/floating-ui/issues/2317
+    return '#document';
+  }
+  function getWindow(node) {
+    var _node$ownerDocument;
+    return (node == null ? void 0 : (_node$ownerDocument = node.ownerDocument) == null ? void 0 : _node$ownerDocument.defaultView) || window;
+  }
+  function getDocumentElement(node) {
+    var _ref;
+    return (_ref = (isNode(node) ? node.ownerDocument : node.document) || window.document) == null ? void 0 : _ref.documentElement;
+  }
+  function isNode(value) {
+    return value instanceof Node || value instanceof getWindow(value).Node;
+  }
+  function isElement(value) {
+    return value instanceof Element || value instanceof getWindow(value).Element;
+  }
+  function isHTMLElement(value) {
+    return value instanceof HTMLElement || value instanceof getWindow(value).HTMLElement;
+  }
+  function isShadowRoot(value) {
+    // Browsers without `ShadowRoot` support.
+    if (typeof ShadowRoot === 'undefined') {
+      return false;
+    }
+    return value instanceof ShadowRoot || value instanceof getWindow(value).ShadowRoot;
+  }
+  function isOverflowElement(element) {
+    var _getComputedStyle = getComputedStyle(element),
+      overflow = _getComputedStyle.overflow,
+      overflowX = _getComputedStyle.overflowX,
+      overflowY = _getComputedStyle.overflowY,
+      display = _getComputedStyle.display;
+    return /auto|scroll|overlay|hidden|clip/.test(overflow + overflowY + overflowX) && !['inline', 'contents'].includes(display);
+  }
+  function isTableElement(element) {
+    return ['table', 'td', 'th'].includes(getNodeName(element));
+  }
+  function isContainingBlock(element) {
+    var webkit = isWebKit();
+    var css = getComputedStyle(element);
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
+    return css.transform !== 'none' || css.perspective !== 'none' || (css.containerType ? css.containerType !== 'normal' : false) || !webkit && (css.backdropFilter ? css.backdropFilter !== 'none' : false) || !webkit && (css.filter ? css.filter !== 'none' : false) || ['transform', 'perspective', 'filter'].some(function (value) {
+      return (css.willChange || '').includes(value);
+    }) || ['paint', 'layout', 'strict', 'content'].some(function (value) {
+      return (css.contain || '').includes(value);
+    });
+  }
+  function getContainingBlock(element) {
+    var currentNode = getParentNode(element);
+    while (isHTMLElement(currentNode) && !isLastTraversableNode(currentNode)) {
+      if (isContainingBlock(currentNode)) {
+        return currentNode;
+      } else {
+        currentNode = getParentNode(currentNode);
+      }
+    }
+    return null;
+  }
+  function isWebKit() {
+    if (typeof CSS === 'undefined' || !CSS.supports) return false;
+    return CSS.supports('-webkit-backdrop-filter', 'none');
+  }
+  function isLastTraversableNode(node) {
+    return ['html', 'body', '#document'].includes(getNodeName(node));
+  }
+  function getComputedStyle(element) {
+    return getWindow(element).getComputedStyle(element);
+  }
+  function getNodeScroll(element) {
+    if (isElement(element)) {
+      return {
+        scrollLeft: element.scrollLeft,
+        scrollTop: element.scrollTop
+      };
+    }
+    return {
+      scrollLeft: element.pageXOffset,
+      scrollTop: element.pageYOffset
+    };
+  }
+  function getParentNode(node) {
+    if (getNodeName(node) === 'html') {
+      return node;
+    }
+    var result =
+    // Step into the shadow DOM of the parent of a slotted node.
+    node.assignedSlot ||
+    // DOM Element detected.
+    node.parentNode ||
+    // ShadowRoot detected.
+    isShadowRoot(node) && node.host ||
+    // Fallback.
+    getDocumentElement(node);
+    return isShadowRoot(result) ? result.host : result;
+  }
+  function getNearestOverflowAncestor(node) {
+    var parentNode = getParentNode(node);
+    if (isLastTraversableNode(parentNode)) {
+      return node.ownerDocument ? node.ownerDocument.body : node.body;
+    }
+    if (isHTMLElement(parentNode) && isOverflowElement(parentNode)) {
+      return parentNode;
+    }
+    return getNearestOverflowAncestor(parentNode);
+  }
+  function getOverflowAncestors(node, list) {
+    var _node$ownerDocument2;
+    if (list === void 0) {
+      list = [];
+    }
+    var scrollableAncestor = getNearestOverflowAncestor(node);
+    var isBody = scrollableAncestor === ((_node$ownerDocument2 = node.ownerDocument) == null ? void 0 : _node$ownerDocument2.body);
+    var win = getWindow(scrollableAncestor);
+    if (isBody) {
+      return list.concat(win, win.visualViewport || [], isOverflowElement(scrollableAncestor) ? scrollableAncestor : []);
+    }
+    return list.concat(scrollableAncestor, getOverflowAncestors(scrollableAncestor));
+  }
+  function getCssDimensions(element) {
+    var css = getComputedStyle(element);
+    // In testing environments, the `width` and `height` properties are empty
+    // strings for SVG elements, returning NaN. Fallback to `0` in this case.
+    var width = parseFloat(css.width) || 0;
+    var height = parseFloat(css.height) || 0;
+    var hasOffset = isHTMLElement(element);
+    var offsetWidth = hasOffset ? element.offsetWidth : width;
+    var offsetHeight = hasOffset ? element.offsetHeight : height;
+    var shouldFallback = round(width) !== offsetWidth || round(height) !== offsetHeight;
+    if (shouldFallback) {
+      width = offsetWidth;
+      height = offsetHeight;
+    }
+    return {
+      width: width,
+      height: height,
+      $: shouldFallback
+    };
+  }
+  function unwrapElement(element) {
+    return !isElement(element) ? element.contextElement : element;
+  }
+  function getScale(element) {
+    var domElement = unwrapElement(element);
+    if (!isHTMLElement(domElement)) {
+      return createCoords(1);
+    }
+    var rect = domElement.getBoundingClientRect();
+    var _getCssDimensions = getCssDimensions(domElement),
+      width = _getCssDimensions.width,
+      height = _getCssDimensions.height,
+      $ = _getCssDimensions.$;
+    var x = ($ ? round(rect.width) : rect.width) / width;
+    var y = ($ ? round(rect.height) : rect.height) / height;
+
+    // 0, NaN, or Infinity should always fallback to 1.
+
+    if (!x || !Number.isFinite(x)) {
+      x = 1;
+    }
+    if (!y || !Number.isFinite(y)) {
+      y = 1;
+    }
+    return {
+      x: x,
+      y: y
+    };
+  }
+  var noOffsets = /*#__PURE__*/createCoords(0);
+  function getVisualOffsets(element) {
+    var win = getWindow(element);
+    if (!isWebKit() || !win.visualViewport) {
+      return noOffsets;
+    }
+    return {
+      x: win.visualViewport.offsetLeft,
+      y: win.visualViewport.offsetTop
+    };
+  }
+  function shouldAddVisualOffsets(element, isFixed, floatingOffsetParent) {
+    if (isFixed === void 0) {
+      isFixed = false;
+    }
+    if (!floatingOffsetParent || isFixed && floatingOffsetParent !== getWindow(element)) {
+      return false;
+    }
+    return isFixed;
+  }
+  function getBoundingClientRect(element, includeScale, isFixedStrategy, offsetParent) {
+    if (includeScale === void 0) {
+      includeScale = false;
+    }
+    if (isFixedStrategy === void 0) {
+      isFixedStrategy = false;
+    }
+    var clientRect = element.getBoundingClientRect();
+    var domElement = unwrapElement(element);
+    var scale = createCoords(1);
+    if (includeScale) {
+      if (offsetParent) {
+        if (isElement(offsetParent)) {
+          scale = getScale(offsetParent);
+        }
+      } else {
+        scale = getScale(element);
+      }
+    }
+    var visualOffsets = shouldAddVisualOffsets(domElement, isFixedStrategy, offsetParent) ? getVisualOffsets(domElement) : createCoords(0);
+    var x = (clientRect.left + visualOffsets.x) / scale.x;
+    var y = (clientRect.top + visualOffsets.y) / scale.y;
+    var width = clientRect.width / scale.x;
+    var height = clientRect.height / scale.y;
+    if (domElement) {
+      var win = getWindow(domElement);
+      var offsetWin = offsetParent && isElement(offsetParent) ? getWindow(offsetParent) : offsetParent;
+      var currentIFrame = win.frameElement;
+      while (currentIFrame && offsetParent && offsetWin !== win) {
+        var iframeScale = getScale(currentIFrame);
+        var iframeRect = currentIFrame.getBoundingClientRect();
+        var css = getComputedStyle(currentIFrame);
+        var left = iframeRect.left + (currentIFrame.clientLeft + parseFloat(css.paddingLeft)) * iframeScale.x;
+        var top = iframeRect.top + (currentIFrame.clientTop + parseFloat(css.paddingTop)) * iframeScale.y;
+        x *= iframeScale.x;
+        y *= iframeScale.y;
+        width *= iframeScale.x;
+        height *= iframeScale.y;
+        x += left;
+        y += top;
+        currentIFrame = getWindow(currentIFrame).frameElement;
+      }
+    }
+    return rectToClientRect({
+      width: width,
+      height: height,
+      x: x,
+      y: y
+    });
+  }
+  function convertOffsetParentRelativeRectToViewportRelativeRect(_ref) {
+    var rect = _ref.rect,
+      offsetParent = _ref.offsetParent,
+      strategy = _ref.strategy;
+    var isOffsetParentAnElement = isHTMLElement(offsetParent);
+    var documentElement = getDocumentElement(offsetParent);
+    if (offsetParent === documentElement) {
+      return rect;
+    }
+    var scroll = {
+      scrollLeft: 0,
+      scrollTop: 0
+    };
+    var scale = createCoords(1);
+    var offsets = createCoords(0);
+    if (isOffsetParentAnElement || !isOffsetParentAnElement && strategy !== 'fixed') {
+      if (getNodeName(offsetParent) !== 'body' || isOverflowElement(documentElement)) {
+        scroll = getNodeScroll(offsetParent);
+      }
+      if (isHTMLElement(offsetParent)) {
+        var offsetRect = getBoundingClientRect(offsetParent);
+        scale = getScale(offsetParent);
+        offsets.x = offsetRect.x + offsetParent.clientLeft;
+        offsets.y = offsetRect.y + offsetParent.clientTop;
+      }
+    }
+    return {
+      width: rect.width * scale.x,
+      height: rect.height * scale.y,
+      x: rect.x * scale.x - scroll.scrollLeft * scale.x + offsets.x,
+      y: rect.y * scale.y - scroll.scrollTop * scale.y + offsets.y
+    };
+  }
+  function getClientRects(element) {
+    return Array.from(element.getClientRects());
+  }
+  function getWindowScrollBarX(element) {
+    // If <html> has a CSS width greater than the viewport, then this will be
+    // incorrect for RTL.
+    return getBoundingClientRect(getDocumentElement(element)).left + getNodeScroll(element).scrollLeft;
+  }
+
+  // Gets the entire size of the scrollable document area, even extending outside
+  // of the `<html>` and `<body>` rect bounds if horizontally scrollable.
+  function getDocumentRect(element) {
+    var html = getDocumentElement(element);
+    var scroll = getNodeScroll(element);
+    var body = element.ownerDocument.body;
+    var width = max(html.scrollWidth, html.clientWidth, body.scrollWidth, body.clientWidth);
+    var height = max(html.scrollHeight, html.clientHeight, body.scrollHeight, body.clientHeight);
+    var x = -scroll.scrollLeft + getWindowScrollBarX(element);
+    var y = -scroll.scrollTop;
+    if (getComputedStyle(body).direction === 'rtl') {
+      x += max(html.clientWidth, body.clientWidth) - width;
+    }
+    return {
+      width: width,
+      height: height,
+      x: x,
+      y: y
+    };
+  }
+  function getViewportRect(element, strategy) {
+    var win = getWindow(element);
+    var html = getDocumentElement(element);
+    var visualViewport = win.visualViewport;
+    var width = html.clientWidth;
+    var height = html.clientHeight;
+    var x = 0;
+    var y = 0;
+    if (visualViewport) {
+      width = visualViewport.width;
+      height = visualViewport.height;
+      var visualViewportBased = isWebKit();
+      if (!visualViewportBased || visualViewportBased && strategy === 'fixed') {
+        x = visualViewport.offsetLeft;
+        y = visualViewport.offsetTop;
+      }
+    }
+    return {
+      width: width,
+      height: height,
+      x: x,
+      y: y
+    };
+  }
+
+  // Returns the inner client rect, subtracting scrollbars if present.
+  function getInnerBoundingClientRect(element, strategy) {
+    var clientRect = getBoundingClientRect(element, true, strategy === 'fixed');
+    var top = clientRect.top + element.clientTop;
+    var left = clientRect.left + element.clientLeft;
+    var scale = isHTMLElement(element) ? getScale(element) : createCoords(1);
+    var width = element.clientWidth * scale.x;
+    var height = element.clientHeight * scale.y;
+    var x = left * scale.x;
+    var y = top * scale.y;
+    return {
+      width: width,
+      height: height,
+      x: x,
+      y: y
+    };
+  }
+  function getClientRectFromClippingAncestor(element, clippingAncestor, strategy) {
+    var rect;
+    if (clippingAncestor === 'viewport') {
+      rect = getViewportRect(element, strategy);
+    } else if (clippingAncestor === 'document') {
+      rect = getDocumentRect(getDocumentElement(element));
+    } else if (isElement(clippingAncestor)) {
+      rect = getInnerBoundingClientRect(clippingAncestor, strategy);
+    } else {
+      var visualOffsets = getVisualOffsets(element);
+      rect = _extends({}, clippingAncestor, {
+        x: clippingAncestor.x - visualOffsets.x,
+        y: clippingAncestor.y - visualOffsets.y
+      });
+    }
+    return rectToClientRect(rect);
+  }
+  function hasFixedPositionAncestor(element, stopNode) {
+    var parentNode = getParentNode(element);
+    if (parentNode === stopNode || !isElement(parentNode) || isLastTraversableNode(parentNode)) {
+      return false;
+    }
+    return getComputedStyle(parentNode).position === 'fixed' || hasFixedPositionAncestor(parentNode, stopNode);
+  }
+
+  // A "clipping ancestor" is an `overflow` element with the characteristic of
+  // clipping (or hiding) child elements. This returns all clipping ancestors
+  // of the given element up the tree.
+  function getClippingElementAncestors(element, cache) {
+    var cachedResult = cache.get(element);
+    if (cachedResult) {
+      return cachedResult;
+    }
+    var result = getOverflowAncestors(element).filter(function (el) {
+      return isElement(el) && getNodeName(el) !== 'body';
+    });
+    var currentContainingBlockComputedStyle = null;
+    var elementIsFixed = getComputedStyle(element).position === 'fixed';
+    var currentNode = elementIsFixed ? getParentNode(element) : element;
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
+    while (isElement(currentNode) && !isLastTraversableNode(currentNode)) {
+      var computedStyle = getComputedStyle(currentNode);
+      var currentNodeIsContaining = isContainingBlock(currentNode);
+      if (!currentNodeIsContaining && computedStyle.position === 'fixed') {
+        currentContainingBlockComputedStyle = null;
+      }
+      var shouldDropCurrentNode = elementIsFixed ? !currentNodeIsContaining && !currentContainingBlockComputedStyle : !currentNodeIsContaining && computedStyle.position === 'static' && !!currentContainingBlockComputedStyle && ['absolute', 'fixed'].includes(currentContainingBlockComputedStyle.position) || isOverflowElement(currentNode) && !currentNodeIsContaining && hasFixedPositionAncestor(element, currentNode);
+      if (shouldDropCurrentNode) {
+        // Drop non-containing blocks.
+        result = result.filter(function (ancestor) {
+          return ancestor !== currentNode;
+        });
+      } else {
+        // Record last containing block for next iteration.
+        currentContainingBlockComputedStyle = computedStyle;
+      }
+      currentNode = getParentNode(currentNode);
+    }
+    cache.set(element, result);
+    return result;
+  }
+
+  // Gets the maximum area that the element is visible in due to any number of
+  // clipping ancestors.
+  function getClippingRect(_ref) {
+    var element = _ref.element,
+      boundary = _ref.boundary,
+      rootBoundary = _ref.rootBoundary,
+      strategy = _ref.strategy;
+    var elementClippingAncestors = boundary === 'clippingAncestors' ? getClippingElementAncestors(element, this._c) : [].concat(boundary);
+    var clippingAncestors = [].concat(_toConsumableArray(elementClippingAncestors), [rootBoundary]);
+    var firstClippingAncestor = clippingAncestors[0];
+    var clippingRect = clippingAncestors.reduce(function (accRect, clippingAncestor) {
+      var rect = getClientRectFromClippingAncestor(element, clippingAncestor, strategy);
+      accRect.top = max(rect.top, accRect.top);
+      accRect.right = min(rect.right, accRect.right);
+      accRect.bottom = min(rect.bottom, accRect.bottom);
+      accRect.left = max(rect.left, accRect.left);
+      return accRect;
+    }, getClientRectFromClippingAncestor(element, firstClippingAncestor, strategy));
+    return {
+      width: clippingRect.right - clippingRect.left,
+      height: clippingRect.bottom - clippingRect.top,
+      x: clippingRect.left,
+      y: clippingRect.top
+    };
+  }
+  function getDimensions(element) {
+    return getCssDimensions(element);
+  }
+  function getRectRelativeToOffsetParent(element, offsetParent, strategy) {
+    var isOffsetParentAnElement = isHTMLElement(offsetParent);
+    var documentElement = getDocumentElement(offsetParent);
+    var isFixed = strategy === 'fixed';
+    var rect = getBoundingClientRect(element, true, isFixed, offsetParent);
+    var scroll = {
+      scrollLeft: 0,
+      scrollTop: 0
+    };
+    var offsets = createCoords(0);
+    if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
+      if (getNodeName(offsetParent) !== 'body' || isOverflowElement(documentElement)) {
+        scroll = getNodeScroll(offsetParent);
+      }
+      if (isOffsetParentAnElement) {
+        var offsetRect = getBoundingClientRect(offsetParent, true, isFixed, offsetParent);
+        offsets.x = offsetRect.x + offsetParent.clientLeft;
+        offsets.y = offsetRect.y + offsetParent.clientTop;
+      } else if (documentElement) {
+        offsets.x = getWindowScrollBarX(documentElement);
+      }
+    }
+    return {
+      x: rect.left + scroll.scrollLeft - offsets.x,
+      y: rect.top + scroll.scrollTop - offsets.y,
+      width: rect.width,
+      height: rect.height
+    };
+  }
+  function getTrueOffsetParent(element, polyfill) {
+    if (!isHTMLElement(element) || getComputedStyle(element).position === 'fixed') {
+      return null;
+    }
+    if (polyfill) {
+      return polyfill(element);
+    }
+    return element.offsetParent;
+  }
+
+  // Gets the closest ancestor positioned element. Handles some edge cases,
+  // such as table ancestors and cross browser bugs.
+  function getOffsetParent(element, polyfill) {
+    var window = getWindow(element);
+    if (!isHTMLElement(element)) {
+      return window;
+    }
+    var offsetParent = getTrueOffsetParent(element, polyfill);
+    while (offsetParent && isTableElement(offsetParent) && getComputedStyle(offsetParent).position === 'static') {
+      offsetParent = getTrueOffsetParent(offsetParent, polyfill);
+    }
+    if (offsetParent && (getNodeName(offsetParent) === 'html' || getNodeName(offsetParent) === 'body' && getComputedStyle(offsetParent).position === 'static' && !isContainingBlock(offsetParent))) {
+      return window;
+    }
+    return offsetParent || getContainingBlock(element) || window;
+  }
+  var getElementRects = /*#__PURE__*/function () {
+    var _getElementRects = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(_ref) {
+      var reference, floating, strategy, getOffsetParentFn, getDimensionsFn;
+      return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        while (1) switch (_context5.prev = _context5.next) {
+          case 0:
+            reference = _ref.reference, floating = _ref.floating, strategy = _ref.strategy;
+            getOffsetParentFn = this.getOffsetParent || getOffsetParent;
+            getDimensionsFn = this.getDimensions;
+            _context5.t0 = getRectRelativeToOffsetParent;
+            _context5.t1 = reference;
+            _context5.next = 7;
+            return getOffsetParentFn(floating);
+          case 7:
+            _context5.t2 = _context5.sent;
+            _context5.t3 = strategy;
+            _context5.t4 = (0, _context5.t0)(_context5.t1, _context5.t2, _context5.t3);
+            _context5.t5 = _extends;
+            _context5.t6 = {
+              x: 0,
+              y: 0
+            };
+            _context5.next = 14;
+            return getDimensionsFn(floating);
+          case 14:
+            _context5.t7 = _context5.sent;
+            _context5.t8 = (0, _context5.t5)(_context5.t6, _context5.t7);
+            return _context5.abrupt("return", {
+              reference: _context5.t4,
+              floating: _context5.t8
+            });
+          case 17:
+          case "end":
+            return _context5.stop();
+        }
+      }, _callee5, this);
+    }));
+    function getElementRects(_x6) {
+      return _getElementRects.apply(this, arguments);
+    }
+    return getElementRects;
+  }();
+  function isRTL(element) {
+    return getComputedStyle(element).direction === 'rtl';
+  }
+  var platform = {
+    convertOffsetParentRelativeRectToViewportRelativeRect: convertOffsetParentRelativeRectToViewportRelativeRect,
+    getDocumentElement: getDocumentElement,
+    getClippingRect: getClippingRect,
+    getOffsetParent: getOffsetParent,
+    getElementRects: getElementRects,
+    getClientRects: getClientRects,
+    getDimensions: getDimensions,
+    getScale: getScale,
+    isElement: isElement,
+    isRTL: isRTL
+  };
+
+  // https://samthor.au/2021/observing-dom/
+  function observeMove(element, onMove) {
+    var io = null;
+    var timeoutId;
+    var root = getDocumentElement(element);
+    function cleanup() {
+      clearTimeout(timeoutId);
+      io && io.disconnect();
+      io = null;
+    }
+    function refresh(skip, threshold) {
+      if (skip === void 0) {
+        skip = false;
+      }
+      if (threshold === void 0) {
+        threshold = 1;
+      }
+      cleanup();
+      var _element$getBoundingC = element.getBoundingClientRect(),
+        left = _element$getBoundingC.left,
+        top = _element$getBoundingC.top,
+        width = _element$getBoundingC.width,
+        height = _element$getBoundingC.height;
+      if (!skip) {
+        onMove();
+      }
+      if (!width || !height) {
+        return;
+      }
+      var insetTop = floor(top);
+      var insetRight = floor(root.clientWidth - (left + width));
+      var insetBottom = floor(root.clientHeight - (top + height));
+      var insetLeft = floor(left);
+      var rootMargin = -insetTop + "px " + -insetRight + "px " + -insetBottom + "px " + -insetLeft + "px";
+      var options = {
+        rootMargin: rootMargin,
+        threshold: max(0, min(1, threshold)) || 1
+      };
+      var isFirstUpdate = true;
+      function handleObserve(entries) {
+        var ratio = entries[0].intersectionRatio;
+        if (ratio !== threshold) {
+          if (!isFirstUpdate) {
+            return refresh();
+          }
+          if (!ratio) {
+            timeoutId = setTimeout(function () {
+              refresh(false, 1e-7);
+            }, 100);
+          } else {
+            refresh(false, ratio);
+          }
+        }
+        isFirstUpdate = false;
+      }
+
+      // Older browsers don't support a `document` as the root and will throw an
+      // error.
+      try {
+        io = new IntersectionObserver(handleObserve, _extends({}, options, {
+          // Handle <iframe>s
+          root: root.ownerDocument
+        }));
+      } catch (e) {
+        io = new IntersectionObserver(handleObserve, options);
+      }
+      io.observe(element);
+    }
+    refresh(true);
+    return cleanup;
+  }
+
+  /**
+   * Automatically updates the position of the floating element when necessary.
+   * Should only be called when the floating element is mounted on the DOM or
+   * visible on the screen.
+   * @returns cleanup function that should be invoked when the floating element is
+   * removed from the DOM or hidden from the screen.
+   * @see https://floating-ui.com/docs/autoUpdate
+   */
+  function autoUpdate(reference, floating, update, options) {
+    if (options === void 0) {
+      options = {};
+    }
+    var _options = options,
+      _options$ancestorScro = _options.ancestorScroll,
+      ancestorScroll = _options$ancestorScro === void 0 ? true : _options$ancestorScro,
+      _options$ancestorResi = _options.ancestorResize,
+      ancestorResize = _options$ancestorResi === void 0 ? true : _options$ancestorResi,
+      _options$elementResiz = _options.elementResize,
+      elementResize = _options$elementResiz === void 0 ? typeof ResizeObserver === 'function' : _options$elementResiz,
+      _options$layoutShift = _options.layoutShift,
+      layoutShift = _options$layoutShift === void 0 ? typeof IntersectionObserver === 'function' : _options$layoutShift,
+      _options$animationFra = _options.animationFrame,
+      animationFrame = _options$animationFra === void 0 ? false : _options$animationFra;
+    var referenceEl = unwrapElement(reference);
+    var ancestors = ancestorScroll || ancestorResize ? [].concat(_toConsumableArray(referenceEl ? getOverflowAncestors(referenceEl) : []), _toConsumableArray(getOverflowAncestors(floating))) : [];
+    ancestors.forEach(function (ancestor) {
+      ancestorScroll && ancestor.addEventListener('scroll', update, {
+        passive: true
+      });
+      ancestorResize && ancestor.addEventListener('resize', update);
+    });
+    var cleanupIo = referenceEl && layoutShift ? observeMove(referenceEl, update) : null;
+    var reobserveFrame = -1;
+    var resizeObserver = null;
+    if (elementResize) {
+      resizeObserver = new ResizeObserver(function (_ref) {
+        var _ref7 = _slicedToArray(_ref, 1),
+          firstEntry = _ref7[0];
+        if (firstEntry && firstEntry.target === referenceEl && resizeObserver) {
+          // Prevent update loops when using the `size` middleware.
+          // https://github.com/floating-ui/floating-ui/issues/1740
+          resizeObserver.unobserve(floating);
+          cancelAnimationFrame(reobserveFrame);
+          reobserveFrame = requestAnimationFrame(function () {
+            resizeObserver && resizeObserver.observe(floating);
+          });
+        }
+        update();
+      });
+      if (referenceEl && !animationFrame) {
+        resizeObserver.observe(referenceEl);
+      }
+      resizeObserver.observe(floating);
+    }
+    var frameId;
+    var prevRefRect = animationFrame ? getBoundingClientRect(reference) : null;
+    if (animationFrame) {
+      frameLoop();
+    }
+    function frameLoop() {
+      var nextRefRect = getBoundingClientRect(reference);
+      if (prevRefRect && (nextRefRect.x !== prevRefRect.x || nextRefRect.y !== prevRefRect.y || nextRefRect.width !== prevRefRect.width || nextRefRect.height !== prevRefRect.height)) {
+        update();
+      }
+      prevRefRect = nextRefRect;
+      frameId = requestAnimationFrame(frameLoop);
+    }
+    update();
+    return function () {
+      ancestors.forEach(function (ancestor) {
+        ancestorScroll && ancestor.removeEventListener('scroll', update);
+        ancestorResize && ancestor.removeEventListener('resize', update);
+      });
+      cleanupIo && cleanupIo();
+      resizeObserver && resizeObserver.disconnect();
+      resizeObserver = null;
+      if (animationFrame) {
+        cancelAnimationFrame(frameId);
+      }
+    };
+  }
+
+  /**
+   * Computes the `x` and `y` coordinates that will place the floating element
+   * next to a reference element when it is given a certain CSS positioning
+   * strategy.
+   */
+  var computePosition = function computePosition(reference, floating, options) {
+    // This caches the expensive `getClippingElementAncestors` function so that
+    // multiple lifecycle resets re-use the same result. It only lives for a
+    // single call. If other functions become expensive, we can add them as well.
+    var cache = new Map();
+    var mergedOptions = _extends({
+      platform: platform
+    }, options);
+    var platformWithCache = _extends({}, mergedOptions.platform, {
+      _c: cache
+    });
+    return computePosition$1(reference, floating, _extends({}, mergedOptions, {
+      platform: platformWithCache
+    }));
+  };
+
+  /**
+   * Floating UI Options
+   *
+   * @typedef {object} FloatingUIOptions
+   */
+
+  /**
+   * Determines options for the tooltip and initializes event listeners.
+   *
+   * @param {Step} step The step instance
+   *
+   * @return {FloatingUIOptions}
+   */
+  function setupTooltip(step) {
+    if (step.cleanup) {
+      step.cleanup();
+    }
+    var attachToOptions = step._getResolvedAttachToOptions();
+    var target = attachToOptions.element;
+    var floatingUIOptions = getFloatingUIOptions(attachToOptions, step);
+    var shouldCenter = shouldCenterStep(attachToOptions);
+    if (shouldCenter) {
+      target = document.body;
+      var content = step.shepherdElementComponent.getElement();
+      content.classList.add('shepherd-centered');
+    }
+    step.cleanup = autoUpdate(target, step.el, function () {
+      // The element might have already been removed by the end of the tour.
+      if (!step.el) {
+        step.cleanup();
+        return;
+      }
+      setPosition(target, step, floatingUIOptions, shouldCenter);
+    });
+    step.target = attachToOptions.element;
+    return floatingUIOptions;
+  }
+
+  /**
+   * Merge tooltip options handling nested keys.
+   *
+   * @param tourOptions - The default tour options.
+   * @param options - Step specific options.
+   *
+   * @return {floatingUIOptions: FloatingUIOptions}
+   */
+  function mergeTooltipConfig(tourOptions, options) {
+    return {
+      floatingUIOptions: cjs(tourOptions.floatingUIOptions || {}, options.floatingUIOptions || {})
+    };
+  }
+
+  /**
+   * Cleanup function called when the step is closed/destroyed.
+   *
+   * @param {Step} step
+   */
+  function destroyTooltip(step) {
+    if (step.cleanup) {
+      step.cleanup();
+    }
+    step.cleanup = null;
+  }
+
+  /**
+   *
+   * @return {Promise<*>}
+   */
+  function setPosition(target, step, floatingUIOptions, shouldCenter) {
+    return computePosition(target, step.el, floatingUIOptions).then(floatingUIposition(step, shouldCenter))
+    // Wait before forcing focus.
+    .then(function (step) {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          return resolve(step);
+        }, 300);
+      });
+    })
+    // Replaces focusAfterRender modifier.
+    .then(function (step) {
+      if (step && step.el) {
+        step.el.focus({
+          preventScroll: true
+        });
+      }
+    });
+  }
+
+  /**
+   *
+   * @param step
+   * @param shouldCenter
+   * @return {function({x: *, y: *, placement: *, middlewareData: *}): Promise<unknown>}
+   */
+  function floatingUIposition(step, shouldCenter) {
+    return function (_ref8) {
+      var x = _ref8.x,
+        y = _ref8.y,
+        placement = _ref8.placement,
+        middlewareData = _ref8.middlewareData;
+      if (!step.el) {
+        return step;
+      }
+      if (shouldCenter) {
+        Object.assign(step.el.style, {
+          position: 'fixed',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)'
+        });
+      } else {
+        Object.assign(step.el.style, {
+          position: 'absolute',
+          left: "".concat(x, "px"),
+          top: "".concat(y, "px")
+        });
+      }
+      step.el.dataset.popperPlacement = placement;
+      placeArrow(step.el, middlewareData);
+      return step;
+    };
+  }
+
+  /**
+   *
+   * @param el
+   * @param middlewareData
+   */
+  function placeArrow(el, middlewareData) {
+    var arrowEl = el.querySelector('.shepherd-arrow');
+    if (arrowEl && middlewareData.arrow) {
+      var _middlewareData$arrow = middlewareData.arrow,
+        arrowX = _middlewareData$arrow.x,
+        arrowY = _middlewareData$arrow.y;
+      Object.assign(arrowEl.style, {
+        left: arrowX != null ? "".concat(arrowX, "px") : '',
+        top: arrowY != null ? "".concat(arrowY, "px") : ''
+      });
+    }
+  }
+
+  /**
+   * Gets the `Floating UI` options from a set of base `attachTo` options
+   * @param attachToOptions
+   * @param {Step} step The step instance
+   * @return {Object}
+   * @private
+   */
+  function getFloatingUIOptions(attachToOptions, step) {
+    var options = {
+      strategy: 'absolute',
+      middleware: []
+    };
+    var arrowEl = addArrow(step);
+    var shouldCenter = shouldCenterStep(attachToOptions);
+    if (!shouldCenter) {
+      options.middleware.push(flip(),
+      // Replicate PopperJS default behavior.
+      shift({
+        limiter: limitShift(),
+        crossAxis: true
+      }));
+      if (arrowEl) {
+        options.middleware.push(arrow({
+          element: arrowEl
+        }));
+      }
+      options.placement = attachToOptions.on;
+    }
+    return cjs(step.options.floatingUIOptions || {}, options);
+  }
+
+  /**
+   * @param {Step} step
+   * @return {HTMLElement|false|null}
+   */
+  function addArrow(step) {
+    if (step.options.arrow && step.el) {
+      return step.el.querySelector('.shepherd-arrow');
+    }
+    return false;
+  }
+  function noop() {}
+  function assign(tar, src) {
+    // @ts-ignore
+    for (var k in src) tar[k] = src[k];
+    return tar;
+  }
+  function run(fn) {
+    return fn();
+  }
+  function blank_object() {
+    return Object.create(null);
+  }
+  function run_all(fns) {
+    fns.forEach(run);
+  }
+  function is_function(thing) {
+    return typeof thing === 'function';
+  }
+  function safe_not_equal(a, b) {
+    return a != a ? b == b : a !== b || a && _typeof(a) === 'object' || typeof a === 'function';
+  }
+  function is_empty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+  function append(target, node) {
+    target.appendChild(node);
+  }
+  function insert(target, node, anchor) {
+    target.insertBefore(node, anchor || null);
+  }
+  function detach(node) {
+    if (node.parentNode) {
+      node.parentNode.removeChild(node);
+    }
+  }
+  function destroy_each(iterations, detaching) {
+    for (var i = 0; i < iterations.length; i += 1) {
+      if (iterations[i]) iterations[i].d(detaching);
+    }
+  }
+  function element(name) {
+    return document.createElement(name);
+  }
+  function svg_element(name) {
+    return document.createElementNS('http://www.w3.org/2000/svg', name);
+  }
+  function text(data) {
+    return document.createTextNode(data);
+  }
+  function space() {
+    return text(' ');
+  }
+  function empty() {
+    return text('');
+  }
+  function listen(node, event, handler, options) {
+    node.addEventListener(event, handler, options);
+    return function () {
+      return node.removeEventListener(event, handler, options);
+    };
+  }
+  function attr(node, attribute, value) {
+    if (value == null) node.removeAttribute(attribute);else if (node.getAttribute(attribute) !== value) node.setAttribute(attribute, value);
+  }
+  /**
+   * List of attributes that should always be set through the attr method,
+   * because updating them through the property setter doesn't work reliably.
+   * In the example of `width`/`height`, the problem is that the setter only
+   * accepts numeric values, but the attribute can also be set to a string like `50%`.
+   * If this list becomes too big, rethink this approach.
+   */
+  var always_set_through_set_attribute = ['width', 'height'];
+  function set_attributes(node, attributes) {
+    // @ts-ignore
+    var descriptors = Object.getOwnPropertyDescriptors(node.__proto__);
+    for (var key in attributes) {
+      if (attributes[key] == null) {
+        node.removeAttribute(key);
+      } else if (key === 'style') {
+        node.style.cssText = attributes[key];
+      } else if (key === '__value') {
+        node.value = node[key] = attributes[key];
+      } else if (descriptors[key] && descriptors[key].set && always_set_through_set_attribute.indexOf(key) === -1) {
+        node[key] = attributes[key];
+      } else {
+        attr(node, key, attributes[key]);
+      }
+    }
+  }
+  function children(element) {
+    return Array.from(element.childNodes);
+  }
+  function toggle_class(element, name, toggle) {
+    element.classList[toggle ? 'add' : 'remove'](name);
+  }
+  var current_component;
+  function set_current_component(component) {
+    current_component = component;
+  }
+  function get_current_component() {
+    if (!current_component) throw new Error('Function called outside component initialization');
+    return current_component;
+  }
+  /**
+   * The `onMount` function schedules a callback to run as soon as the component has been mounted to the DOM.
+   * It must be called during the component's initialisation (but doesn't need to live *inside* the component;
+   * it can be called from an external module).
+   *
+   * `onMount` does not run inside a [server-side component](/docs#run-time-server-side-component-api).
+   *
+   * https://svelte.dev/docs#run-time-svelte-onmount
+   */
+  function onMount(fn) {
+    get_current_component().$$.on_mount.push(fn);
+  }
+  /**
+   * Schedules a callback to run immediately after the component has been updated.
+   *
+   * The first time the callback runs will be after the initial `onMount`
+   */
+  function afterUpdate(fn) {
+    get_current_component().$$.after_update.push(fn);
+  }
+  var dirty_components = [];
+  var binding_callbacks = [];
+  var render_callbacks = [];
+  var flush_callbacks = [];
+  var resolved_promise = /* @__PURE__ */Promise.resolve();
+  var update_scheduled = false;
+  function schedule_update() {
+    if (!update_scheduled) {
+      update_scheduled = true;
+      resolved_promise.then(flush);
+    }
+  }
+  function add_render_callback(fn) {
+    render_callbacks.push(fn);
+  }
+  // flush() calls callbacks in this order:
+  // 1. All beforeUpdate callbacks, in order: parents before children
+  // 2. All bind:this callbacks, in reverse order: children before parents.
+  // 3. All afterUpdate callbacks, in order: parents before children. EXCEPT
+  //    for afterUpdates called during the initial onMount, which are called in
+  //    reverse order: children before parents.
+  // Since callbacks might update component values, which could trigger another
+  // call to flush(), the following steps guard against this:
+  // 1. During beforeUpdate, any updated components will be added to the
+  //    dirty_components array and will cause a reentrant call to flush(). Because
+  //    the flush index is kept outside the function, the reentrant call will pick
+  //    up where the earlier call left off and go through all dirty components. The
+  //    current_component value is saved and restored so that the reentrant call will
+  //    not interfere with the "parent" flush() call.
+  // 2. bind:this callbacks cannot trigger new flush() calls.
+  // 3. During afterUpdate, any updated components will NOT have their afterUpdate
+  //    callback called a second time; the seen_callbacks set, outside the flush()
+  //    function, guarantees this behavior.
+  var seen_callbacks = new Set();
+  var flushidx = 0; // Do *not* move this inside the flush() function
+  function flush() {
+    // Do not reenter flush while dirty components are updated, as this can
+    // result in an infinite loop. Instead, let the inner flush handle it.
+    // Reentrancy is ok afterwards for bindings etc.
+    if (flushidx !== 0) {
+      return;
+    }
+    var saved_component = current_component;
+    do {
+      // first, call beforeUpdate functions
+      // and update components
+      try {
+        while (flushidx < dirty_components.length) {
+          var component = dirty_components[flushidx];
+          flushidx++;
+          set_current_component(component);
+          update(component.$$);
+        }
+      } catch (e) {
+        // reset dirty state to not end up in a deadlocked state and then rethrow
+        dirty_components.length = 0;
+        flushidx = 0;
+        throw e;
+      }
+      set_current_component(null);
+      dirty_components.length = 0;
+      flushidx = 0;
+      while (binding_callbacks.length) binding_callbacks.pop()();
+      // then, once components are updated, call
+      // afterUpdate functions. This may cause
+      // subsequent updates...
+      for (var i = 0; i < render_callbacks.length; i += 1) {
+        var callback = render_callbacks[i];
+        if (!seen_callbacks.has(callback)) {
+          // ...so guard against infinite loops
+          seen_callbacks.add(callback);
+          callback();
+        }
+      }
+      render_callbacks.length = 0;
+    } while (dirty_components.length);
+    while (flush_callbacks.length) {
+      flush_callbacks.pop()();
+    }
+    update_scheduled = false;
+    seen_callbacks.clear();
+    set_current_component(saved_component);
+  }
+  function update($$) {
+    if ($$.fragment !== null) {
+      $$.update();
+      run_all($$.before_update);
+      var dirty = $$.dirty;
+      $$.dirty = [-1];
+      $$.fragment && $$.fragment.p($$.ctx, dirty);
+      $$.after_update.forEach(add_render_callback);
+    }
+  }
+  /**
+   * Useful for example to execute remaining `afterUpdate` callbacks before executing `destroy`.
+   */
+  function flush_render_callbacks(fns) {
+    var filtered = [];
+    var targets = [];
+    render_callbacks.forEach(function (c) {
+      return fns.indexOf(c) === -1 ? filtered.push(c) : targets.push(c);
+    });
+    targets.forEach(function (c) {
+      return c();
+    });
+    render_callbacks = filtered;
+  }
+  var outroing = new Set();
+  var outros;
+  function group_outros() {
+    outros = {
+      r: 0,
+      c: [],
+      p: outros // parent group
+    };
+  }
+  function check_outros() {
+    if (!outros.r) {
+      run_all(outros.c);
+    }
+    outros = outros.p;
+  }
+  function transition_in(block, local) {
+    if (block && block.i) {
+      outroing.delete(block);
+      block.i(local);
+    }
+  }
+  function transition_out(block, local, detach, callback) {
+    if (block && block.o) {
+      if (outroing.has(block)) return;
+      outroing.add(block);
+      outros.c.push(function () {
+        outroing.delete(block);
+        if (callback) {
+          if (detach) block.d(1);
+          callback();
+        }
+      });
+      block.o(local);
+    } else if (callback) {
+      callback();
+    }
+  }
+  function get_spread_update(levels, updates) {
+    var update = {};
+    var to_null_out = {};
+    var accounted_for = {
+      $$scope: 1
+    };
+    var i = levels.length;
+    while (i--) {
+      var o = levels[i];
+      var n = updates[i];
+      if (n) {
+        for (var key in o) {
+          if (!(key in n)) to_null_out[key] = 1;
+        }
+        for (var _key2 in n) {
+          if (!accounted_for[_key2]) {
+            update[_key2] = n[_key2];
+            accounted_for[_key2] = 1;
+          }
+        }
+        levels[i] = n;
+      } else {
+        for (var _key3 in o) {
+          accounted_for[_key3] = 1;
+        }
+      }
+    }
+    for (var _key4 in to_null_out) {
+      if (!(_key4 in update)) update[_key4] = undefined;
+    }
+    return update;
+  }
+  function create_component(block) {
+    block && block.c();
+  }
+  function mount_component(component, target, anchor, customElement) {
+    var _component$$$ = component.$$,
+      fragment = _component$$$.fragment,
+      after_update = _component$$$.after_update;
+    fragment && fragment.m(target, anchor);
+    if (!customElement) {
+      // onMount happens before the initial afterUpdate
+      add_render_callback(function () {
+        var new_on_destroy = component.$$.on_mount.map(run).filter(is_function);
+        // if the component was destroyed immediately
+        // it will update the `$$.on_destroy` reference to `null`.
+        // the destructured on_destroy may still reference to the old array
+        if (component.$$.on_destroy) {
+          var _component$$$$on_dest;
+          (_component$$$$on_dest = component.$$.on_destroy).push.apply(_component$$$$on_dest, _toConsumableArray(new_on_destroy));
+        } else {
+          // Edge case - component was destroyed immediately,
+          // most likely as a result of a binding initialising
+          run_all(new_on_destroy);
+        }
+        component.$$.on_mount = [];
+      });
+    }
+    after_update.forEach(add_render_callback);
+  }
+  function destroy_component(component, detaching) {
+    var $$ = component.$$;
+    if ($$.fragment !== null) {
+      flush_render_callbacks($$.after_update);
+      run_all($$.on_destroy);
+      $$.fragment && $$.fragment.d(detaching);
+      // TODO null out other refs, including component.$$ (but need to
+      // preserve final state?)
+      $$.on_destroy = $$.fragment = null;
+      $$.ctx = [];
+    }
+  }
+  function make_dirty(component, i) {
+    if (component.$$.dirty[0] === -1) {
+      dirty_components.push(component);
+      schedule_update();
+      component.$$.dirty.fill(0);
+    }
+    component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
+  }
+  function init(component, options, instance, create_fragment, not_equal, props, append_styles) {
+    var dirty = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : [-1];
+    var parent_component = current_component;
+    set_current_component(component);
+    var $$ = component.$$ = {
+      fragment: null,
+      ctx: [],
+      // state
+      props: props,
+      update: noop,
+      not_equal: not_equal,
+      bound: blank_object(),
+      // lifecycle
+      on_mount: [],
+      on_destroy: [],
+      on_disconnect: [],
+      before_update: [],
+      after_update: [],
+      context: new Map(options.context || (parent_component ? parent_component.$$.context : [])),
+      // everything else
+      callbacks: blank_object(),
+      dirty: dirty,
+      skip_bound: false,
+      root: options.target || parent_component.$$.root
+    };
+    append_styles && append_styles($$.root);
+    var ready = false;
+    $$.ctx = instance ? instance(component, options.props || {}, function (i, ret) {
+      var value = (arguments.length <= 2 ? 0 : arguments.length - 2) ? arguments.length <= 2 ? undefined : arguments[2] : ret;
+      if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {
+        if (!$$.skip_bound && $$.bound[i]) $$.bound[i](value);
+        if (ready) make_dirty(component, i);
+      }
+      return ret;
+    }) : [];
+    $$.update();
+    ready = true;
+    run_all($$.before_update);
+    // `false` as a special case of no DOM component
+    $$.fragment = create_fragment ? create_fragment($$.ctx) : false;
+    if (options.target) {
+      if (options.hydrate) {
+        var nodes = children(options.target);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        $$.fragment && $$.fragment.l(nodes);
+        nodes.forEach(detach);
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        $$.fragment && $$.fragment.c();
+      }
+      if (options.intro) transition_in(component.$$.fragment);
+      mount_component(component, options.target, options.anchor, options.customElement);
+      flush();
+    }
+    set_current_component(parent_component);
+  }
+  /**
+   * Base class for Svelte components. Used when dev=false.
+   */
+  var SvelteComponent = /*#__PURE__*/function () {
+    function SvelteComponent() {
+      _classCallCheck(this, SvelteComponent);
+    }
+    _createClass(SvelteComponent, [{
+      key: "$destroy",
+      value: function $destroy() {
+        destroy_component(this, 1);
+        this.$destroy = noop;
+      }
+    }, {
+      key: "$on",
+      value: function $on(type, callback) {
+        if (!is_function(callback)) {
+          return noop;
+        }
+        var callbacks = this.$$.callbacks[type] || (this.$$.callbacks[type] = []);
+        callbacks.push(callback);
+        return function () {
+          var index = callbacks.indexOf(callback);
+          if (index !== -1) callbacks.splice(index, 1);
+        };
+      }
+    }, {
+      key: "$set",
+      value: function $set($$props) {
+        if (this.$$set && !is_empty($$props)) {
+          this.$$.skip_bound = true;
+          this.$$set($$props);
+          this.$$.skip_bound = false;
+        }
+      }
+    }]);
+    return SvelteComponent;
+  }();
+  /* src/js/components/shepherd-button.svelte generated by Svelte v3.59.2 */
+  function create_fragment$8(ctx) {
+    var button;
+    var button_aria_label_value;
+    var button_class_value;
+    var mounted;
+    var dispose;
+    return {
+      c: function c() {
+        button = element("button");
+        attr(button, "aria-label", button_aria_label_value = /*label*/ctx[3] ? /*label*/ctx[3] : null);
+        attr(button, "class", button_class_value = "".concat( /*classes*/ctx[1] || '', " shepherd-button ").concat( /*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''));
+        button.disabled = /*disabled*/ctx[2];
+        attr(button, "tabindex", "0");
+      },
+      m: function m(target, anchor) {
+        insert(target, button, anchor);
+        button.innerHTML = /*text*/ctx[5];
+        if (!mounted) {
+          dispose = listen(button, "click", function () {
+            if (is_function( /*action*/ctx[0])) /*action*/ctx[0].apply(this, arguments);
+          });
+          mounted = true;
+        }
+      },
+      p: function p(new_ctx, _ref9) {
+        var _ref10 = _slicedToArray(_ref9, 1),
+          dirty = _ref10[0];
+        ctx = new_ctx;
+        if (dirty & /*text*/32) button.innerHTML = /*text*/ctx[5];
+        if (dirty & /*label*/8 && button_aria_label_value !== (button_aria_label_value = /*label*/ctx[3] ? /*label*/ctx[3] : null)) {
+          attr(button, "aria-label", button_aria_label_value);
+        }
+        if (dirty & /*classes, secondary*/18 && button_class_value !== (button_class_value = "".concat( /*classes*/ctx[1] || '', " shepherd-button ").concat( /*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''))) {
+          attr(button, "class", button_class_value);
+        }
+        if (dirty & /*disabled*/4) {
+          button.disabled = /*disabled*/ctx[2];
+        }
+      },
+      i: noop,
+      o: noop,
+      d: function d(detaching) {
+        if (detaching) detach(button);
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  function instance$8($$self, $$props, $$invalidate) {
+    var config = $$props.config,
+      step = $$props.step;
+    var action, classes, disabled, label, secondary, text;
+    function getConfigOption(option) {
+      if (isFunction(option)) {
+        return option = option.call(step);
+      }
+      return option;
+    }
+    $$self.$$set = function ($$props) {
+      if ('config' in $$props) $$invalidate(6, config = $$props.config);
+      if ('step' in $$props) $$invalidate(7, step = $$props.step);
+    };
+    $$self.$$.update = function () {
+      if ($$self.$$.dirty & /*config, step*/192) {
+        {
+          $$invalidate(0, action = config.action ? config.action.bind(step.tour) : null);
+          $$invalidate(1, classes = config.classes);
+          $$invalidate(2, disabled = config.disabled ? getConfigOption(config.disabled) : false);
+          $$invalidate(3, label = config.label ? getConfigOption(config.label) : null);
+          $$invalidate(4, secondary = config.secondary);
+          $$invalidate(5, text = config.text ? getConfigOption(config.text) : null);
+        }
+      }
+    };
+    return [action, classes, disabled, label, secondary, text, config, step];
+  }
+  var Shepherd_button = /*#__PURE__*/function (_SvelteComponent) {
+    _inherits(Shepherd_button, _SvelteComponent);
+    function Shepherd_button(options) {
+      var _this3;
+      _classCallCheck(this, Shepherd_button);
+      _this3 = _callSuper(this, Shepherd_button);
+      init(_assertThisInitialized(_this3), options, instance$8, create_fragment$8, safe_not_equal, {
+        config: 6,
+        step: 7
+      });
+      return _this3;
+    }
+    return _createClass(Shepherd_button);
+  }(SvelteComponent);
+  /* src/js/components/shepherd-footer.svelte generated by Svelte v3.59.2 */
+  function get_each_context(ctx, list, i) {
+    var child_ctx = ctx.slice();
+    child_ctx[2] = list[i];
+    return child_ctx;
+  }
+
+  // (24:4) {#if buttons}
+  function create_if_block$3(ctx) {
+    var each_1_anchor;
+    var current;
+    var each_value = /*buttons*/ctx[1];
+    var each_blocks = [];
+    for (var i = 0; i < each_value.length; i += 1) {
+      each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
+    }
+    var out = function out(i) {
+      return transition_out(each_blocks[i], 1, 1, function () {
+        each_blocks[i] = null;
+      });
+    };
+    return {
+      c: function c() {
+        for (var _i = 0; _i < each_blocks.length; _i += 1) {
+          each_blocks[_i].c();
+        }
+        each_1_anchor = empty();
+      },
+      m: function m(target, anchor) {
+        for (var _i2 = 0; _i2 < each_blocks.length; _i2 += 1) {
+          if (each_blocks[_i2]) {
+            each_blocks[_i2].m(target, anchor);
+          }
+        }
+        insert(target, each_1_anchor, anchor);
+        current = true;
+      },
+      p: function p(ctx, dirty) {
+        if (dirty & /*buttons, step*/3) {
+          each_value = /*buttons*/ctx[1];
+          var _i3;
+          for (_i3 = 0; _i3 < each_value.length; _i3 += 1) {
+            var child_ctx = get_each_context(ctx, each_value, _i3);
+            if (each_blocks[_i3]) {
+              each_blocks[_i3].p(child_ctx, dirty);
+              transition_in(each_blocks[_i3], 1);
+            } else {
+              each_blocks[_i3] = create_each_block(child_ctx);
+              each_blocks[_i3].c();
+              transition_in(each_blocks[_i3], 1);
+              each_blocks[_i3].m(each_1_anchor.parentNode, each_1_anchor);
+            }
+          }
+          group_outros();
+          for (_i3 = each_value.length; _i3 < each_blocks.length; _i3 += 1) {
+            out(_i3);
+          }
+          check_outros();
+        }
+      },
+      i: function i(local) {
+        if (current) return;
+        for (var _i4 = 0; _i4 < each_value.length; _i4 += 1) {
+          transition_in(each_blocks[_i4]);
+        }
+        current = true;
+      },
+      o: function o(local) {
+        each_blocks = each_blocks.filter(Boolean);
+        for (var _i5 = 0; _i5 < each_blocks.length; _i5 += 1) {
+          transition_out(each_blocks[_i5]);
+        }
+        current = false;
+      },
+      d: function d(detaching) {
+        destroy_each(each_blocks, detaching);
+        if (detaching) detach(each_1_anchor);
+      }
+    };
+  }
+
+  // (25:8) {#each buttons as config}
+  function create_each_block(ctx) {
+    var shepherdbutton;
+    var current;
+    shepherdbutton = new Shepherd_button({
+      props: {
+        config: /*config*/ctx[2],
+        step: /*step*/ctx[0]
+      }
+    });
+    return {
+      c: function c() {
+        create_component(shepherdbutton.$$.fragment);
+      },
+      m: function m(target, anchor) {
+        mount_component(shepherdbutton, target, anchor);
+        current = true;
+      },
+      p: function p(ctx, dirty) {
+        var shepherdbutton_changes = {};
+        if (dirty & /*buttons*/2) shepherdbutton_changes.config = /*config*/ctx[2];
+        if (dirty & /*step*/1) shepherdbutton_changes.step = /*step*/ctx[0];
+        shepherdbutton.$set(shepherdbutton_changes);
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(shepherdbutton.$$.fragment, local);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(shepherdbutton.$$.fragment, local);
+        current = false;
+      },
+      d: function d(detaching) {
+        destroy_component(shepherdbutton, detaching);
+      }
+    };
+  }
+  function create_fragment$7(ctx) {
+    var footer;
+    var current;
+    var if_block = /*buttons*/ctx[1] && create_if_block$3(ctx);
+    return {
+      c: function c() {
+        footer = element("footer");
+        if (if_block) if_block.c();
+        attr(footer, "class", "shepherd-footer");
+      },
+      m: function m(target, anchor) {
+        insert(target, footer, anchor);
+        if (if_block) if_block.m(footer, null);
+        current = true;
+      },
+      p: function p(ctx, _ref11) {
+        var _ref12 = _slicedToArray(_ref11, 1),
+          dirty = _ref12[0];
+        if ( /*buttons*/ctx[1]) {
+          if (if_block) {
+            if_block.p(ctx, dirty);
+            if (dirty & /*buttons*/2) {
+              transition_in(if_block, 1);
+            }
+          } else {
+            if_block = create_if_block$3(ctx);
+            if_block.c();
+            transition_in(if_block, 1);
+            if_block.m(footer, null);
+          }
+        } else if (if_block) {
+          group_outros();
+          transition_out(if_block, 1, 1, function () {
+            if_block = null;
+          });
+          check_outros();
+        }
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(if_block);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(if_block);
+        current = false;
+      },
+      d: function d(detaching) {
+        if (detaching) detach(footer);
+        if (if_block) if_block.d();
+      }
+    };
+  }
+  function instance$7($$self, $$props, $$invalidate) {
+    var buttons;
+    var step = $$props.step;
+    $$self.$$set = function ($$props) {
+      if ('step' in $$props) $$invalidate(0, step = $$props.step);
+    };
+    $$self.$$.update = function () {
+      if ($$self.$$.dirty & /*step*/1) {
+        $$invalidate(1, buttons = step.options.buttons);
+      }
+    };
+    return [step, buttons];
+  }
+  var Shepherd_footer = /*#__PURE__*/function (_SvelteComponent2) {
+    _inherits(Shepherd_footer, _SvelteComponent2);
+    function Shepherd_footer(options) {
+      var _this4;
+      _classCallCheck(this, Shepherd_footer);
+      _this4 = _callSuper(this, Shepherd_footer);
+      init(_assertThisInitialized(_this4), options, instance$7, create_fragment$7, safe_not_equal, {
+        step: 0
+      });
+      return _this4;
+    }
+    return _createClass(Shepherd_footer);
+  }(SvelteComponent);
+  /* src/js/components/shepherd-cancel-icon.svelte generated by Svelte v3.59.2 */
+  function create_fragment$6(ctx) {
+    var button;
+    var span;
+    var button_aria_label_value;
+    var mounted;
+    var dispose;
+    return {
+      c: function c() {
+        button = element("button");
+        span = element("span");
+        span.textContent = "×";
+        attr(span, "aria-hidden", "true");
+        attr(button, "aria-label", button_aria_label_value = /*cancelIcon*/ctx[0].label ? /*cancelIcon*/ctx[0].label : 'Close Tour');
+        attr(button, "class", "shepherd-cancel-icon");
+        attr(button, "type", "button");
+      },
+      m: function m(target, anchor) {
+        insert(target, button, anchor);
+        append(button, span);
+        if (!mounted) {
+          dispose = listen(button, "click", /*handleCancelClick*/ctx[1]);
+          mounted = true;
+        }
+      },
+      p: function p(ctx, _ref13) {
+        var _ref14 = _slicedToArray(_ref13, 1),
+          dirty = _ref14[0];
+        if (dirty & /*cancelIcon*/1 && button_aria_label_value !== (button_aria_label_value = /*cancelIcon*/ctx[0].label ? /*cancelIcon*/ctx[0].label : 'Close Tour')) {
+          attr(button, "aria-label", button_aria_label_value);
+        }
+      },
+      i: noop,
+      o: noop,
+      d: function d(detaching) {
+        if (detaching) detach(button);
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  function instance$6($$self, $$props, $$invalidate) {
+    var cancelIcon = $$props.cancelIcon,
+      step = $$props.step;
+
+    /**
+    * Add a click listener to the cancel link that cancels the tour
+    */
+    var handleCancelClick = function handleCancelClick(e) {
+      e.preventDefault();
+      step.cancel();
+    };
+    $$self.$$set = function ($$props) {
+      if ('cancelIcon' in $$props) $$invalidate(0, cancelIcon = $$props.cancelIcon);
+      if ('step' in $$props) $$invalidate(2, step = $$props.step);
+    };
+    return [cancelIcon, handleCancelClick, step];
+  }
+  var Shepherd_cancel_icon = /*#__PURE__*/function (_SvelteComponent3) {
+    _inherits(Shepherd_cancel_icon, _SvelteComponent3);
+    function Shepherd_cancel_icon(options) {
+      var _this5;
+      _classCallCheck(this, Shepherd_cancel_icon);
+      _this5 = _callSuper(this, Shepherd_cancel_icon);
+      init(_assertThisInitialized(_this5), options, instance$6, create_fragment$6, safe_not_equal, {
+        cancelIcon: 0,
+        step: 2
+      });
+      return _this5;
+    }
+    return _createClass(Shepherd_cancel_icon);
+  }(SvelteComponent);
+  /* src/js/components/shepherd-title.svelte generated by Svelte v3.59.2 */
+  function create_fragment$5(ctx) {
+    var h3;
+    return {
+      c: function c() {
+        h3 = element("h3");
+        attr(h3, "id", /*labelId*/ctx[1]);
+        attr(h3, "class", "shepherd-title");
+      },
+      m: function m(target, anchor) {
+        insert(target, h3, anchor);
+        /*h3_binding*/
+        ctx[3](h3);
+      },
+      p: function p(ctx, _ref15) {
+        var _ref16 = _slicedToArray(_ref15, 1),
+          dirty = _ref16[0];
+        if (dirty & /*labelId*/2) {
+          attr(h3, "id", /*labelId*/ctx[1]);
+        }
+      },
+      i: noop,
+      o: noop,
+      d: function d(detaching) {
+        if (detaching) detach(h3);
+        /*h3_binding*/
+        ctx[3](null);
+      }
+    };
+  }
+  function instance$5($$self, $$props, $$invalidate) {
+    var labelId = $$props.labelId,
+      element = $$props.element,
+      title = $$props.title;
+    afterUpdate(function () {
+      if (isFunction(title)) {
+        $$invalidate(2, title = title());
+      }
+      $$invalidate(0, element.innerHTML = title, element);
+    });
+    function h3_binding($$value) {
+      binding_callbacks[$$value ? 'unshift' : 'push'](function () {
+        element = $$value;
+        $$invalidate(0, element);
+      });
+    }
+    $$self.$$set = function ($$props) {
+      if ('labelId' in $$props) $$invalidate(1, labelId = $$props.labelId);
+      if ('element' in $$props) $$invalidate(0, element = $$props.element);
+      if ('title' in $$props) $$invalidate(2, title = $$props.title);
+    };
+    return [element, labelId, title, h3_binding];
+  }
+  var Shepherd_title = /*#__PURE__*/function (_SvelteComponent4) {
+    _inherits(Shepherd_title, _SvelteComponent4);
+    function Shepherd_title(options) {
+      var _this6;
+      _classCallCheck(this, Shepherd_title);
+      _this6 = _callSuper(this, Shepherd_title);
+      init(_assertThisInitialized(_this6), options, instance$5, create_fragment$5, safe_not_equal, {
+        labelId: 1,
+        element: 0,
+        title: 2
+      });
+      return _this6;
+    }
+    return _createClass(Shepherd_title);
+  }(SvelteComponent);
+  /* src/js/components/shepherd-header.svelte generated by Svelte v3.59.2 */
+  function create_if_block_1$1(ctx) {
+    var shepherdtitle;
+    var current;
+    shepherdtitle = new Shepherd_title({
+      props: {
+        labelId: /*labelId*/ctx[0],
+        title: /*title*/ctx[2]
+      }
+    });
+    return {
+      c: function c() {
+        create_component(shepherdtitle.$$.fragment);
+      },
+      m: function m(target, anchor) {
+        mount_component(shepherdtitle, target, anchor);
+        current = true;
+      },
+      p: function p(ctx, dirty) {
+        var shepherdtitle_changes = {};
+        if (dirty & /*labelId*/1) shepherdtitle_changes.labelId = /*labelId*/ctx[0];
+        if (dirty & /*title*/4) shepherdtitle_changes.title = /*title*/ctx[2];
+        shepherdtitle.$set(shepherdtitle_changes);
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(shepherdtitle.$$.fragment, local);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(shepherdtitle.$$.fragment, local);
+        current = false;
+      },
+      d: function d(detaching) {
+        destroy_component(shepherdtitle, detaching);
+      }
+    };
+  }
+
+  // (39:4) {#if cancelIcon && cancelIcon.enabled}
+  function create_if_block$2(ctx) {
+    var shepherdcancelicon;
+    var current;
+    shepherdcancelicon = new Shepherd_cancel_icon({
+      props: {
+        cancelIcon: /*cancelIcon*/ctx[3],
+        step: /*step*/ctx[1]
+      }
+    });
+    return {
+      c: function c() {
+        create_component(shepherdcancelicon.$$.fragment);
+      },
+      m: function m(target, anchor) {
+        mount_component(shepherdcancelicon, target, anchor);
+        current = true;
+      },
+      p: function p(ctx, dirty) {
+        var shepherdcancelicon_changes = {};
+        if (dirty & /*cancelIcon*/8) shepherdcancelicon_changes.cancelIcon = /*cancelIcon*/ctx[3];
+        if (dirty & /*step*/2) shepherdcancelicon_changes.step = /*step*/ctx[1];
+        shepherdcancelicon.$set(shepherdcancelicon_changes);
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(shepherdcancelicon.$$.fragment, local);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(shepherdcancelicon.$$.fragment, local);
+        current = false;
+      },
+      d: function d(detaching) {
+        destroy_component(shepherdcancelicon, detaching);
+      }
+    };
+  }
+  function create_fragment$4(ctx) {
+    var header;
+    var t;
+    var current;
+    var if_block0 = /*title*/ctx[2] && create_if_block_1$1(ctx);
+    var if_block1 = /*cancelIcon*/ctx[3] && /*cancelIcon*/ctx[3].enabled && create_if_block$2(ctx);
+    return {
+      c: function c() {
+        header = element("header");
+        if (if_block0) if_block0.c();
+        t = space();
+        if (if_block1) if_block1.c();
+        attr(header, "class", "shepherd-header");
+      },
+      m: function m(target, anchor) {
+        insert(target, header, anchor);
+        if (if_block0) if_block0.m(header, null);
+        append(header, t);
+        if (if_block1) if_block1.m(header, null);
+        current = true;
+      },
+      p: function p(ctx, _ref17) {
+        var _ref18 = _slicedToArray(_ref17, 1),
+          dirty = _ref18[0];
+        if ( /*title*/ctx[2]) {
+          if (if_block0) {
+            if_block0.p(ctx, dirty);
+            if (dirty & /*title*/4) {
+              transition_in(if_block0, 1);
+            }
+          } else {
+            if_block0 = create_if_block_1$1(ctx);
+            if_block0.c();
+            transition_in(if_block0, 1);
+            if_block0.m(header, t);
+          }
+        } else if (if_block0) {
+          group_outros();
+          transition_out(if_block0, 1, 1, function () {
+            if_block0 = null;
+          });
+          check_outros();
+        }
+        if ( /*cancelIcon*/ctx[3] && /*cancelIcon*/ctx[3].enabled) {
+          if (if_block1) {
+            if_block1.p(ctx, dirty);
+            if (dirty & /*cancelIcon*/8) {
+              transition_in(if_block1, 1);
+            }
+          } else {
+            if_block1 = create_if_block$2(ctx);
+            if_block1.c();
+            transition_in(if_block1, 1);
+            if_block1.m(header, null);
+          }
+        } else if (if_block1) {
+          group_outros();
+          transition_out(if_block1, 1, 1, function () {
+            if_block1 = null;
+          });
+          check_outros();
+        }
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(if_block0);
+        transition_in(if_block1);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(if_block0);
+        transition_out(if_block1);
+        current = false;
+      },
+      d: function d(detaching) {
+        if (detaching) detach(header);
+        if (if_block0) if_block0.d();
+        if (if_block1) if_block1.d();
+      }
+    };
+  }
+  function instance$4($$self, $$props, $$invalidate) {
+    var labelId = $$props.labelId,
+      step = $$props.step;
+    var title, cancelIcon;
+    $$self.$$set = function ($$props) {
+      if ('labelId' in $$props) $$invalidate(0, labelId = $$props.labelId);
+      if ('step' in $$props) $$invalidate(1, step = $$props.step);
+    };
+    $$self.$$.update = function () {
+      if ($$self.$$.dirty & /*step*/2) {
+        {
+          $$invalidate(2, title = step.options.title);
+          $$invalidate(3, cancelIcon = step.options.cancelIcon);
+        }
+      }
+    };
+    return [labelId, step, title, cancelIcon];
+  }
+  var Shepherd_header = /*#__PURE__*/function (_SvelteComponent5) {
+    _inherits(Shepherd_header, _SvelteComponent5);
+    function Shepherd_header(options) {
+      var _this7;
+      _classCallCheck(this, Shepherd_header);
+      _this7 = _callSuper(this, Shepherd_header);
+      init(_assertThisInitialized(_this7), options, instance$4, create_fragment$4, safe_not_equal, {
+        labelId: 0,
+        step: 1
+      });
+      return _this7;
+    }
+    return _createClass(Shepherd_header);
+  }(SvelteComponent);
+  /* src/js/components/shepherd-text.svelte generated by Svelte v3.59.2 */
+  function create_fragment$3(ctx) {
+    var div;
+    return {
+      c: function c() {
+        div = element("div");
+        attr(div, "class", "shepherd-text");
+        attr(div, "id", /*descriptionId*/ctx[1]);
+      },
+      m: function m(target, anchor) {
+        insert(target, div, anchor);
+        /*div_binding*/
+        ctx[3](div);
+      },
+      p: function p(ctx, _ref19) {
+        var _ref20 = _slicedToArray(_ref19, 1),
+          dirty = _ref20[0];
+        if (dirty & /*descriptionId*/2) {
+          attr(div, "id", /*descriptionId*/ctx[1]);
+        }
+      },
+      i: noop,
+      o: noop,
+      d: function d(detaching) {
+        if (detaching) detach(div);
+        /*div_binding*/
+        ctx[3](null);
+      }
+    };
+  }
+  function instance$3($$self, $$props, $$invalidate) {
+    var descriptionId = $$props.descriptionId,
+      element = $$props.element,
+      step = $$props.step;
+    afterUpdate(function () {
+      var text = step.options.text;
+      if (isFunction(text)) {
+        text = text.call(step);
+      }
+      if (isHTMLElement$1(text)) {
+        element.appendChild(text);
+      } else {
+        $$invalidate(0, element.innerHTML = text, element);
+      }
+    });
+    function div_binding($$value) {
+      binding_callbacks[$$value ? 'unshift' : 'push'](function () {
+        element = $$value;
+        $$invalidate(0, element);
+      });
+    }
+    $$self.$$set = function ($$props) {
+      if ('descriptionId' in $$props) $$invalidate(1, descriptionId = $$props.descriptionId);
+      if ('element' in $$props) $$invalidate(0, element = $$props.element);
+      if ('step' in $$props) $$invalidate(2, step = $$props.step);
+    };
+    return [element, descriptionId, step, div_binding];
+  }
+  var Shepherd_text = /*#__PURE__*/function (_SvelteComponent6) {
+    _inherits(Shepherd_text, _SvelteComponent6);
+    function Shepherd_text(options) {
+      var _this8;
+      _classCallCheck(this, Shepherd_text);
+      _this8 = _callSuper(this, Shepherd_text);
+      init(_assertThisInitialized(_this8), options, instance$3, create_fragment$3, safe_not_equal, {
+        descriptionId: 1,
+        element: 0,
+        step: 2
+      });
+      return _this8;
+    }
+    return _createClass(Shepherd_text);
+  }(SvelteComponent);
+  /* src/js/components/shepherd-content.svelte generated by Svelte v3.59.2 */
+  function create_if_block_2(ctx) {
+    var shepherdheader;
+    var current;
+    shepherdheader = new Shepherd_header({
+      props: {
+        labelId: /*labelId*/ctx[1],
+        step: /*step*/ctx[2]
+      }
+    });
+    return {
+      c: function c() {
+        create_component(shepherdheader.$$.fragment);
+      },
+      m: function m(target, anchor) {
+        mount_component(shepherdheader, target, anchor);
+        current = true;
+      },
+      p: function p(ctx, dirty) {
+        var shepherdheader_changes = {};
+        if (dirty & /*labelId*/2) shepherdheader_changes.labelId = /*labelId*/ctx[1];
+        if (dirty & /*step*/4) shepherdheader_changes.step = /*step*/ctx[2];
+        shepherdheader.$set(shepherdheader_changes);
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(shepherdheader.$$.fragment, local);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(shepherdheader.$$.fragment, local);
+        current = false;
+      },
+      d: function d(detaching) {
+        destroy_component(shepherdheader, detaching);
+      }
+    };
+  }
+
+  // (28:2) {#if !isUndefined(step.options.text)}
+  function create_if_block_1(ctx) {
+    var shepherdtext;
+    var current;
+    shepherdtext = new Shepherd_text({
+      props: {
+        descriptionId: /*descriptionId*/ctx[0],
+        step: /*step*/ctx[2]
+      }
+    });
+    return {
+      c: function c() {
+        create_component(shepherdtext.$$.fragment);
+      },
+      m: function m(target, anchor) {
+        mount_component(shepherdtext, target, anchor);
+        current = true;
+      },
+      p: function p(ctx, dirty) {
+        var shepherdtext_changes = {};
+        if (dirty & /*descriptionId*/1) shepherdtext_changes.descriptionId = /*descriptionId*/ctx[0];
+        if (dirty & /*step*/4) shepherdtext_changes.step = /*step*/ctx[2];
+        shepherdtext.$set(shepherdtext_changes);
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(shepherdtext.$$.fragment, local);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(shepherdtext.$$.fragment, local);
+        current = false;
+      },
+      d: function d(detaching) {
+        destroy_component(shepherdtext, detaching);
+      }
+    };
+  }
+
+  // (35:2) {#if Array.isArray(step.options.buttons) && step.options.buttons.length}
+  function create_if_block$1(ctx) {
+    var shepherdfooter;
+    var current;
+    shepherdfooter = new Shepherd_footer({
+      props: {
+        step: /*step*/ctx[2]
+      }
+    });
+    return {
+      c: function c() {
+        create_component(shepherdfooter.$$.fragment);
+      },
+      m: function m(target, anchor) {
+        mount_component(shepherdfooter, target, anchor);
+        current = true;
+      },
+      p: function p(ctx, dirty) {
+        var shepherdfooter_changes = {};
+        if (dirty & /*step*/4) shepherdfooter_changes.step = /*step*/ctx[2];
+        shepherdfooter.$set(shepherdfooter_changes);
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(shepherdfooter.$$.fragment, local);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(shepherdfooter.$$.fragment, local);
+        current = false;
+      },
+      d: function d(detaching) {
+        destroy_component(shepherdfooter, detaching);
+      }
+    };
+  }
+  function create_fragment$2(ctx) {
+    var div;
+    var show_if_2 = !isUndefined( /*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
+    var t0;
+    var show_if_1 = !isUndefined( /*step*/ctx[2].options.text);
+    var t1;
+    var show_if = Array.isArray( /*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
+    var current;
+    var if_block0 = show_if_2 && create_if_block_2(ctx);
+    var if_block1 = show_if_1 && create_if_block_1(ctx);
+    var if_block2 = show_if && create_if_block$1(ctx);
+    return {
+      c: function c() {
+        div = element("div");
+        if (if_block0) if_block0.c();
+        t0 = space();
+        if (if_block1) if_block1.c();
+        t1 = space();
+        if (if_block2) if_block2.c();
+        attr(div, "class", "shepherd-content");
+      },
+      m: function m(target, anchor) {
+        insert(target, div, anchor);
+        if (if_block0) if_block0.m(div, null);
+        append(div, t0);
+        if (if_block1) if_block1.m(div, null);
+        append(div, t1);
+        if (if_block2) if_block2.m(div, null);
+        current = true;
+      },
+      p: function p(ctx, _ref21) {
+        var _ref22 = _slicedToArray(_ref21, 1),
+          dirty = _ref22[0];
+        if (dirty & /*step*/4) show_if_2 = !isUndefined( /*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
+        if (show_if_2) {
+          if (if_block0) {
+            if_block0.p(ctx, dirty);
+            if (dirty & /*step*/4) {
+              transition_in(if_block0, 1);
+            }
+          } else {
+            if_block0 = create_if_block_2(ctx);
+            if_block0.c();
+            transition_in(if_block0, 1);
+            if_block0.m(div, t0);
+          }
+        } else if (if_block0) {
+          group_outros();
+          transition_out(if_block0, 1, 1, function () {
+            if_block0 = null;
+          });
+          check_outros();
+        }
+        if (dirty & /*step*/4) show_if_1 = !isUndefined( /*step*/ctx[2].options.text);
+        if (show_if_1) {
+          if (if_block1) {
+            if_block1.p(ctx, dirty);
+            if (dirty & /*step*/4) {
+              transition_in(if_block1, 1);
+            }
+          } else {
+            if_block1 = create_if_block_1(ctx);
+            if_block1.c();
+            transition_in(if_block1, 1);
+            if_block1.m(div, t1);
+          }
+        } else if (if_block1) {
+          group_outros();
+          transition_out(if_block1, 1, 1, function () {
+            if_block1 = null;
+          });
+          check_outros();
+        }
+        if (dirty & /*step*/4) show_if = Array.isArray( /*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
+        if (show_if) {
+          if (if_block2) {
+            if_block2.p(ctx, dirty);
+            if (dirty & /*step*/4) {
+              transition_in(if_block2, 1);
+            }
+          } else {
+            if_block2 = create_if_block$1(ctx);
+            if_block2.c();
+            transition_in(if_block2, 1);
+            if_block2.m(div, null);
+          }
+        } else if (if_block2) {
+          group_outros();
+          transition_out(if_block2, 1, 1, function () {
+            if_block2 = null;
+          });
+          check_outros();
+        }
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(if_block0);
+        transition_in(if_block1);
+        transition_in(if_block2);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(if_block0);
+        transition_out(if_block1);
+        transition_out(if_block2);
+        current = false;
+      },
+      d: function d(detaching) {
+        if (detaching) detach(div);
+        if (if_block0) if_block0.d();
+        if (if_block1) if_block1.d();
+        if (if_block2) if_block2.d();
+      }
+    };
+  }
+  function instance$2($$self, $$props, $$invalidate) {
+    var descriptionId = $$props.descriptionId,
+      labelId = $$props.labelId,
+      step = $$props.step;
+    $$self.$$set = function ($$props) {
+      if ('descriptionId' in $$props) $$invalidate(0, descriptionId = $$props.descriptionId);
+      if ('labelId' in $$props) $$invalidate(1, labelId = $$props.labelId);
+      if ('step' in $$props) $$invalidate(2, step = $$props.step);
+    };
+    return [descriptionId, labelId, step];
+  }
+  var Shepherd_content = /*#__PURE__*/function (_SvelteComponent7) {
+    _inherits(Shepherd_content, _SvelteComponent7);
+    function Shepherd_content(options) {
+      var _this9;
+      _classCallCheck(this, Shepherd_content);
+      _this9 = _callSuper(this, Shepherd_content);
+      init(_assertThisInitialized(_this9), options, instance$2, create_fragment$2, safe_not_equal, {
+        descriptionId: 0,
+        labelId: 1,
+        step: 2
+      });
+      return _this9;
+    }
+    return _createClass(Shepherd_content);
+  }(SvelteComponent);
+  /* src/js/components/shepherd-element.svelte generated by Svelte v3.59.2 */
+  function create_if_block(ctx) {
+    var div;
+    return {
+      c: function c() {
+        div = element("div");
+        attr(div, "class", "shepherd-arrow");
+        attr(div, "data-popper-arrow", "");
+      },
+      m: function m(target, anchor) {
+        insert(target, div, anchor);
+      },
+      d: function d(detaching) {
+        if (detaching) detach(div);
+      }
+    };
+  }
+  function create_fragment$1(ctx) {
+    var div;
+    var t;
+    var shepherdcontent;
+    var div_aria_describedby_value;
+    var div_aria_labelledby_value;
+    var current;
+    var mounted;
+    var dispose;
+    var if_block = /*step*/ctx[4].options.arrow && /*step*/ctx[4].options.attachTo && /*step*/ctx[4].options.attachTo.element && /*step*/ctx[4].options.attachTo.on && create_if_block();
+    shepherdcontent = new Shepherd_content({
+      props: {
+        descriptionId: /*descriptionId*/ctx[2],
+        labelId: /*labelId*/ctx[3],
+        step: /*step*/ctx[4]
+      }
+    });
+    var div_levels = [{
+      "aria-describedby": div_aria_describedby_value = !isUndefined( /*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null
+    }, {
+      "aria-labelledby": div_aria_labelledby_value = /*step*/ctx[4].options.title ? /*labelId*/ctx[3] : null
+    }, /*dataStepId*/ctx[1], {
+      role: "dialog"
+    }, {
+      tabindex: "0"
+    }];
+    var div_data = {};
+    for (var i = 0; i < div_levels.length; i += 1) {
+      div_data = assign(div_data, div_levels[i]);
+    }
+    return {
+      c: function c() {
+        div = element("div");
+        if (if_block) if_block.c();
+        t = space();
+        create_component(shepherdcontent.$$.fragment);
+        set_attributes(div, div_data);
+        toggle_class(div, "shepherd-has-cancel-icon", /*hasCancelIcon*/ctx[5]);
+        toggle_class(div, "shepherd-has-title", /*hasTitle*/ctx[6]);
+        toggle_class(div, "shepherd-element", true);
+      },
+      m: function m(target, anchor) {
+        insert(target, div, anchor);
+        if (if_block) if_block.m(div, null);
+        append(div, t);
+        mount_component(shepherdcontent, div, null);
+        /*div_binding*/
+        ctx[13](div);
+        current = true;
+        if (!mounted) {
+          dispose = listen(div, "keydown", /*handleKeyDown*/ctx[7]);
+          mounted = true;
+        }
+      },
+      p: function p(ctx, _ref23) {
+        var _ref24 = _slicedToArray(_ref23, 1),
+          dirty = _ref24[0];
+        if ( /*step*/ctx[4].options.arrow && /*step*/ctx[4].options.attachTo && /*step*/ctx[4].options.attachTo.element && /*step*/ctx[4].options.attachTo.on) {
+          if (if_block) ;else {
+            if_block = create_if_block();
+            if_block.c();
+            if_block.m(div, t);
+          }
+        } else if (if_block) {
+          if_block.d(1);
+          if_block = null;
+        }
+        var shepherdcontent_changes = {};
+        if (dirty & /*descriptionId*/4) shepherdcontent_changes.descriptionId = /*descriptionId*/ctx[2];
+        if (dirty & /*labelId*/8) shepherdcontent_changes.labelId = /*labelId*/ctx[3];
+        if (dirty & /*step*/16) shepherdcontent_changes.step = /*step*/ctx[4];
+        shepherdcontent.$set(shepherdcontent_changes);
+        set_attributes(div, div_data = get_spread_update(div_levels, [(!current || dirty & /*step, descriptionId*/20 && div_aria_describedby_value !== (div_aria_describedby_value = !isUndefined( /*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null)) && {
+          "aria-describedby": div_aria_describedby_value
+        }, (!current || dirty & /*step, labelId*/24 && div_aria_labelledby_value !== (div_aria_labelledby_value = /*step*/ctx[4].options.title ? /*labelId*/ctx[3] : null)) && {
+          "aria-labelledby": div_aria_labelledby_value
+        }, dirty & /*dataStepId*/2 && /*dataStepId*/ctx[1], {
+          role: "dialog"
+        }, {
+          tabindex: "0"
+        }]));
+        toggle_class(div, "shepherd-has-cancel-icon", /*hasCancelIcon*/ctx[5]);
+        toggle_class(div, "shepherd-has-title", /*hasTitle*/ctx[6]);
+        toggle_class(div, "shepherd-element", true);
+      },
+      i: function i(local) {
+        if (current) return;
+        transition_in(shepherdcontent.$$.fragment, local);
+        current = true;
+      },
+      o: function o(local) {
+        transition_out(shepherdcontent.$$.fragment, local);
+        current = false;
+      },
+      d: function d(detaching) {
+        if (detaching) detach(div);
+        if (if_block) if_block.d();
+        destroy_component(shepherdcontent);
+        /*div_binding*/
+        ctx[13](null);
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  var KEY_TAB = 9;
+  var KEY_ESC = 27;
+  var LEFT_ARROW = 37;
+  var RIGHT_ARROW = 39;
+  function getClassesArray(classes) {
+    return classes.split(' ').filter(function (className) {
+      return !!className.length;
+    });
+  }
+  function instance$1($$self, $$props, $$invalidate) {
+    var classPrefix = $$props.classPrefix,
+      element = $$props.element,
+      descriptionId = $$props.descriptionId,
+      firstFocusableElement = $$props.firstFocusableElement,
+      focusableElements = $$props.focusableElements,
+      labelId = $$props.labelId,
+      lastFocusableElement = $$props.lastFocusableElement,
+      step = $$props.step,
+      dataStepId = $$props.dataStepId;
+    var hasCancelIcon, hasTitle, classes;
+    var getElement = function getElement() {
+      return element;
+    };
+    onMount(function () {
+      // Get all elements that are focusable
+      $$invalidate(1, dataStepId = _defineProperty({}, "data-".concat(classPrefix, "shepherd-step-id"), step.id));
+      $$invalidate(9, focusableElements = element.querySelectorAll('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex="0"]'));
+      $$invalidate(8, firstFocusableElement = focusableElements[0]);
+      $$invalidate(10, lastFocusableElement = focusableElements[focusableElements.length - 1]);
+    });
+    afterUpdate(function () {
+      if (classes !== step.options.classes) {
+        updateDynamicClasses();
+      }
+    });
+    function updateDynamicClasses() {
+      removeClasses(classes);
+      classes = step.options.classes;
+      addClasses(classes);
+    }
+    function removeClasses(classes) {
+      if (isString(classes)) {
+        var oldClasses = getClassesArray(classes);
+        if (oldClasses.length) {
+          var _element$classList;
+          (_element$classList = element.classList).remove.apply(_element$classList, _toConsumableArray(oldClasses));
+        }
+      }
+    }
+    function addClasses(classes) {
+      if (isString(classes)) {
+        var newClasses = getClassesArray(classes);
+        if (newClasses.length) {
+          var _element$classList2;
+          (_element$classList2 = element.classList).add.apply(_element$classList2, _toConsumableArray(newClasses));
+        }
+      }
+    }
+
+    /**
+    * Setup keydown events to allow closing the modal with ESC
+    *
+    * Borrowed from this great post! https://bitsofco.de/accessible-modal-dialog/
+    *
+    * @private
+    */
+    var handleKeyDown = function handleKeyDown(e) {
+      var _step = step,
+        tour = _step.tour;
+      switch (e.keyCode) {
+        case KEY_TAB:
+          if (focusableElements.length === 0) {
+            e.preventDefault();
+            break;
+          }
+          // Backward tab
+          if (e.shiftKey) {
+            if (document.activeElement === firstFocusableElement || document.activeElement.classList.contains('shepherd-element')) {
+              e.preventDefault();
+              lastFocusableElement.focus();
+            }
+          } else {
+            if (document.activeElement === lastFocusableElement) {
+              e.preventDefault();
+              firstFocusableElement.focus();
+            }
+          }
+          break;
+        case KEY_ESC:
+          if (tour.options.exitOnEsc) {
+            e.stopPropagation();
+            step.cancel();
+          }
+          break;
+        case LEFT_ARROW:
+          if (tour.options.keyboardNavigation) {
+            e.stopPropagation();
+            tour.back();
+          }
+          break;
+        case RIGHT_ARROW:
+          if (tour.options.keyboardNavigation) {
+            e.stopPropagation();
+            tour.next();
+          }
+          break;
+      }
+    };
+    function div_binding($$value) {
+      binding_callbacks[$$value ? 'unshift' : 'push'](function () {
+        element = $$value;
+        $$invalidate(0, element);
+      });
+    }
+    $$self.$$set = function ($$props) {
+      if ('classPrefix' in $$props) $$invalidate(11, classPrefix = $$props.classPrefix);
+      if ('element' in $$props) $$invalidate(0, element = $$props.element);
+      if ('descriptionId' in $$props) $$invalidate(2, descriptionId = $$props.descriptionId);
+      if ('firstFocusableElement' in $$props) $$invalidate(8, firstFocusableElement = $$props.firstFocusableElement);
+      if ('focusableElements' in $$props) $$invalidate(9, focusableElements = $$props.focusableElements);
+      if ('labelId' in $$props) $$invalidate(3, labelId = $$props.labelId);
+      if ('lastFocusableElement' in $$props) $$invalidate(10, lastFocusableElement = $$props.lastFocusableElement);
+      if ('step' in $$props) $$invalidate(4, step = $$props.step);
+      if ('dataStepId' in $$props) $$invalidate(1, dataStepId = $$props.dataStepId);
+    };
+    $$self.$$.update = function () {
+      if ($$self.$$.dirty & /*step*/16) {
+        {
+          $$invalidate(5, hasCancelIcon = step.options && step.options.cancelIcon && step.options.cancelIcon.enabled);
+          $$invalidate(6, hasTitle = step.options && step.options.title);
+        }
+      }
+    };
+    return [element, dataStepId, descriptionId, labelId, step, hasCancelIcon, hasTitle, handleKeyDown, firstFocusableElement, focusableElements, lastFocusableElement, classPrefix, getElement, div_binding];
+  }
+  var Shepherd_element = /*#__PURE__*/function (_SvelteComponent8) {
+    _inherits(Shepherd_element, _SvelteComponent8);
+    function Shepherd_element(options) {
+      var _this10;
+      _classCallCheck(this, Shepherd_element);
+      _this10 = _callSuper(this, Shepherd_element);
+      init(_assertThisInitialized(_this10), options, instance$1, create_fragment$1, safe_not_equal, {
+        classPrefix: 11,
+        element: 0,
+        descriptionId: 2,
+        firstFocusableElement: 8,
+        focusableElements: 9,
+        labelId: 3,
+        lastFocusableElement: 10,
+        step: 4,
+        dataStepId: 1,
+        getElement: 12
+      });
+      return _this10;
+    }
+    _createClass(Shepherd_element, [{
+      key: "getElement",
+      get: function get() {
+        return this.$$.ctx[12];
+      }
+    }]);
+    return Shepherd_element;
+  }(SvelteComponent);
+  /**
+   * A class representing steps to be added to a tour.
+   * @extends {Evented}
+   */
+  var Step = /*#__PURE__*/function (_Evented) {
+    _inherits(Step, _Evented);
+    /**
+     * Create a step
+     * @param {Tour} tour The tour for the step
+     * @param {object} options The options for the step
+     * @param {boolean} options.arrow Whether to display the arrow for the tooltip or not. Defaults to `true`.
+     * @param {object} options.attachTo The element the step should be attached to on the page.
+     * An object with properties `element` and `on`.
+     *
+     * ```js
+     * const step = new Step(tour, {
+     *   attachTo: { element: '.some .selector-path', on: 'left' },
+     *   ...moreOptions
+     * });
+     * ```
+     *
+     * If you don’t specify an `attachTo` the element will appear in the middle of the screen. The same will happen if your `attachTo.element` callback returns `null`, `undefined`, or a selector that does not exist in the DOM.
+     * If you omit the `on` portion of `attachTo`, the element will still be highlighted, but the tooltip will appear
+     * in the middle of the screen, without an arrow pointing to the target.
+     * If the element to highlight does not yet exist while instantiating tour steps, you may use lazy evaluation by supplying a function to `attachTo.element`. The function will be called in the `before-show` phase.
+     * @param {string|HTMLElement|function} options.attachTo.element An element selector string, DOM element, or a function (returning a selector, a DOM element, `null` or `undefined`).
+     * @param {string} options.attachTo.on The optional direction to place the FloatingUI tooltip relative to the element.
+     *   - Possible string values: 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'right', 'right-start', 'right-end', 'left', 'left-start', 'left-end'
+     * @param {Object} options.advanceOn An action on the page which should advance shepherd to the next step.
+     * It should be an object with a string `selector` and an `event` name
+     * ```js
+     * const step = new Step(tour, {
+     *   advanceOn: { selector: '.some .selector-path', event: 'click' },
+     *   ...moreOptions
+     * });
+     * ```
+     * `event` doesn’t have to be an event inside the tour, it can be any event fired on any element on the page.
+     * You can also always manually advance the Tour by calling `myTour.next()`.
+     * @param {function} options.beforeShowPromise A function that returns a promise.
+     * When the promise resolves, the rest of the `show` code for the step will execute.
+     * @param {Object[]} options.buttons An array of buttons to add to the step. These will be rendered in a
+     * footer below the main body text.
+     * @param {function} options.buttons.button.action A function executed when the button is clicked on.
+     * It is automatically bound to the `tour` the step is associated with, so things like `this.next` will
+     * work inside the action.
+     * You can use action to skip steps or navigate to specific steps, with something like:
+     * ```js
+     * action() {
+     *   return this.show('some_step_name');
+     * }
+     * ```
+     * @param {string} options.buttons.button.classes Extra classes to apply to the `<a>`
+     * @param {boolean} options.buttons.button.disabled Should the button be disabled?
+     * @param {string} options.buttons.button.label The aria-label text of the button
+     * @param {boolean} options.buttons.button.secondary If true, a shepherd-button-secondary class is applied to the button
+     * @param {string} options.buttons.button.text The HTML text of the button
+     * @param {boolean} options.canClickTarget A boolean, that when set to false, will set `pointer-events: none` on the target
+     * @param {object} options.cancelIcon Options for the cancel icon
+     * @param {boolean} options.cancelIcon.enabled Should a cancel “✕” be shown in the header of the step?
+     * @param {string} options.cancelIcon.label The label to add for `aria-label`
+     * @param {string} options.classes A string of extra classes to add to the step's content element.
+     * @param {string} options.highlightClass An extra class to apply to the `attachTo` element when it is
+     * highlighted (that is, when its step is active). You can then target that selector in your CSS.
+     * @param {string} options.id The string to use as the `id` for the step.
+     * @param {number} options.modalOverlayOpeningPadding An amount of padding to add around the modal overlay opening
+     * @param {number | { topLeft: number, bottomLeft: number, bottomRight: number, topRight: number }} options.modalOverlayOpeningRadius An amount of border radius to add around the modal overlay opening
+     * @param {object} options.floatingUIOptions Extra options to pass to FloatingUI
+     * @param {boolean|Object} options.scrollTo Should the element be scrolled to when this step is shown? If true, uses the default `scrollIntoView`,
+     * if an object, passes that object as the params to `scrollIntoView` i.e. `{behavior: 'smooth', block: 'center'}`
+     * @param {function} options.scrollToHandler A function that lets you override the default scrollTo behavior and
+     * define a custom action to do the scrolling, and possibly other logic.
+     * @param {function} options.showOn A function that, when it returns `true`, will show the step.
+     * If it returns false, the step will be skipped.
+     * @param {string} options.text The text in the body of the step. It can be one of three types:
+     * ```
+     * - HTML string
+     * - `HTMLElement` object
+     * - `Function` to be executed when the step is built. It must return one the two options above.
+     * ```
+     * @param {string} options.title The step's title. It becomes an `h3` at the top of the step. It can be one of two types:
+     * ```
+     * - HTML string
+     * - `Function` to be executed when the step is built. It must return HTML string.
+     * ```
+     * @param {object} options.when You can define `show`, `hide`, etc events inside `when`. For example:
+     * ```js
+     * when: {
+     *   show: function() {
+     *     window.scrollTo(0, 0);
+     *   }
+     * }
+     * ```
+     * @return {Step} The newly created Step instance
+     */
+    function Step(tour) {
+      var _this11;
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      _classCallCheck(this, Step);
+      _this11 = _callSuper(this, Step, [tour, options]);
+      _this11.tour = tour;
+      _this11.classPrefix = _this11.tour.options ? normalizePrefix(_this11.tour.options.classPrefix) : '';
+      _this11.styles = tour.styles;
+
+      /**
+       * Resolved attachTo options. Due to lazy evaluation, we only resolve the options during `before-show` phase.
+       * Do not use this directly, use the _getResolvedAttachToOptions method instead.
+       * @type {null|{}|{element, to}}
+       * @private
+       */
+      _this11._resolvedAttachTo = null;
+      autoBind(_assertThisInitialized(_this11));
+      _this11._setOptions(options);
+      return _possibleConstructorReturn(_this11, _assertThisInitialized(_this11));
+    }
+
+    /**
+     * Cancel the tour
+     * Triggers the `cancel` event
+     */
+    _createClass(Step, [{
+      key: "cancel",
+      value: function cancel() {
+        this.tour.cancel();
+        this.trigger('cancel');
+      }
+
+      /**
+       * Complete the tour
+       * Triggers the `complete` event
+       */
+    }, {
+      key: "complete",
+      value: function complete() {
+        this.tour.complete();
+        this.trigger('complete');
+      }
+
+      /**
+       * Remove the step, delete the step's element, and destroy the FloatingUI instance for the step.
+       * Triggers `destroy` event
+       */
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        destroyTooltip(this);
+        if (isHTMLElement$1(this.el)) {
+          this.el.remove();
+          this.el = null;
+        }
+        this._updateStepTargetOnHide();
+        this.trigger('destroy');
+      }
+
+      /**
+       * Returns the tour for the step
+       * @return {Tour} The tour instance
+       */
+    }, {
+      key: "getTour",
+      value: function getTour() {
+        return this.tour;
+      }
+
+      /**
+       * Hide the step
+       */
+    }, {
+      key: "hide",
+      value: function hide() {
+        this.tour.modal.hide();
+        this.trigger('before-hide');
+        if (this.el) {
+          this.el.hidden = true;
+        }
+        this._updateStepTargetOnHide();
+        this.trigger('hide');
+      }
+
+      /**
+       * Resolves attachTo options.
+       * @returns {{}|{element, on}}
+       * @private
+       */
+    }, {
+      key: "_resolveAttachToOptions",
+      value: function _resolveAttachToOptions() {
+        this._resolvedAttachTo = parseAttachTo(this);
+        return this._resolvedAttachTo;
+      }
+
+      /**
+       * A selector for resolved attachTo options.
+       * @returns {{}|{element, on}}
+       * @private
+       */
+    }, {
+      key: "_getResolvedAttachToOptions",
+      value: function _getResolvedAttachToOptions() {
+        if (this._resolvedAttachTo === null) {
+          return this._resolveAttachToOptions();
+        }
+        return this._resolvedAttachTo;
+      }
+
+      /**
+       * Check if the step is open and visible
+       * @return {boolean} True if the step is open and visible
+       */
+    }, {
+      key: "isOpen",
+      value: function isOpen() {
+        return Boolean(this.el && !this.el.hidden);
+      }
+
+      /**
+       * Wraps `_show` and ensures `beforeShowPromise` resolves before calling show
+       * @return {*|Promise}
+       */
+    }, {
+      key: "show",
+      value: function show() {
+        var _this12 = this;
+        if (isFunction(this.options.beforeShowPromise)) {
+          return Promise.resolve(this.options.beforeShowPromise()).then(function () {
+            return _this12._show();
+          });
+        }
+        return Promise.resolve(this._show());
+      }
+
+      /**
+       * Updates the options of the step.
+       *
+       * @param {Object} options The options for the step
+       */
+    }, {
+      key: "updateStepOptions",
+      value: function updateStepOptions(options) {
+        Object.assign(this.options, options);
+        if (this.shepherdElementComponent) {
+          this.shepherdElementComponent.$set({
+            step: this
+          });
+        }
+      }
+
+      /**
+       * Returns the element for the step
+       * @return {HTMLElement|null|undefined} The element instance. undefined if it has never been shown, null if it has been destroyed
+       */
+    }, {
+      key: "getElement",
+      value: function getElement() {
+        return this.el;
+      }
+
+      /**
+       * Returns the target for the step
+       * @return {HTMLElement|null|undefined} The element instance. undefined if it has never been shown, null if query string has not been found
+       */
+    }, {
+      key: "getTarget",
+      value: function getTarget() {
+        return this.target;
+      }
+
+      /**
+       * Creates Shepherd element for step based on options
+       *
+       * @return {Element} The DOM element for the step tooltip
+       * @private
+       */
+    }, {
+      key: "_createTooltipContent",
+      value: function _createTooltipContent() {
+        var descriptionId = "".concat(this.id, "-description");
+        var labelId = "".concat(this.id, "-label");
+        this.shepherdElementComponent = new Shepherd_element({
+          target: this.tour.options.stepsContainer || document.body,
+          props: {
+            classPrefix: this.classPrefix,
+            descriptionId: descriptionId,
+            labelId: labelId,
+            step: this,
+            styles: this.styles
+          }
+        });
+        return this.shepherdElementComponent.getElement();
+      }
+
+      /**
+       * If a custom scrollToHandler is defined, call that, otherwise do the generic
+       * scrollIntoView call.
+       *
+       * @param {boolean|Object} scrollToOptions If true, uses the default `scrollIntoView`,
+       * if an object, passes that object as the params to `scrollIntoView` i.e. `{ behavior: 'smooth', block: 'center' }`
+       * @private
+       */
+    }, {
+      key: "_scrollTo",
+      value: function _scrollTo(scrollToOptions) {
+        var _this$_getResolvedAtt = this._getResolvedAttachToOptions(),
+          element = _this$_getResolvedAtt.element;
+        if (isFunction(this.options.scrollToHandler)) {
+          this.options.scrollToHandler(element);
+        } else if (isElement$1(element) && typeof element.scrollIntoView === 'function') {
+          element.scrollIntoView(scrollToOptions);
+        }
+      }
+
+      /**
+       * _getClassOptions gets all possible classes for the step
+       * @param {Object} stepOptions The step specific options
+       * @returns {String} unique string from array of classes
+       * @private
+       */
+    }, {
+      key: "_getClassOptions",
+      value: function _getClassOptions(stepOptions) {
+        var defaultStepOptions = this.tour && this.tour.options && this.tour.options.defaultStepOptions;
+        var stepClasses = stepOptions.classes ? stepOptions.classes : '';
+        var defaultStepOptionsClasses = defaultStepOptions && defaultStepOptions.classes ? defaultStepOptions.classes : '';
+        var allClasses = [].concat(_toConsumableArray(stepClasses.split(' ')), _toConsumableArray(defaultStepOptionsClasses.split(' ')));
+        var uniqClasses = new Set(allClasses);
+        return Array.from(uniqClasses).join(' ').trim();
+      }
+
+      /**
+       * Sets the options for the step, maps `when` to events, sets up buttons
+       * @param {Object} options The options for the step
+       * @private
+       */
+    }, {
+      key: "_setOptions",
+      value: function _setOptions() {
+        var _this13 = this;
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var tourOptions = this.tour && this.tour.options && this.tour.options.defaultStepOptions;
+        tourOptions = cjs({}, tourOptions || {});
+        this.options = Object.assign({
+          arrow: true
+        }, tourOptions, options, mergeTooltipConfig(tourOptions, options));
+        var when = this.options.when;
+        this.options.classes = this._getClassOptions(options);
+        this.destroy();
+        this.id = this.options.id || "step-".concat(uuid());
+        if (when) {
+          Object.keys(when).forEach(function (event) {
+            _this13.on(event, when[event], _this13);
+          });
+        }
+      }
+
+      /**
+       * Create the element and set up the FloatingUI instance
+       * @private
+       */
+    }, {
+      key: "_setupElements",
+      value: function _setupElements() {
+        if (!isUndefined(this.el)) {
+          this.destroy();
+        }
+        this.el = this._createTooltipContent();
+        if (this.options.advanceOn) {
+          bindAdvance(this);
+        }
+
+        // The tooltip implementation details are handled outside of the Step
+        // object.
+        setupTooltip(this);
+      }
+
+      /**
+       * Triggers `before-show`, generates the tooltip DOM content,
+       * sets up a FloatingUI instance for the tooltip, then triggers `show`.
+       * @private
+       */
+    }, {
+      key: "_show",
+      value: function _show() {
+        var _this14 = this;
+        this.trigger('before-show');
+
+        // Force resolve to make sure the options are updated on subsequent shows.
+        this._resolveAttachToOptions();
+        this._setupElements();
+        if (!this.tour.modal) {
+          this.tour._setupModal();
+        }
+        this.tour.modal.setupForStep(this);
+        this._styleTargetElementForStep(this);
+        this.el.hidden = false;
+
+        // start scrolling to target before showing the step
+        if (this.options.scrollTo) {
+          setTimeout(function () {
+            _this14._scrollTo(_this14.options.scrollTo);
+          });
+        }
+        this.el.hidden = false;
+        var content = this.shepherdElementComponent.getElement();
+        var target = this.target || document.body;
+        target.classList.add("".concat(this.classPrefix, "shepherd-enabled"));
+        target.classList.add("".concat(this.classPrefix, "shepherd-target"));
+        content.classList.add('shepherd-enabled');
+        this.trigger('show');
+      }
+
+      /**
+       * Modulates the styles of the passed step's target element, based on the step's options and
+       * the tour's `modal` option, to visually emphasize the element
+       *
+       * @param step The step object that attaches to the element
+       * @private
+       */
+    }, {
+      key: "_styleTargetElementForStep",
+      value: function _styleTargetElementForStep(step) {
+        var targetElement = step.target;
+        if (!targetElement) {
+          return;
+        }
+        if (step.options.highlightClass) {
+          targetElement.classList.add(step.options.highlightClass);
+        }
+        targetElement.classList.remove('shepherd-target-click-disabled');
+        if (step.options.canClickTarget === false) {
+          targetElement.classList.add('shepherd-target-click-disabled');
+        }
+      }
+
+      /**
+       * When a step is hidden, remove the highlightClass and 'shepherd-enabled'
+       * and 'shepherd-target' classes
+       * @private
+       */
+    }, {
+      key: "_updateStepTargetOnHide",
+      value: function _updateStepTargetOnHide() {
+        var target = this.target || document.body;
+        if (this.options.highlightClass) {
+          target.classList.remove(this.options.highlightClass);
+        }
+        target.classList.remove('shepherd-target-click-disabled', "".concat(this.classPrefix, "shepherd-enabled"), "".concat(this.classPrefix, "shepherd-target"));
+      }
+    }]);
+    return Step;
+  }(Evented);
+  /**
+   * Cleanup the steps and set pointerEvents back to 'auto'
+   * @param tour The tour object
+   */
+  function cleanupSteps(tour) {
+    if (tour) {
+      var steps = tour.steps;
+      steps.forEach(function (step) {
+        if (step.options && step.options.canClickTarget === false && step.options.attachTo) {
+          if (step.target instanceof HTMLElement) {
+            step.target.classList.remove('shepherd-target-click-disabled');
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Generates the svg path data for a rounded rectangle overlay
+   * @param {Object} dimension - Dimensions of rectangle.
+   * @param {number} width - Width.
+   * @param {number} height - Height.
+   * @param {number} [x=0] - Offset from top left corner in x axis. default 0.
+   * @param {number} [y=0] - Offset from top left corner in y axis. default 0.
+   * @param {number | { topLeft: number, topRight: number, bottomRight: number, bottomLeft: number }} [r=0] - Corner Radius. Keep this smaller than half of width or height.
+   * @returns {string} - Rounded rectangle overlay path data.
+   */
+  function makeOverlayPath(_ref25) {
+    var width = _ref25.width,
+      height = _ref25.height,
+      _ref25$x = _ref25.x,
+      x = _ref25$x === void 0 ? 0 : _ref25$x,
+      _ref25$y = _ref25.y,
+      y = _ref25$y === void 0 ? 0 : _ref25$y,
+      _ref25$r = _ref25.r,
+      r = _ref25$r === void 0 ? 0 : _ref25$r;
+    var _window = window,
+      w = _window.innerWidth,
+      h = _window.innerHeight;
+    var _ref26 = typeof r === 'number' ? {
+        topLeft: r,
+        topRight: r,
+        bottomRight: r,
+        bottomLeft: r
+      } : r,
+      _ref26$topLeft = _ref26.topLeft,
+      topLeft = _ref26$topLeft === void 0 ? 0 : _ref26$topLeft,
+      _ref26$topRight = _ref26.topRight,
+      topRight = _ref26$topRight === void 0 ? 0 : _ref26$topRight,
+      _ref26$bottomRight = _ref26.bottomRight,
+      bottomRight = _ref26$bottomRight === void 0 ? 0 : _ref26$bottomRight,
+      _ref26$bottomLeft = _ref26.bottomLeft,
+      bottomLeft = _ref26$bottomLeft === void 0 ? 0 : _ref26$bottomLeft;
+    return "M".concat(w, ",").concat(h, "H0V0H").concat(w, "V").concat(h, "ZM").concat(x + topLeft, ",").concat(y, "a").concat(topLeft, ",").concat(topLeft, ",0,0,0-").concat(topLeft, ",").concat(topLeft, "V").concat(height + y - bottomLeft, "a").concat(bottomLeft, ",").concat(bottomLeft, ",0,0,0,").concat(bottomLeft, ",").concat(bottomLeft, "H").concat(width + x - bottomRight, "a").concat(bottomRight, ",").concat(bottomRight, ",0,0,0,").concat(bottomRight, "-").concat(bottomRight, "V").concat(y + topRight, "a").concat(topRight, ",").concat(topRight, ",0,0,0-").concat(topRight, "-").concat(topRight, "Z");
+  }
+
+  /* src/js/components/shepherd-modal.svelte generated by Svelte v3.59.2 */
+  function create_fragment(ctx) {
+    var svg;
+    var path;
+    var svg_class_value;
+    var mounted;
+    var dispose;
+    return {
+      c: function c() {
+        svg = svg_element("svg");
+        path = svg_element("path");
+        attr(path, "d", /*pathDefinition*/ctx[2]);
+        attr(svg, "class", svg_class_value = "".concat( /*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : '', " shepherd-modal-overlay-container"));
+      },
+      m: function m(target, anchor) {
+        insert(target, svg, anchor);
+        append(svg, path);
+        /*svg_binding*/
+        ctx[11](svg);
+        if (!mounted) {
+          dispose = listen(svg, "touchmove", /*_preventModalOverlayTouch*/ctx[3]);
+          mounted = true;
+        }
+      },
+      p: function p(ctx, _ref27) {
+        var _ref28 = _slicedToArray(_ref27, 1),
+          dirty = _ref28[0];
+        if (dirty & /*pathDefinition*/4) {
+          attr(path, "d", /*pathDefinition*/ctx[2]);
+        }
+        if (dirty & /*modalIsVisible*/2 && svg_class_value !== (svg_class_value = "".concat( /*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : '', " shepherd-modal-overlay-container"))) {
+          attr(svg, "class", svg_class_value);
+        }
+      },
+      i: noop,
+      o: noop,
+      d: function d(detaching) {
+        if (detaching) detach(svg);
+        /*svg_binding*/
+        ctx[11](null);
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  function _getScrollParent(element) {
+    if (!element) {
+      return null;
+    }
+    var isHtmlElement = element instanceof HTMLElement;
+    var overflowY = isHtmlElement && window.getComputedStyle(element).overflowY;
+    var isScrollable = overflowY !== 'hidden' && overflowY !== 'visible';
+    if (isScrollable && element.scrollHeight >= element.clientHeight) {
+      return element;
+    }
+    return _getScrollParent(element.parentElement);
+  }
+
+  /**
+   * Get the visible height of the target element relative to its scrollParent.
+   * If there is no scroll parent, the height of the element is returned.
+   *
+   * @param {HTMLElement} element The target element
+   * @param {HTMLElement} [scrollParent] The scrollable parent element
+   * @returns {{y: number, height: number}}
+   * @private
+   */
+  function _getVisibleHeight(element, scrollParent) {
+    var elementRect = element.getBoundingClientRect();
+    var top = elementRect.y || elementRect.top;
+    var bottom = elementRect.bottom || top + elementRect.height;
+    if (scrollParent) {
+      var scrollRect = scrollParent.getBoundingClientRect();
+      var scrollTop = scrollRect.y || scrollRect.top;
+      var scrollBottom = scrollRect.bottom || scrollTop + scrollRect.height;
+      top = Math.max(top, scrollTop);
+      bottom = Math.min(bottom, scrollBottom);
+    }
+    var height = Math.max(bottom - top, 0); // Default to 0 if height is negative
+    return {
+      y: top,
+      height: height
+    };
+  }
+  function instance($$self, $$props, $$invalidate) {
+    var element = $$props.element,
+      openingProperties = $$props.openingProperties;
+    uuid();
+    var modalIsVisible = false;
+    var rafId = undefined;
+    var pathDefinition;
+    closeModalOpening();
+    var getElement = function getElement() {
+      return element;
+    };
+    function closeModalOpening() {
+      $$invalidate(4, openingProperties = {
+        width: 0,
+        height: 0,
+        x: 0,
+        y: 0,
+        r: 0
+      });
+    }
+    function hide() {
+      $$invalidate(1, modalIsVisible = false);
+
+      // Ensure we cleanup all event listeners when we hide the modal
+      _cleanupStepEventListeners();
+    }
+    function positionModal() {
+      var modalOverlayOpeningPadding = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var modalOverlayOpeningRadius = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var scrollParent = arguments.length > 2 ? arguments[2] : undefined;
+      var targetElement = arguments.length > 3 ? arguments[3] : undefined;
+      if (targetElement) {
+        var _getVisibleHeight2 = _getVisibleHeight(targetElement, scrollParent),
+          y = _getVisibleHeight2.y,
+          height = _getVisibleHeight2.height;
+        var _targetElement$getBou = targetElement.getBoundingClientRect(),
+          x = _targetElement$getBou.x,
+          width = _targetElement$getBou.width,
+          left = _targetElement$getBou.left;
+
+        // getBoundingClientRect is not consistent. Some browsers use x and y, while others use left and top
+        $$invalidate(4, openingProperties = {
+          width: width + modalOverlayOpeningPadding * 2,
+          height: height + modalOverlayOpeningPadding * 2,
+          x: (x || left) - modalOverlayOpeningPadding,
+          y: y - modalOverlayOpeningPadding,
+          r: modalOverlayOpeningRadius
+        });
+      } else {
+        closeModalOpening();
+      }
+    }
+    function setupForStep(step) {
+      // Ensure we move listeners from the previous step, before we setup new ones
+      _cleanupStepEventListeners();
+      if (step.tour.options.useModalOverlay) {
+        _styleForStep(step);
+        show();
+      } else {
+        hide();
+      }
+    }
+    function show() {
+      $$invalidate(1, modalIsVisible = true);
+    }
+    var _preventModalBodyTouch = function _preventModalBodyTouch(e) {
+      e.preventDefault();
+    };
+    var _preventModalOverlayTouch = function _preventModalOverlayTouch(e) {
+      e.stopPropagation();
+    };
+
+    /**
+    * Add touchmove event listener
+    * @private
+    */
+    function _addStepEventListeners() {
+      // Prevents window from moving on touch.
+      window.addEventListener('touchmove', _preventModalBodyTouch, {
+        passive: false
+      });
+    }
+
+    /**
+    * Cancel the requestAnimationFrame loop and remove touchmove event listeners
+    * @private
+    */
+    function _cleanupStepEventListeners() {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = undefined;
+      }
+      window.removeEventListener('touchmove', _preventModalBodyTouch, {
+        passive: false
+      });
+    }
+
+    /**
+    * Style the modal for the step
+    * @param {Step} step The step to style the opening for
+    * @private
+    */
+    function _styleForStep(step) {
+      var _step$options = step.options,
+        modalOverlayOpeningPadding = _step$options.modalOverlayOpeningPadding,
+        modalOverlayOpeningRadius = _step$options.modalOverlayOpeningRadius;
+      var scrollParent = _getScrollParent(step.target);
+
+      // Setup recursive function to call requestAnimationFrame to update the modal opening position
+      var rafLoop = function rafLoop() {
+        rafId = undefined;
+        positionModal(modalOverlayOpeningPadding, modalOverlayOpeningRadius, scrollParent, step.target);
+        rafId = requestAnimationFrame(rafLoop);
+      };
+      rafLoop();
+      _addStepEventListeners();
+    }
+    function svg_binding($$value) {
+      binding_callbacks[$$value ? 'unshift' : 'push'](function () {
+        element = $$value;
+        $$invalidate(0, element);
+      });
+    }
+    $$self.$$set = function ($$props) {
+      if ('element' in $$props) $$invalidate(0, element = $$props.element);
+      if ('openingProperties' in $$props) $$invalidate(4, openingProperties = $$props.openingProperties);
+    };
+    $$self.$$.update = function () {
+      if ($$self.$$.dirty & /*openingProperties*/16) {
+        $$invalidate(2, pathDefinition = makeOverlayPath(openingProperties));
+      }
+    };
+    return [element, modalIsVisible, pathDefinition, _preventModalOverlayTouch, openingProperties, getElement, closeModalOpening, hide, positionModal, setupForStep, show, svg_binding];
+  }
+  var Shepherd_modal = /*#__PURE__*/function (_SvelteComponent9) {
+    _inherits(Shepherd_modal, _SvelteComponent9);
+    function Shepherd_modal(options) {
+      var _this15;
+      _classCallCheck(this, Shepherd_modal);
+      _this15 = _callSuper(this, Shepherd_modal);
+      init(_assertThisInitialized(_this15), options, instance, create_fragment, safe_not_equal, {
+        element: 0,
+        openingProperties: 4,
+        getElement: 5,
+        closeModalOpening: 6,
+        hide: 7,
+        positionModal: 8,
+        setupForStep: 9,
+        show: 10
+      });
+      return _this15;
+    }
+    _createClass(Shepherd_modal, [{
+      key: "getElement",
+      get: function get() {
+        return this.$$.ctx[5];
+      }
+    }, {
+      key: "closeModalOpening",
+      get: function get() {
+        return this.$$.ctx[6];
+      }
+    }, {
+      key: "hide",
+      get: function get() {
+        return this.$$.ctx[7];
+      }
+    }, {
+      key: "positionModal",
+      get: function get() {
+        return this.$$.ctx[8];
+      }
+    }, {
+      key: "setupForStep",
+      get: function get() {
+        return this.$$.ctx[9];
+      }
+    }, {
+      key: "show",
+      get: function get() {
+        return this.$$.ctx[10];
+      }
+    }]);
+    return Shepherd_modal;
+  }(SvelteComponent);
+  var Shepherd = new Evented();
+
+  /**
+   * Class representing the site tour
+   * @extends {Evented}
+   */
+  var Tour = /*#__PURE__*/function (_Evented2) {
+    _inherits(Tour, _Evented2);
+    /**
+     * @param {Object} options The options for the tour
+     * @param {boolean | function(): boolean | Promise<boolean> | function(): Promise<boolean>} options.confirmCancel If true, will issue a `window.confirm` before cancelling.
+     * If it is a function(support Async Function), it will be called and wait for the return value, and will only be cancelled if the value returned is true
+     * @param {string} options.confirmCancelMessage The message to display in the `window.confirm` dialog
+     * @param {string} options.classPrefix The prefix to add to the `shepherd-enabled` and `shepherd-target` class names as well as the `data-shepherd-step-id`.
+     * @param {Object} options.defaultStepOptions Default options for Steps ({@link Step#constructor}), created through `addStep`
+     * @param {boolean} options.exitOnEsc Exiting the tour with the escape key will be enabled unless this is explicitly
+     * set to false.
+     * @param {boolean} options.keyboardNavigation Navigating the tour via left and right arrow keys will be enabled
+     * unless this is explicitly set to false.
+     * @param {HTMLElement} options.stepsContainer An optional container element for the steps.
+     * If not set, the steps will be appended to `document.body`.
+     * @param {HTMLElement} options.modalContainer An optional container element for the modal.
+     * If not set, the modal will be appended to `document.body`.
+     * @param {object[] | Step[]} options.steps An array of step options objects or Step instances to initialize the tour with
+     * @param {string} options.tourName An optional "name" for the tour. This will be appended to the the tour's
+     * dynamically generated `id` property.
+     * @param {boolean} options.useModalOverlay Whether or not steps should be placed above a darkened
+     * modal overlay. If true, the overlay will create an opening around the target element so that it
+     * can remain interactive
+     * @returns {Tour}
+     */
+    function Tour() {
+      var _this16;
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      _classCallCheck(this, Tour);
+      _this16 = _callSuper(this, Tour, [options]);
+      autoBind(_assertThisInitialized(_this16));
+      var defaultTourOptions = {
+        exitOnEsc: true,
+        keyboardNavigation: true
+      };
+      _this16.options = Object.assign({}, defaultTourOptions, options);
+      _this16.classPrefix = normalizePrefix(_this16.options.classPrefix);
+      _this16.steps = [];
+      _this16.addSteps(_this16.options.steps);
+
+      // Pass these events onto the global Shepherd object
+      var events = ['active', 'cancel', 'complete', 'inactive', 'show', 'start'];
+      events.map(function (event) {
+        (function (e) {
+          _this16.on(e, function (opts) {
+            opts = opts || {};
+            opts.tour = _assertThisInitialized(_this16);
+            Shepherd.trigger(e, opts);
+          });
+        })(event);
+      });
+      _this16._setTourID();
+      return _possibleConstructorReturn(_this16, _assertThisInitialized(_this16));
+    }
+
+    /**
+     * Adds a new step to the tour
+     * @param {Object|Step} options An object containing step options or a Step instance
+     * @param {number} index The optional index to insert the step at. If undefined, the step
+     * is added to the end of the array.
+     * @return {Step} The newly added step
+     */
+    _createClass(Tour, [{
+      key: "addStep",
+      value: function addStep(options, index) {
+        var step = options;
+        if (!(step instanceof Step)) {
+          step = new Step(this, step);
+        } else {
+          step.tour = this;
+        }
+        if (!isUndefined(index)) {
+          this.steps.splice(index, 0, step);
+        } else {
+          this.steps.push(step);
+        }
+        return step;
+      }
+
+      /**
+       * Add multiple steps to the tour
+       * @param {Array<object> | Array<Step>} steps The steps to add to the tour
+       */
+    }, {
+      key: "addSteps",
+      value: function addSteps(steps) {
+        var _this17 = this;
+        if (Array.isArray(steps)) {
+          steps.forEach(function (step) {
+            _this17.addStep(step);
+          });
+        }
+        return this;
+      }
+
+      /**
+       * Go to the previous step in the tour
+       */
+    }, {
+      key: "back",
+      value: function back() {
+        var index = this.steps.indexOf(this.currentStep);
+        this.show(index - 1, false);
+      }
+
+      /**
+       * Calls _done() triggering the 'cancel' event
+       * If `confirmCancel` is true, will show a window.confirm before cancelling
+       * If `confirmCancel` is a function, will call it and wait for the return value,
+       * and only cancel when the value returned is true
+       */
+    }, {
+      key: "cancel",
+      value: (function () {
+        var _cancel = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+          var confirmCancelIsFunction, cancelMessage, stopTour;
+          return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+            while (1) switch (_context6.prev = _context6.next) {
+              case 0:
+                if (!this.options.confirmCancel) {
+                  _context6.next = 14;
+                  break;
+                }
+                confirmCancelIsFunction = typeof this.options.confirmCancel === 'function';
+                cancelMessage = this.options.confirmCancelMessage || 'Are you sure you want to stop the tour?';
+                if (!confirmCancelIsFunction) {
+                  _context6.next = 9;
+                  break;
+                }
+                _context6.next = 6;
+                return this.options.confirmCancel();
+              case 6:
+                _context6.t0 = _context6.sent;
+                _context6.next = 10;
+                break;
+              case 9:
+                _context6.t0 = window.confirm(cancelMessage);
+              case 10:
+                stopTour = _context6.t0;
+                if (stopTour) {
+                  this._done('cancel');
+                }
+                _context6.next = 15;
+                break;
+              case 14:
+                this._done('cancel');
+              case 15:
+              case "end":
+                return _context6.stop();
+            }
+          }, _callee6, this);
+        }));
+        function cancel() {
+          return _cancel.apply(this, arguments);
+        }
+        return cancel;
+      }()
+      /**
+       * Calls _done() triggering the `complete` event
+       */
+      )
+    }, {
+      key: "complete",
+      value: function complete() {
+        this._done('complete');
+      }
+
+      /**
+       * Gets the step from a given id
+       * @param {Number|String} id The id of the step to retrieve
+       * @return {Step} The step corresponding to the `id`
+       */
+    }, {
+      key: "getById",
+      value: function getById(id) {
+        return this.steps.find(function (step) {
+          return step.id === id;
+        });
+      }
+
+      /**
+       * Gets the current step
+       * @returns {Step|null}
+       */
+    }, {
+      key: "getCurrentStep",
+      value: function getCurrentStep() {
+        return this.currentStep;
+      }
+
+      /**
+       * Hide the current step
+       */
+    }, {
+      key: "hide",
+      value: function hide() {
+        var currentStep = this.getCurrentStep();
+        if (currentStep) {
+          return currentStep.hide();
+        }
+      }
+
+      /**
+       * Check if the tour is active
+       * @return {boolean}
+       */
+    }, {
+      key: "isActive",
+      value: function isActive() {
+        return Shepherd.activeTour === this;
+      }
+
+      /**
+       * Go to the next step in the tour
+       * If we are at the end, call `complete`
+       */
+    }, {
+      key: "next",
+      value: function next() {
+        var index = this.steps.indexOf(this.currentStep);
+        if (index === this.steps.length - 1) {
+          this.complete();
+        } else {
+          this.show(index + 1, true);
+        }
+      }
+
+      /**
+       * Removes the step from the tour
+       * @param {String} name The id for the step to remove
+       */
+    }, {
+      key: "removeStep",
+      value: function removeStep(name) {
+        var _this18 = this;
+        var current = this.getCurrentStep();
+
+        // Find the step, destroy it and remove it from this.steps
+        this.steps.some(function (step, i) {
+          if (step.id === name) {
+            if (step.isOpen()) {
+              step.hide();
+            }
+            step.destroy();
+            _this18.steps.splice(i, 1);
+            return true;
+          }
+        });
+        if (current && current.id === name) {
+          this.currentStep = undefined;
+
+          // If we have steps left, show the first one, otherwise just cancel the tour
+          this.steps.length ? this.show(0) : this.cancel();
+        }
+      }
+
+      /**
+       * Show a specific step in the tour
+       * @param {Number|String} key The key to look up the step by
+       * @param {Boolean} forward True if we are going forward, false if backward
+       */
+    }, {
+      key: "show",
+      value: function show() {
+        var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var forward = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        var step = isString(key) ? this.getById(key) : this.steps[key];
+        if (step) {
+          this._updateStateBeforeShow();
+          var shouldSkipStep = isFunction(step.options.showOn) && !step.options.showOn();
+
+          // If `showOn` returns false, we want to skip the step, otherwise, show the step like normal
+          if (shouldSkipStep) {
+            this._skipStep(step, forward);
+          } else {
+            this.trigger('show', {
+              step: step,
+              previous: this.currentStep
+            });
+            this.currentStep = step;
+            step.show();
+          }
+        }
+      }
+
+      /**
+       * Start the tour
+       */
+    }, {
+      key: "start",
+      value: function start() {
+        this.trigger('start');
+
+        // Save the focused element before the tour opens
+        this.focusedElBeforeOpen = document.activeElement;
+        this.currentStep = null;
+        this._setupModal();
+        this._setupActiveTour();
+        this.next();
+      }
+
+      /**
+       * Called whenever the tour is cancelled or completed, basically anytime we exit the tour
+       * @param {String} event The event name to trigger
+       * @private
+       */
+    }, {
+      key: "_done",
+      value: function _done(event) {
+        var index = this.steps.indexOf(this.currentStep);
+        if (Array.isArray(this.steps)) {
+          this.steps.forEach(function (step) {
+            return step.destroy();
+          });
+        }
+        cleanupSteps(this);
+        this.trigger(event, {
+          index: index
+        });
+        Shepherd.activeTour = null;
+        this.trigger('inactive', {
+          tour: this
+        });
+        if (this.modal) {
+          this.modal.hide();
+        }
+        if (event === 'cancel' || event === 'complete') {
+          if (this.modal) {
+            var modalContainer = document.querySelector('.shepherd-modal-overlay-container');
+            if (modalContainer) {
+              modalContainer.remove();
+            }
+          }
+        }
+
+        // Focus the element that was focused before the tour started
+        if (isHTMLElement$1(this.focusedElBeforeOpen)) {
+          this.focusedElBeforeOpen.focus();
+        }
+      }
+
+      /**
+       * Make this tour "active"
+       * @private
+       */
+    }, {
+      key: "_setupActiveTour",
+      value: function _setupActiveTour() {
+        this.trigger('active', {
+          tour: this
+        });
+        Shepherd.activeTour = this;
+      }
+
+      /**
+       * _setupModal create the modal container and instance
+       * @private
+       */
+    }, {
+      key: "_setupModal",
+      value: function _setupModal() {
+        this.modal = new Shepherd_modal({
+          target: this.options.modalContainer || document.body,
+          props: {
+            classPrefix: this.classPrefix,
+            styles: this.styles
+          }
+        });
+      }
+
+      /**
+       * Called when `showOn` evaluates to false, to skip the step or complete the tour if it's the last step
+       * @param {Step} step The step to skip
+       * @param {Boolean} forward True if we are going forward, false if backward
+       * @private
+       */
+    }, {
+      key: "_skipStep",
+      value: function _skipStep(step, forward) {
+        var index = this.steps.indexOf(step);
+        if (index === this.steps.length - 1) {
+          this.complete();
+        } else {
+          var nextIndex = forward ? index + 1 : index - 1;
+          this.show(nextIndex, forward);
+        }
+      }
+
+      /**
+       * Before showing, hide the current step and if the tour is not
+       * already active, call `this._setupActiveTour`.
+       * @private
+       */
+    }, {
+      key: "_updateStateBeforeShow",
+      value: function _updateStateBeforeShow() {
+        if (this.currentStep) {
+          this.currentStep.hide();
+        }
+        if (!this.isActive()) {
+          this._setupActiveTour();
+        }
+      }
+
+      /**
+       * Sets this.id to `${tourName}--${uuid}`
+       * @private
+       */
+    }, {
+      key: "_setTourID",
+      value: function _setTourID() {
+        var tourName = this.options.tourName || 'tour';
+        this.id = "".concat(tourName, "--").concat(uuid());
+      }
+    }]);
+    return Tour;
+  }(Evented);
+  var isServerSide = typeof window === 'undefined';
+  var NoOp = /*#__PURE__*/_createClass(function NoOp() {
+    _classCallCheck(this, NoOp);
+  });
+  if (isServerSide) {
+    Object.assign(Shepherd, {
+      Tour: NoOp,
+      Step: NoOp
+    });
+  } else {
+    Object.assign(Shepherd, {
+      Tour: Tour,
+      Step: Step
+    });
+  }
+  return Shepherd;
+});
+}
 
 /***/ })
 

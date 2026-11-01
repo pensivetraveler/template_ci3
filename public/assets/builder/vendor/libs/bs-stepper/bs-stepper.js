@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -26,7 +18,46 @@ return /******/ (function() { // webpackBootstrap
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   Stepper: function() { return /* reexport default from dynamic */ bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0___default.a; }\n/* harmony export */ });\n/* harmony import */ var bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! bs-stepper/dist/js/bs-stepper */ \"./node_modules/bs-stepper/dist/js/bs-stepper.js\");\n/* harmony import */ var bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0__);\n\nvar bsStepper = document.querySelectorAll('.bs-stepper');\n\n// Adds crossed class\nbsStepper.forEach(function (el) {\n  el.addEventListener('show.bs-stepper', function (event) {\n    var index = event.detail.indexStep;\n    var numberOfSteps = el.querySelectorAll('.line').length;\n    var line = el.querySelectorAll('.step');\n\n    // The first for loop is for increasing the steps,\n    // the second is for turning them off when going back\n    // and the third with the if statement because the last line\n    // can't seem to turn off when I press the first item. ¯\\_(ツ)_/¯\n\n    for (var i = 0; i < index; i++) {\n      line[i].classList.add('crossed');\n      for (var j = index; j < numberOfSteps; j++) {\n        line[j].classList.remove('crossed');\n      }\n    }\n    if (event.detail.to == 0) {\n      for (var k = index; k < numberOfSteps; k++) {\n        line[k].classList.remove('crossed');\n      }\n      line[0].classList.remove('crossed');\n    }\n  });\n});\ntry {\n  window.Stepper = (bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0___default());\n} catch (e) {}\n\n\n//# sourceURL=webpack://Materialize/./libs/bs-stepper/bs-stepper.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Stepper: function() { return /* reexport default from dynamic */ bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0___default.a; }
+/* harmony export */ });
+/* harmony import */ var bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! bs-stepper/dist/js/bs-stepper */ "./node_modules/bs-stepper/dist/js/bs-stepper.js");
+/* harmony import */ var bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0__);
+
+var bsStepper = document.querySelectorAll('.bs-stepper');
+
+// Adds crossed class
+bsStepper.forEach(function (el) {
+  el.addEventListener('show.bs-stepper', function (event) {
+    var index = event.detail.indexStep;
+    var numberOfSteps = el.querySelectorAll('.line').length;
+    var line = el.querySelectorAll('.step');
+
+    // The first for loop is for increasing the steps,
+    // the second is for turning them off when going back
+    // and the third with the if statement because the last line
+    // can't seem to turn off when I press the first item. ¯\_(ツ)_/¯
+
+    for (var i = 0; i < index; i++) {
+      line[i].classList.add('crossed');
+      for (var j = index; j < numberOfSteps; j++) {
+        line[j].classList.remove('crossed');
+      }
+    }
+    if (event.detail.to == 0) {
+      for (var k = index; k < numberOfSteps; k++) {
+        line[k].classList.remove('crossed');
+      }
+      line[0].classList.remove('crossed');
+    }
+  });
+});
+try {
+  window.Stepper = (bs_stepper_dist_js_bs_stepper__WEBPACK_IMPORTED_MODULE_0___default());
+} catch (e) {}
+}
 
 /***/ }),
 
@@ -36,7 +67,435 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \*******************************************************/
 /***/ (function(module) {
 
-eval("/*!\n * bsStepper v1.7.0 (https://github.com/Johann-S/bs-stepper)\n * Copyright 2018 - 2019 Johann-S <johann.servoire@gmail.com>\n * Licensed under MIT (https://github.com/Johann-S/bs-stepper/blob/master/LICENSE)\n */\n(function (global, factory) {\n   true ? module.exports = factory() :\n  0;\n}(this, function () { 'use strict';\n\n  function _extends() {\n    _extends = Object.assign || function (target) {\n      for (var i = 1; i < arguments.length; i++) {\n        var source = arguments[i];\n\n        for (var key in source) {\n          if (Object.prototype.hasOwnProperty.call(source, key)) {\n            target[key] = source[key];\n          }\n        }\n      }\n\n      return target;\n    };\n\n    return _extends.apply(this, arguments);\n  }\n\n  var matches = window.Element.prototype.matches;\n\n  var closest = function closest(element, selector) {\n    return element.closest(selector);\n  };\n\n  var WinEvent = function WinEvent(inType, params) {\n    return new window.Event(inType, params);\n  };\n\n  var createCustomEvent = function createCustomEvent(eventName, params) {\n    var cEvent = new window.CustomEvent(eventName, params);\n    return cEvent;\n  };\n  /* istanbul ignore next */\n\n\n  function polyfill() {\n    if (!window.Element.prototype.matches) {\n      matches = window.Element.prototype.msMatchesSelector || window.Element.prototype.webkitMatchesSelector;\n    }\n\n    if (!window.Element.prototype.closest) {\n      closest = function closest(element, selector) {\n        if (!document.documentElement.contains(element)) {\n          return null;\n        }\n\n        do {\n          if (matches.call(element, selector)) {\n            return element;\n          }\n\n          element = element.parentElement || element.parentNode;\n        } while (element !== null && element.nodeType === 1);\n\n        return null;\n      };\n    }\n\n    if (!window.Event || typeof window.Event !== 'function') {\n      WinEvent = function WinEvent(inType, params) {\n        params = params || {};\n        var e = document.createEvent('Event');\n        e.initEvent(inType, Boolean(params.bubbles), Boolean(params.cancelable));\n        return e;\n      };\n    }\n\n    if (typeof window.CustomEvent !== 'function') {\n      var originPreventDefault = window.Event.prototype.preventDefault;\n\n      createCustomEvent = function createCustomEvent(eventName, params) {\n        var evt = document.createEvent('CustomEvent');\n        params = params || {\n          bubbles: false,\n          cancelable: false,\n          detail: null\n        };\n        evt.initCustomEvent(eventName, params.bubbles, params.cancelable, params.detail);\n\n        evt.preventDefault = function () {\n          if (!this.cancelable) {\n            return;\n          }\n\n          originPreventDefault.call(this);\n          Object.defineProperty(this, 'defaultPrevented', {\n            get: function get() {\n              return true;\n            }\n          });\n        };\n\n        return evt;\n      };\n    }\n  }\n\n  polyfill();\n\n  var MILLISECONDS_MULTIPLIER = 1000;\n  var ClassName = {\n    ACTIVE: 'active',\n    LINEAR: 'linear',\n    BLOCK: 'dstepper-block',\n    NONE: 'dstepper-none',\n    FADE: 'fade',\n    VERTICAL: 'vertical'\n  };\n  var transitionEndEvent = 'transitionend';\n  var customProperty = 'bsStepper';\n\n  var show = function show(stepperNode, indexStep, options, done) {\n    var stepper = stepperNode[customProperty];\n\n    if (stepper._steps[indexStep].classList.contains(ClassName.ACTIVE) || stepper._stepsContents[indexStep].classList.contains(ClassName.ACTIVE)) {\n      return;\n    }\n\n    var showEvent = createCustomEvent('show.bs-stepper', {\n      cancelable: true,\n      detail: {\n        from: stepper._currentIndex,\n        to: indexStep,\n        indexStep: indexStep\n      }\n    });\n    stepperNode.dispatchEvent(showEvent);\n\n    var activeStep = stepper._steps.filter(function (step) {\n      return step.classList.contains(ClassName.ACTIVE);\n    });\n\n    var activeContent = stepper._stepsContents.filter(function (content) {\n      return content.classList.contains(ClassName.ACTIVE);\n    });\n\n    if (showEvent.defaultPrevented) {\n      return;\n    }\n\n    if (activeStep.length) {\n      activeStep[0].classList.remove(ClassName.ACTIVE);\n    }\n\n    if (activeContent.length) {\n      activeContent[0].classList.remove(ClassName.ACTIVE);\n\n      if (!stepperNode.classList.contains(ClassName.VERTICAL) && !stepper.options.animation) {\n        activeContent[0].classList.remove(ClassName.BLOCK);\n      }\n    }\n\n    showStep(stepperNode, stepper._steps[indexStep], stepper._steps, options);\n    showContent(stepperNode, stepper._stepsContents[indexStep], stepper._stepsContents, activeContent, done);\n  };\n\n  var showStep = function showStep(stepperNode, step, stepList, options) {\n    stepList.forEach(function (step) {\n      var trigger = step.querySelector(options.selectors.trigger);\n      trigger.setAttribute('aria-selected', 'false'); // if stepper is in linear mode, set disabled attribute on the trigger\n\n      if (stepperNode.classList.contains(ClassName.LINEAR)) {\n        trigger.setAttribute('disabled', 'disabled');\n      }\n    });\n    step.classList.add(ClassName.ACTIVE);\n    var currentTrigger = step.querySelector(options.selectors.trigger);\n    currentTrigger.setAttribute('aria-selected', 'true'); // if stepper is in linear mode, remove disabled attribute on current\n\n    if (stepperNode.classList.contains(ClassName.LINEAR)) {\n      currentTrigger.removeAttribute('disabled');\n    }\n  };\n\n  var showContent = function showContent(stepperNode, content, contentList, activeContent, done) {\n    var stepper = stepperNode[customProperty];\n    var toIndex = contentList.indexOf(content);\n    var shownEvent = createCustomEvent('shown.bs-stepper', {\n      cancelable: true,\n      detail: {\n        from: stepper._currentIndex,\n        to: toIndex,\n        indexStep: toIndex\n      }\n    });\n\n    function complete() {\n      content.classList.add(ClassName.BLOCK);\n      content.removeEventListener(transitionEndEvent, complete);\n      stepperNode.dispatchEvent(shownEvent);\n      done();\n    }\n\n    if (content.classList.contains(ClassName.FADE)) {\n      content.classList.remove(ClassName.NONE);\n      var duration = getTransitionDurationFromElement(content);\n      content.addEventListener(transitionEndEvent, complete);\n\n      if (activeContent.length) {\n        activeContent[0].classList.add(ClassName.NONE);\n      }\n\n      content.classList.add(ClassName.ACTIVE);\n      emulateTransitionEnd(content, duration);\n    } else {\n      content.classList.add(ClassName.ACTIVE);\n      content.classList.add(ClassName.BLOCK);\n      stepperNode.dispatchEvent(shownEvent);\n      done();\n    }\n  };\n\n  var getTransitionDurationFromElement = function getTransitionDurationFromElement(element) {\n    if (!element) {\n      return 0;\n    } // Get transition-duration of the element\n\n\n    var transitionDuration = window.getComputedStyle(element).transitionDuration;\n    var floatTransitionDuration = parseFloat(transitionDuration); // Return 0 if element or transition duration is not found\n\n    if (!floatTransitionDuration) {\n      return 0;\n    } // If multiple durations are defined, take the first\n\n\n    transitionDuration = transitionDuration.split(',')[0];\n    return parseFloat(transitionDuration) * MILLISECONDS_MULTIPLIER;\n  };\n\n  var emulateTransitionEnd = function emulateTransitionEnd(element, duration) {\n    var called = false;\n    var durationPadding = 5;\n    var emulatedDuration = duration + durationPadding;\n\n    function listener() {\n      called = true;\n      element.removeEventListener(transitionEndEvent, listener);\n    }\n\n    element.addEventListener(transitionEndEvent, listener);\n    window.setTimeout(function () {\n      if (!called) {\n        element.dispatchEvent(WinEvent(transitionEndEvent));\n      }\n\n      element.removeEventListener(transitionEndEvent, listener);\n    }, emulatedDuration);\n  };\n\n  var detectAnimation = function detectAnimation(contentList, options) {\n    if (options.animation) {\n      contentList.forEach(function (content) {\n        content.classList.add(ClassName.FADE);\n        content.classList.add(ClassName.NONE);\n      });\n    }\n  };\n\n  var buildClickStepLinearListener = function buildClickStepLinearListener() {\n    return function clickStepLinearListener(event) {\n      event.preventDefault();\n    };\n  };\n\n  var buildClickStepNonLinearListener = function buildClickStepNonLinearListener(options) {\n    return function clickStepNonLinearListener(event) {\n      event.preventDefault();\n      var step = closest(event.target, options.selectors.steps);\n      var stepperNode = closest(step, options.selectors.stepper);\n      var stepper = stepperNode[customProperty];\n\n      var stepIndex = stepper._steps.indexOf(step);\n\n      show(stepperNode, stepIndex, options, function () {\n        stepper._currentIndex = stepIndex;\n      });\n    };\n  };\n\n  var DEFAULT_OPTIONS = {\n    linear: true,\n    animation: false,\n    selectors: {\n      steps: '.step',\n      trigger: '.step-trigger',\n      stepper: '.bs-stepper'\n    }\n  };\n\n  var Stepper =\n  /*#__PURE__*/\n  function () {\n    function Stepper(element, _options) {\n      var _this = this;\n\n      if (_options === void 0) {\n        _options = {};\n      }\n\n      this._element = element;\n      this._currentIndex = 0;\n      this._stepsContents = [];\n      this.options = _extends({}, DEFAULT_OPTIONS, {}, _options);\n      this.options.selectors = _extends({}, DEFAULT_OPTIONS.selectors, {}, this.options.selectors);\n\n      if (this.options.linear) {\n        this._element.classList.add(ClassName.LINEAR);\n      }\n\n      this._steps = [].slice.call(this._element.querySelectorAll(this.options.selectors.steps));\n\n      this._steps.filter(function (step) {\n        return step.hasAttribute('data-target');\n      }).forEach(function (step) {\n        _this._stepsContents.push(_this._element.querySelector(step.getAttribute('data-target')));\n      });\n\n      detectAnimation(this._stepsContents, this.options);\n\n      this._setLinkListeners();\n\n      Object.defineProperty(this._element, customProperty, {\n        value: this,\n        writable: true\n      });\n\n      if (this._steps.length) {\n        show(this._element, this._currentIndex, this.options, function () {});\n      }\n    } // Private\n\n\n    var _proto = Stepper.prototype;\n\n    _proto._setLinkListeners = function _setLinkListeners() {\n      var _this2 = this;\n\n      this._steps.forEach(function (step) {\n        var trigger = step.querySelector(_this2.options.selectors.trigger);\n\n        if (_this2.options.linear) {\n          _this2._clickStepLinearListener = buildClickStepLinearListener(_this2.options);\n          trigger.addEventListener('click', _this2._clickStepLinearListener);\n        } else {\n          _this2._clickStepNonLinearListener = buildClickStepNonLinearListener(_this2.options);\n          trigger.addEventListener('click', _this2._clickStepNonLinearListener);\n        }\n      });\n    } // Public\n    ;\n\n    _proto.next = function next() {\n      var _this3 = this;\n\n      var nextStep = this._currentIndex + 1 <= this._steps.length - 1 ? this._currentIndex + 1 : this._steps.length - 1;\n      show(this._element, nextStep, this.options, function () {\n        _this3._currentIndex = nextStep;\n      });\n    };\n\n    _proto.previous = function previous() {\n      var _this4 = this;\n\n      var previousStep = this._currentIndex - 1 >= 0 ? this._currentIndex - 1 : 0;\n      show(this._element, previousStep, this.options, function () {\n        _this4._currentIndex = previousStep;\n      });\n    };\n\n    _proto.to = function to(stepNumber) {\n      var _this5 = this;\n\n      var tempIndex = stepNumber - 1;\n      var nextStep = tempIndex >= 0 && tempIndex < this._steps.length ? tempIndex : 0;\n      show(this._element, nextStep, this.options, function () {\n        _this5._currentIndex = nextStep;\n      });\n    };\n\n    _proto.reset = function reset() {\n      var _this6 = this;\n\n      show(this._element, 0, this.options, function () {\n        _this6._currentIndex = 0;\n      });\n    };\n\n    _proto.destroy = function destroy() {\n      var _this7 = this;\n\n      this._steps.forEach(function (step) {\n        var trigger = step.querySelector(_this7.options.selectors.trigger);\n\n        if (_this7.options.linear) {\n          trigger.removeEventListener('click', _this7._clickStepLinearListener);\n        } else {\n          trigger.removeEventListener('click', _this7._clickStepNonLinearListener);\n        }\n      });\n\n      this._element[customProperty] = undefined;\n      this._element = undefined;\n      this._currentIndex = undefined;\n      this._steps = undefined;\n      this._stepsContents = undefined;\n      this._clickStepLinearListener = undefined;\n      this._clickStepNonLinearListener = undefined;\n    };\n\n    return Stepper;\n  }();\n\n  return Stepper;\n\n}));\n//# sourceMappingURL=bs-stepper.js.map\n\n\n//# sourceURL=webpack://Materialize/./node_modules/bs-stepper/dist/js/bs-stepper.js?");
+{
+/*!
+ * bsStepper v1.7.0 (https://github.com/Johann-S/bs-stepper)
+ * Copyright 2018 - 2019 Johann-S <johann.servoire@gmail.com>
+ * Licensed under MIT (https://github.com/Johann-S/bs-stepper/blob/master/LICENSE)
+ */
+(function (global, factory) {
+   true ? module.exports = factory() :
+  0;
+}(this, function () { 'use strict';
+
+  function _extends() {
+    _extends = Object.assign || function (target) {
+      for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
+
+        for (var key in source) {
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+
+      return target;
+    };
+
+    return _extends.apply(this, arguments);
+  }
+
+  var matches = window.Element.prototype.matches;
+
+  var closest = function closest(element, selector) {
+    return element.closest(selector);
+  };
+
+  var WinEvent = function WinEvent(inType, params) {
+    return new window.Event(inType, params);
+  };
+
+  var createCustomEvent = function createCustomEvent(eventName, params) {
+    var cEvent = new window.CustomEvent(eventName, params);
+    return cEvent;
+  };
+  /* istanbul ignore next */
+
+
+  function polyfill() {
+    if (!window.Element.prototype.matches) {
+      matches = window.Element.prototype.msMatchesSelector || window.Element.prototype.webkitMatchesSelector;
+    }
+
+    if (!window.Element.prototype.closest) {
+      closest = function closest(element, selector) {
+        if (!document.documentElement.contains(element)) {
+          return null;
+        }
+
+        do {
+          if (matches.call(element, selector)) {
+            return element;
+          }
+
+          element = element.parentElement || element.parentNode;
+        } while (element !== null && element.nodeType === 1);
+
+        return null;
+      };
+    }
+
+    if (!window.Event || typeof window.Event !== 'function') {
+      WinEvent = function WinEvent(inType, params) {
+        params = params || {};
+        var e = document.createEvent('Event');
+        e.initEvent(inType, Boolean(params.bubbles), Boolean(params.cancelable));
+        return e;
+      };
+    }
+
+    if (typeof window.CustomEvent !== 'function') {
+      var originPreventDefault = window.Event.prototype.preventDefault;
+
+      createCustomEvent = function createCustomEvent(eventName, params) {
+        var evt = document.createEvent('CustomEvent');
+        params = params || {
+          bubbles: false,
+          cancelable: false,
+          detail: null
+        };
+        evt.initCustomEvent(eventName, params.bubbles, params.cancelable, params.detail);
+
+        evt.preventDefault = function () {
+          if (!this.cancelable) {
+            return;
+          }
+
+          originPreventDefault.call(this);
+          Object.defineProperty(this, 'defaultPrevented', {
+            get: function get() {
+              return true;
+            }
+          });
+        };
+
+        return evt;
+      };
+    }
+  }
+
+  polyfill();
+
+  var MILLISECONDS_MULTIPLIER = 1000;
+  var ClassName = {
+    ACTIVE: 'active',
+    LINEAR: 'linear',
+    BLOCK: 'dstepper-block',
+    NONE: 'dstepper-none',
+    FADE: 'fade',
+    VERTICAL: 'vertical'
+  };
+  var transitionEndEvent = 'transitionend';
+  var customProperty = 'bsStepper';
+
+  var show = function show(stepperNode, indexStep, options, done) {
+    var stepper = stepperNode[customProperty];
+
+    if (stepper._steps[indexStep].classList.contains(ClassName.ACTIVE) || stepper._stepsContents[indexStep].classList.contains(ClassName.ACTIVE)) {
+      return;
+    }
+
+    var showEvent = createCustomEvent('show.bs-stepper', {
+      cancelable: true,
+      detail: {
+        from: stepper._currentIndex,
+        to: indexStep,
+        indexStep: indexStep
+      }
+    });
+    stepperNode.dispatchEvent(showEvent);
+
+    var activeStep = stepper._steps.filter(function (step) {
+      return step.classList.contains(ClassName.ACTIVE);
+    });
+
+    var activeContent = stepper._stepsContents.filter(function (content) {
+      return content.classList.contains(ClassName.ACTIVE);
+    });
+
+    if (showEvent.defaultPrevented) {
+      return;
+    }
+
+    if (activeStep.length) {
+      activeStep[0].classList.remove(ClassName.ACTIVE);
+    }
+
+    if (activeContent.length) {
+      activeContent[0].classList.remove(ClassName.ACTIVE);
+
+      if (!stepperNode.classList.contains(ClassName.VERTICAL) && !stepper.options.animation) {
+        activeContent[0].classList.remove(ClassName.BLOCK);
+      }
+    }
+
+    showStep(stepperNode, stepper._steps[indexStep], stepper._steps, options);
+    showContent(stepperNode, stepper._stepsContents[indexStep], stepper._stepsContents, activeContent, done);
+  };
+
+  var showStep = function showStep(stepperNode, step, stepList, options) {
+    stepList.forEach(function (step) {
+      var trigger = step.querySelector(options.selectors.trigger);
+      trigger.setAttribute('aria-selected', 'false'); // if stepper is in linear mode, set disabled attribute on the trigger
+
+      if (stepperNode.classList.contains(ClassName.LINEAR)) {
+        trigger.setAttribute('disabled', 'disabled');
+      }
+    });
+    step.classList.add(ClassName.ACTIVE);
+    var currentTrigger = step.querySelector(options.selectors.trigger);
+    currentTrigger.setAttribute('aria-selected', 'true'); // if stepper is in linear mode, remove disabled attribute on current
+
+    if (stepperNode.classList.contains(ClassName.LINEAR)) {
+      currentTrigger.removeAttribute('disabled');
+    }
+  };
+
+  var showContent = function showContent(stepperNode, content, contentList, activeContent, done) {
+    var stepper = stepperNode[customProperty];
+    var toIndex = contentList.indexOf(content);
+    var shownEvent = createCustomEvent('shown.bs-stepper', {
+      cancelable: true,
+      detail: {
+        from: stepper._currentIndex,
+        to: toIndex,
+        indexStep: toIndex
+      }
+    });
+
+    function complete() {
+      content.classList.add(ClassName.BLOCK);
+      content.removeEventListener(transitionEndEvent, complete);
+      stepperNode.dispatchEvent(shownEvent);
+      done();
+    }
+
+    if (content.classList.contains(ClassName.FADE)) {
+      content.classList.remove(ClassName.NONE);
+      var duration = getTransitionDurationFromElement(content);
+      content.addEventListener(transitionEndEvent, complete);
+
+      if (activeContent.length) {
+        activeContent[0].classList.add(ClassName.NONE);
+      }
+
+      content.classList.add(ClassName.ACTIVE);
+      emulateTransitionEnd(content, duration);
+    } else {
+      content.classList.add(ClassName.ACTIVE);
+      content.classList.add(ClassName.BLOCK);
+      stepperNode.dispatchEvent(shownEvent);
+      done();
+    }
+  };
+
+  var getTransitionDurationFromElement = function getTransitionDurationFromElement(element) {
+    if (!element) {
+      return 0;
+    } // Get transition-duration of the element
+
+
+    var transitionDuration = window.getComputedStyle(element).transitionDuration;
+    var floatTransitionDuration = parseFloat(transitionDuration); // Return 0 if element or transition duration is not found
+
+    if (!floatTransitionDuration) {
+      return 0;
+    } // If multiple durations are defined, take the first
+
+
+    transitionDuration = transitionDuration.split(',')[0];
+    return parseFloat(transitionDuration) * MILLISECONDS_MULTIPLIER;
+  };
+
+  var emulateTransitionEnd = function emulateTransitionEnd(element, duration) {
+    var called = false;
+    var durationPadding = 5;
+    var emulatedDuration = duration + durationPadding;
+
+    function listener() {
+      called = true;
+      element.removeEventListener(transitionEndEvent, listener);
+    }
+
+    element.addEventListener(transitionEndEvent, listener);
+    window.setTimeout(function () {
+      if (!called) {
+        element.dispatchEvent(WinEvent(transitionEndEvent));
+      }
+
+      element.removeEventListener(transitionEndEvent, listener);
+    }, emulatedDuration);
+  };
+
+  var detectAnimation = function detectAnimation(contentList, options) {
+    if (options.animation) {
+      contentList.forEach(function (content) {
+        content.classList.add(ClassName.FADE);
+        content.classList.add(ClassName.NONE);
+      });
+    }
+  };
+
+  var buildClickStepLinearListener = function buildClickStepLinearListener() {
+    return function clickStepLinearListener(event) {
+      event.preventDefault();
+    };
+  };
+
+  var buildClickStepNonLinearListener = function buildClickStepNonLinearListener(options) {
+    return function clickStepNonLinearListener(event) {
+      event.preventDefault();
+      var step = closest(event.target, options.selectors.steps);
+      var stepperNode = closest(step, options.selectors.stepper);
+      var stepper = stepperNode[customProperty];
+
+      var stepIndex = stepper._steps.indexOf(step);
+
+      show(stepperNode, stepIndex, options, function () {
+        stepper._currentIndex = stepIndex;
+      });
+    };
+  };
+
+  var DEFAULT_OPTIONS = {
+    linear: true,
+    animation: false,
+    selectors: {
+      steps: '.step',
+      trigger: '.step-trigger',
+      stepper: '.bs-stepper'
+    }
+  };
+
+  var Stepper =
+  /*#__PURE__*/
+  function () {
+    function Stepper(element, _options) {
+      var _this = this;
+
+      if (_options === void 0) {
+        _options = {};
+      }
+
+      this._element = element;
+      this._currentIndex = 0;
+      this._stepsContents = [];
+      this.options = _extends({}, DEFAULT_OPTIONS, {}, _options);
+      this.options.selectors = _extends({}, DEFAULT_OPTIONS.selectors, {}, this.options.selectors);
+
+      if (this.options.linear) {
+        this._element.classList.add(ClassName.LINEAR);
+      }
+
+      this._steps = [].slice.call(this._element.querySelectorAll(this.options.selectors.steps));
+
+      this._steps.filter(function (step) {
+        return step.hasAttribute('data-target');
+      }).forEach(function (step) {
+        _this._stepsContents.push(_this._element.querySelector(step.getAttribute('data-target')));
+      });
+
+      detectAnimation(this._stepsContents, this.options);
+
+      this._setLinkListeners();
+
+      Object.defineProperty(this._element, customProperty, {
+        value: this,
+        writable: true
+      });
+
+      if (this._steps.length) {
+        show(this._element, this._currentIndex, this.options, function () {});
+      }
+    } // Private
+
+
+    var _proto = Stepper.prototype;
+
+    _proto._setLinkListeners = function _setLinkListeners() {
+      var _this2 = this;
+
+      this._steps.forEach(function (step) {
+        var trigger = step.querySelector(_this2.options.selectors.trigger);
+
+        if (_this2.options.linear) {
+          _this2._clickStepLinearListener = buildClickStepLinearListener(_this2.options);
+          trigger.addEventListener('click', _this2._clickStepLinearListener);
+        } else {
+          _this2._clickStepNonLinearListener = buildClickStepNonLinearListener(_this2.options);
+          trigger.addEventListener('click', _this2._clickStepNonLinearListener);
+        }
+      });
+    } // Public
+    ;
+
+    _proto.next = function next() {
+      var _this3 = this;
+
+      var nextStep = this._currentIndex + 1 <= this._steps.length - 1 ? this._currentIndex + 1 : this._steps.length - 1;
+      show(this._element, nextStep, this.options, function () {
+        _this3._currentIndex = nextStep;
+      });
+    };
+
+    _proto.previous = function previous() {
+      var _this4 = this;
+
+      var previousStep = this._currentIndex - 1 >= 0 ? this._currentIndex - 1 : 0;
+      show(this._element, previousStep, this.options, function () {
+        _this4._currentIndex = previousStep;
+      });
+    };
+
+    _proto.to = function to(stepNumber) {
+      var _this5 = this;
+
+      var tempIndex = stepNumber - 1;
+      var nextStep = tempIndex >= 0 && tempIndex < this._steps.length ? tempIndex : 0;
+      show(this._element, nextStep, this.options, function () {
+        _this5._currentIndex = nextStep;
+      });
+    };
+
+    _proto.reset = function reset() {
+      var _this6 = this;
+
+      show(this._element, 0, this.options, function () {
+        _this6._currentIndex = 0;
+      });
+    };
+
+    _proto.destroy = function destroy() {
+      var _this7 = this;
+
+      this._steps.forEach(function (step) {
+        var trigger = step.querySelector(_this7.options.selectors.trigger);
+
+        if (_this7.options.linear) {
+          trigger.removeEventListener('click', _this7._clickStepLinearListener);
+        } else {
+          trigger.removeEventListener('click', _this7._clickStepNonLinearListener);
+        }
+      });
+
+      this._element[customProperty] = undefined;
+      this._element = undefined;
+      this._currentIndex = undefined;
+      this._steps = undefined;
+      this._stepsContents = undefined;
+      this._clickStepLinearListener = undefined;
+      this._clickStepNonLinearListener = undefined;
+    };
+
+    return Stepper;
+  }();
+
+  return Stepper;
+
+}));
+//# sourceMappingURL=bs-stepper.js.map
+}
 
 /***/ })
 

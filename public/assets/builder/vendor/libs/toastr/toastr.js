@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("jQuery"));
@@ -26,7 +18,18 @@ return /******/ (function() { // webpackBootstrap
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   toastr: function() { return /* reexport default from dynamic */ toastr_toastr__WEBPACK_IMPORTED_MODULE_0___default.a; }\n/* harmony export */ });\n/* harmony import */ var toastr_toastr__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! toastr/toastr */ \"./node_modules/toastr/toastr.js\");\n/* harmony import */ var toastr_toastr__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(toastr_toastr__WEBPACK_IMPORTED_MODULE_0__);\n\ntry {\n  window.toastr = (toastr_toastr__WEBPACK_IMPORTED_MODULE_0___default());\n} catch (e) {}\n\n\n//# sourceURL=webpack://Materialize/./libs/toastr/toastr.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   toastr: function() { return /* reexport default from dynamic */ toastr_toastr__WEBPACK_IMPORTED_MODULE_0___default.a; }
+/* harmony export */ });
+/* harmony import */ var toastr_toastr__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! toastr/toastr */ "./node_modules/toastr/toastr.js");
+/* harmony import */ var toastr_toastr__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(toastr_toastr__WEBPACK_IMPORTED_MODULE_0__);
+
+try {
+  window.toastr = (toastr_toastr__WEBPACK_IMPORTED_MODULE_0___default());
+} catch (e) {}
+}
 
 /***/ }),
 
@@ -36,7 +39,479 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \***************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*\n * Toastr\n * Copyright 2012-2015\n * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.\n * All Rights Reserved.\n * Use, reproduction, distribution, and modification of this code is subject to the terms and\n * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php\n *\n * ARIA Support: Greta Krafsig\n *\n * Project: https://github.com/CodeSeven/toastr\n */\n/* global define */\n(function (define) {\n    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! jquery */ \"jquery\")], __WEBPACK_AMD_DEFINE_RESULT__ = (function ($) {\n        return (function () {\n            var $container;\n            var listener;\n            var toastId = 0;\n            var toastType = {\n                error: 'error',\n                info: 'info',\n                success: 'success',\n                warning: 'warning'\n            };\n\n            var toastr = {\n                clear: clear,\n                remove: remove,\n                error: error,\n                getContainer: getContainer,\n                info: info,\n                options: {},\n                subscribe: subscribe,\n                success: success,\n                version: '2.1.4',\n                warning: warning\n            };\n\n            var previousToast;\n\n            return toastr;\n\n            ////////////////\n\n            function error(message, title, optionsOverride) {\n                return notify({\n                    type: toastType.error,\n                    iconClass: getOptions().iconClasses.error,\n                    message: message,\n                    optionsOverride: optionsOverride,\n                    title: title\n                });\n            }\n\n            function getContainer(options, create) {\n                if (!options) { options = getOptions(); }\n                $container = $('#' + options.containerId);\n                if ($container.length) {\n                    return $container;\n                }\n                if (create) {\n                    $container = createContainer(options);\n                }\n                return $container;\n            }\n\n            function info(message, title, optionsOverride) {\n                return notify({\n                    type: toastType.info,\n                    iconClass: getOptions().iconClasses.info,\n                    message: message,\n                    optionsOverride: optionsOverride,\n                    title: title\n                });\n            }\n\n            function subscribe(callback) {\n                listener = callback;\n            }\n\n            function success(message, title, optionsOverride) {\n                return notify({\n                    type: toastType.success,\n                    iconClass: getOptions().iconClasses.success,\n                    message: message,\n                    optionsOverride: optionsOverride,\n                    title: title\n                });\n            }\n\n            function warning(message, title, optionsOverride) {\n                return notify({\n                    type: toastType.warning,\n                    iconClass: getOptions().iconClasses.warning,\n                    message: message,\n                    optionsOverride: optionsOverride,\n                    title: title\n                });\n            }\n\n            function clear($toastElement, clearOptions) {\n                var options = getOptions();\n                if (!$container) { getContainer(options); }\n                if (!clearToast($toastElement, options, clearOptions)) {\n                    clearContainer(options);\n                }\n            }\n\n            function remove($toastElement) {\n                var options = getOptions();\n                if (!$container) { getContainer(options); }\n                if ($toastElement && $(':focus', $toastElement).length === 0) {\n                    removeToast($toastElement);\n                    return;\n                }\n                if ($container.children().length) {\n                    $container.remove();\n                }\n            }\n\n            // internal functions\n\n            function clearContainer (options) {\n                var toastsToClear = $container.children();\n                for (var i = toastsToClear.length - 1; i >= 0; i--) {\n                    clearToast($(toastsToClear[i]), options);\n                }\n            }\n\n            function clearToast ($toastElement, options, clearOptions) {\n                var force = clearOptions && clearOptions.force ? clearOptions.force : false;\n                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {\n                    $toastElement[options.hideMethod]({\n                        duration: options.hideDuration,\n                        easing: options.hideEasing,\n                        complete: function () { removeToast($toastElement); }\n                    });\n                    return true;\n                }\n                return false;\n            }\n\n            function createContainer(options) {\n                $container = $('<div/>')\n                    .attr('id', options.containerId)\n                    .addClass(options.positionClass);\n\n                $container.appendTo($(options.target));\n                return $container;\n            }\n\n            function getDefaults() {\n                return {\n                    tapToDismiss: true,\n                    toastClass: 'toast',\n                    containerId: 'toast-container',\n                    debug: false,\n\n                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery\n                    showDuration: 300,\n                    showEasing: 'swing', //swing and linear are built into jQuery\n                    onShown: undefined,\n                    hideMethod: 'fadeOut',\n                    hideDuration: 1000,\n                    hideEasing: 'swing',\n                    onHidden: undefined,\n                    closeMethod: false,\n                    closeDuration: false,\n                    closeEasing: false,\n                    closeOnHover: true,\n\n                    extendedTimeOut: 1000,\n                    iconClasses: {\n                        error: 'toast-error',\n                        info: 'toast-info',\n                        success: 'toast-success',\n                        warning: 'toast-warning'\n                    },\n                    iconClass: 'toast-info',\n                    positionClass: 'toast-top-right',\n                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky\n                    titleClass: 'toast-title',\n                    messageClass: 'toast-message',\n                    escapeHtml: false,\n                    target: 'body',\n                    closeHtml: '<button type=\"button\">&times;</button>',\n                    closeClass: 'toast-close-button',\n                    newestOnTop: true,\n                    preventDuplicates: false,\n                    progressBar: false,\n                    progressClass: 'toast-progress',\n                    rtl: false\n                };\n            }\n\n            function publish(args) {\n                if (!listener) { return; }\n                listener(args);\n            }\n\n            function notify(map) {\n                var options = getOptions();\n                var iconClass = map.iconClass || options.iconClass;\n\n                if (typeof (map.optionsOverride) !== 'undefined') {\n                    options = $.extend(options, map.optionsOverride);\n                    iconClass = map.optionsOverride.iconClass || iconClass;\n                }\n\n                if (shouldExit(options, map)) { return; }\n\n                toastId++;\n\n                $container = getContainer(options, true);\n\n                var intervalId = null;\n                var $toastElement = $('<div/>');\n                var $titleElement = $('<div/>');\n                var $messageElement = $('<div/>');\n                var $progressElement = $('<div/>');\n                var $closeElement = $(options.closeHtml);\n                var progressBar = {\n                    intervalId: null,\n                    hideEta: null,\n                    maxHideTime: null\n                };\n                var response = {\n                    toastId: toastId,\n                    state: 'visible',\n                    startTime: new Date(),\n                    options: options,\n                    map: map\n                };\n\n                personalizeToast();\n\n                displayToast();\n\n                handleEvents();\n\n                publish(response);\n\n                if (options.debug && console) {\n                    console.log(response);\n                }\n\n                return $toastElement;\n\n                function escapeHtml(source) {\n                    if (source == null) {\n                        source = '';\n                    }\n\n                    return source\n                        .replace(/&/g, '&amp;')\n                        .replace(/\"/g, '&quot;')\n                        .replace(/'/g, '&#39;')\n                        .replace(/</g, '&lt;')\n                        .replace(/>/g, '&gt;');\n                }\n\n                function personalizeToast() {\n                    setIcon();\n                    setTitle();\n                    setMessage();\n                    setCloseButton();\n                    setProgressBar();\n                    setRTL();\n                    setSequence();\n                    setAria();\n                }\n\n                function setAria() {\n                    var ariaValue = '';\n                    switch (map.iconClass) {\n                        case 'toast-success':\n                        case 'toast-info':\n                            ariaValue =  'polite';\n                            break;\n                        default:\n                            ariaValue = 'assertive';\n                    }\n                    $toastElement.attr('aria-live', ariaValue);\n                }\n\n                function handleEvents() {\n                    if (options.closeOnHover) {\n                        $toastElement.hover(stickAround, delayedHideToast);\n                    }\n\n                    if (!options.onclick && options.tapToDismiss) {\n                        $toastElement.click(hideToast);\n                    }\n\n                    if (options.closeButton && $closeElement) {\n                        $closeElement.click(function (event) {\n                            if (event.stopPropagation) {\n                                event.stopPropagation();\n                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {\n                                event.cancelBubble = true;\n                            }\n\n                            if (options.onCloseClick) {\n                                options.onCloseClick(event);\n                            }\n\n                            hideToast(true);\n                        });\n                    }\n\n                    if (options.onclick) {\n                        $toastElement.click(function (event) {\n                            options.onclick(event);\n                            hideToast();\n                        });\n                    }\n                }\n\n                function displayToast() {\n                    $toastElement.hide();\n\n                    $toastElement[options.showMethod](\n                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}\n                    );\n\n                    if (options.timeOut > 0) {\n                        intervalId = setTimeout(hideToast, options.timeOut);\n                        progressBar.maxHideTime = parseFloat(options.timeOut);\n                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;\n                        if (options.progressBar) {\n                            progressBar.intervalId = setInterval(updateProgress, 10);\n                        }\n                    }\n                }\n\n                function setIcon() {\n                    if (map.iconClass) {\n                        $toastElement.addClass(options.toastClass).addClass(iconClass);\n                    }\n                }\n\n                function setSequence() {\n                    if (options.newestOnTop) {\n                        $container.prepend($toastElement);\n                    } else {\n                        $container.append($toastElement);\n                    }\n                }\n\n                function setTitle() {\n                    if (map.title) {\n                        var suffix = map.title;\n                        if (options.escapeHtml) {\n                            suffix = escapeHtml(map.title);\n                        }\n                        $titleElement.append(suffix).addClass(options.titleClass);\n                        $toastElement.append($titleElement);\n                    }\n                }\n\n                function setMessage() {\n                    if (map.message) {\n                        var suffix = map.message;\n                        if (options.escapeHtml) {\n                            suffix = escapeHtml(map.message);\n                        }\n                        $messageElement.append(suffix).addClass(options.messageClass);\n                        $toastElement.append($messageElement);\n                    }\n                }\n\n                function setCloseButton() {\n                    if (options.closeButton) {\n                        $closeElement.addClass(options.closeClass).attr('role', 'button');\n                        $toastElement.prepend($closeElement);\n                    }\n                }\n\n                function setProgressBar() {\n                    if (options.progressBar) {\n                        $progressElement.addClass(options.progressClass);\n                        $toastElement.prepend($progressElement);\n                    }\n                }\n\n                function setRTL() {\n                    if (options.rtl) {\n                        $toastElement.addClass('rtl');\n                    }\n                }\n\n                function shouldExit(options, map) {\n                    if (options.preventDuplicates) {\n                        if (map.message === previousToast) {\n                            return true;\n                        } else {\n                            previousToast = map.message;\n                        }\n                    }\n                    return false;\n                }\n\n                function hideToast(override) {\n                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;\n                    var duration = override && options.closeDuration !== false ?\n                        options.closeDuration : options.hideDuration;\n                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;\n                    if ($(':focus', $toastElement).length && !override) {\n                        return;\n                    }\n                    clearTimeout(progressBar.intervalId);\n                    return $toastElement[method]({\n                        duration: duration,\n                        easing: easing,\n                        complete: function () {\n                            removeToast($toastElement);\n                            clearTimeout(intervalId);\n                            if (options.onHidden && response.state !== 'hidden') {\n                                options.onHidden();\n                            }\n                            response.state = 'hidden';\n                            response.endTime = new Date();\n                            publish(response);\n                        }\n                    });\n                }\n\n                function delayedHideToast() {\n                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {\n                        intervalId = setTimeout(hideToast, options.extendedTimeOut);\n                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);\n                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;\n                    }\n                }\n\n                function stickAround() {\n                    clearTimeout(intervalId);\n                    progressBar.hideEta = 0;\n                    $toastElement.stop(true, true)[options.showMethod](\n                        {duration: options.showDuration, easing: options.showEasing}\n                    );\n                }\n\n                function updateProgress() {\n                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;\n                    $progressElement.width(percentage + '%');\n                }\n            }\n\n            function getOptions() {\n                return $.extend({}, getDefaults(), toastr.options);\n            }\n\n            function removeToast($toastElement) {\n                if (!$container) { $container = getContainer(); }\n                if ($toastElement.is(':visible')) {\n                    return;\n                }\n                $toastElement.remove();\n                $toastElement = null;\n                if ($container.children().length === 0) {\n                    $container.remove();\n                    previousToast = undefined;\n                }\n            }\n\n        })();\n    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),\n\t\t__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));\n}(__webpack_require__.amdD));\n\n\n//# sourceURL=webpack://Materialize/./node_modules/toastr/toastr.js?");
+{
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
+ * Toastr
+ * Copyright 2012-2015
+ * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.
+ * All Rights Reserved.
+ * Use, reproduction, distribution, and modification of this code is subject to the terms and
+ * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php
+ *
+ * ARIA Support: Greta Krafsig
+ *
+ * Project: https://github.com/CodeSeven/toastr
+ */
+/* global define */
+(function (define) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! jquery */ "jquery")], __WEBPACK_AMD_DEFINE_RESULT__ = (function ($) {
+        return (function () {
+            var $container;
+            var listener;
+            var toastId = 0;
+            var toastType = {
+                error: 'error',
+                info: 'info',
+                success: 'success',
+                warning: 'warning'
+            };
+
+            var toastr = {
+                clear: clear,
+                remove: remove,
+                error: error,
+                getContainer: getContainer,
+                info: info,
+                options: {},
+                subscribe: subscribe,
+                success: success,
+                version: '2.1.4',
+                warning: warning
+            };
+
+            var previousToast;
+
+            return toastr;
+
+            ////////////////
+
+            function error(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.error,
+                    iconClass: getOptions().iconClasses.error,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function getContainer(options, create) {
+                if (!options) { options = getOptions(); }
+                $container = $('#' + options.containerId);
+                if ($container.length) {
+                    return $container;
+                }
+                if (create) {
+                    $container = createContainer(options);
+                }
+                return $container;
+            }
+
+            function info(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.info,
+                    iconClass: getOptions().iconClasses.info,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function subscribe(callback) {
+                listener = callback;
+            }
+
+            function success(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.success,
+                    iconClass: getOptions().iconClasses.success,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function warning(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.warning,
+                    iconClass: getOptions().iconClasses.warning,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function clear($toastElement, clearOptions) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if (!clearToast($toastElement, options, clearOptions)) {
+                    clearContainer(options);
+                }
+            }
+
+            function remove($toastElement) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if ($toastElement && $(':focus', $toastElement).length === 0) {
+                    removeToast($toastElement);
+                    return;
+                }
+                if ($container.children().length) {
+                    $container.remove();
+                }
+            }
+
+            // internal functions
+
+            function clearContainer (options) {
+                var toastsToClear = $container.children();
+                for (var i = toastsToClear.length - 1; i >= 0; i--) {
+                    clearToast($(toastsToClear[i]), options);
+                }
+            }
+
+            function clearToast ($toastElement, options, clearOptions) {
+                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
+                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
+                    $toastElement[options.hideMethod]({
+                        duration: options.hideDuration,
+                        easing: options.hideEasing,
+                        complete: function () { removeToast($toastElement); }
+                    });
+                    return true;
+                }
+                return false;
+            }
+
+            function createContainer(options) {
+                $container = $('<div/>')
+                    .attr('id', options.containerId)
+                    .addClass(options.positionClass);
+
+                $container.appendTo($(options.target));
+                return $container;
+            }
+
+            function getDefaults() {
+                return {
+                    tapToDismiss: true,
+                    toastClass: 'toast',
+                    containerId: 'toast-container',
+                    debug: false,
+
+                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
+                    showDuration: 300,
+                    showEasing: 'swing', //swing and linear are built into jQuery
+                    onShown: undefined,
+                    hideMethod: 'fadeOut',
+                    hideDuration: 1000,
+                    hideEasing: 'swing',
+                    onHidden: undefined,
+                    closeMethod: false,
+                    closeDuration: false,
+                    closeEasing: false,
+                    closeOnHover: true,
+
+                    extendedTimeOut: 1000,
+                    iconClasses: {
+                        error: 'toast-error',
+                        info: 'toast-info',
+                        success: 'toast-success',
+                        warning: 'toast-warning'
+                    },
+                    iconClass: 'toast-info',
+                    positionClass: 'toast-top-right',
+                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
+                    titleClass: 'toast-title',
+                    messageClass: 'toast-message',
+                    escapeHtml: false,
+                    target: 'body',
+                    closeHtml: '<button type="button">&times;</button>',
+                    closeClass: 'toast-close-button',
+                    newestOnTop: true,
+                    preventDuplicates: false,
+                    progressBar: false,
+                    progressClass: 'toast-progress',
+                    rtl: false
+                };
+            }
+
+            function publish(args) {
+                if (!listener) { return; }
+                listener(args);
+            }
+
+            function notify(map) {
+                var options = getOptions();
+                var iconClass = map.iconClass || options.iconClass;
+
+                if (typeof (map.optionsOverride) !== 'undefined') {
+                    options = $.extend(options, map.optionsOverride);
+                    iconClass = map.optionsOverride.iconClass || iconClass;
+                }
+
+                if (shouldExit(options, map)) { return; }
+
+                toastId++;
+
+                $container = getContainer(options, true);
+
+                var intervalId = null;
+                var $toastElement = $('<div/>');
+                var $titleElement = $('<div/>');
+                var $messageElement = $('<div/>');
+                var $progressElement = $('<div/>');
+                var $closeElement = $(options.closeHtml);
+                var progressBar = {
+                    intervalId: null,
+                    hideEta: null,
+                    maxHideTime: null
+                };
+                var response = {
+                    toastId: toastId,
+                    state: 'visible',
+                    startTime: new Date(),
+                    options: options,
+                    map: map
+                };
+
+                personalizeToast();
+
+                displayToast();
+
+                handleEvents();
+
+                publish(response);
+
+                if (options.debug && console) {
+                    console.log(response);
+                }
+
+                return $toastElement;
+
+                function escapeHtml(source) {
+                    if (source == null) {
+                        source = '';
+                    }
+
+                    return source
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+
+                function personalizeToast() {
+                    setIcon();
+                    setTitle();
+                    setMessage();
+                    setCloseButton();
+                    setProgressBar();
+                    setRTL();
+                    setSequence();
+                    setAria();
+                }
+
+                function setAria() {
+                    var ariaValue = '';
+                    switch (map.iconClass) {
+                        case 'toast-success':
+                        case 'toast-info':
+                            ariaValue =  'polite';
+                            break;
+                        default:
+                            ariaValue = 'assertive';
+                    }
+                    $toastElement.attr('aria-live', ariaValue);
+                }
+
+                function handleEvents() {
+                    if (options.closeOnHover) {
+                        $toastElement.hover(stickAround, delayedHideToast);
+                    }
+
+                    if (!options.onclick && options.tapToDismiss) {
+                        $toastElement.click(hideToast);
+                    }
+
+                    if (options.closeButton && $closeElement) {
+                        $closeElement.click(function (event) {
+                            if (event.stopPropagation) {
+                                event.stopPropagation();
+                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
+                                event.cancelBubble = true;
+                            }
+
+                            if (options.onCloseClick) {
+                                options.onCloseClick(event);
+                            }
+
+                            hideToast(true);
+                        });
+                    }
+
+                    if (options.onclick) {
+                        $toastElement.click(function (event) {
+                            options.onclick(event);
+                            hideToast();
+                        });
+                    }
+                }
+
+                function displayToast() {
+                    $toastElement.hide();
+
+                    $toastElement[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
+                    );
+
+                    if (options.timeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.timeOut);
+                        progressBar.maxHideTime = parseFloat(options.timeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                        if (options.progressBar) {
+                            progressBar.intervalId = setInterval(updateProgress, 10);
+                        }
+                    }
+                }
+
+                function setIcon() {
+                    if (map.iconClass) {
+                        $toastElement.addClass(options.toastClass).addClass(iconClass);
+                    }
+                }
+
+                function setSequence() {
+                    if (options.newestOnTop) {
+                        $container.prepend($toastElement);
+                    } else {
+                        $container.append($toastElement);
+                    }
+                }
+
+                function setTitle() {
+                    if (map.title) {
+                        var suffix = map.title;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.title);
+                        }
+                        $titleElement.append(suffix).addClass(options.titleClass);
+                        $toastElement.append($titleElement);
+                    }
+                }
+
+                function setMessage() {
+                    if (map.message) {
+                        var suffix = map.message;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.message);
+                        }
+                        $messageElement.append(suffix).addClass(options.messageClass);
+                        $toastElement.append($messageElement);
+                    }
+                }
+
+                function setCloseButton() {
+                    if (options.closeButton) {
+                        $closeElement.addClass(options.closeClass).attr('role', 'button');
+                        $toastElement.prepend($closeElement);
+                    }
+                }
+
+                function setProgressBar() {
+                    if (options.progressBar) {
+                        $progressElement.addClass(options.progressClass);
+                        $toastElement.prepend($progressElement);
+                    }
+                }
+
+                function setRTL() {
+                    if (options.rtl) {
+                        $toastElement.addClass('rtl');
+                    }
+                }
+
+                function shouldExit(options, map) {
+                    if (options.preventDuplicates) {
+                        if (map.message === previousToast) {
+                            return true;
+                        } else {
+                            previousToast = map.message;
+                        }
+                    }
+                    return false;
+                }
+
+                function hideToast(override) {
+                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
+                    var duration = override && options.closeDuration !== false ?
+                        options.closeDuration : options.hideDuration;
+                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
+                    if ($(':focus', $toastElement).length && !override) {
+                        return;
+                    }
+                    clearTimeout(progressBar.intervalId);
+                    return $toastElement[method]({
+                        duration: duration,
+                        easing: easing,
+                        complete: function () {
+                            removeToast($toastElement);
+                            clearTimeout(intervalId);
+                            if (options.onHidden && response.state !== 'hidden') {
+                                options.onHidden();
+                            }
+                            response.state = 'hidden';
+                            response.endTime = new Date();
+                            publish(response);
+                        }
+                    });
+                }
+
+                function delayedHideToast() {
+                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
+                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                    }
+                }
+
+                function stickAround() {
+                    clearTimeout(intervalId);
+                    progressBar.hideEta = 0;
+                    $toastElement.stop(true, true)[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing}
+                    );
+                }
+
+                function updateProgress() {
+                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
+                    $progressElement.width(percentage + '%');
+                }
+            }
+
+            function getOptions() {
+                return $.extend({}, getDefaults(), toastr.options);
+            }
+
+            function removeToast($toastElement) {
+                if (!$container) { $container = getContainer(); }
+                if ($toastElement.is(':visible')) {
+                    return;
+                }
+                $toastElement.remove();
+                $toastElement = null;
+                if ($container.children().length === 0) {
+                    $container.remove();
+                    previousToast = undefined;
+                }
+            }
+
+        })();
+    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+}(__webpack_require__.amdD));
+}
 
 /***/ }),
 

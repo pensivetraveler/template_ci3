@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -26,7 +18,11 @@ return /******/ (function() { // webpackBootstrap
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var bootstrap_maxlength_src_bootstrap_maxlength__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! bootstrap-maxlength/src/bootstrap-maxlength */ \"./node_modules/bootstrap-maxlength/src/bootstrap-maxlength.js\");\n/* harmony import */ var bootstrap_maxlength_src_bootstrap_maxlength__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bootstrap_maxlength_src_bootstrap_maxlength__WEBPACK_IMPORTED_MODULE_0__);\n\n\n//# sourceURL=webpack://Materialize/./libs/bootstrap-maxlength/bootstrap-maxlength.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var bootstrap_maxlength_src_bootstrap_maxlength__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! bootstrap-maxlength/src/bootstrap-maxlength */ "./node_modules/bootstrap-maxlength/src/bootstrap-maxlength.js");
+/* harmony import */ var bootstrap_maxlength_src_bootstrap_maxlength__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bootstrap_maxlength_src_bootstrap_maxlength__WEBPACK_IMPORTED_MODULE_0__);
+}
 
 /***/ }),
 
@@ -36,7 +32,607 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var boot
   \*********************************************************************/
 /***/ (function() {
 
-eval("/* ==========================================================\n * bootstrap-maxlength.js v1.10.0\n *\n * Copyright (c) 2013-2021 Maurizio Napoleoni;\n *\n * Licensed under the terms of the MIT license.\n * See: https://github.com/mimo84/bootstrap-maxlength/blob/master/LICENSE\n * ========================================================== */\n/*global  jQuery*/\n\n(function ($) {\n  'use strict';\n  /**\n   * We need an event when the elements are destroyed\n   * because if an input is removed, we have to remove the\n   * maxlength object associated (if any).\n   * From:\n   * http://stackoverflow.com/questions/2200494/jquery-trigger-event-when-an-element-is-removed-from-the-dom\n   */\n  if (!$.event.special.destroyed) {\n    $.event.special.destroyed = {\n      remove: function (o) {\n        if (o.handler) {\n          o.handler();\n        }\n      }\n    };\n  }\n\n\n  $.fn.extend({\n    maxlength: function (options, callback) {\n      var documentBody = $('body'),\n        defaults = {\n          showOnReady: false, // true to always show when indicator is ready\n          alwaysShow: true, // if true the indicator it's always shown.\n          threshold: 0, // Represents how many chars left are needed to show up the counter\n          warningClass: 'small form-text text-muted',\n          limitReachedClass: 'small form-text text-danger',\n          limitExceededClass: '',\n          separator: ' / ',\n          preText: '',\n          postText: '',\n          showMaxLength: true,\n          placement: 'bottom-right-inside',\n          message: null, // an alternative way to provide the message text\n          showCharsTyped: true, // show the number of characters typed and not the number of characters remaining\n          validate: false, // if the browser doesn't support the maxlength attribute, attempt to type more than the indicated chars, will be prevented.\n          utf8: false, // counts using bytesize rather than length. eg: '£' is counted as 2 characters.\n          appendToParent: false, // append the indicator to the input field's parent instead of body\n          twoCharLinebreak: true, // count linebreak as 2 characters to match IE/Chrome textarea validation. As well as DB storage.\n          customMaxAttribute: null, // null = use maxlength attribute and browser functionality, string = use specified attribute instead.\n          customMaxClass: 'overmax', // Class to add to the input field when the maxlength is exceeded.\n          allowOverMax: false, // Form submit validation is handled on your own.  when maxlength has been exceeded 'overmax' class added to element\n          zIndex: 1099\n        };\n\n      if ($.isFunction(options) && !callback) {\n        callback = options;\n        options = {};\n      }\n      options = $.extend(defaults, options);\n\n\n      /**\n       * Return the byte count of the specified character in UTF8 encoding.\n       * Note: This won't cover UTF-8 characters that are 4 bytes long.\n       *\n       * @param input\n       * @return {number}\n       */\n      function utf8CharByteCount(character) {\n        var c = character.charCodeAt();\n        // Not c then 0, else c < 128 then 1, else c < 2048 then 2, else 3\n        return !c ? 0 : c < 128 ? 1 : c < 2048 ? 2 : 3;\n      }\n\n      /**\n       * Return the length of the specified input in UTF8 encoding.\n       *\n       * @param input\n       * @return {number}\n       */\n      function utf8Length(string) {\n        return string.split(\"\")\n          .map(utf8CharByteCount)\n          // Prevent reduce from throwing an error if the string is empty.\n          .concat(0)\n          .reduce(function (sum, val) {\n            return sum + val;\n          });\n      }\n\n      /**\n       * Return the length of the specified input.\n       *\n       * @param input\n       * @return {number}\n       */\n      function inputLength(input) {\n        var text = input.val();\n\n        if (options.twoCharLinebreak) {\n          // Count all line breaks as 2 characters\n          text = text.replace(/\\r(?!\\n)|\\n(?!\\r)/g, '\\r\\n');\n        } else {\n          // Remove all double-character (\\r\\n) linebreaks, so they're counted only once.\n          text = text.replace(/(?:\\r\\n|\\r|\\n)/g, '\\n');\n        }\n\n        var currentLength = 0;\n\n        if (options.utf8) {\n          currentLength = utf8Length(text);\n        } else {\n          currentLength = text.length;\n        }\n\n        // Remove \"C:\\fakepath\\\" from counter when using file input\n        // Fix https://github.com/mimo84/bootstrap-maxlength/issues/146\n        if (input.prop(\"type\") === \"file\" && input.val() !== \"\") {\n          currentLength -= 12;\n        }\n\n        return currentLength;\n      }\n\n      /**\n       * Truncate the text of the specified input.\n       *\n       * @param input\n       * @param limit\n       */\n      function truncateChars(input, maxlength) {\n        var text = input.val();\n\n        if (options.twoCharLinebreak) {\n          text = text.replace(/\\r(?!\\n)|\\n(?!\\r)/g, '\\r\\n');\n\n          if (text[text.length - 1] === '\\n') {\n            maxlength -= text.length % 2;\n          }\n        }\n\n        if (options.utf8) {\n          var indexedSize = text.split(\"\").map(utf8CharByteCount);\n          for (\n            var removedBytes = 0,\n            bytesPastMax = utf8Length(text) - maxlength; removedBytes < bytesPastMax; removedBytes += indexedSize.pop()\n          );\n          maxlength -= (maxlength - indexedSize.length);\n        }\n\n        input.val(text.substr(0, maxlength));\n      }\n\n      /**\n       * Return true if the indicator should be showing up.\n       *\n       * @param input\n       * @param threshold\n       * @param maxlength\n       * @return {number}\n       */\n      function charsLeftThreshold(input, threshold, maxlength) {\n        var output = true;\n        if (!options.alwaysShow && (maxlength - inputLength(input) > threshold)) {\n          output = false;\n        }\n        return output;\n      }\n\n      /**\n       * Returns how many chars are left to complete the fill up of the form.\n       *\n       * @param input\n       * @param maxlength\n       * @return {number}\n       */\n      function remainingChars(input, maxlength) {\n        var length = maxlength - inputLength(input);\n        return length;\n      }\n\n      /**\n       * When called displays the indicator.\n       *\n       * @param indicator\n       */\n      function showRemaining(currentInput, indicator) {\n        indicator.css({\n          display: 'block'\n        });\n        currentInput.trigger('maxlength.shown');\n      }\n\n      /**\n       * When called shows the indicator.\n       *\n       * @param indicator\n       */\n      function hideRemaining(currentInput, indicator) {\n\n        if (options.alwaysShow) {\n          return;\n        }\n\n        indicator.css({\n          display: 'none'\n        });\n        currentInput.trigger('maxlength.hidden');\n      }\n\n      /**\n       * This function updates the value in the indicator\n       *\n       * @param maxLengthThisInput\n       * @param typedChars\n       * @return String\n       */\n      function updateMaxLengthHTML(currentInputText, maxLengthThisInput, typedChars) {\n        var output = '';\n        if (options.message) {\n          if (typeof options.message === 'function') {\n            output = options.message(currentInputText, maxLengthThisInput);\n          } else {\n            output = options.message.replace('%charsTyped%', typedChars)\n              .replace('%charsRemaining%', maxLengthThisInput - typedChars)\n              .replace('%charsTotal%', maxLengthThisInput);\n          }\n        } else {\n          if (options.preText) {\n            output += options.preText;\n          }\n          if (!options.showCharsTyped) {\n            output += maxLengthThisInput - typedChars;\n          } else {\n            output += typedChars;\n          }\n          if (options.showMaxLength) {\n            output += options.separator + maxLengthThisInput;\n          }\n          if (options.postText) {\n            output += options.postText;\n          }\n        }\n        return output;\n      }\n\n      /**\n       * This function updates the value of the counter in the indicator.\n       * Wants as parameters: the number of remaining chars, the element currently managed,\n       * the maxLength for the current input and the indicator generated for it.\n       *\n       * @param remaining\n       * @param currentInput\n       * @param maxLengthCurrentInput\n       * @param maxLengthIndicator\n       */\n      function manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator) {\n        if (maxLengthIndicator) {\n          maxLengthIndicator.html(updateMaxLengthHTML(currentInput.val(), maxLengthCurrentInput, (maxLengthCurrentInput - remaining)));\n\n          if (remaining > 0) {\n            if (charsLeftThreshold(currentInput, options.threshold, maxLengthCurrentInput)) {\n              showRemaining(currentInput, maxLengthIndicator.removeClass(options.limitReachedClass + ' ' + options.limitExceededClass).addClass(options.warningClass));\n            } else {\n              hideRemaining(currentInput, maxLengthIndicator);\n            }\n          } else {\n            if (!options.limitExceededClass) {\n              showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass).addClass(options.limitReachedClass));\n            } else {\n              if (remaining === 0) {\n                showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass + ' ' + options.limitExceededClass).addClass(options.limitReachedClass));\n              } else {\n                showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass + ' ' + options.limitReachedClass).addClass(options.limitExceededClass));\n              }\n            }\n          }\n        }\n\n        if (options.customMaxAttribute) {\n          // class to use for form validation on custom maxlength attribute\n          if (remaining < 0) {\n            currentInput.addClass(options.customMaxClass);\n          } else {\n            currentInput.removeClass(options.customMaxClass);\n          }\n        }\n      }\n\n      /**\n       * This function returns an object containing all the\n       * informations about the position of the current input\n       *\n       * @param currentInput\n       * @return object {bottom height left right top width}\n       *\n       */\n      function getPosition(currentInput) {\n        var el = currentInput[0];\n        return $.extend({}, (typeof el.getBoundingClientRect === 'function') ? el.getBoundingClientRect() : {\n          width: el.offsetWidth,\n          height: el.offsetHeight\n        }, currentInput.offset());\n      }\n\n      /**\n       * This function places the maxLengthIndicator based on placement config object.\n       *\n       * @param {object} placement\n       * @param {$} maxLengthIndicator\n       * @return null\n       *\n       */\n      function placeWithCSS(placement, maxLengthIndicator) {\n        if (!placement || !maxLengthIndicator) {\n          return;\n        }\n\n        var POSITION_KEYS = [\n          'top',\n          'bottom',\n          'left',\n          'right',\n          'position'\n        ];\n\n        var cssPos = {};\n\n        // filter css properties to position\n        $.each(POSITION_KEYS, function (i, key) {\n          var val = options.placement[key];\n          if (typeof val !== 'undefined') {\n            cssPos[key] = val;\n          }\n        });\n\n        maxLengthIndicator.css(cssPos);\n\n        return;\n      }\n\n\n      /**\n       * This function places the maxLengthIndicator at the\n       * top / bottom / left / right of the currentInput\n       *\n       * @param currentInput\n       * @param maxLengthIndicator\n       * @return null\n       *\n       */\n      function place(currentInput, maxLengthIndicator) {\n        var pos = getPosition(currentInput);\n\n        // Supports custom placement handler\n        if ($.type(options.placement) === 'function') {\n          options.placement(currentInput, maxLengthIndicator, pos);\n          return;\n        }\n\n        // Supports custom placement via css positional properties\n        if ($.isPlainObject(options.placement)) {\n          placeWithCSS(options.placement, maxLengthIndicator);\n          return;\n        }\n\n        var inputOuter = currentInput.outerWidth(),\n          outerWidth = maxLengthIndicator.outerWidth(),\n          actualWidth = maxLengthIndicator.width(),\n          actualHeight = maxLengthIndicator.height();\n\n        // get the right position if the indicator is appended to the input's parent\n        if (options.appendToParent) {\n          pos.top -= currentInput.parent().offset().top;\n          pos.left -= currentInput.parent().offset().left;\n        }\n\n        switch (options.placement) {\n          case 'bottom':\n            maxLengthIndicator.css({\n              top: pos.top + pos.height,\n              left: pos.left + pos.width / 2 - actualWidth / 2\n            });\n            break;\n          case 'top':\n            maxLengthIndicator.css({\n              top: pos.top - actualHeight,\n              left: pos.left + pos.width / 2 - actualWidth / 2\n            });\n            break;\n          case 'left':\n            maxLengthIndicator.css({\n              top: pos.top + pos.height / 2 - actualHeight / 2,\n              left: pos.left - actualWidth\n            });\n            break;\n          case 'right':\n            maxLengthIndicator.css({\n              top: pos.top + pos.height / 2 - actualHeight / 2,\n              left: pos.left + pos.width\n            });\n            break;\n          case 'bottom-right':\n            maxLengthIndicator.css({\n              top: pos.top + pos.height,\n              left: pos.left + pos.width\n            });\n            break;\n          case 'top-right':\n            maxLengthIndicator.css({\n              top: pos.top - actualHeight,\n              left: pos.left + inputOuter\n            });\n            break;\n          case 'top-left':\n            maxLengthIndicator.css({\n              top: pos.top - actualHeight,\n              left: pos.left - outerWidth\n            });\n            break;\n          case 'bottom-left':\n            maxLengthIndicator.css({\n              top: pos.top + currentInput.outerHeight(),\n              left: pos.left - outerWidth\n            });\n            break;\n          case 'centered-right':\n            maxLengthIndicator.css({\n              top: pos.top + (actualHeight / 2),\n              left: pos.left + inputOuter - outerWidth - 3\n            });\n            break;\n\n          // Some more options for placements\n          case 'bottom-right-inside':\n            maxLengthIndicator.css({\n              top: pos.top + pos.height,\n              left: pos.left + pos.width - outerWidth\n            });\n            break;\n          case 'top-right-inside':\n            maxLengthIndicator.css({\n              top: pos.top - actualHeight,\n              left: pos.left + inputOuter - outerWidth\n            });\n            break;\n          case 'top-left-inside':\n            maxLengthIndicator.css({\n              top: pos.top - actualHeight,\n              left: pos.left\n            });\n            break;\n          case 'bottom-left-inside':\n            maxLengthIndicator.css({\n              top: pos.top + currentInput.outerHeight(),\n              left: pos.left\n            });\n            break;\n        }\n      }\n\n      /**\n       * This function returns true if the indicator position needs to\n       * be recalculated when the currentInput changes\n       *\n       * @return {boolean}\n       *\n       */\n      function isPlacementMutable() {\n        return options.placement === 'bottom-right-inside' || options.placement === 'top-right-inside' || typeof options.placement === 'function' || (options.message && typeof options.message === 'function');\n      }\n\n      /**\n       * This function retrieves the maximum length of currentInput\n       *\n       * @param currentInput\n       * @return {number}\n       *\n       */\n      function getMaxLength(currentInput) {\n        var max = currentInput.attr('maxlength') || options.customMaxAttribute;\n\n        if (options.customMaxAttribute && !options.allowOverMax) {\n          var custom = currentInput.attr(options.customMaxAttribute);\n          if (!max || custom < max) {\n            max = custom;\n          }\n        }\n\n        if (!max) {\n          max = currentInput.attr('size');\n        }\n        return max;\n      }\n\n      return this.each(function () {\n\n        var currentInput = $(this),\n          maxLengthCurrentInput,\n          maxLengthIndicator;\n\n        $(window).resize(function () {\n          if (maxLengthIndicator) {\n            place(currentInput, maxLengthIndicator);\n          }\n        });\n\n        function firstInit() {\n          var maxlengthContent = updateMaxLengthHTML(currentInput.val(), maxLengthCurrentInput, '0');\n          maxLengthCurrentInput = getMaxLength(currentInput);\n\n          if (!maxLengthIndicator) {\n            maxLengthIndicator = $('<span class=\"bootstrap-maxlength\"></span>').css({\n              display: 'none',\n              position: 'absolute',\n              whiteSpace: 'nowrap',\n              zIndex: options.zIndex\n            }).html(maxlengthContent);\n          }\n\n          // We need to detect resizes if we are dealing with a textarea:\n          if (currentInput.is('textarea')) {\n            currentInput.data('maxlenghtsizex', currentInput.outerWidth());\n            currentInput.data('maxlenghtsizey', currentInput.outerHeight());\n\n            currentInput.mouseup(function () {\n              if (currentInput.outerWidth() !== currentInput.data('maxlenghtsizex') || currentInput.outerHeight() !== currentInput.data('maxlenghtsizey')) {\n                place(currentInput, maxLengthIndicator);\n              }\n\n              currentInput.data('maxlenghtsizex', currentInput.outerWidth());\n              currentInput.data('maxlenghtsizey', currentInput.outerHeight());\n            });\n          }\n\n          if (options.appendToParent) {\n            currentInput.parent().append(maxLengthIndicator);\n            currentInput.parent().css('position', 'relative');\n          } else {\n            documentBody.append(maxLengthIndicator);\n          }\n\n          var remaining = remainingChars(currentInput, getMaxLength(currentInput));\n          manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator);\n          place(currentInput, maxLengthIndicator);\n        }\n\n        if (options.showOnReady) {\n          currentInput.ready(function () {\n            firstInit();\n          });\n        } else {\n          currentInput.focus(function () {\n            firstInit();\n          });\n        }\n\n        currentInput.on('maxlength.reposition', function () {\n          place(currentInput, maxLengthIndicator);\n        });\n\n\n        currentInput.on('destroyed', function () {\n          if (maxLengthIndicator) {\n            maxLengthIndicator.remove();\n          }\n        });\n\n        currentInput.on('blur', function () {\n          if (maxLengthIndicator && !options.showOnReady) {\n            maxLengthIndicator.remove();\n          }\n        });\n\n        currentInput.on('input', function () {\n          var maxlength = getMaxLength(currentInput),\n            remaining = remainingChars(currentInput, maxlength),\n            output = true;\n\n          if (options.validate && remaining < 0) {\n            truncateChars(currentInput, maxlength);\n            output = false;\n          } else {\n            manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator);\n          }\n\n          // if (isPlacementMutable()) {\n          //   place(currentInput, maxLengthIndicator);\n          // }\n\n          return output;\n        });\n      });\n    }\n  });\n}(jQuery));\n\n//# sourceURL=webpack://Materialize/./node_modules/bootstrap-maxlength/src/bootstrap-maxlength.js?");
+{
+/* ==========================================================
+ * bootstrap-maxlength.js v1.10.0
+ *
+ * Copyright (c) 2013-2021 Maurizio Napoleoni;
+ *
+ * Licensed under the terms of the MIT license.
+ * See: https://github.com/mimo84/bootstrap-maxlength/blob/master/LICENSE
+ * ========================================================== */
+/*global  jQuery*/
+
+(function ($) {
+  'use strict';
+  /**
+   * We need an event when the elements are destroyed
+   * because if an input is removed, we have to remove the
+   * maxlength object associated (if any).
+   * From:
+   * http://stackoverflow.com/questions/2200494/jquery-trigger-event-when-an-element-is-removed-from-the-dom
+   */
+  if (!$.event.special.destroyed) {
+    $.event.special.destroyed = {
+      remove: function (o) {
+        if (o.handler) {
+          o.handler();
+        }
+      }
+    };
+  }
+
+
+  $.fn.extend({
+    maxlength: function (options, callback) {
+      var documentBody = $('body'),
+        defaults = {
+          showOnReady: false, // true to always show when indicator is ready
+          alwaysShow: true, // if true the indicator it's always shown.
+          threshold: 0, // Represents how many chars left are needed to show up the counter
+          warningClass: 'small form-text text-muted',
+          limitReachedClass: 'small form-text text-danger',
+          limitExceededClass: '',
+          separator: ' / ',
+          preText: '',
+          postText: '',
+          showMaxLength: true,
+          placement: 'bottom-right-inside',
+          message: null, // an alternative way to provide the message text
+          showCharsTyped: true, // show the number of characters typed and not the number of characters remaining
+          validate: false, // if the browser doesn't support the maxlength attribute, attempt to type more than the indicated chars, will be prevented.
+          utf8: false, // counts using bytesize rather than length. eg: '£' is counted as 2 characters.
+          appendToParent: false, // append the indicator to the input field's parent instead of body
+          twoCharLinebreak: true, // count linebreak as 2 characters to match IE/Chrome textarea validation. As well as DB storage.
+          customMaxAttribute: null, // null = use maxlength attribute and browser functionality, string = use specified attribute instead.
+          customMaxClass: 'overmax', // Class to add to the input field when the maxlength is exceeded.
+          allowOverMax: false, // Form submit validation is handled on your own.  when maxlength has been exceeded 'overmax' class added to element
+          zIndex: 1099
+        };
+
+      if ($.isFunction(options) && !callback) {
+        callback = options;
+        options = {};
+      }
+      options = $.extend(defaults, options);
+
+
+      /**
+       * Return the byte count of the specified character in UTF8 encoding.
+       * Note: This won't cover UTF-8 characters that are 4 bytes long.
+       *
+       * @param input
+       * @return {number}
+       */
+      function utf8CharByteCount(character) {
+        var c = character.charCodeAt();
+        // Not c then 0, else c < 128 then 1, else c < 2048 then 2, else 3
+        return !c ? 0 : c < 128 ? 1 : c < 2048 ? 2 : 3;
+      }
+
+      /**
+       * Return the length of the specified input in UTF8 encoding.
+       *
+       * @param input
+       * @return {number}
+       */
+      function utf8Length(string) {
+        return string.split("")
+          .map(utf8CharByteCount)
+          // Prevent reduce from throwing an error if the string is empty.
+          .concat(0)
+          .reduce(function (sum, val) {
+            return sum + val;
+          });
+      }
+
+      /**
+       * Return the length of the specified input.
+       *
+       * @param input
+       * @return {number}
+       */
+      function inputLength(input) {
+        var text = input.val();
+
+        if (options.twoCharLinebreak) {
+          // Count all line breaks as 2 characters
+          text = text.replace(/\r(?!\n)|\n(?!\r)/g, '\r\n');
+        } else {
+          // Remove all double-character (\r\n) linebreaks, so they're counted only once.
+          text = text.replace(/(?:\r\n|\r|\n)/g, '\n');
+        }
+
+        var currentLength = 0;
+
+        if (options.utf8) {
+          currentLength = utf8Length(text);
+        } else {
+          currentLength = text.length;
+        }
+
+        // Remove "C:\fakepath\" from counter when using file input
+        // Fix https://github.com/mimo84/bootstrap-maxlength/issues/146
+        if (input.prop("type") === "file" && input.val() !== "") {
+          currentLength -= 12;
+        }
+
+        return currentLength;
+      }
+
+      /**
+       * Truncate the text of the specified input.
+       *
+       * @param input
+       * @param limit
+       */
+      function truncateChars(input, maxlength) {
+        var text = input.val();
+
+        if (options.twoCharLinebreak) {
+          text = text.replace(/\r(?!\n)|\n(?!\r)/g, '\r\n');
+
+          if (text[text.length - 1] === '\n') {
+            maxlength -= text.length % 2;
+          }
+        }
+
+        if (options.utf8) {
+          var indexedSize = text.split("").map(utf8CharByteCount);
+          for (
+            var removedBytes = 0,
+            bytesPastMax = utf8Length(text) - maxlength; removedBytes < bytesPastMax; removedBytes += indexedSize.pop()
+          );
+          maxlength -= (maxlength - indexedSize.length);
+        }
+
+        input.val(text.substr(0, maxlength));
+      }
+
+      /**
+       * Return true if the indicator should be showing up.
+       *
+       * @param input
+       * @param threshold
+       * @param maxlength
+       * @return {number}
+       */
+      function charsLeftThreshold(input, threshold, maxlength) {
+        var output = true;
+        if (!options.alwaysShow && (maxlength - inputLength(input) > threshold)) {
+          output = false;
+        }
+        return output;
+      }
+
+      /**
+       * Returns how many chars are left to complete the fill up of the form.
+       *
+       * @param input
+       * @param maxlength
+       * @return {number}
+       */
+      function remainingChars(input, maxlength) {
+        var length = maxlength - inputLength(input);
+        return length;
+      }
+
+      /**
+       * When called displays the indicator.
+       *
+       * @param indicator
+       */
+      function showRemaining(currentInput, indicator) {
+        indicator.css({
+          display: 'block'
+        });
+        currentInput.trigger('maxlength.shown');
+      }
+
+      /**
+       * When called shows the indicator.
+       *
+       * @param indicator
+       */
+      function hideRemaining(currentInput, indicator) {
+
+        if (options.alwaysShow) {
+          return;
+        }
+
+        indicator.css({
+          display: 'none'
+        });
+        currentInput.trigger('maxlength.hidden');
+      }
+
+      /**
+       * This function updates the value in the indicator
+       *
+       * @param maxLengthThisInput
+       * @param typedChars
+       * @return String
+       */
+      function updateMaxLengthHTML(currentInputText, maxLengthThisInput, typedChars) {
+        var output = '';
+        if (options.message) {
+          if (typeof options.message === 'function') {
+            output = options.message(currentInputText, maxLengthThisInput);
+          } else {
+            output = options.message.replace('%charsTyped%', typedChars)
+              .replace('%charsRemaining%', maxLengthThisInput - typedChars)
+              .replace('%charsTotal%', maxLengthThisInput);
+          }
+        } else {
+          if (options.preText) {
+            output += options.preText;
+          }
+          if (!options.showCharsTyped) {
+            output += maxLengthThisInput - typedChars;
+          } else {
+            output += typedChars;
+          }
+          if (options.showMaxLength) {
+            output += options.separator + maxLengthThisInput;
+          }
+          if (options.postText) {
+            output += options.postText;
+          }
+        }
+        return output;
+      }
+
+      /**
+       * This function updates the value of the counter in the indicator.
+       * Wants as parameters: the number of remaining chars, the element currently managed,
+       * the maxLength for the current input and the indicator generated for it.
+       *
+       * @param remaining
+       * @param currentInput
+       * @param maxLengthCurrentInput
+       * @param maxLengthIndicator
+       */
+      function manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator) {
+        if (maxLengthIndicator) {
+          maxLengthIndicator.html(updateMaxLengthHTML(currentInput.val(), maxLengthCurrentInput, (maxLengthCurrentInput - remaining)));
+
+          if (remaining > 0) {
+            if (charsLeftThreshold(currentInput, options.threshold, maxLengthCurrentInput)) {
+              showRemaining(currentInput, maxLengthIndicator.removeClass(options.limitReachedClass + ' ' + options.limitExceededClass).addClass(options.warningClass));
+            } else {
+              hideRemaining(currentInput, maxLengthIndicator);
+            }
+          } else {
+            if (!options.limitExceededClass) {
+              showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass).addClass(options.limitReachedClass));
+            } else {
+              if (remaining === 0) {
+                showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass + ' ' + options.limitExceededClass).addClass(options.limitReachedClass));
+              } else {
+                showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass + ' ' + options.limitReachedClass).addClass(options.limitExceededClass));
+              }
+            }
+          }
+        }
+
+        if (options.customMaxAttribute) {
+          // class to use for form validation on custom maxlength attribute
+          if (remaining < 0) {
+            currentInput.addClass(options.customMaxClass);
+          } else {
+            currentInput.removeClass(options.customMaxClass);
+          }
+        }
+      }
+
+      /**
+       * This function returns an object containing all the
+       * informations about the position of the current input
+       *
+       * @param currentInput
+       * @return object {bottom height left right top width}
+       *
+       */
+      function getPosition(currentInput) {
+        var el = currentInput[0];
+        return $.extend({}, (typeof el.getBoundingClientRect === 'function') ? el.getBoundingClientRect() : {
+          width: el.offsetWidth,
+          height: el.offsetHeight
+        }, currentInput.offset());
+      }
+
+      /**
+       * This function places the maxLengthIndicator based on placement config object.
+       *
+       * @param {object} placement
+       * @param {$} maxLengthIndicator
+       * @return null
+       *
+       */
+      function placeWithCSS(placement, maxLengthIndicator) {
+        if (!placement || !maxLengthIndicator) {
+          return;
+        }
+
+        var POSITION_KEYS = [
+          'top',
+          'bottom',
+          'left',
+          'right',
+          'position'
+        ];
+
+        var cssPos = {};
+
+        // filter css properties to position
+        $.each(POSITION_KEYS, function (i, key) {
+          var val = options.placement[key];
+          if (typeof val !== 'undefined') {
+            cssPos[key] = val;
+          }
+        });
+
+        maxLengthIndicator.css(cssPos);
+
+        return;
+      }
+
+
+      /**
+       * This function places the maxLengthIndicator at the
+       * top / bottom / left / right of the currentInput
+       *
+       * @param currentInput
+       * @param maxLengthIndicator
+       * @return null
+       *
+       */
+      function place(currentInput, maxLengthIndicator) {
+        var pos = getPosition(currentInput);
+
+        // Supports custom placement handler
+        if ($.type(options.placement) === 'function') {
+          options.placement(currentInput, maxLengthIndicator, pos);
+          return;
+        }
+
+        // Supports custom placement via css positional properties
+        if ($.isPlainObject(options.placement)) {
+          placeWithCSS(options.placement, maxLengthIndicator);
+          return;
+        }
+
+        var inputOuter = currentInput.outerWidth(),
+          outerWidth = maxLengthIndicator.outerWidth(),
+          actualWidth = maxLengthIndicator.width(),
+          actualHeight = maxLengthIndicator.height();
+
+        // get the right position if the indicator is appended to the input's parent
+        if (options.appendToParent) {
+          pos.top -= currentInput.parent().offset().top;
+          pos.left -= currentInput.parent().offset().left;
+        }
+
+        switch (options.placement) {
+          case 'bottom':
+            maxLengthIndicator.css({
+              top: pos.top + pos.height,
+              left: pos.left + pos.width / 2 - actualWidth / 2
+            });
+            break;
+          case 'top':
+            maxLengthIndicator.css({
+              top: pos.top - actualHeight,
+              left: pos.left + pos.width / 2 - actualWidth / 2
+            });
+            break;
+          case 'left':
+            maxLengthIndicator.css({
+              top: pos.top + pos.height / 2 - actualHeight / 2,
+              left: pos.left - actualWidth
+            });
+            break;
+          case 'right':
+            maxLengthIndicator.css({
+              top: pos.top + pos.height / 2 - actualHeight / 2,
+              left: pos.left + pos.width
+            });
+            break;
+          case 'bottom-right':
+            maxLengthIndicator.css({
+              top: pos.top + pos.height,
+              left: pos.left + pos.width
+            });
+            break;
+          case 'top-right':
+            maxLengthIndicator.css({
+              top: pos.top - actualHeight,
+              left: pos.left + inputOuter
+            });
+            break;
+          case 'top-left':
+            maxLengthIndicator.css({
+              top: pos.top - actualHeight,
+              left: pos.left - outerWidth
+            });
+            break;
+          case 'bottom-left':
+            maxLengthIndicator.css({
+              top: pos.top + currentInput.outerHeight(),
+              left: pos.left - outerWidth
+            });
+            break;
+          case 'centered-right':
+            maxLengthIndicator.css({
+              top: pos.top + (actualHeight / 2),
+              left: pos.left + inputOuter - outerWidth - 3
+            });
+            break;
+
+          // Some more options for placements
+          case 'bottom-right-inside':
+            maxLengthIndicator.css({
+              top: pos.top + pos.height,
+              left: pos.left + pos.width - outerWidth
+            });
+            break;
+          case 'top-right-inside':
+            maxLengthIndicator.css({
+              top: pos.top - actualHeight,
+              left: pos.left + inputOuter - outerWidth
+            });
+            break;
+          case 'top-left-inside':
+            maxLengthIndicator.css({
+              top: pos.top - actualHeight,
+              left: pos.left
+            });
+            break;
+          case 'bottom-left-inside':
+            maxLengthIndicator.css({
+              top: pos.top + currentInput.outerHeight(),
+              left: pos.left
+            });
+            break;
+        }
+      }
+
+      /**
+       * This function returns true if the indicator position needs to
+       * be recalculated when the currentInput changes
+       *
+       * @return {boolean}
+       *
+       */
+      function isPlacementMutable() {
+        return options.placement === 'bottom-right-inside' || options.placement === 'top-right-inside' || typeof options.placement === 'function' || (options.message && typeof options.message === 'function');
+      }
+
+      /**
+       * This function retrieves the maximum length of currentInput
+       *
+       * @param currentInput
+       * @return {number}
+       *
+       */
+      function getMaxLength(currentInput) {
+        var max = currentInput.attr('maxlength') || options.customMaxAttribute;
+
+        if (options.customMaxAttribute && !options.allowOverMax) {
+          var custom = currentInput.attr(options.customMaxAttribute);
+          if (!max || custom < max) {
+            max = custom;
+          }
+        }
+
+        if (!max) {
+          max = currentInput.attr('size');
+        }
+        return max;
+      }
+
+      return this.each(function () {
+
+        var currentInput = $(this),
+          maxLengthCurrentInput,
+          maxLengthIndicator;
+
+        $(window).resize(function () {
+          if (maxLengthIndicator) {
+            place(currentInput, maxLengthIndicator);
+          }
+        });
+
+        function firstInit() {
+          var maxlengthContent = updateMaxLengthHTML(currentInput.val(), maxLengthCurrentInput, '0');
+          maxLengthCurrentInput = getMaxLength(currentInput);
+
+          if (!maxLengthIndicator) {
+            maxLengthIndicator = $('<span class="bootstrap-maxlength"></span>').css({
+              display: 'none',
+              position: 'absolute',
+              whiteSpace: 'nowrap',
+              zIndex: options.zIndex
+            }).html(maxlengthContent);
+          }
+
+          // We need to detect resizes if we are dealing with a textarea:
+          if (currentInput.is('textarea')) {
+            currentInput.data('maxlenghtsizex', currentInput.outerWidth());
+            currentInput.data('maxlenghtsizey', currentInput.outerHeight());
+
+            currentInput.mouseup(function () {
+              if (currentInput.outerWidth() !== currentInput.data('maxlenghtsizex') || currentInput.outerHeight() !== currentInput.data('maxlenghtsizey')) {
+                place(currentInput, maxLengthIndicator);
+              }
+
+              currentInput.data('maxlenghtsizex', currentInput.outerWidth());
+              currentInput.data('maxlenghtsizey', currentInput.outerHeight());
+            });
+          }
+
+          if (options.appendToParent) {
+            currentInput.parent().append(maxLengthIndicator);
+            currentInput.parent().css('position', 'relative');
+          } else {
+            documentBody.append(maxLengthIndicator);
+          }
+
+          var remaining = remainingChars(currentInput, getMaxLength(currentInput));
+          manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator);
+          place(currentInput, maxLengthIndicator);
+        }
+
+        if (options.showOnReady) {
+          currentInput.ready(function () {
+            firstInit();
+          });
+        } else {
+          currentInput.focus(function () {
+            firstInit();
+          });
+        }
+
+        currentInput.on('maxlength.reposition', function () {
+          place(currentInput, maxLengthIndicator);
+        });
+
+
+        currentInput.on('destroyed', function () {
+          if (maxLengthIndicator) {
+            maxLengthIndicator.remove();
+          }
+        });
+
+        currentInput.on('blur', function () {
+          if (maxLengthIndicator && !options.showOnReady) {
+            maxLengthIndicator.remove();
+          }
+        });
+
+        currentInput.on('input', function () {
+          var maxlength = getMaxLength(currentInput),
+            remaining = remainingChars(currentInput, maxlength),
+            output = true;
+
+          if (options.validate && remaining < 0) {
+            truncateChars(currentInput, maxlength);
+            output = false;
+          } else {
+            manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator);
+          }
+
+          // if (isPlacementMutable()) {
+          //   place(currentInput, maxLengthIndicator);
+          // }
+
+          return output;
+        });
+      });
+    }
+  });
+}(jQuery));
+}
 
 /***/ })
 

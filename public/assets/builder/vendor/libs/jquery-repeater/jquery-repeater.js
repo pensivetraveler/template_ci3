@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -26,7 +18,11 @@ return /******/ (function() { // webpackBootstrap
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var jquery_repeater_jquery_repeater__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery.repeater/jquery.repeater */ \"./node_modules/jquery.repeater/jquery.repeater.js\");\n/* harmony import */ var jquery_repeater_jquery_repeater__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery_repeater_jquery_repeater__WEBPACK_IMPORTED_MODULE_0__);\n\n\n//# sourceURL=webpack://Materialize/./libs/jquery-repeater/jquery-repeater.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery_repeater_jquery_repeater__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery.repeater/jquery.repeater */ "./node_modules/jquery.repeater/jquery.repeater.js");
+/* harmony import */ var jquery_repeater_jquery_repeater__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery_repeater_jquery_repeater__WEBPACK_IMPORTED_MODULE_0__);
+}
 
 /***/ }),
 
@@ -36,7 +32,1024 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var jque
   \*********************************************************/
 /***/ (function() {
 
-eval("// jquery.repeater version 1.2.1\n// https://github.com/DubFriend/jquery.repeater\n// (MIT) 09-10-2016\n// Brian Detering <BDeterin@gmail.com> (http://www.briandetering.net/)\n(function ($) {\n'use strict';\n\nvar identity = function (x) {\n    return x;\n};\n\nvar isArray = function (value) {\n    return $.isArray(value);\n};\n\nvar isObject = function (value) {\n    return !isArray(value) && (value instanceof Object);\n};\n\nvar isNumber = function (value) {\n    return value instanceof Number;\n};\n\nvar isFunction = function (value) {\n    return value instanceof Function;\n};\n\nvar indexOf = function (object, value) {\n    return $.inArray(value, object);\n};\n\nvar inArray = function (array, value) {\n    return indexOf(array, value) !== -1;\n};\n\nvar foreach = function (collection, callback) {\n    for(var i in collection) {\n        if(collection.hasOwnProperty(i)) {\n            callback(collection[i], i, collection);\n        }\n    }\n};\n\n\nvar last = function (array) {\n    return array[array.length - 1];\n};\n\nvar argumentsToArray = function (args) {\n    return Array.prototype.slice.call(args);\n};\n\nvar extend = function () {\n    var extended = {};\n    foreach(argumentsToArray(arguments), function (o) {\n        foreach(o, function (val, key) {\n            extended[key] = val;\n        });\n    });\n    return extended;\n};\n\nvar mapToArray = function (collection, callback) {\n    var mapped = [];\n    foreach(collection, function (value, key, coll) {\n        mapped.push(callback(value, key, coll));\n    });\n    return mapped;\n};\n\nvar mapToObject = function (collection, callback, keyCallback) {\n    var mapped = {};\n    foreach(collection, function (value, key, coll) {\n        key = keyCallback ? keyCallback(key, value) : key;\n        mapped[key] = callback(value, key, coll);\n    });\n    return mapped;\n};\n\nvar map = function (collection, callback, keyCallback) {\n    return isArray(collection) ?\n        mapToArray(collection, callback) :\n        mapToObject(collection, callback, keyCallback);\n};\n\nvar pluck = function (arrayOfObjects, key) {\n    return map(arrayOfObjects, function (val) {\n        return val[key];\n    });\n};\n\nvar filter = function (collection, callback) {\n    var filtered;\n\n    if(isArray(collection)) {\n        filtered = [];\n        foreach(collection, function (val, key, coll) {\n            if(callback(val, key, coll)) {\n                filtered.push(val);\n            }\n        });\n    }\n    else {\n        filtered = {};\n        foreach(collection, function (val, key, coll) {\n            if(callback(val, key, coll)) {\n                filtered[key] = val;\n            }\n        });\n    }\n\n    return filtered;\n};\n\nvar call = function (collection, functionName, args) {\n    return map(collection, function (object, name) {\n        return object[functionName].apply(object, args || []);\n    });\n};\n\n//execute callback immediately and at most one time on the minimumInterval,\n//ignore block attempts\nvar throttle = function (minimumInterval, callback) {\n    var timeout = null;\n    return function () {\n        var that = this, args = arguments;\n        if(timeout === null) {\n            timeout = setTimeout(function () {\n                timeout = null;\n            }, minimumInterval);\n            callback.apply(that, args);\n        }\n    };\n};\n\n\nvar mixinPubSub = function (object) {\n    object = object || {};\n    var topics = {};\n\n    object.publish = function (topic, data) {\n        foreach(topics[topic], function (callback) {\n            callback(data);\n        });\n    };\n\n    object.subscribe = function (topic, callback) {\n        topics[topic] = topics[topic] || [];\n        topics[topic].push(callback);\n    };\n\n    object.unsubscribe = function (callback) {\n        foreach(topics, function (subscribers) {\n            var index = indexOf(subscribers, callback);\n            if(index !== -1) {\n                subscribers.splice(index, 1);\n            }\n        });\n    };\n\n    return object;\n};\n\n// jquery.input version 0.0.0\n// https://github.com/DubFriend/jquery.input\n// (MIT) 09-04-2014\n// Brian Detering <BDeterin@gmail.com> (http://www.briandetering.net/)\n(function ($) {\n'use strict';\n\nvar createBaseInput = function (fig, my) {\n    var self = mixinPubSub(),\n        $self = fig.$;\n\n    self.getType = function () {\n        throw 'implement me (return type. \"text\", \"radio\", etc.)';\n    };\n\n    self.$ = function (selector) {\n        return selector ? $self.find(selector) : $self;\n    };\n\n    self.disable = function () {\n        self.$().prop('disabled', true);\n        self.publish('isEnabled', false);\n    };\n\n    self.enable = function () {\n        self.$().prop('disabled', false);\n        self.publish('isEnabled', true);\n    };\n\n    my.equalTo = function (a, b) {\n        return a === b;\n    };\n\n    my.publishChange = (function () {\n        var oldValue;\n        return function (e, domElement) {\n            var newValue = self.get();\n            if(!my.equalTo(newValue, oldValue)) {\n                self.publish('change', { e: e, domElement: domElement });\n            }\n            oldValue = newValue;\n        };\n    }());\n\n    return self;\n};\n\n\nvar createInput = function (fig, my) {\n    var self = createBaseInput(fig, my);\n\n    self.get = function () {\n        return self.$().val();\n    };\n\n    self.set = function (newValue) {\n        self.$().val(newValue);\n    };\n\n    self.clear = function () {\n        self.set('');\n    };\n\n    my.buildSetter = function (callback) {\n        return function (newValue) {\n            callback.call(self, newValue);\n        };\n    };\n\n    return self;\n};\n\nvar inputEqualToArray = function (a, b) {\n    a = isArray(a) ? a : [a];\n    b = isArray(b) ? b : [b];\n\n    var isEqual = true;\n    if(a.length !== b.length) {\n        isEqual = false;\n    }\n    else {\n        foreach(a, function (value) {\n            if(!inArray(b, value)) {\n                isEqual = false;\n            }\n        });\n    }\n\n    return isEqual;\n};\n\nvar createInputButton = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'button';\n    };\n\n    self.$().on('change', function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputCheckbox = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'checkbox';\n    };\n\n    self.get = function () {\n        var values = [];\n        self.$().filter(':checked').each(function () {\n            values.push($(this).val());\n        });\n        return values;\n    };\n\n    self.set = function (newValues) {\n        newValues = isArray(newValues) ? newValues : [newValues];\n\n        self.$().each(function () {\n            $(this).prop('checked', false);\n        });\n\n        foreach(newValues, function (value) {\n            self.$().filter('[value=\"' + value + '\"]')\n                .prop('checked', true);\n        });\n    };\n\n    my.equalTo = inputEqualToArray;\n\n    self.$().change(function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputEmail = function (fig) {\n    var my = {},\n        self = createInputText(fig, my);\n\n    self.getType = function () {\n        return 'email';\n    };\n\n    return self;\n};\n\nvar createInputFile = function (fig) {\n    var my = {},\n        self = createBaseInput(fig, my);\n\n    self.getType = function () {\n        return 'file';\n    };\n\n    self.get = function () {\n        return last(self.$().val().split('\\\\'));\n    };\n\n    self.clear = function () {\n        // http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery\n        this.$().each(function () {\n            $(this).wrap('<form>').closest('form').get(0).reset();\n            $(this).unwrap();\n        });\n    };\n\n    self.$().change(function (e) {\n        my.publishChange(e, this);\n        // self.publish('change', self);\n    });\n\n    return self;\n};\n\nvar createInputHidden = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'hidden';\n    };\n\n    self.$().change(function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\nvar createInputMultipleFile = function (fig) {\n    var my = {},\n        self = createBaseInput(fig, my);\n\n    self.getType = function () {\n        return 'file[multiple]';\n    };\n\n    self.get = function () {\n        // http://stackoverflow.com/questions/14035530/how-to-get-value-of-html-5-multiple-file-upload-variable-using-jquery\n        var fileListObject = self.$().get(0).files || [],\n            names = [], i;\n\n        for(i = 0; i < (fileListObject.length || 0); i += 1) {\n            names.push(fileListObject[i].name);\n        }\n\n        return names;\n    };\n\n    self.clear = function () {\n        // http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery\n        this.$().each(function () {\n            $(this).wrap('<form>').closest('form').get(0).reset();\n            $(this).unwrap();\n        });\n    };\n\n    self.$().change(function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputMultipleSelect = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'select[multiple]';\n    };\n\n    self.get = function () {\n        return self.$().val() || [];\n    };\n\n    self.set = function (newValues) {\n        self.$().val(\n            newValues === '' ? [] : isArray(newValues) ? newValues : [newValues]\n        );\n    };\n\n    my.equalTo = inputEqualToArray;\n\n    self.$().change(function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputPassword = function (fig) {\n    var my = {},\n        self = createInputText(fig, my);\n\n    self.getType = function () {\n        return 'password';\n    };\n\n    return self;\n};\n\nvar createInputRadio = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'radio';\n    };\n\n    self.get = function () {\n        return self.$().filter(':checked').val() || null;\n    };\n\n    self.set = function (newValue) {\n        if(!newValue) {\n            self.$().each(function () {\n                $(this).prop('checked', false);\n            });\n        }\n        else {\n            self.$().filter('[value=\"' + newValue + '\"]').prop('checked', true);\n        }\n    };\n\n    self.$().change(function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputRange = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'range';\n    };\n\n    self.$().change(function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputSelect = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'select';\n    };\n\n    self.$().change(function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputText = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'text';\n    };\n\n    self.$().on('change keyup keydown', function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputTextarea = function (fig) {\n    var my = {},\n        self = createInput(fig, my);\n\n    self.getType = function () {\n        return 'textarea';\n    };\n\n    self.$().on('change keyup keydown', function (e) {\n        my.publishChange(e, this);\n    });\n\n    return self;\n};\n\nvar createInputURL = function (fig) {\n    var my = {},\n        self = createInputText(fig, my);\n\n    self.getType = function () {\n        return 'url';\n    };\n\n    return self;\n};\n\nvar buildFormInputs = function (fig) {\n    var inputs = {},\n        $self = fig.$;\n\n    var constructor = fig.constructorOverride || {\n        button: createInputButton,\n        text: createInputText,\n        url: createInputURL,\n        email: createInputEmail,\n        password: createInputPassword,\n        range: createInputRange,\n        textarea: createInputTextarea,\n        select: createInputSelect,\n        'select[multiple]': createInputMultipleSelect,\n        radio: createInputRadio,\n        checkbox: createInputCheckbox,\n        file: createInputFile,\n        'file[multiple]': createInputMultipleFile,\n        hidden: createInputHidden\n    };\n\n    var addInputsBasic = function (type, selector) {\n        var $input = isObject(selector) ? selector : $self.find(selector);\n\n        $input.each(function () {\n            var name = $(this).attr('name');\n            inputs[name] = constructor[type]({\n                $: $(this)\n            });\n        });\n    };\n\n    var addInputsGroup = function (type, selector) {\n        var names = [],\n            $input = isObject(selector) ? selector : $self.find(selector);\n\n        if(isObject(selector)) {\n            inputs[$input.attr('name')] = constructor[type]({\n                $: $input\n            });\n        }\n        else {\n            // group by name attribute\n            $input.each(function () {\n                if(indexOf(names, $(this).attr('name')) === -1) {\n                    names.push($(this).attr('name'));\n                }\n            });\n\n            foreach(names, function (name) {\n                inputs[name] = constructor[type]({\n                    $: $self.find('input[name=\"' + name + '\"]')\n                });\n            });\n        }\n    };\n\n\n    if($self.is('input, select, textarea')) {\n        if($self.is('input[type=\"button\"], button, input[type=\"submit\"]')) {\n            addInputsBasic('button', $self);\n        }\n        else if($self.is('textarea')) {\n            addInputsBasic('textarea', $self);\n        }\n        else if(\n            $self.is('input[type=\"text\"]') ||\n            $self.is('input') && !$self.attr('type')\n        ) {\n            addInputsBasic('text', $self);\n        }\n        else if($self.is('input[type=\"password\"]')) {\n            addInputsBasic('password', $self);\n        }\n        else if($self.is('input[type=\"email\"]')) {\n            addInputsBasic('email', $self);\n        }\n        else if($self.is('input[type=\"url\"]')) {\n            addInputsBasic('url', $self);\n        }\n        else if($self.is('input[type=\"range\"]')) {\n            addInputsBasic('range', $self);\n        }\n        else if($self.is('select')) {\n            if($self.is('[multiple]')) {\n                addInputsBasic('select[multiple]', $self);\n            }\n            else {\n                addInputsBasic('select', $self);\n            }\n        }\n        else if($self.is('input[type=\"file\"]')) {\n            if($self.is('[multiple]')) {\n                addInputsBasic('file[multiple]', $self);\n            }\n            else {\n                addInputsBasic('file', $self);\n            }\n        }\n        else if($self.is('input[type=\"hidden\"]')) {\n            addInputsBasic('hidden', $self);\n        }\n        else if($self.is('input[type=\"radio\"]')) {\n            addInputsGroup('radio', $self);\n        }\n        else if($self.is('input[type=\"checkbox\"]')) {\n            addInputsGroup('checkbox', $self);\n        }\n        else {\n            //in all other cases default to a \"text\" input interface.\n            addInputsBasic('text', $self);\n        }\n    }\n    else {\n        addInputsBasic('button', 'input[type=\"button\"], button, input[type=\"submit\"]');\n        addInputsBasic('text', 'input[type=\"text\"]');\n        addInputsBasic('password', 'input[type=\"password\"]');\n        addInputsBasic('email', 'input[type=\"email\"]');\n        addInputsBasic('url', 'input[type=\"url\"]');\n        addInputsBasic('range', 'input[type=\"range\"]');\n        addInputsBasic('textarea', 'textarea');\n        addInputsBasic('select', 'select:not([multiple])');\n        addInputsBasic('select[multiple]', 'select[multiple]');\n        addInputsBasic('file', 'input[type=\"file\"]:not([multiple])');\n        addInputsBasic('file[multiple]', 'input[type=\"file\"][multiple]');\n        addInputsBasic('hidden', 'input[type=\"hidden\"]');\n        addInputsGroup('radio', 'input[type=\"radio\"]');\n        addInputsGroup('checkbox', 'input[type=\"checkbox\"]');\n    }\n\n    return inputs;\n};\n\n$.fn.inputVal = function (newValue) {\n    var $self = $(this);\n\n    var inputs = buildFormInputs({ $: $self });\n\n    if($self.is('input, textarea, select')) {\n        if(typeof newValue === 'undefined') {\n            return inputs[$self.attr('name')].get();\n        }\n        else {\n            inputs[$self.attr('name')].set(newValue);\n            return $self;\n        }\n    }\n    else {\n        if(typeof newValue === 'undefined') {\n            return call(inputs, 'get');\n        }\n        else {\n            foreach(newValue, function (value, inputName) {\n                inputs[inputName].set(value);\n            });\n            return $self;\n        }\n    }\n};\n\n$.fn.inputOnChange = function (callback) {\n    var $self = $(this);\n    var inputs = buildFormInputs({ $: $self });\n    foreach(inputs, function (input) {\n        input.subscribe('change', function (data) {\n            callback.call(data.domElement, data.e);\n        });\n    });\n    return $self;\n};\n\n$.fn.inputDisable = function () {\n    var $self = $(this);\n    call(buildFormInputs({ $: $self }), 'disable');\n    return $self;\n};\n\n$.fn.inputEnable = function () {\n    var $self = $(this);\n    call(buildFormInputs({ $: $self }), 'enable');\n    return $self;\n};\n\n$.fn.inputClear = function () {\n    var $self = $(this);\n    call(buildFormInputs({ $: $self }), 'clear');\n    return $self;\n};\n\n}(jQuery));\n\n$.fn.repeaterVal = function () {\n    var parse = function (raw) {\n        var parsed = [];\n\n        foreach(raw, function (val, key) {\n            var parsedKey = [];\n            if(key !== \"undefined\") {\n                parsedKey.push(key.match(/^[^\\[]*/)[0]);\n                parsedKey = parsedKey.concat(map(\n                    key.match(/\\[[^\\]]*\\]/g),\n                    function (bracketed) {\n                        return bracketed.replace(/[\\[\\]]/g, '');\n                    }\n                ));\n\n                parsed.push({\n                    val: val,\n                    key: parsedKey\n                });\n            }\n        });\n\n        return parsed;\n    };\n\n    var build = function (parsed) {\n        if(\n            parsed.length === 1 &&\n            (parsed[0].key.length === 0 || parsed[0].key.length === 1 && !parsed[0].key[0])\n        ) {\n            return parsed[0].val;\n        }\n\n        foreach(parsed, function (p) {\n            p.head = p.key.shift();\n        });\n\n        var grouped = (function () {\n            var grouped = {};\n\n            foreach(parsed, function (p) {\n                if(!grouped[p.head]) {\n                    grouped[p.head] = [];\n                }\n                grouped[p.head].push(p);\n            });\n\n            return grouped;\n        }());\n\n        var built;\n\n        if(/^[0-9]+$/.test(parsed[0].head)) {\n            built = [];\n            foreach(grouped, function (group) {\n                built.push(build(group));\n            });\n        }\n        else {\n            built = {};\n            foreach(grouped, function (group, key) {\n                built[key] = build(group);\n            });\n        }\n\n        return built;\n    };\n\n    return build(parse($(this).inputVal()));\n};\n\n$.fn.repeater = function (fig) {\n    fig = fig || {};\n\n    var setList;\n\n    $(this).each(function () {\n\n        var $self = $(this);\n\n        var show = fig.show || function () {\n            $(this).show();\n        };\n\n        var hide = fig.hide || function (removeElement) {\n            removeElement();\n        };\n\n        var $list = $self.find('[data-repeater-list]').first();\n\n        var $filterNested = function ($items, repeaters) {\n            return $items.filter(function () {\n                return repeaters ?\n                    $(this).closest(\n                        pluck(repeaters, 'selector').join(',')\n                    ).length === 0 : true;\n            });\n        };\n\n        var $items = function () {\n            return $filterNested($list.find('[data-repeater-item]'), fig.repeaters);\n        };\n\n        var $itemTemplate = $list.find('[data-repeater-item]')\n                                 .first().clone().hide();\n\n        var $firstDeleteButton = $filterNested(\n            $filterNested($(this).find('[data-repeater-item]'), fig.repeaters)\n            .first().find('[data-repeater-delete]'),\n            fig.repeaters\n        );\n\n        if(fig.isFirstItemUndeletable && $firstDeleteButton) {\n            $firstDeleteButton.remove();\n        }\n\n        var getGroupName = function () {\n            var groupName = $list.data('repeater-list');\n            return fig.$parent ?\n                fig.$parent.data('item-name') + '[' + groupName + ']' :\n                groupName;\n        };\n\n        var initNested = function ($listItems) {\n            if(fig.repeaters) {\n                $listItems.each(function () {\n                    var $item = $(this);\n                    foreach(fig.repeaters, function (nestedFig) {\n                        $item.find(nestedFig.selector).repeater(extend(\n                            nestedFig, { $parent: $item }\n                        ));\n                    });\n                });\n            }\n        };\n\n        var $foreachRepeaterInItem = function (repeaters, $item, cb) {\n            if(repeaters) {\n                foreach(repeaters, function (nestedFig) {\n                    cb.call($item.find(nestedFig.selector)[0], nestedFig);\n                });\n            }\n        };\n\n        var setIndexes = function ($items, groupName, repeaters) {\n            $items.each(function (index) {\n                var $item = $(this);\n                $item.data('item-name', groupName + '[' + index + ']');\n                $filterNested($item.find('[name]'), repeaters)\n                .each(function () {\n                    var $input = $(this);\n                    // match non empty brackets (ex: \"[foo]\")\n                    var matches = $input.attr('name').match(/\\[[^\\]]+\\]/g);\n\n                    var name = matches ?\n                        // strip \"[\" and \"]\" characters\n                        last(matches).replace(/\\[|\\]/g, '') :\n                        $input.attr('name');\n\n\n                    var newName = groupName + '[' + index + '][' + name + ']' +\n                        ($input.is(':checkbox') || $input.attr('multiple') ? '[]' : '');\n\n                    $input.attr('name', newName);\n\n                    $foreachRepeaterInItem(repeaters, $item, function (nestedFig) {\n                        var $repeater = $(this);\n                        setIndexes(\n                            $filterNested($repeater.find('[data-repeater-item]'), nestedFig.repeaters || []),\n                            groupName + '[' + index + ']' +\n                                        '[' + $repeater.find('[data-repeater-list]').first().data('repeater-list') + ']',\n                            nestedFig.repeaters\n                        );\n                    });\n                });\n            });\n\n            $list.find('input[name][checked]')\n                .removeAttr('checked')\n                .prop('checked', true);\n        };\n\n        setIndexes($items(), getGroupName(), fig.repeaters);\n        initNested($items());\n        if(fig.initEmpty) {\n            $items().remove();\n        }\n\n        if(fig.ready) {\n            fig.ready(function () {\n                setIndexes($items(), getGroupName(), fig.repeaters);\n            });\n        }\n\n        var appendItem = (function () {\n            var setItemsValues = function ($item, data, repeaters) {\n                if(data || fig.defaultValues) {\n                    var inputNames = {};\n                    $filterNested($item.find('[name]'), repeaters).each(function () {\n                        var key = $(this).attr('name').match(/\\[([^\\]]*)(\\]|\\]\\[\\])$/)[1];\n                        inputNames[key] = $(this).attr('name');\n                    });\n\n                    $item.inputVal(map(\n                        filter(data || fig.defaultValues, function (val, name) {\n                            return inputNames[name];\n                        }),\n                        identity,\n                        function (name) {\n                            return inputNames[name];\n                        }\n                    ));\n                }\n\n\n                $foreachRepeaterInItem(repeaters, $item, function (nestedFig) {\n                    var $repeater = $(this);\n                    $filterNested(\n                        $repeater.find('[data-repeater-item]'),\n                        nestedFig.repeaters\n                    )\n                    .each(function () {\n                        var fieldName = $repeater.find('[data-repeater-list]').data('repeater-list');\n                        if(data && data[fieldName]) {\n                            var $template = $(this).clone();\n                            $repeater.find('[data-repeater-item]').remove();\n                            foreach(data[fieldName], function (data) {\n                                var $item = $template.clone();\n                                setItemsValues(\n                                    $item,\n                                    data,\n                                    nestedFig.repeaters || []\n                                );\n                                $repeater.find('[data-repeater-list]').append($item);\n                            });\n                        }\n                        else {\n                            setItemsValues(\n                                $(this),\n                                nestedFig.defaultValues,\n                                nestedFig.repeaters || []\n                            );\n                        }\n                    });\n                });\n\n            };\n\n            return function ($item, data) {\n                $list.append($item);\n                setIndexes($items(), getGroupName(), fig.repeaters);\n                $item.find('[name]').each(function () {\n                    $(this).inputClear();\n                });\n                setItemsValues($item, data || fig.defaultValues, fig.repeaters);\n            };\n        }());\n\n        var addItem = function (data) {\n            var $item = $itemTemplate.clone();\n            appendItem($item, data);\n            if(fig.repeaters) {\n                initNested($item);\n            }\n            show.call($item.get(0));\n        };\n\n        setList = function (rows) {\n            $items().remove();\n            foreach(rows, addItem);\n        };\n\n        $filterNested($self.find('[data-repeater-create]'), fig.repeaters).click(function () {\n            addItem();\n        });\n\n        $list.on('click', '[data-repeater-delete]', function () {\n            var self = $(this).closest('[data-repeater-item]').get(0);\n            hide.call(self, function () {\n                $(self).remove();\n                setIndexes($items(), getGroupName(), fig.repeaters);\n            });\n        });\n    });\n\n    this.setList = setList;\n\n    return this;\n};\n\n}(jQuery));\n\n//# sourceURL=webpack://Materialize/./node_modules/jquery.repeater/jquery.repeater.js?");
+{
+// jquery.repeater version 1.2.1
+// https://github.com/DubFriend/jquery.repeater
+// (MIT) 09-10-2016
+// Brian Detering <BDeterin@gmail.com> (http://www.briandetering.net/)
+(function ($) {
+'use strict';
+
+var identity = function (x) {
+    return x;
+};
+
+var isArray = function (value) {
+    return $.isArray(value);
+};
+
+var isObject = function (value) {
+    return !isArray(value) && (value instanceof Object);
+};
+
+var isNumber = function (value) {
+    return value instanceof Number;
+};
+
+var isFunction = function (value) {
+    return value instanceof Function;
+};
+
+var indexOf = function (object, value) {
+    return $.inArray(value, object);
+};
+
+var inArray = function (array, value) {
+    return indexOf(array, value) !== -1;
+};
+
+var foreach = function (collection, callback) {
+    for(var i in collection) {
+        if(collection.hasOwnProperty(i)) {
+            callback(collection[i], i, collection);
+        }
+    }
+};
+
+
+var last = function (array) {
+    return array[array.length - 1];
+};
+
+var argumentsToArray = function (args) {
+    return Array.prototype.slice.call(args);
+};
+
+var extend = function () {
+    var extended = {};
+    foreach(argumentsToArray(arguments), function (o) {
+        foreach(o, function (val, key) {
+            extended[key] = val;
+        });
+    });
+    return extended;
+};
+
+var mapToArray = function (collection, callback) {
+    var mapped = [];
+    foreach(collection, function (value, key, coll) {
+        mapped.push(callback(value, key, coll));
+    });
+    return mapped;
+};
+
+var mapToObject = function (collection, callback, keyCallback) {
+    var mapped = {};
+    foreach(collection, function (value, key, coll) {
+        key = keyCallback ? keyCallback(key, value) : key;
+        mapped[key] = callback(value, key, coll);
+    });
+    return mapped;
+};
+
+var map = function (collection, callback, keyCallback) {
+    return isArray(collection) ?
+        mapToArray(collection, callback) :
+        mapToObject(collection, callback, keyCallback);
+};
+
+var pluck = function (arrayOfObjects, key) {
+    return map(arrayOfObjects, function (val) {
+        return val[key];
+    });
+};
+
+var filter = function (collection, callback) {
+    var filtered;
+
+    if(isArray(collection)) {
+        filtered = [];
+        foreach(collection, function (val, key, coll) {
+            if(callback(val, key, coll)) {
+                filtered.push(val);
+            }
+        });
+    }
+    else {
+        filtered = {};
+        foreach(collection, function (val, key, coll) {
+            if(callback(val, key, coll)) {
+                filtered[key] = val;
+            }
+        });
+    }
+
+    return filtered;
+};
+
+var call = function (collection, functionName, args) {
+    return map(collection, function (object, name) {
+        return object[functionName].apply(object, args || []);
+    });
+};
+
+//execute callback immediately and at most one time on the minimumInterval,
+//ignore block attempts
+var throttle = function (minimumInterval, callback) {
+    var timeout = null;
+    return function () {
+        var that = this, args = arguments;
+        if(timeout === null) {
+            timeout = setTimeout(function () {
+                timeout = null;
+            }, minimumInterval);
+            callback.apply(that, args);
+        }
+    };
+};
+
+
+var mixinPubSub = function (object) {
+    object = object || {};
+    var topics = {};
+
+    object.publish = function (topic, data) {
+        foreach(topics[topic], function (callback) {
+            callback(data);
+        });
+    };
+
+    object.subscribe = function (topic, callback) {
+        topics[topic] = topics[topic] || [];
+        topics[topic].push(callback);
+    };
+
+    object.unsubscribe = function (callback) {
+        foreach(topics, function (subscribers) {
+            var index = indexOf(subscribers, callback);
+            if(index !== -1) {
+                subscribers.splice(index, 1);
+            }
+        });
+    };
+
+    return object;
+};
+
+// jquery.input version 0.0.0
+// https://github.com/DubFriend/jquery.input
+// (MIT) 09-04-2014
+// Brian Detering <BDeterin@gmail.com> (http://www.briandetering.net/)
+(function ($) {
+'use strict';
+
+var createBaseInput = function (fig, my) {
+    var self = mixinPubSub(),
+        $self = fig.$;
+
+    self.getType = function () {
+        throw 'implement me (return type. "text", "radio", etc.)';
+    };
+
+    self.$ = function (selector) {
+        return selector ? $self.find(selector) : $self;
+    };
+
+    self.disable = function () {
+        self.$().prop('disabled', true);
+        self.publish('isEnabled', false);
+    };
+
+    self.enable = function () {
+        self.$().prop('disabled', false);
+        self.publish('isEnabled', true);
+    };
+
+    my.equalTo = function (a, b) {
+        return a === b;
+    };
+
+    my.publishChange = (function () {
+        var oldValue;
+        return function (e, domElement) {
+            var newValue = self.get();
+            if(!my.equalTo(newValue, oldValue)) {
+                self.publish('change', { e: e, domElement: domElement });
+            }
+            oldValue = newValue;
+        };
+    }());
+
+    return self;
+};
+
+
+var createInput = function (fig, my) {
+    var self = createBaseInput(fig, my);
+
+    self.get = function () {
+        return self.$().val();
+    };
+
+    self.set = function (newValue) {
+        self.$().val(newValue);
+    };
+
+    self.clear = function () {
+        self.set('');
+    };
+
+    my.buildSetter = function (callback) {
+        return function (newValue) {
+            callback.call(self, newValue);
+        };
+    };
+
+    return self;
+};
+
+var inputEqualToArray = function (a, b) {
+    a = isArray(a) ? a : [a];
+    b = isArray(b) ? b : [b];
+
+    var isEqual = true;
+    if(a.length !== b.length) {
+        isEqual = false;
+    }
+    else {
+        foreach(a, function (value) {
+            if(!inArray(b, value)) {
+                isEqual = false;
+            }
+        });
+    }
+
+    return isEqual;
+};
+
+var createInputButton = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'button';
+    };
+
+    self.$().on('change', function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputCheckbox = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'checkbox';
+    };
+
+    self.get = function () {
+        var values = [];
+        self.$().filter(':checked').each(function () {
+            values.push($(this).val());
+        });
+        return values;
+    };
+
+    self.set = function (newValues) {
+        newValues = isArray(newValues) ? newValues : [newValues];
+
+        self.$().each(function () {
+            $(this).prop('checked', false);
+        });
+
+        foreach(newValues, function (value) {
+            self.$().filter('[value="' + value + '"]')
+                .prop('checked', true);
+        });
+    };
+
+    my.equalTo = inputEqualToArray;
+
+    self.$().change(function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputEmail = function (fig) {
+    var my = {},
+        self = createInputText(fig, my);
+
+    self.getType = function () {
+        return 'email';
+    };
+
+    return self;
+};
+
+var createInputFile = function (fig) {
+    var my = {},
+        self = createBaseInput(fig, my);
+
+    self.getType = function () {
+        return 'file';
+    };
+
+    self.get = function () {
+        return last(self.$().val().split('\\'));
+    };
+
+    self.clear = function () {
+        // http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery
+        this.$().each(function () {
+            $(this).wrap('<form>').closest('form').get(0).reset();
+            $(this).unwrap();
+        });
+    };
+
+    self.$().change(function (e) {
+        my.publishChange(e, this);
+        // self.publish('change', self);
+    });
+
+    return self;
+};
+
+var createInputHidden = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'hidden';
+    };
+
+    self.$().change(function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+var createInputMultipleFile = function (fig) {
+    var my = {},
+        self = createBaseInput(fig, my);
+
+    self.getType = function () {
+        return 'file[multiple]';
+    };
+
+    self.get = function () {
+        // http://stackoverflow.com/questions/14035530/how-to-get-value-of-html-5-multiple-file-upload-variable-using-jquery
+        var fileListObject = self.$().get(0).files || [],
+            names = [], i;
+
+        for(i = 0; i < (fileListObject.length || 0); i += 1) {
+            names.push(fileListObject[i].name);
+        }
+
+        return names;
+    };
+
+    self.clear = function () {
+        // http://stackoverflow.com/questions/1043957/clearing-input-type-file-using-jquery
+        this.$().each(function () {
+            $(this).wrap('<form>').closest('form').get(0).reset();
+            $(this).unwrap();
+        });
+    };
+
+    self.$().change(function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputMultipleSelect = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'select[multiple]';
+    };
+
+    self.get = function () {
+        return self.$().val() || [];
+    };
+
+    self.set = function (newValues) {
+        self.$().val(
+            newValues === '' ? [] : isArray(newValues) ? newValues : [newValues]
+        );
+    };
+
+    my.equalTo = inputEqualToArray;
+
+    self.$().change(function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputPassword = function (fig) {
+    var my = {},
+        self = createInputText(fig, my);
+
+    self.getType = function () {
+        return 'password';
+    };
+
+    return self;
+};
+
+var createInputRadio = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'radio';
+    };
+
+    self.get = function () {
+        return self.$().filter(':checked').val() || null;
+    };
+
+    self.set = function (newValue) {
+        if(!newValue) {
+            self.$().each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+        else {
+            self.$().filter('[value="' + newValue + '"]').prop('checked', true);
+        }
+    };
+
+    self.$().change(function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputRange = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'range';
+    };
+
+    self.$().change(function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputSelect = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'select';
+    };
+
+    self.$().change(function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputText = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'text';
+    };
+
+    self.$().on('change keyup keydown', function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputTextarea = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+
+    self.getType = function () {
+        return 'textarea';
+    };
+
+    self.$().on('change keyup keydown', function (e) {
+        my.publishChange(e, this);
+    });
+
+    return self;
+};
+
+var createInputURL = function (fig) {
+    var my = {},
+        self = createInputText(fig, my);
+
+    self.getType = function () {
+        return 'url';
+    };
+
+    return self;
+};
+
+var buildFormInputs = function (fig) {
+    var inputs = {},
+        $self = fig.$;
+
+    var constructor = fig.constructorOverride || {
+        button: createInputButton,
+        text: createInputText,
+        url: createInputURL,
+        email: createInputEmail,
+        password: createInputPassword,
+        range: createInputRange,
+        textarea: createInputTextarea,
+        select: createInputSelect,
+        'select[multiple]': createInputMultipleSelect,
+        radio: createInputRadio,
+        checkbox: createInputCheckbox,
+        file: createInputFile,
+        'file[multiple]': createInputMultipleFile,
+        hidden: createInputHidden
+    };
+
+    var addInputsBasic = function (type, selector) {
+        var $input = isObject(selector) ? selector : $self.find(selector);
+
+        $input.each(function () {
+            var name = $(this).attr('name');
+            inputs[name] = constructor[type]({
+                $: $(this)
+            });
+        });
+    };
+
+    var addInputsGroup = function (type, selector) {
+        var names = [],
+            $input = isObject(selector) ? selector : $self.find(selector);
+
+        if(isObject(selector)) {
+            inputs[$input.attr('name')] = constructor[type]({
+                $: $input
+            });
+        }
+        else {
+            // group by name attribute
+            $input.each(function () {
+                if(indexOf(names, $(this).attr('name')) === -1) {
+                    names.push($(this).attr('name'));
+                }
+            });
+
+            foreach(names, function (name) {
+                inputs[name] = constructor[type]({
+                    $: $self.find('input[name="' + name + '"]')
+                });
+            });
+        }
+    };
+
+
+    if($self.is('input, select, textarea')) {
+        if($self.is('input[type="button"], button, input[type="submit"]')) {
+            addInputsBasic('button', $self);
+        }
+        else if($self.is('textarea')) {
+            addInputsBasic('textarea', $self);
+        }
+        else if(
+            $self.is('input[type="text"]') ||
+            $self.is('input') && !$self.attr('type')
+        ) {
+            addInputsBasic('text', $self);
+        }
+        else if($self.is('input[type="password"]')) {
+            addInputsBasic('password', $self);
+        }
+        else if($self.is('input[type="email"]')) {
+            addInputsBasic('email', $self);
+        }
+        else if($self.is('input[type="url"]')) {
+            addInputsBasic('url', $self);
+        }
+        else if($self.is('input[type="range"]')) {
+            addInputsBasic('range', $self);
+        }
+        else if($self.is('select')) {
+            if($self.is('[multiple]')) {
+                addInputsBasic('select[multiple]', $self);
+            }
+            else {
+                addInputsBasic('select', $self);
+            }
+        }
+        else if($self.is('input[type="file"]')) {
+            if($self.is('[multiple]')) {
+                addInputsBasic('file[multiple]', $self);
+            }
+            else {
+                addInputsBasic('file', $self);
+            }
+        }
+        else if($self.is('input[type="hidden"]')) {
+            addInputsBasic('hidden', $self);
+        }
+        else if($self.is('input[type="radio"]')) {
+            addInputsGroup('radio', $self);
+        }
+        else if($self.is('input[type="checkbox"]')) {
+            addInputsGroup('checkbox', $self);
+        }
+        else {
+            //in all other cases default to a "text" input interface.
+            addInputsBasic('text', $self);
+        }
+    }
+    else {
+        addInputsBasic('button', 'input[type="button"], button, input[type="submit"]');
+        addInputsBasic('text', 'input[type="text"]');
+        addInputsBasic('password', 'input[type="password"]');
+        addInputsBasic('email', 'input[type="email"]');
+        addInputsBasic('url', 'input[type="url"]');
+        addInputsBasic('range', 'input[type="range"]');
+        addInputsBasic('textarea', 'textarea');
+        addInputsBasic('select', 'select:not([multiple])');
+        addInputsBasic('select[multiple]', 'select[multiple]');
+        addInputsBasic('file', 'input[type="file"]:not([multiple])');
+        addInputsBasic('file[multiple]', 'input[type="file"][multiple]');
+        addInputsBasic('hidden', 'input[type="hidden"]');
+        addInputsGroup('radio', 'input[type="radio"]');
+        addInputsGroup('checkbox', 'input[type="checkbox"]');
+    }
+
+    return inputs;
+};
+
+$.fn.inputVal = function (newValue) {
+    var $self = $(this);
+
+    var inputs = buildFormInputs({ $: $self });
+
+    if($self.is('input, textarea, select')) {
+        if(typeof newValue === 'undefined') {
+            return inputs[$self.attr('name')].get();
+        }
+        else {
+            inputs[$self.attr('name')].set(newValue);
+            return $self;
+        }
+    }
+    else {
+        if(typeof newValue === 'undefined') {
+            return call(inputs, 'get');
+        }
+        else {
+            foreach(newValue, function (value, inputName) {
+                inputs[inputName].set(value);
+            });
+            return $self;
+        }
+    }
+};
+
+$.fn.inputOnChange = function (callback) {
+    var $self = $(this);
+    var inputs = buildFormInputs({ $: $self });
+    foreach(inputs, function (input) {
+        input.subscribe('change', function (data) {
+            callback.call(data.domElement, data.e);
+        });
+    });
+    return $self;
+};
+
+$.fn.inputDisable = function () {
+    var $self = $(this);
+    call(buildFormInputs({ $: $self }), 'disable');
+    return $self;
+};
+
+$.fn.inputEnable = function () {
+    var $self = $(this);
+    call(buildFormInputs({ $: $self }), 'enable');
+    return $self;
+};
+
+$.fn.inputClear = function () {
+    var $self = $(this);
+    call(buildFormInputs({ $: $self }), 'clear');
+    return $self;
+};
+
+}(jQuery));
+
+$.fn.repeaterVal = function () {
+    var parse = function (raw) {
+        var parsed = [];
+
+        foreach(raw, function (val, key) {
+            var parsedKey = [];
+            if(key !== "undefined") {
+                parsedKey.push(key.match(/^[^\[]*/)[0]);
+                parsedKey = parsedKey.concat(map(
+                    key.match(/\[[^\]]*\]/g),
+                    function (bracketed) {
+                        return bracketed.replace(/[\[\]]/g, '');
+                    }
+                ));
+
+                parsed.push({
+                    val: val,
+                    key: parsedKey
+                });
+            }
+        });
+
+        return parsed;
+    };
+
+    var build = function (parsed) {
+        if(
+            parsed.length === 1 &&
+            (parsed[0].key.length === 0 || parsed[0].key.length === 1 && !parsed[0].key[0])
+        ) {
+            return parsed[0].val;
+        }
+
+        foreach(parsed, function (p) {
+            p.head = p.key.shift();
+        });
+
+        var grouped = (function () {
+            var grouped = {};
+
+            foreach(parsed, function (p) {
+                if(!grouped[p.head]) {
+                    grouped[p.head] = [];
+                }
+                grouped[p.head].push(p);
+            });
+
+            return grouped;
+        }());
+
+        var built;
+
+        if(/^[0-9]+$/.test(parsed[0].head)) {
+            built = [];
+            foreach(grouped, function (group) {
+                built.push(build(group));
+            });
+        }
+        else {
+            built = {};
+            foreach(grouped, function (group, key) {
+                built[key] = build(group);
+            });
+        }
+
+        return built;
+    };
+
+    return build(parse($(this).inputVal()));
+};
+
+$.fn.repeater = function (fig) {
+    fig = fig || {};
+
+    var setList;
+
+    $(this).each(function () {
+
+        var $self = $(this);
+
+        var show = fig.show || function () {
+            $(this).show();
+        };
+
+        var hide = fig.hide || function (removeElement) {
+            removeElement();
+        };
+
+        var $list = $self.find('[data-repeater-list]').first();
+
+        var $filterNested = function ($items, repeaters) {
+            return $items.filter(function () {
+                return repeaters ?
+                    $(this).closest(
+                        pluck(repeaters, 'selector').join(',')
+                    ).length === 0 : true;
+            });
+        };
+
+        var $items = function () {
+            return $filterNested($list.find('[data-repeater-item]'), fig.repeaters);
+        };
+
+        var $itemTemplate = $list.find('[data-repeater-item]')
+                                 .first().clone().hide();
+
+        var $firstDeleteButton = $filterNested(
+            $filterNested($(this).find('[data-repeater-item]'), fig.repeaters)
+            .first().find('[data-repeater-delete]'),
+            fig.repeaters
+        );
+
+        if(fig.isFirstItemUndeletable && $firstDeleteButton) {
+            $firstDeleteButton.remove();
+        }
+
+        var getGroupName = function () {
+            var groupName = $list.data('repeater-list');
+            return fig.$parent ?
+                fig.$parent.data('item-name') + '[' + groupName + ']' :
+                groupName;
+        };
+
+        var initNested = function ($listItems) {
+            if(fig.repeaters) {
+                $listItems.each(function () {
+                    var $item = $(this);
+                    foreach(fig.repeaters, function (nestedFig) {
+                        $item.find(nestedFig.selector).repeater(extend(
+                            nestedFig, { $parent: $item }
+                        ));
+                    });
+                });
+            }
+        };
+
+        var $foreachRepeaterInItem = function (repeaters, $item, cb) {
+            if(repeaters) {
+                foreach(repeaters, function (nestedFig) {
+                    cb.call($item.find(nestedFig.selector)[0], nestedFig);
+                });
+            }
+        };
+
+        var setIndexes = function ($items, groupName, repeaters) {
+            $items.each(function (index) {
+                var $item = $(this);
+                $item.data('item-name', groupName + '[' + index + ']');
+                $filterNested($item.find('[name]'), repeaters)
+                .each(function () {
+                    var $input = $(this);
+                    // match non empty brackets (ex: "[foo]")
+                    var matches = $input.attr('name').match(/\[[^\]]+\]/g);
+
+                    var name = matches ?
+                        // strip "[" and "]" characters
+                        last(matches).replace(/\[|\]/g, '') :
+                        $input.attr('name');
+
+
+                    var newName = groupName + '[' + index + '][' + name + ']' +
+                        ($input.is(':checkbox') || $input.attr('multiple') ? '[]' : '');
+
+                    $input.attr('name', newName);
+
+                    $foreachRepeaterInItem(repeaters, $item, function (nestedFig) {
+                        var $repeater = $(this);
+                        setIndexes(
+                            $filterNested($repeater.find('[data-repeater-item]'), nestedFig.repeaters || []),
+                            groupName + '[' + index + ']' +
+                                        '[' + $repeater.find('[data-repeater-list]').first().data('repeater-list') + ']',
+                            nestedFig.repeaters
+                        );
+                    });
+                });
+            });
+
+            $list.find('input[name][checked]')
+                .removeAttr('checked')
+                .prop('checked', true);
+        };
+
+        setIndexes($items(), getGroupName(), fig.repeaters);
+        initNested($items());
+        if(fig.initEmpty) {
+            $items().remove();
+        }
+
+        if(fig.ready) {
+            fig.ready(function () {
+                setIndexes($items(), getGroupName(), fig.repeaters);
+            });
+        }
+
+        var appendItem = (function () {
+            var setItemsValues = function ($item, data, repeaters) {
+                if(data || fig.defaultValues) {
+                    var inputNames = {};
+                    $filterNested($item.find('[name]'), repeaters).each(function () {
+                        var key = $(this).attr('name').match(/\[([^\]]*)(\]|\]\[\])$/)[1];
+                        inputNames[key] = $(this).attr('name');
+                    });
+
+                    $item.inputVal(map(
+                        filter(data || fig.defaultValues, function (val, name) {
+                            return inputNames[name];
+                        }),
+                        identity,
+                        function (name) {
+                            return inputNames[name];
+                        }
+                    ));
+                }
+
+
+                $foreachRepeaterInItem(repeaters, $item, function (nestedFig) {
+                    var $repeater = $(this);
+                    $filterNested(
+                        $repeater.find('[data-repeater-item]'),
+                        nestedFig.repeaters
+                    )
+                    .each(function () {
+                        var fieldName = $repeater.find('[data-repeater-list]').data('repeater-list');
+                        if(data && data[fieldName]) {
+                            var $template = $(this).clone();
+                            $repeater.find('[data-repeater-item]').remove();
+                            foreach(data[fieldName], function (data) {
+                                var $item = $template.clone();
+                                setItemsValues(
+                                    $item,
+                                    data,
+                                    nestedFig.repeaters || []
+                                );
+                                $repeater.find('[data-repeater-list]').append($item);
+                            });
+                        }
+                        else {
+                            setItemsValues(
+                                $(this),
+                                nestedFig.defaultValues,
+                                nestedFig.repeaters || []
+                            );
+                        }
+                    });
+                });
+
+            };
+
+            return function ($item, data) {
+                $list.append($item);
+                setIndexes($items(), getGroupName(), fig.repeaters);
+                $item.find('[name]').each(function () {
+                    $(this).inputClear();
+                });
+                setItemsValues($item, data || fig.defaultValues, fig.repeaters);
+            };
+        }());
+
+        var addItem = function (data) {
+            var $item = $itemTemplate.clone();
+            appendItem($item, data);
+            if(fig.repeaters) {
+                initNested($item);
+            }
+            show.call($item.get(0));
+        };
+
+        setList = function (rows) {
+            $items().remove();
+            foreach(rows, addItem);
+        };
+
+        $filterNested($self.find('[data-repeater-create]'), fig.repeaters).click(function () {
+            addItem();
+        });
+
+        $list.on('click', '[data-repeater-delete]', function () {
+            var self = $(this).closest('[data-repeater-item]').get(0);
+            hide.call(self, function () {
+                $(self).remove();
+                setIndexes($items(), getGroupName(), fig.repeaters);
+            });
+        });
+    });
+
+    this.setList = setList;
+
+    return this;
+};
+
+}(jQuery));
+}
 
 /***/ })
 
