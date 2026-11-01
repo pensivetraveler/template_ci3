@@ -267,6 +267,16 @@ class MenuList extends Common
         return [$key, $data];
     }
 
+    protected function beforeRemove($key = 0, $data = []): array
+    {
+        $menuId = (int)($this->idData['menu_id'] ?? $key);
+        if($this->Model->getCntWhere(['parent_id' => $menuId])) {
+            $this->response(['code' => BAD_REQUEST, 'msg' => 'You Should Delete Sub Menus First']);
+        }
+
+        return parent::beforeRemove($key, $data);
+    }
+
     protected function executeRemove($key, $data, $bool): array
     {
         $menuId = $this->idData['menu_id'] ?? 0;

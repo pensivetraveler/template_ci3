@@ -97,10 +97,13 @@ class Comments extends Common
 	{
 		if(empty($dto['article_id']) || empty($dto['comment_id'])) return;
 
+		// 알림 표(tbl_message)는 템플릿 기본 표가 아니다. 표를 만든 프로젝트에서만 알림을 남긴다
+		if(!$this->db->table_exists($this->Model_Message->table)) return;
+
 		$article = $this->Model_Article->getData([], [
 			'where' => ['article_id' => $dto['article_id'],]
 		]);
-		if(!$article || (int)$article->board_id !== 3) return;
+		if(!$article) return;
 
 		if(empty($dto['parent_id'])) {
 			// 댓글
@@ -126,7 +129,7 @@ class Comments extends Common
 					'user_id' => $parentComment->created_id,
 					'article_id' => $dto['article_id'],
 					'comment_id' => $dto['comment_id'],
-					'content' => '내 댓글에 새 답글이 달렷어요.',
+					'content' => '내 댓글에 새 답글이 달렸어요.',
 					'read_yn' => 'N',
 				]);
 			}

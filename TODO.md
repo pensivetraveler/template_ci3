@@ -130,8 +130,8 @@
 - [x] (2026-11-01: auth none 을 빼 비로그인 401, IP 별 300초 5회 제한) `api/Auth::passwordCheck_post` 로그인하지 않은 요청이 500 (세션 사용자 행이 없어 Notice, 2026-11-01 관찰, 수정 전 코드도 같음). `/admin/api/auth/passwordCheck` 도 auth none 이라 같을 것으로 보임
 - [x] (2026-11-01: 컬럼 추가, 연결 표는 필요해지면 검토) `/admin/api/partners` 목록이 500: `Model_Partner` nullList 의 company_ids 컬럼이 템플릿 tbl_partner 에 없음 (2026-11-01 로컬 관찰, 이번 변경과 무관. bizsoft 파트너 시험은 통과)
 - [x] (2026-11-01 사용자 결정: varchar(255) 까지만, 넘으면 422) `tbl_partner.company_ids` 60자에서 값이 조용히 잘림 (20개 이상 담당 가능)
-- [ ] `api/Comments` 게시판 3번(board_id 하드코딩)에 다른 사람이 댓글을 달면 없는 tbl_message 에 넣음 (템플릿 기본 표에 없음, 2026-11-01 코드로 확인, 미시험)
-- [ ] 하위 메뉴가 있는 메뉴를 삭제하면 하위 메뉴 행이 남음 (2026-11-01 코드로 확인, 미시험)
+- [x] (2026-11-01: 게시판 조건을 없애고 tbl_message 표가 있을 때만 알림) `api/Comments` 게시판 3번(board_id 하드코딩)에 다른 사람이 댓글을 달면 없는 tbl_message 에 넣음
+- [x] (2026-11-01: 하위 메뉴를 먼저 지우도록 막음, 카테고리 삭제와 같은 방식) 하위 메뉴가 있는 메뉴를 삭제하면 하위 메뉴 행이 남음
 - [x] (2026-11-01: 메뉴 삭제 때 권한 행도 지움) 메뉴를 삭제해도 tbl_menu_auth·tbl_partner_auth 행이 남을 수 있음 (외래 키 없음, 2026-11-01 코드로 확인, 동작 미시험)
 - [x] (2026-11-01: 목록 화면과 같은 조건의 메뉴가 아니면 404) `MenuAuth` 없는 menu_id 로 PATCH 하면 `ensureAuthRow`가 고아 권한 행을 만들고 200 (PartnerAuth 도 같은 구조로 보임, 2026-11-01 관찰)
 
@@ -150,7 +150,7 @@
 - [ ] 기본 컨트롤러 `Welcome` 교체
 - [x] (2026-11-01: PHPUnit 도입, scripts/test.sh, tests/app/README.md) 프로젝트 테스트(PHPUnit)
 - [ ] ESLint 도입
-- [ ] `vendor` 일부 파일이 git 에 추적되고 composer.lock 과 맞지 않음 (.gitignore 에 /vendor/ 가 있는데 init 커밋에 들어감. composer install 을 하면 추적 파일 339개가 바뀌거나 지워짐, autoload 에 aws·htmlpurifier 없음. 2026-11-01 관찰)
+- [x] (2026-11-01 12478b3: 추적을 없애고 composer.lock 추적) `vendor` 일부 파일이 git 에 추적되고 composer.lock 과 맞지 않음 (.gitignore 에 /vendor/ 가 있는데 init 커밋에 들어감. composer install 을 하면 추적 파일 339개가 바뀌거나 지워짐, autoload 에 aws·htmlpurifier 없음. 2026-11-01 관찰)
 
 ## 6. 빌더 설정 조사 (2026-10-23)
 

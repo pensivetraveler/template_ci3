@@ -211,6 +211,35 @@ class AdminRecordTest extends ApiTestCase
         $this->assertSame(404, $this->systemAdmin()->request('PATCH', '/admin/api/boards/message_read/999999', ['x' => '1'])->status);
     }
 
+    public function testMenuWithSubMenusCannotBeDeleted(): void
+    {
+        TestDb::exec("INSERT INTO tbl_menu (parent_id, code, title, class, method, depth, srt, is_sub_menu, is_login, is_auth, is_super, is_use, base_auth) VALUES (0, '', 'tmpparent', '', '', 1, 99, 1, 1, 1, 0, 1, '111111')");
+        $parent = (int)TestDb::conn()->insert_id;
+        TestDb::exec("INSERT INTO tbl_menu (parent_id, code, title, class, method, depth, srt, is_sub_menu, is_login, is_auth, is_super, is_use, base_auth) VALUES ($parent, '', 'tmpchild', 'tmpchild', 'index', 2, 1, 0, 1, 1, 0, 1, '111111')");
+        $child = (int)TestDb::conn()->insert_id;
+
+        $sys = $this->systemAdmin();
+        $sys->request('DELETE', "/admin/api/menuList/$parent");
+        $this->assertSame('1', TestDb::value("SELECT COUNT(*) FROM tbl_menu WHERE menu_id = $parent"), '하위 메뉴가 있으면 지워지지 않음');
+
+        $this->assertSame(200, $sys->request('DELETE', "/admin/api/menuList/$child")->status);
+        $this->assertSame(200, $sys->request('DELETE', "/admin/api/menuList/$parent")->status);
+        $this->assertSame('0', TestDb::value("SELECT COUNT(*) FROM tbl_menu WHERE menu_id = $parent"));
+    }
+
+    public function testCommentSavedWithoutMessageTable(): void
+    {
+        [$writerId, $writerPk] = self::makeUser('USR001');
+        TestDb::exec("INSERT INTO tbl_board (board_name, board_cd, created_id) VALUES ('시험', 'BRD001', 1)");
+        $board = (int)TestDb::conn()->insert_id;
+        TestDb::exec("INSERT INTO tbl_article (board_id, subject, content, created_id) VALUES ($board, '글', '내용', $writerPk)");
+        $article = (int)TestDb::conn()->insert_id;
+
+        $response = $this->systemAdmin()->request('POST', '/admin/api/comments', ['article_id' => $article, 'content' => '댓글', 'parent_id' => 0, 'depth' => 0]);
+        $this->assertSame(201, $response->status, $response->body);
+        $this->assertSame('1', TestDb::value("SELECT COUNT(*) FROM tbl_comment WHERE article_id = $article"));
+    }
+
     public function testDeletingMenuRemovesAuthRows(): void
     {
         TestDb::exec("INSERT INTO tbl_menu (parent_id, code, title, class, method, depth, srt, is_sub_menu, is_login, is_auth, is_super, is_use, base_auth) VALUES (0, '', 'tmp', 'tmpmenu', 'index', 1, 99, 0, 1, 1, 0, 1, '111111')");
