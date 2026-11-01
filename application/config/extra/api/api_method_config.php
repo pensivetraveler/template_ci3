@@ -36,6 +36,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |     check : false 면 권한 검사 생략 (로그인만 확인)
 |     public: true 면 메뉴 권한을 검사하지 않는 플랫폼(/api/* 등)에도 연다. 없으면 그 경로는 404.
 |             관리자 경로(/admin/api/*)에서도 권한 검사를 건너뛴다
+|     web   : false 면 public 이어도 /api/* 에서는 닫는다 (관리자 경로에는 영향 없음)
 |   resource   : 이 API 가 쓸 엔티티 설정 이름 (form·list·view, MY_Builder_API). 생략하면 API 클래스명.
 |                화면이 route 의 resourceConfig 로 다른 설정을 쓰면 API 도 같은 값을 준다 (예: users → myinfo)
 |
@@ -65,15 +66,17 @@ $config['api_method_config'] = [
     'menuAuth' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuAuth']]]],
 
     // 인증·회원 API: 로그인 전에 쓰는 엔드포인트는 auth none, 키·로그 생략
+    // 웹 로그인 화면이 없으면 쓰는 곳이 없어 /api/auth/* 는 .env WEB_AUTH_API 를 켠 프로젝트만 연다
     'auth' => [
-        '*'             => ['*' => ['permission' => ['public' => true]]],
+        '*'             => ['*' => ['permission' => ['public' => true, 'web' => filter_var(getenv('WEB_AUTH_API'), FILTER_VALIDATE_BOOLEAN)]]],
         'dupCheck'      => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
         'idCheck'       => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
         'emailCheck'    => ['get'  => ['auth' => 'none', 'key' => false, 'log' => false]],
         // 로그인·아이디/비밀번호 찾기: IP 별 60초에 10회 (무차별 대입 방지, RestController user_limits).
         // log 는 끈 채 둔다 — rest_logs 는 요청 파라미터를 그대로 저장해 비밀번호가 남는다
         'login'         => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
-        'signup'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
+        // 가입은 SIGNUP_USER_CD 로 따로 연다 (signup_post 가 값이 없으면 404)
+        'signup'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60, 'permission' => ['public' => true, 'web' => true]]],
         'findId'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         // 비밀번호 찾기·재설정은 계정을 바꿀 수 있어 IP 별 300초에 5회
         'findPassword'  => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 5, 'time' => 300]],

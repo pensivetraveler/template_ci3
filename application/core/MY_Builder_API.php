@@ -85,7 +85,10 @@ class MY_Builder_API extends MY_Controller_API
         }
 
         // 메뉴 권한을 검사하지 않는 플랫폼(/api/* 등)은 permission.public 으로 연 API 만 받는다 (설정: api_method_config)
-        if(!in_array($this->flag, $this->permissionFlags, true) && empty($this->apiMethodFeature['permission']['public'])) show_404();
+        if(!in_array($this->flag, $this->permissionFlags, true)) {
+            $permission = $this->apiMethodFeature['permission'] ?? [];
+            if(empty($permission['public']) || ($permission['web'] ?? true) === false) show_404();
+        }
 
         // builder_method_config: 메뉴 기본 권한 계산(getMenuRouteConfigs → fillMethodConfigProperties)이 method 기본값을 쓴다.
         // 플랫폼 설정보다 먼저 불러야 하므로 여기서 (WEB 과 같은 순서)
