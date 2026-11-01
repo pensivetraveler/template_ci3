@@ -3,7 +3,7 @@ appPlugins.form.select2 = {
         onHandler: {
             change(e) {
                 if($('[name="class"]').val()) {
-                    setDynamicSelect2Options(
+                    setDynamicSelectOptions(
                         '[name="class"]',
                         {
                             url: getUrlWithIdentifiers(common.API_URI+'/options', {}, {

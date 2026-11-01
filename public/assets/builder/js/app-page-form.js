@@ -156,7 +156,8 @@ function preparePlugins(form) {
                         $(this).slideUp(deleteElement);
                     }else{
                         const wrap = repeater.closest('[data-repeater-type]');
-                        if(repeaterId = wrap.getAttribute('data-repeater-id')) {
+                        const repeaterId = wrap.getAttribute('data-repeater-id');
+                        if(repeaterId) {
                             if(repeater.querySelector(`[data-group-field="${repeaterId}"]`).value === ''){
                                 $(this).slideUp(deleteElement);
                                 return;
@@ -317,9 +318,10 @@ function resetFrmInputs(form, fields = []) {
                     case 'password' :
                         node.value = '';
                         break;
-                    case 'file' :
+                    case 'file' : {
                         const newNode = node.cloneNode(true);
                         node.parentNode.replaceChild(newNode, node);
+                    }
                 }
                 break;
             case 'SELECT' :
@@ -348,7 +350,8 @@ function resetFrmInputs(form, fields = []) {
 
     // list 초기화
     fields.map(function(item) {
-        if(list = document.querySelector('#'+item.id+'-list')) {
+        const list = document.querySelector('#'+item.id+'-list');
+        if(list) {
             list.innerHTML = '';
             list.classList.add('d-none');
         }
@@ -397,7 +400,7 @@ function readyFrmInputs(form, mode = null, fields = []) {
         const viewMod = node.getAttribute('data-view-mod').trim();
         if(!viewMod) return;
         const modList = viewMod.startsWith('[')
-            ? viewMod.replace(/[\[\]'"\s]/g, '').split(',')
+            ? viewMod.replace(/[[\]'"\s]/g, '').split(',')
             : viewMod.split('|');
         if(modList.includes(mode)){
             node.closest('.form-validation-unit').classList.remove('d-none');
@@ -553,7 +556,7 @@ function applyFrmValues(form, data, fields = [], triggerEvent = true) {
             // group_repeater type manual: 데이터 개수만큼 행을 만든다
             if(groupAttrs[groupName].repeater_type === 'manual') {
                 const wrap = document.querySelector(`[data-repeater-type="manual"][data-group-name="${groupName}"]`);
-                if(wrap && data.hasOwnProperty(groupName) && Array.isArray(data[groupName])) {
+                if(wrap && Object.hasOwn(data, groupName) && Array.isArray(data[groupName])) {
                     while(wrap.querySelectorAll('[data-repeater-list] > [data-repeater-item]').length < data[groupName].length) {
                         if(!addManualRepeaterRow(wrap)) break;
                     }
@@ -562,7 +565,7 @@ function applyFrmValues(form, data, fields = [], triggerEvent = true) {
             if(groupAttrs[groupName].repeater_type === 'jquery' && $('[data-repeater-type="jquery"]').length) {
                 const repeater = document.querySelector(`[data-repeater-type="jquery"][data-group-name="${groupName}"]`);
                 const rowCount = parseInt(repeater.getAttribute('data-repeater-count'));
-                if(data.hasOwnProperty(groupName)) {
+                if(Object.hasOwn(data, groupName)) {
                     for(let i = rowCount+1; i <= data[groupName].length; i++) repeater.querySelector('[data-repeater-create]').click();
                     repeater.setAttribute('data-repeater-count', data[groupName].length === 0 ? 1 : data[groupName].length);
                 }
@@ -1314,7 +1317,7 @@ function getFilterData(selector, isFirstDraw = null) {
     if(isFirstDraw !== null && isFirstDraw) {
         $(selector).find('[data-default-value], [data-set-default-first]').each(function (i, node) {
             const value = node.dataset.defaultValue;
-            const match = node.name.match(/^([^\[]+)\[([^\]]+)\]$/);
+            const match = node.name.match(/^([^[]+)\[([^\]]+)\]$/);
             if (match) {
                 const group = match[1]; // where
                 const key = match[2];   // partner_id

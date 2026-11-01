@@ -11,12 +11,12 @@ class FormValidator {
 		this.fields = fields;
 		this.validator = null;
 
-		if(option.rowSelector) {
-			this.rowSelector = option.rowSelector;
+		if(options && options.rowSelector) {
+			this.rowSelector = options.rowSelector;
 		}
 
 		// Custom validators 추가
-		if (option.customValidatorsPreset && option.customValidatorsPreset.validators) {
+		if (options && options.customValidatorsPreset && options.customValidatorsPreset.validators) {
 			this.addCustomValidators(customValidatorsPreset.validators);
 		}
 
@@ -103,7 +103,8 @@ class FormValidator {
 
 	onValidatingEvent(event) {
 		if(event.element.hasAttribute('data-textarea-id')) {
-			if(textareaId = event.element.getAttribute('data-textarea-id'))
+			const textareaId = event.element.getAttribute('data-textarea-id');
+			if(textareaId)
 				event.element.value = editors[`${textareaId}`].root.innerHTML;
 		}
 	}

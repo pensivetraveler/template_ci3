@@ -149,7 +149,7 @@
 - [x] (2026-11-01: 1.30, PHP 7.4 지원하는 마지막 계열) PHPExcel → PhpSpreadsheet (추가: `MY_Builder_WEB::getExcelSample`의 `Excel_lib`)
 - [ ] 기본 컨트롤러 `Welcome` 교체
 - [x] (2026-11-01: PHPUnit 도입, scripts/test.sh, tests/app/README.md) 프로젝트 테스트(PHPUnit)
-- [ ] ESLint 도입
+- [x] (2026-11-01: npm run lint, 오류 0건. 미사용 변수는 경고로 남김) ESLint 도입
 - [x] (2026-11-01 12478b3: 추적을 없애고 composer.lock 추적) `vendor` 일부 파일이 git 에 추적되고 composer.lock 과 맞지 않음 (.gitignore 에 /vendor/ 가 있는데 init 커밋에 들어감. composer install 을 하면 추적 파일 339개가 바뀌거나 지워짐, autoload 에 aws·htmlpurifier 없음. 2026-11-01 관찰)
 
 ## 6. 빌더 설정 조사 (2026-10-23)

@@ -33,6 +33,8 @@ CodeIgniter 3 기반 관리자 템플릿이다. 설정 파일(config)만으로 �
 composer install --no-dev --no-scripts
 ```
 
+화면 스크립트 검사는 `npm ci` 후 `npm run lint`로 한다 (`eslint.config.mjs`). 라이브러리는 npm 이 아니라 `public/assets`에 있다.
+
 Sentry 로그(`config/extra/sentry_config.php`)는 기본으로 꺼져 있고 패키지도 설치되지 않는다. 켜려면 패키지를 따로 설치한다.
 
 ### 환경 설정

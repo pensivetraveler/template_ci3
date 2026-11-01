@@ -133,7 +133,7 @@ $(function () {
 					title: 'Complete',
 					text: formRecord['_mode'].value === 'edit' ? 'Your Data Is Updated' : 'Registered Successfully',
 					...(() => {
-                        if (response.data.hasOwnProperty('redirect_to')) {
+                        if (Object.hasOwn(response.data, 'redirect_to')) {
                             return {
                                 callback: redirect,
                                 params: response.data.redirect_to,

@@ -810,6 +810,8 @@ function renderButtonColumn(data, type, full, meta, column) {
  */
 function isSafeListUrl(url) {
 	if(url === null || url === undefined) return false;
+	// 제어 문자를 끼워 javascript: 검사를 피하지 못하게 지운다
+	// eslint-disable-next-line no-control-regex
 	const value = String(url).trim().replace(/[\u0000-\u001F\u007F]/g, '');
 	return !/^(javascript|data|vbscript):/i.test(value);
 }

@@ -104,7 +104,7 @@ function findAddress(wrap) {
 
 function callUserFunc(callback = undefined, params = undefined) {
     try {
-        if(callback === undefined || typeof callback === undefined)
+        if(callback === undefined)
             throw new Error(`callUserFunc : callback is not defined !`);
 
         if(typeof callback === 'string' && callback.trim().length === 0)
@@ -317,7 +317,7 @@ function reformatFormData(form, data, regexp = {}, side = false) {
             };
         }
 
-        curr.rules.split(/\|(?![^\[]*\])/).forEach(raw => {
+        curr.rules.split(/\|(?![^[]*\])/).forEach(raw => {
             if(!raw.length) return;
             if(['required', 'trim'].includes(raw)) return;
             const rule = raw.match(/^[a-zA-Z_]+/)?.[0];
@@ -394,7 +394,7 @@ function getFvFieldKey(fv, param) {
     param = String(param);
     if(fv.fields[param]) return param;
 
-    const last = param.match(/\[([^\[\]]+)\]$/);
+    const last = param.match(/\[([^[\]]+)\]$/);
     if(last && isNaN(last[1]) && fv.fields[last[1]]) return last[1];
 
     const base = param.split('[')[0];

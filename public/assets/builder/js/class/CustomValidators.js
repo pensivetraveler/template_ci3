@@ -1,7 +1,7 @@
 const customValidatorsPreset = {
 	inflector: function(name) {
 		let res = '';
-		if(this.rules.hasOwnProperty(name) && this.rules[name].hasOwnProperty('validatorName')){
+		if(Object.hasOwn(this.rules, name) && Object.hasOwn(this.rules[name], 'validatorName')){
 			res = this.rules[name].validatorName;
 		}
 		return res;

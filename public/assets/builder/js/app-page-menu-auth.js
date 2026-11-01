@@ -83,7 +83,7 @@ function isAuthChangeable(baseAuth, mode) {
         import : 5,
     }
 
-    if(!map.hasOwnProperty(mode)) return 0;
+    if(!Object.hasOwn(map, mode)) return 0;
 
     return parseInt(baseAuth.substring(map[mode], map[mode]+1));
 }

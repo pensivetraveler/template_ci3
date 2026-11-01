@@ -166,7 +166,7 @@ $(function () {
         }
     }).on('core.form.valid', function(event) {
         // 유효성 검사 완료 후
-        updateFormLifeCycle('checkFrmValues', formRecord);
+        updateFormLifeCycle('checkFrmValues', event.formValidation.form);
 
         // Send the form data to back-end
         // You need to grab the form data and create an Ajax request to send them
