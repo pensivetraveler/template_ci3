@@ -176,9 +176,9 @@ class AdminRecordTest extends ApiTestCase
 
     public function testServerRunsInRequestedMode(): void
     {
-        $cookie = preg_grep('/^Set-Cookie:/i', (new ApiClient())->request('GET', '/admin/auth')->headers);
-        $secure = stripos(implode("\n", $cookie), 'secure') !== false;
-        $this->assertSame(!self::devMode(), $secure, '운영 모드만 Secure 쿠키');
+        // 개발 모드 화면에만 CI 프로파일러가 붙는다 (Secure 쿠키는 두 모드 모두라 구분이 안 된다)
+        $body = (new ApiClient())->request('GET', '/admin/auth')->body;
+        $this->assertSame(self::devMode(), strpos($body, 'codeigniter_profiler') !== false);
     }
 
     public function testCspHeaderOnlyWhenEnabled(): void
