@@ -7,7 +7,8 @@ $(function() {
 
             node.addEventListener('change', function () {
                 if (
-                    common.FORM_LIFECYCLE?.[form.name]?.refreshPlugins === true
+                    // form.name 은 name 입력칸이 있으면 그 입력칸을 가리킨다
+                    common.FORM_LIFECYCLE?.[form.getAttribute('name')]?.refreshPlugins === true
                 ) {
                     node.setAttribute('data-input-changed', 'true');
                 }
