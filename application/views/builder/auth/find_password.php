@@ -61,6 +61,7 @@ extract(trans_formdata_dit_type($formData));
 							</div>
 						</div>
 					</div>
+					<?php if(isset($tel)): ?>
 					<div class="col-sm-12 form-validation-unit">
 						<div class="input-group input-group-merge form-password-toggle">
 							<div class="form-floating form-floating-outline">
@@ -79,6 +80,7 @@ extract(trans_formdata_dit_type($formData));
 							</div>
 						</div>
 					</div>
+					<?php endif; ?>
 					<div>
 						<button class="btn btn-primary d-grid w-100" type="submit"><?=lang('Submit')?></button>
 					</div>
@@ -92,10 +94,12 @@ extract(trans_formdata_dit_type($formData));
 								<a href="<?=base_url('/admin/auth/login')?>" class="float-start mb-1 mt-2">
 									<span><?=lang('Login')?></span>
 								</a>
+								<?php if(find_id_enabled()): ?>
 								<span class="d-inline-block mb-1 mt-2 text-primary">&nbsp;|&nbsp;</span>
 								<a href="<?=base_url('/admin/auth/findId')?>" class="float-end mb-1 mt-2">
 									<span><?=lang('Find ID')?></span>
 								</a>
+								<?php endif; ?>
 							</div>
 						</div>
 					</div>

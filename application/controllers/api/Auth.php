@@ -208,7 +208,7 @@ class Auth extends Common
         $userCd = $this->config->item('signup_user_cd');
         if(!$userCd || in_array($this->flag, $this->permissionFlags, true)) show_404();
 
-        $this->validateFormRules('form_signup_config');
+        $this->validateAuthForm('form_signup_config', 'signup');
 
         // user_id 는 AUTO_INCREMENT 라 기본값을 넣지 않는다
         // 등급도 모델 필수값이라 검증 전에 넣는다
@@ -233,14 +233,29 @@ class Auth extends Common
         ], RestController::HTTP_CREATED);
     }
 
+    /**
+     * 가입 필드 설정(회원 설정 화면)에 맞춘 폼 항목으로 검증한다
+     */
+    private function validateAuthForm(string $configName, string $form): void
+    {
+        $this->config->set_item($configName, filter_auth_form($this->config->item($configName) ?: [], $form));
+        $this->validateFormRules($configName);
+    }
+
     public function findId_post()
     {
-        $this->validateFormRules('form_find_id_config');
+        if(!find_id_enabled()) show_404();
+
+        $this->validateAuthForm('form_find_id_config', 'find_id');
 
         $params = [
-            'email' => $this->input->post('email'),
             'tel' => $this->input->post('tel'),
         ];
+        if(signup_field_enabled('email')) {
+            $params['email'] = $this->input->post('email');
+        }else{
+            $params['name'] = $this->input->post('name');
+        }
         if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
 
         $count = $this->Model->getCntWhere($params);
@@ -264,13 +279,15 @@ class Auth extends Common
 
     public function findPassword_post()
     {
-        $this->validateFormRules('form_find_id_config');
+        if(!find_password_enabled()) show_404();
+
+        $this->validateAuthForm('form_find_password_config', 'find_password');
 
         $params = [
             'id' => $this->input->post('id'),
             'email' => $this->input->post('email'),
-            'tel' => $this->input->post('tel'),
         ];
+        if(signup_field_enabled('tel')) $params['tel'] = $this->input->post('tel');
         if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
 
         $count = $this->Model->getCntWhere($params);

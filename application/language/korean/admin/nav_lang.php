@@ -33,6 +33,9 @@ $lang['nav']['System Management'] = '시스템 설정';
 $lang['nav']['SysCfg'] = '환경값 설정';
 $lang['nav']['SysCfg Management'] = $lang['nav']['SysCfg'];
 
+$lang['nav']['UserCfg'] = '회원 설정';
+$lang['nav']['UserCfg Management'] = $lang['nav']['UserCfg'];
+
 $lang['nav']['SysCode'] = '시스템 코드';
 $lang['nav']['SysCode Management'] = $lang['nav']['SysCode'];
 

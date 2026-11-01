@@ -269,7 +269,7 @@ $config['form_find_id_config'] = [
     [
         'field' => 'email',
         'label' => 'lang:user.email',
-        'rules' => 'trim|required|is_unique[user.email.user_id]',
+        'rules' => 'trim|required',
         'category' => 'base',
         'type' => 'email',
         'icon' => 'ri-font-family',
@@ -293,6 +293,17 @@ $config['form_find_id_config'] = [
         'attributes' => [],
         'default' => '',
         'list_attributes' => [],
+    ],
+    [
+        'field' => 'name',
+        'label' => 'lang:user.name',
+        'rules' => 'trim|required',
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => 'ri-user-line',
+        'attributes' => [
+            'autocomplete' => 'off',
+        ],
     ],
 ];
 

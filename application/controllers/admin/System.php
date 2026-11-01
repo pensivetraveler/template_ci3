@@ -35,6 +35,30 @@ class System extends Common
         $this->viewApp($data);
     }
 
+    public function userCfg()
+    {
+        $this->titleList[] = 'UserCfg';
+
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['subPage'] = 'builder/system/user_config';
+        $data = $this->prepareFormData($data);
+
+        $data['signupEmailYn'] = signup_field_enabled('email') ? 'Y' : 'N';
+        $data['signupTelYn'] = signup_field_enabled('tel') ? 'Y' : 'N';
+        $data['passwordFindMode'] = user_cfg('PASSWORD_FIND_MODE');
+        $data['canShowPassword'] = (bool)PASSWORD_DECRYPTABLE;
+
+        $this->addJS['tail'][] = [
+            base_url('public/assets/builder/js/app-page-user-config.js'),
+        ];
+
+        $this->addJsVars([
+            'API_URI' => $this->apiUri.'userCfg',
+        ]);
+
+        $this->viewApp($data);
+    }
+
     public function sysCode()
     {
         $this->titleList[] = 'SysCode';

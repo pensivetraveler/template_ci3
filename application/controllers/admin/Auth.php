@@ -51,10 +51,12 @@ class Auth extends Common
     public function findId()
     {
         if($this->isLoggedIn) redirect($this->loggedInRedirect);
+        if(!find_id_enabled()) show_404();
 
         $this->addJsVars([
             'API_URI_ADD' => 'findId',
-            'REDIRECT_URI' => base_url($this->noLoginRedirect)
+            'REDIRECT_URI' => base_url($this->noLoginRedirect),
+            'FORM_DATA' => filter_auth_form($this->jsVars['FORM_DATA'], 'find_id'),
         ]);
 
         $data['subPage'] = 'admin/auth/find_id';
@@ -67,10 +69,12 @@ class Auth extends Common
     public function findPassword()
     {
         if($this->isLoggedIn) redirect($this->loggedInRedirect);
+        if(!find_password_enabled()) show_404();
 
         $this->addJsVars([
             'API_URI_ADD' => 'findPassword',
-            'REDIRECT_URI' => base_url($this->noLoginRedirect)
+            'REDIRECT_URI' => base_url($this->noLoginRedirect),
+            'FORM_DATA' => filter_auth_form($this->jsVars['FORM_DATA'], 'find_password'),
         ]);
 
         $data['subPage'] = 'admin/auth/find_password';

@@ -57,6 +57,7 @@ $config['api_method_config'] = [
     // 메뉴가 없고 일반 등급도 쓰므로 권한 검사 생략 (본인 제한은 api/Users)
     'users'    => ['*' => ['*' => ['resource' => 'myinfo', 'permission' => ['check' => false]]]],
     'sysCfg'   => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCfg']]]],
+    'userCfg'  => ['*' => ['*' => ['permission' => ['menu' => 'system/userCfg']]]],
     'sysCode'  => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCode']]]],
     'menuList' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuList']]]],
     'menuAuth' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuAuth']]]],

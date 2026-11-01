@@ -265,6 +265,75 @@ if ( ! function_usable('recursive_ksort')) {
     }
 }
 
+if ( ! function_exists('user_cfg'))
+{
+    /**
+     * 사용자 관련 환경값 (tbl_sys_cfg big_cfg = USER, 관리자 > 시스템 > 회원 설정).
+     * 표가 없는 설치 전이나 값이 없으면 기본값. 한 요청 안에서는 한 번만 읽는다.
+     */
+    function user_cfg(string $name, string $default = ''): string
+    {
+        static $values = null;
+
+        if ($values === null) {
+            $values = [];
+            $CI =& get_instance();
+            if (isset($CI->db) && $CI->db->table_exists('sys_cfg')) {
+                $rows = $CI->db->select('sml_cfg, cfg_val')->where('big_cfg', 'USER')->get('sys_cfg')->result();
+                foreach ($rows as $row) $values[$row->sml_cfg] = trim((string)$row->cfg_val);
+            }
+        }
+
+        return ($values[$name] ?? '') !== '' ? $values[$name] : $default;
+    }
+}
+
+if ( ! function_exists('signup_field_enabled'))
+{
+    /**
+     * 가입 필드 사용 여부 (email, tel). 설정이 없으면 사용
+     */
+    function signup_field_enabled(string $field): bool
+    {
+        return user_cfg('SIGNUP_'.strtoupper($field).'_YN', 'Y') !== 'N';
+    }
+}
+
+if ( ! function_exists('find_id_enabled'))
+{
+    function find_id_enabled(): bool
+    {
+        return signup_field_enabled('tel');
+    }
+}
+
+if ( ! function_exists('find_password_enabled'))
+{
+    function find_password_enabled(): bool
+    {
+        return signup_field_enabled('email');
+    }
+}
+
+if ( ! function_exists('filter_auth_form'))
+{
+    /**
+     * 가입 필드 설정에 맞춰 가입·찾기 폼 항목을 고른다 (signup, find_id, find_password).
+     * 이메일을 쓰지 않으면 아이디 찾기는 이름·전화번호로 확인한다.
+     */
+    function filter_auth_form(array $items, string $form): array
+    {
+        $except = [];
+        if (!signup_field_enabled('email') && $form !== 'find_id') $except[] = 'email';
+        if (!signup_field_enabled('tel')) $except[] = 'tel';
+        if ($form === 'find_id') $except[] = signup_field_enabled('email') ? 'name' : 'email';
+
+        return array_values(array_filter($items, function ($item) use ($except) {
+            return !in_array($item['field'] ?? '', $except, true);
+        }));
+    }
+}
+
 if ( ! function_exists('token_lifetime'))
 {
     /**

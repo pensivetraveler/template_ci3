@@ -82,13 +82,19 @@ extract(trans_formdata_dit_type($formData));
 									?>
 								</div>
 								<div>
+									<?php if(find_id_enabled()): ?>
 									<a href="<?=base_url($this->flag.'/auth/findId')?>" class="float-start mb-1 mt-2">
 										<span><?=lang('Find ID')?></span>
 									</a>
+									<?php endif; ?>
+									<?php if(find_id_enabled() && find_password_enabled()): ?>
 									<span class="d-inline-block mb-1 mt-2 text-primary">&nbsp;|&nbsp;</span>
+									<?php endif; ?>
+									<?php if(find_password_enabled()): ?>
 									<a href="<?=base_url($this->flag.'/auth/findPassword')?>" class="float-end mb-1 mt-2">
 										<span><?=lang('Find Password')?></span>
 									</a>
+									<?php endif; ?>
 								</div>
 							</div>
 						</div>

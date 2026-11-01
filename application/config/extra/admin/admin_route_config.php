@@ -398,6 +398,13 @@ $config['route_config'] = [
                 'resourceConfig' => 'sys_cfg',
                 'mode' => 'update',
             ],
+            'userCfg' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'side',
+                'resourceConfig' => 'sys_cfg',
+                'mode' => 'update',
+            ],
             'sysCode' => [
                 'category' => 'list',
                 'type' => 'table',
