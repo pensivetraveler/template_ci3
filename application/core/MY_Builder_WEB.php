@@ -1105,26 +1105,26 @@ class MY_Builder_WEB extends MY_Controller_WEB
                     if($data[$i]['required']) {
                         $sheet->getStyle($alphabet.'1')
                             ->getFont()->setBold(true)
-                            ->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED);
+                            ->getColor()->setARGB(Excel_lib::COLOR_RED);
                     }
 
                     $sheet->getColumnDimension($alphabet)->setWidth(24);
                 }
                 $lastAlphabet = number_to_alphabet(count($data)-1);
 
-                $sheet->getStyle('A1:'.$lastAlphabet.'1')->applyFromArray([
+                $this->excel_lib->applyStyle($sheet->getStyle('A1:'.$lastAlphabet.'1'), [
                     'alignment' => [
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, // 가로 가운데 정렬
+                        'horizontal' => Excel_lib::ALIGN_CENTER, // 가로 가운데 정렬
                     ],
                     'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'fillType' => Excel_lib::FILL_SOLID,
                         'startColor' => ['rgb' => 'FFFF00'],
                     ],
                 ]);
-                $sheet->getStyle('A1:'.$lastAlphabet.'5')->applyFromArray([
+                $this->excel_lib->applyStyle($sheet->getStyle('A1:'.$lastAlphabet.'5'), [
                     'borders' => [
                         'allBorders' => [
-                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'borderStyle' => Excel_lib::BORDER_THIN,
                             'color' => array('rgb' => 'A6A6A6')
                         ],
                     ],
@@ -1133,8 +1133,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 // 폴더가 없으면 생성
                 if (!is_dir(FCPATH.$filepath)) make_directory($filepath, 0755);
 
-                $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                $writer->save(FCPATH.$filepath . $filename);
+                $this->excel_lib->saveXlsx($excel, FCPATH.$filepath . $filename);
             }
         }
         return $sampleUri;

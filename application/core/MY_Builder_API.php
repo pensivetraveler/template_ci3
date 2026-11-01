@@ -2053,14 +2053,15 @@ class MY_Builder_API extends MY_Controller_API
         foreach ($range as $columnID) {
             $sheet->getColumnDimension($columnID)->setWidth(20);
         }
-        $sheet->getStyle('A1:'.$maxAlphabet.$rowMax)->applyFromArray(
+        $this->excel_lib->applyStyle(
+            $sheet->getStyle('A1:'.$maxAlphabet.$rowMax),
             array(
                 'alignment' => array(
-                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'vertical' => Excel_lib::ALIGN_CENTER,
                 ),
                 'borders' => array(
                     'allBorders' => array(
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'borderStyle' => Excel_lib::BORDER_THIN,
                     ),
                 ),
             )
@@ -2090,11 +2091,11 @@ class MY_Builder_API extends MY_Controller_API
         $sheet->getStyle("A1:{$maxAlphabet}1")
             ->getFont()->setBold(true);
         $sheet->getStyle("A1:{$maxAlphabet}1")
-            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            ->getFill()->setFillType(Excel_lib::FILL_SOLID);
         $sheet->getStyle("A1:{$maxAlphabet}1")
             ->getFill()->getStartColor()->setRGB('EEEEEE');
         $sheet->getStyle("A1:{$maxAlphabet}1")
-            ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            ->getAlignment()->setHorizontal(Excel_lib::ALIGN_CENTER);
 
         // body
         foreach ($dataset as $i=>$item) {
@@ -2110,14 +2111,11 @@ class MY_Builder_API extends MY_Controller_API
 
         $this->setExcelSheetStyle($sheet, $maxAlphabet, $rowMax);
 
-        // 엑셀 Writer 생성 (XLSX 형식)
-        $objWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($objPHPExcel, 'Xlsx');
-
         // 파일 저장
         error_clear_last(); // 이전 에러 초기화
 
         try {
-            $objWriter->save($filepath);
+            $this->excel_lib->saveXlsx($objPHPExcel, $filepath);
         } catch (Exception $e) {
             $this->response([
                 'code' => INTERNAL_SERVER_ERROR,
@@ -2145,7 +2143,7 @@ class MY_Builder_API extends MY_Controller_API
                 $sheet->setCellValue($location, $diffInDays);
                 $sheet->getStyle($location)
                     ->getNumberFormat()
-                    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_YYYYMMDD);
+                    ->setFormatCode(Excel_lib::FORMAT_DATE);
             }
         }elseif(
             in_array($field, $formats['int'])
@@ -2158,7 +2156,7 @@ class MY_Builder_API extends MY_Controller_API
             $sheet->setCellValueExplicit(
                 $location,
                 $value,
-                is_numeric($value) ? \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC : \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+                is_numeric($value) ? Excel_lib::TYPE_NUMERIC : Excel_lib::TYPE_STRING
             );
 
             if(in_array($field, $formats['float'])) {
@@ -2169,7 +2167,7 @@ class MY_Builder_API extends MY_Controller_API
         }else {
             if(!$value) $value = '';
 
-            $sheet->setCellValueExplicit($location, $value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit($location, $value, Excel_lib::TYPE_STRING);
         }
     }
 

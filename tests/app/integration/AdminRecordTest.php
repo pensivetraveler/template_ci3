@@ -211,13 +211,21 @@ class AdminRecordTest extends ApiTestCase
         $this->assertSame(404, $this->systemAdmin()->request('PATCH', '/admin/api/boards/message_read/999999', ['x' => '1'])->status);
     }
 
-    public function testExcelExportWritesReadableFile(): void
+    public function excelEngines(): array
+    {
+        return [['phpspreadsheet'], ['phpexcel'], ['']];
+    }
+
+    /**
+     * @dataProvider excelEngines
+     */
+    public function testExcelExportWritesReadableFile(string $engine): void
     {
         $sys = $this->systemAdmin();
         $added = $sys->request('POST', '/admin/api/administrators', $this->adminData(['name' => '=1+1']));
         $this->assertSame(201, $added->status, $added->body);
 
-        $response = $sys->request('GET', '/admin/api/administrators/prepareExports?exportType=xlsx');
+        $response = $sys->request('GET', '/admin/api/administrators/prepareExports?exportType=xlsx', [], ['EXCEL_ENGINE' => $engine]);
         $this->assertSame(201, $response->status, $response->body);
         $file = APPPATH.'cache/exports/'.basename(json_decode($response->body, true)['data'][0]['filename']);
         $this->assertFileExists($file);
@@ -226,6 +234,10 @@ class AdminRecordTest extends ApiTestCase
         $this->assertNotSame('', (string)$sheet->getCell('A1')->getValue());
         $cells = array_merge(...$sheet->toArray(null, false, false));
         $this->assertContains('=1+1', $cells, '수식이 아니라 글자로 저장');
+        $style = $sheet->getStyle('A1');
+        $this->assertSame('solid', $style->getFill()->getFillType());
+        $this->assertSame('center', $style->getAlignment()->getHorizontal());
+        $this->assertSame('thin', $style->getBorders()->getLeft()->getBorderStyle());
         @unlink($file);
     }
 

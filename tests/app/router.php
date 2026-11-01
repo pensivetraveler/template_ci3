@@ -15,6 +15,7 @@ $env = array_merge($env, [
     'REST_STRICT' => 'true',
     'CSP_REPORT_ONLY' => 'false',
     'CSP_ENFORCE' => 'false',
+    'EXCEL_ENGINE' => '',
     'WEB_AUTH_API' => 'false',
     'SIGNUP_USER_CD' => '',
     'MAIL_HOST' => '',

@@ -24,7 +24,7 @@ CodeIgniter 3 기반 관리자 템플릿이다. 설정 파일(config)만으로 �
 - Composer 의존성 (`composer.json` 기준)
   - `symfony/dotenv` ^5.4: `.env` 로딩
   - `aws/aws-sdk-php` ^3.337: S3 파일 저장소 (`libraries/Storage.php`). PHP 7.4를 지원하는 마지막 3.337.x로 고정
-  - `phpoffice/phpspreadsheet` ^1.30: 엑셀 내보내기·샘플 (`libraries/Excel_lib.php`). 2.x는 PHP 8이 필요해서 1.x를 쓴다. PHP 확장 `gd`, `zip`이 필요하다
+  - `phpoffice/phpspreadsheet` ^1.30: 엑셀 내보내기·샘플 (`libraries/Excel_lib.php`). 2.x는 PHP 8이 필요해서 1.x를 쓴다. PHP 확장 `gd`, `zip`이 필요하다. `.env EXCEL_ENGINE=phpexcel`이면 저장소의 `third_party/PHPExcel`을 쓴다 (비우면 PhpSpreadsheet 가 있을 때 그것을, 없으면 PHPExcel)
 - `symfony/http-client`는 PHP 8.1 이상이 필요해서 쓰지 않는다.
 
 `vendor`는 저장소에 없다. 저장소를 받은 뒤, 그리고 `composer.lock`이 바뀐 뒤 한 번 실행한다.
