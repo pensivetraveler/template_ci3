@@ -59,7 +59,7 @@ class MY_Builder_API extends MY_Controller_API
     /**
      * 응답에서 항상 빼는 컬럼 (목록·상세 모두). 비밀번호 해시 등.
      */
-    protected array $hiddenResponseFields = ['password'];
+    protected array $hiddenResponseFields = ['password', 'active_id', 'active_email'];
 
     /**
      * 목록 응답·내보내기에서 빼는 컬럼. 상세(수정 폼)에서는 보여 줘야 하는 값(API 키 등).

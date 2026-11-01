@@ -33,7 +33,11 @@ CREATE TABLE `tbl_user` (
   `created_id` bigint(20) unsigned NOT NULL COMMENT '생성자 (tbl_user.user_id)',
   `updated_dt` datetime DEFAULT NULL COMMENT '수정일시',
   `updated_id` bigint(20) unsigned DEFAULT NULL COMMENT '수정자 (tbl_user.user_id)',
-  PRIMARY KEY (`user_id`)
+  `active_id` varchar(20) GENERATED ALWAYS AS (if(`del_yn` = 'N',`id`,NULL)) VIRTUAL COMMENT '삭제되지 않은 행의 아이디 (중복 방지용)',
+  `active_email` varchar(100) GENERATED ALWAYS AS (if(`del_yn` = 'N' and `email` <> '',`email`,NULL)) VIRTUAL COMMENT '삭제되지 않은 행의 이메일 (중복 방지용)',
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `uk_user_active_id` (`active_id`),
+  UNIQUE KEY `uk_user_active_email` (`active_email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `tbl_administrator` (
