@@ -20,8 +20,13 @@ class System extends Common
         $data['subPage'] = 'builder/system/system_config';
         $data = $this->prepareFormData($data);
 
+        $bigCfgColumns = $this->setFormColumns('big_cfg');
+        $bigCfgFormData = $this->setFormData($bigCfgColumns);
+
         $this->load->model('Model_Sys_Cfg');
+        $data['category'] = $this->Model_Sys_Cfg->getBigCfgList();
         $data['data'] = $this->Model_Sys_Cfg->getListByBig()??[];
+        $data['bigCfgFormData'] = restructure_form_data_by_type($bigCfgFormData);
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-system-config.js'),
@@ -30,31 +35,7 @@ class System extends Common
         $this->addJsVars([
             'API_URI' => $this->apiUri.'sysCfg',
             'FORM_REGEXP' => $this->config->item('regexp'),
-        ]);
-
-        $this->viewApp($data);
-    }
-
-    public function userCfg()
-    {
-        $this->titleList[] = 'UserCfg';
-
-        $data['backLink'] = WEB_HISTORY_BACK;
-        $data['subPage'] = 'builder/system/user_config';
-        $data = $this->prepareFormData($data);
-
-        $data['signupEmailYn'] = signup_field_enabled('email') ? 'Y' : 'N';
-        $data['signupTelYn'] = signup_field_enabled('tel') ? 'Y' : 'N';
-        $data['passwordFindMode'] = user_cfg('PASSWORD_FIND_MODE');
-        $data['canShowPassword'] = (bool)PASSWORD_DECRYPTABLE;
-        $data['logKeepDays'] = user_cfg('LOG_KEEP_DAYS');
-
-        $this->addJS['tail'][] = [
-            base_url('public/assets/builder/js/app-page-user-config.js'),
-        ];
-
-        $this->addJsVars([
-            'API_URI' => $this->apiUri.'userCfg',
+            'EXTRA_FORMDATA' => $bigCfgFormData,
         ]);
 
         $this->viewApp($data);

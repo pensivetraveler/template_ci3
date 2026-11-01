@@ -1089,7 +1089,7 @@ class MY_Builder_API extends MY_Controller_API
     }
 
     /**
-     * 보관 기간(회원 설정 LOG_KEEP_DAYS)이 지난 사용자 로그·요청 로그를 지운다. 비었거나 0 이면 지우지 않는다.
+     * 보관 기간(환경값 USER_LOG_KEEP_DAYS)이 지난 사용자 로그·요청 로그를 지운다. 비었거나 0 이면 지우지 않는다.
      * 예약 실행 환경이 없어 로그를 남길 때 지운다
      */
     protected function purgeLogs(): void

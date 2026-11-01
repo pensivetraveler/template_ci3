@@ -543,6 +543,21 @@ $config['form_sys_cfg_config'] = [
         'field' => 'big_cfg',
         'label' => 'lang:system.big_cfg',
         'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'model',
+            'option_data' => [
+                'model' => 'Model_Sys_Cfg',
+                'method' => 'getBigCfgList',
+                'params' => [],
+            ],
+            'render' => [
+                'id' => 'big_cfg',
+                'text' => 'cfg_name',
+                'add' => 'big_cfg'
+            ],
+        ],
         'form_attributes' => [
             'editable' => false,
         ],
@@ -579,6 +594,62 @@ $config['form_sys_cfg_config'] = [
         'option_attributes' => [
             'option_type' => 'field',
         ],
+    ],
+];
+
+$config['form_big_cfg_config'] = [
+    [
+        'field' => 'cmb_cfg',
+        'label' => 'lang:system.cmb_cfg',
+        'rules' => 'trim|required_mod[edit]|concat[big_cfg,sml_cfg|&#95;]',
+        'type' => 'text',
+        'subtype' => 'identifier',
+        'attributes' => [
+            'readonly' => 'readonly',
+        ],
+    ],
+    [
+        'field' => 'sml_cfg',
+        'label' => 'lang:system.sml_cfg',
+        'rules' => 'trim|required|in_list[000]',
+        'type' => 'hidden',
+        'default' => '000',
+    ],
+    [
+        'field' => 'cfg_val',
+        'label' => 'lang:system.cfg_val',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '',
+    ],
+    [
+        'field' => 'cfg_desc',
+        'label' => 'lang:system.cfg_desc',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '',
+    ],
+    [
+        'field' => 'cfg_type',
+        'label' => 'lang:system.cfg_type',
+        'rules' => 'trim|required|in_list[text]',
+        'type' => 'hidden',
+        'default' => 'text',
+    ],
+    [
+        'field' => 'big_cfg',
+        'label' => 'lang:system.big_cfg',
+        'rules' => 'trim|required|max_length[50]|regex_match[/^[A-Z][A-Z0-9_]*$/]',
+        'subtype' => 'identifier',
+        'form_text' => '영문 대문자로 시작하고 영문 대문자·숫자·밑줄(_)만 씁니다. 등록 후에는 바꿀 수 없습니다.',
+        'form_attributes' => [
+            'editable' => false,
+        ],
+    ],
+    [
+        'field' => 'cfg_name',
+        'label' => 'lang:system.cfg_name',
+        'rules' => 'trim|required',
     ],
 ];
 

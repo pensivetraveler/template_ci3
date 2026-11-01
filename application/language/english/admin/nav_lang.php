@@ -33,8 +33,6 @@ $lang['nav']['System Management'] = 'System Management';
 $lang['nav']['SysCfg'] = 'System Config';
 $lang['nav']['SysCfg Management'] = $lang['nav']['SysCfg'];
 
-$lang['nav']['UserCfg'] = 'User Settings';
-$lang['nav']['UserCfg Management'] = $lang['nav']['UserCfg'];
 
 $lang['nav']['SysCode'] = 'System Codes';
 $lang['nav']['SysCode Management'] = $lang['nav']['SysCode'];

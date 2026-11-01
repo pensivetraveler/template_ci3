@@ -1,6 +1,6 @@
 <?php
 /**
- * 회원 설정과 아이디·비밀번호 찾기
+ * 환경값 USER 카테고리와 아이디·비밀번호 찾기
  */
 class PasswordFindTest extends ApiTestCase
 {
@@ -142,24 +142,69 @@ class PasswordFindTest extends ApiTestCase
         $this->assertSame(1, substr_count((string)file_get_contents(self::MAIL_FILE), '====='), '60초 안에 다시 보내지 않음');
     }
 
+    private function saveCfg(ApiClient $client, string $sml, string $value): ApiResponse
+    {
+        $this->setUserCfg([$sml => '']);
+        return $client->request('PUT', '/admin/api/sysCfg/USER_'.$sml, [
+            'cmb_cfg' => 'USER_'.$sml, 'big_cfg' => 'USER', 'sml_cfg' => $sml, 'cfg_name' => $sml, 'cfg_type' => 'text', 'cfg_val' => $value,
+        ]);
+    }
+
     public function testShowModeRejectedWhileNotDecryptable(): void
     {
-        $response = $this->systemAdmin()->request('POST', '/admin/api/userCfg/save', ['signup_email_yn' => 'Y', 'signup_tel_yn' => 'Y', 'password_find_mode' => 'show']);
-        $this->assertSame(400, $response->status, $response->body);
+        $this->assertSame(400, $this->saveCfg($this->systemAdmin(), 'PASSWORD_FIND_MODE', 'show')->status);
     }
 
     public function testSettingsRequireSystemAdmin(): void
     {
         [$id] = self::makeUser('USR001');
-        $data = ['signup_email_yn' => 'N', 'signup_tel_yn' => 'N', 'password_find_mode' => ''];
-        $this->assertSame(403, $this->login($id)->request('POST', '/admin/api/userCfg/save', $data)->status);
-        $this->assertSame(401, (new ApiClient())->request('POST', '/admin/api/userCfg/save', $data)->status);
-        $this->assertSame(200, $this->systemAdmin()->request('POST', '/admin/api/userCfg/save', $data)->status);
+        $this->assertSame(403, $this->saveCfg($this->login($id), 'SIGNUP_TEL_YN', 'N')->status);
+        $this->assertSame(401, $this->saveCfg(new ApiClient(), 'SIGNUP_TEL_YN', 'N')->status);
+        $response = $this->saveCfg($this->systemAdmin(), 'SIGNUP_TEL_YN', 'N');
+        $this->assertSame(200, $response->status, $response->body);
+        $this->assertSame('N', TestDb::value("SELECT cfg_val FROM tbl_sys_cfg WHERE cmb_cfg = 'USER_SIGNUP_TEL_YN'"));
     }
 
-    public function testLogKeepDaysValidation(): void
+    public function testUserSettingValuesAreValidated(): void
     {
-        $data = ['signup_email_yn' => 'Y', 'signup_tel_yn' => 'Y', 'password_find_mode' => '', 'log_keep_days' => 'abc'];
-        $this->assertSame(400, $this->systemAdmin()->request('POST', '/admin/api/userCfg/save', $data)->status);
+        $sys = $this->systemAdmin();
+        $this->assertSame(400, $this->saveCfg($sys, 'LOG_KEEP_DAYS', 'abc')->status);
+        $this->assertSame(400, $this->saveCfg($sys, 'SIGNUP_EMAIL_YN', 'yes')->status);
+        $this->assertSame(400, $this->saveCfg($sys, 'PASSWORD_FIND_MODE', 'mail')->status);
+        $this->assertSame(200, $this->saveCfg($sys, 'PASSWORD_FIND_MODE', 'reset')->status);
+        $this->assertSame(200, $this->saveCfg($sys, 'LOG_KEEP_DAYS', '')->status);
+    }
+
+    public function testUserCategoryAndMenuMoved(): void
+    {
+        $sys = $this->systemAdmin();
+        $this->setUserCfg(['LOG_KEEP_DAYS' => '']);
+        $page = $sys->request('GET', '/admin/system/sysCfg');
+        $this->assertSame(200, $page->status);
+        $this->assertStringContainsString('USER_LOG_KEEP_DAYS', $page->body);
+        $this->assertSame(404, $sys->request('POST', '/admin/api/userCfg/save', [])->status);
+    }
+
+    public function testCategoryRules(): void
+    {
+        $sys = $this->systemAdmin();
+        $category = ['cmb_cfg' => 'TEST_CAT_000', 'big_cfg' => 'TEST_CAT', 'sml_cfg' => '000', 'cfg_name' => '시험', 'cfg_type' => 'text', 'cfg_val' => '', 'cfg_desc' => ''];
+        $this->assertSame(422, $sys->request('POST', '/admin/api/sysCfg', ['big_cfg' => 'bad key', 'cmb_cfg' => 'bad key_000'] + $category)->status, '키 형식');
+        $added = $sys->request('POST', '/admin/api/sysCfg', $category);
+        $this->assertSame(201, $added->status, $added->body);
+
+        $value = ['big_cfg' => 'TEST_CAT', 'sml_cfg' => 'ONE', 'cmb_cfg' => 'TEST_CAT_ONE', 'cfg_name' => '값', 'cfg_type' => 'text', 'cfg_val' => '1'];
+        $this->assertSame(201, $sys->request('POST', '/admin/api/sysCfg', $value)->status);
+        $this->assertSame(422, $sys->request('PUT', '/admin/api/sysCfg/TEST_CAT_ONE', ['sml_cfg' => '000', 'cmb_cfg' => 'TEST_CAT_ONE'] + $value)->status, '자기 키로 값 행을 카테고리로');
+        $this->assertSame(400, $sys->request('PUT', '/admin/api/sysCfg/TEST_CAT_ONE', ['sml_cfg' => '000', 'cmb_cfg' => 'TEST_CAT_000'] + $value)->status, '값 행을 카테고리로');
+        $this->assertSame(400, $sys->request('POST', '/admin/api/sysCfg/TEST_CAT_ONE', ['sml_cfg' => '000', 'cmb_cfg' => 'TEST_CAT_000'] + $value)->status, 'POST 로 값 행을 카테고리로');
+        $this->assertSame(200, $sys->request('PATCH', '/admin/api/sysCfg/TEST_CAT_ONE', ['cfg_val' => '2'] + $value)->status);
+        $this->assertSame(400, $sys->request('PATCH', '/admin/api/sysCfg/SYS_AUTH_TOKEN_LIFETIME', ['cmb_cfg' => 'SYS_AUTH_TOKEN_LIFETIME', 'big_cfg' => 'SYS_AUTH', 'sml_cfg' => 'TOKEN_LIFETIME', 'cfg_name' => '토큰', 'cfg_type' => 'text', 'cfg_val' => 'abc'])->status, 'PATCH 값 검사');
+        $this->assertSame('ONE', TestDb::value("SELECT sml_cfg FROM tbl_sys_cfg WHERE cmb_cfg = 'TEST_CAT_ONE'"));
+
+        $sys->request('DELETE', '/admin/api/sysCfg/TEST_CAT_000');
+        $this->assertSame('1', TestDb::value("SELECT COUNT(*) FROM tbl_sys_cfg WHERE cmb_cfg = 'TEST_CAT_000'"), '값이 남으면 삭제 안 됨');
+        $this->assertSame(200, $sys->request('DELETE', '/admin/api/sysCfg/TEST_CAT_ONE')->status);
+        $this->assertSame(200, $sys->request('DELETE', '/admin/api/sysCfg/TEST_CAT_000')->status);
     }
 }

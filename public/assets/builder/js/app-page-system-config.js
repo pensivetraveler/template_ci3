@@ -1,4 +1,4 @@
-let fv, offCanvasEl;
+let fv, offCanvasEl, fvBigCfg, offCanvasBigCfg;
 
 $(function () {
     const formSelector = '#formRecord';
@@ -41,6 +41,8 @@ $(function () {
     $('.card-body').on('click', '.add-record', function () {
         if(!common.IDENTIFIER.length) throw new Error(`Identifier is not defined`);
         readyFrmInputs(formRecord, 'add', common.FORM_DATA);
+        // 보고 있는 탭의 카테고리를 미리 고른다
+        $(formRecord['big_cfg']).selectpicker('val', $(this).closest('.tab-pane').data('big-cfg'));
     });
 
     $('.card-body').on('click', '.edit-record', function() {
@@ -189,9 +191,11 @@ $(function () {
                         }
                     });
                 }else{
+                    // 환경값 검사(SysCfg::checkCfgValue)는 errors 에 이유를 담아 보낸다
+                    const errors = jqXHR.responseJSON.errors;
                     showAlert({
                         type: 'warning',
-                        text: jqXHR.responseJSON.msg,
+                        text: Array.isArray(errors) && errors.length ? errors.map(error => error.msg).join('\n') : jqXHR.responseJSON.msg,
                     });
                 }
             }
@@ -199,5 +203,108 @@ $(function () {
     }).on('core.form.invalid', function () {
         // if fields are invalid
         console.log('core.form.invalid')
+    });
+
+    // 다시 불러와도 보던 탭을 유지한다
+    const tabStorageKey = 'system-config-tab';
+    $('.system-code-nav [data-bs-toggle="tab"]').on('shown.bs.tab', function () {
+        try { sessionStorage.setItem(tabStorageKey, this.dataset.bsTarget); } catch (e) {}
+    });
+    try {
+        const savedTab = document.querySelector(`.system-code-nav [data-bs-target="${sessionStorage.getItem(tabStorageKey)}"]`);
+        if(savedTab) bootstrap.Tab.getOrCreateInstance(savedTab).show();
+    } catch (e) {}
+
+    // 카테고리(소구분 000)
+    const formBigCfgSelector = '#formBigCfg';
+    const offCanvasBigCfgEl = document.querySelector('#offcanvasBigCfg');
+    const formBigCfg = document.querySelector(formBigCfgSelector);
+    if(formBigCfg === null) throw new Error(`formBigCfg is not exist`);
+
+    onLoadedLayout(formBigCfg);
+    preparePlugins(formBigCfg);
+
+    offCanvasBigCfg = new bootstrap.Offcanvas(offCanvasBigCfgEl);
+
+    offCanvasBigCfgEl.addEventListener('show.bs.offcanvas', function(e) {
+        refreshPlugins(formBigCfg);
+        document.getElementById('offcanvasBigCfgLabel').textContent = getLocale(`${capitalize(formBigCfg['_mode'].value)} Record`, common.LOCALE);
+    });
+
+    offCanvasBigCfgEl.addEventListener('hidden.bs.offcanvas', function(e) {
+        resetFrmInputs(formBigCfg, common.EXTRA_FORMDATA);
+        fvBigCfg.resetForm(true);
+    });
+
+    $('.card-body').on('click', '.add-big-cfg', function () {
+        readyFrmInputs(formBigCfg, 'add', common.EXTRA_FORMDATA);
+    });
+
+    $('.card-body').on('click', '.edit-big-cfg', function () {
+        readyFrmInputs(formBigCfg, 'edit', common.EXTRA_FORMDATA);
+        fetchFrmValues(formBigCfg, {'cmb_cfg' : `${$(this).data('id')}_000`});
+    });
+
+    $('.card-body').on('click', '.delete-big-cfg', function () {
+        deleteData({'cmb_cfg' : `${$(this).data('id')}_000`}, {
+            callback: reload,
+        });
+    });
+
+    formBigCfg.addEventListener('readyFrmInputs', (e) => {
+        if(formBigCfg._mode.value !== 'edit') offCanvasBigCfg.show();
+    });
+
+    formBigCfg.addEventListener('fetchFrmValues', (e) => {
+        readyFrmInputs(formBigCfg, 'edit', common.EXTRA_FORMDATA);
+        applyFrmValues(formBigCfg, record, common.EXTRA_FORMDATA);
+        refreshPlugins(formBigCfg);
+        offCanvasBigCfg.show();
+    });
+
+    formBigCfg.addEventListener('transFrmValues', (e) => {
+        offCanvasBigCfg.hide();
+    });
+
+    fvBigCfg = FormValidation.formValidation(
+        formBigCfg,
+        {
+            fields: reformatFormData(formBigCfg, common.EXTRA_FORMDATA, common.FORM_REGEXP, true),
+            plugins: {
+                trigger: new FormValidation.plugins.Trigger(),
+                bootstrap5: new FormValidation.plugins.Bootstrap5({
+                    eleValidClass: '',
+                    rowSelector: function(field, ele) {
+                        return '.form-validation-unit';
+                    },
+                }),
+                submitButton: new FormValidation.plugins.SubmitButton(),
+                autoFocus: new FormValidation.plugins.AutoFocus(),
+            },
+        }
+    ).on('core.form.validating', function(event) {
+        const form = event.formValidation.form;
+        if(form['_event'] !== undefined) form['_event'].value = 'submit';
+    }).on('core.form.valid', function(event) {
+        updateFormLifeCycle('checkFrmValues', formBigCfg);
+
+        submitAjax(formBigCfgSelector, {
+            success: function(response) {
+                showAlert({
+                    type: 'success',
+                    title: 'Complete',
+                    text: formBigCfg['_mode'].value === 'edit' ? 'Your Data Is Updated' : 'Registered Successfully',
+                    callback: reload,
+                });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.warn(jqXHR.responseJSON)
+                // 키 형식(regex_match)·USER 차단은 화면 검사기가 없어 서버 문구를 그대로 보여 준다
+                showAlert({
+                    type: 'warning',
+                    text: [400, 422].includes(jqXHR.status) ? jqXHR.responseJSON.errors.map(error => error.msg).join('\n') : jqXHR.responseJSON.msg,
+                });
+            }
+        }, true);
     });
 });

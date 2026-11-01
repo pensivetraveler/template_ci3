@@ -63,7 +63,6 @@ $config['api_method_config'] = [
     'companies' => ['*' => ['*' => ['resource' => 'company']]],
     'users'    => ['*' => ['*' => ['resource' => 'myinfo', 'permission' => ['check' => false]]]],
     'sysCfg'   => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCfg']]]],
-    'userCfg'  => ['*' => ['*' => ['permission' => ['menu' => 'system/userCfg']]]],
     'sysCode'  => ['*' => ['*' => ['permission' => ['menu' => 'system/sysCode']]]],
     'menuList' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuList']]]],
     'menuAuth' => ['*' => ['*' => ['permission' => ['menu' => 'system/menuAuth']]]],

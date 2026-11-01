@@ -83,12 +83,6 @@ $config['admin_nav_menu'] = [
                 'isSuper' => true,
             ],
             [
-                'title' => 'UserCfg Management',
-                'class' => 'system',
-                'method' => 'userCfg',
-                'isSuper' => true,
-            ],
-            [
                 'title' => 'SysCode Management',
                 'class' => 'system',
                 'method' => 'sysCode',

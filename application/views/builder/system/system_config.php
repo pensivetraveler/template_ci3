@@ -20,20 +20,22 @@
 							<span class="d-none d-sm-block"><i class="icon-base ri ri-alert-fill text-danger icon-sm me-2"></i><?=lang('Caution')?></span>
 						</button>
 					</li>
-					<li class="nav-item">
+					<?php foreach ($category as $i=>$big): ?>
+					<li class="nav-item" data-id="<?=html_escape($big->big_cfg)?>">
 						<button
 							type="button"
 							class="nav-link py-6"
 							role="tab"
 							data-bs-toggle="tab"
-							data-bs-target="#navs-justified-config"
-							aria-controls="navs-justified-config"
+							data-bs-target="#navs-justified-config-<?=$i?>"
+							aria-controls="navs-justified-config-<?=$i?>"
 							aria-selected="false">
 							<span class="d-none d-sm-block">
-								환경값 설정
+								<?=html_escape($big->cfg_name)?> (<?=html_escape($big->big_cfg)?>)
 							</span>
 						</button>
 					</li>
+					<?php endforeach; ?>
 				</ul>
 			</div>
         </div>
@@ -47,13 +49,15 @@
 						<h6>변경 전에는 항상 데이터베이스 백업을 수행하고, 테스트 환경에서 충분히 검증한 후 운영 서버에 적용하시기 바랍니다.</h6>
 						<h6>설정값 입력 시 오타나 불완전한 정보가 입력되지 않도록, 값을 복사/붙여넣기 하신 후에도 재확인해 주십시오.</h6>
 						<h6 class="mb-0">의문사항이 있거나 수정이 어려우신 경우, 시스템 관리자 또는 개발 담당자에게 문의해 주시기 바랍니다.</h6>
+						<?php if($isSystemAdmin): ?>
+						<button type="button" class="add-big-cfg btn btn-primary data-submit me-sm-4 me-1 mt-8"><?=lang('Add Big Cd')?></button>
+						<?php endif; ?>
 					</div>
 				</div>
-				<div class="tab-pane" id="navs-justified-config" role="tabpanel">
-					<?php foreach ($data as $bigCfg=>$list): ?>
+				<?php foreach ($category as $i=>$big): ?>
+				<div class="tab-pane" id="navs-justified-config-<?=$i?>" role="tabpanel" data-big-cfg="<?=html_escape($big->big_cfg)?>">
 					<div class="p-4 mb-4">
-						<h5 class="text-primary fw-bolder"><?=html_escape($bigCfg)?></h5>
-						<?php foreach ($list as $item): ?>
+						<?php foreach ($data[$big->big_cfg] ?? [] as $item): ?>
 						<div class="row mb-3">
 							<label for="form_page-family_name" class="col-sm-2 col-form-label"><?=html_escape($item['cfg_name'])?></label>
 							<div class="col-sm-10">
@@ -69,18 +73,46 @@
 						</div>
 						<?php endforeach; ?>
 					</div>
-					<?php endforeach; ?>
 
 					<?php if($isSystemAdmin): ?>
 					<div class="row">
 						<div class="col-sm-12 text-end">
+							<?php if($big->registered): ?>
+							<button type="button" class="btn btn-outline-primary waves-effect me-2 edit-big-cfg" data-id="<?=html_escape($big->big_cfg)?>"><?=lang('Edit Big Cd')?></button>
+							<button type="button" class="btn btn-outline-danger waves-effect me-2 delete-big-cfg" data-id="<?=html_escape($big->big_cfg)?>"><?=lang('Delete Big Cd')?></button>
+							<?php endif; ?>
 							<button type="button" class="btn btn-outline-primary waves-effect add-record"><?=lang('Add')?></button>
 						</div>
 					</div>
 					<?php endif; ?>
 				</div>
+				<?php endforeach; ?>
 			</div>
         </div>
+
+		<!-- Modal to add category -->
+		<div
+				class="offcanvas offcanvas-end"
+				tabindex="-1"
+				id="offcanvasBigCfg"
+				data-bs-scroll="true"
+				data-bs-backdrop="true"
+				data-bs-keyboard="false"
+				aria-labelledby="offcanvasBigCfgLabel">
+			<div class="offcanvas-header border-bottom">
+				<h5 class="offcanvas-title" id="offcanvasBigCfgLabel"><?=lang('Add Record')?></h5>
+				<button
+					inert
+					type="button"
+					class="btn-close text-reset"
+					data-bs-dismiss="offcanvas"
+					aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body flex-grow-1">
+				<?php builder_view("builder/layout/form_side", ['formType' => 'side', 'formData' => $bigCfgFormData, 'formName' => 'formBigCfg']); ?>
+			</div>
+		</div>
+		<!--/ Modal to add category -->
 
 		<!-- Modal to add new record -->
 		<div

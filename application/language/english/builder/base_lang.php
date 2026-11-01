@@ -118,6 +118,7 @@ $lang['Add Big Cd'] = 'Add Category';
 $lang['Edit Big Cd'] = 'Edit Category';
 $lang['Delete Big Cd'] = 'Delete Category';
 $lang['You Should Delete Codes In The Category'] = 'You Should Delete Codes In The Category.';
+$lang['You Should Delete Configs In The Category'] = 'You Should Delete Configs In The Category.';
 $lang['What is System Code'] = 'What is System Code ?';
 $lang['What is System Config'] = 'What is System Config ?';
 $lang['View Record'] = 'View Record';

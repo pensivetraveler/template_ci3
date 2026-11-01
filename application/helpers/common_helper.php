@@ -298,7 +298,7 @@ if ( ! function_exists('mask_sensitive_fields'))
 if ( ! function_exists('user_cfg'))
 {
     /**
-     * 사용자 관련 환경값 (tbl_sys_cfg big_cfg = USER, 관리자 > 시스템 > 회원 설정).
+     * 사용자 관련 환경값 (tbl_sys_cfg big_cfg = USER, 관리자 > 시스템 > 환경값 설정).
      * 표가 없는 설치 전이나 값이 없으면 기본값. 한 요청 안에서는 한 번만 읽는다.
      */
     function user_cfg(string $name, string $default = ''): string
