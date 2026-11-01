@@ -92,8 +92,9 @@ class SysCfg extends Common
         if(($data['cfg_type'] ?? '') === 'dropdown') {
             // 수정 화면은 바뀐 칸만 보내므로, 선택지를 보내지 않았으면 저장된 값으로 본다
             $options = $data['cfg_options'] ?? null;
-            if($options === null && $key) {
-                $row = $this->Model->getData([], ['where' => ['cmb_cfg' => (string)($this->idData['cmb_cfg'] ?? $key)]]);
+            $cmbCfg = (string)($this->idData['cmb_cfg'] ?? $key);
+            if($options === null && $cmbCfg !== '' && $cmbCfg !== '0') {
+                $row = $this->Model->getData([], ['where' => ['cmb_cfg' => $cmbCfg]]);
                 $options = $row ? $row->cfg_options : null;
             }
             if(trim((string)$options) === '') $this->cfgError('cfg_options', '', '드롭다운은 선택지를 입력하세요.');

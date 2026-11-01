@@ -200,7 +200,7 @@ class PasswordFindTest extends ApiTestCase
         $this->assertSame("Y|사용\nN|사용 안 함", TestDb::value("SELECT cfg_options FROM tbl_sys_cfg WHERE cmb_cfg = 'TEST_DD_ONE'"), '줄바꿈 유지');
 
         // 수정 화면은 바뀐 칸만 보낸다
-        $edited = $sys->request('POST', '/admin/api/sysCfg/TEST_DD_ONE', ['cmb_cfg' => 'TEST_DD_ONE', 'big_cfg' => 'TEST_DD', 'sml_cfg' => 'ONE', 'cfg_name' => '값', 'cfg_type' => 'dropdown', 'cfg_val' => 'N']);
+        $edited = $sys->request('POST', '/admin/api/sysCfg?cmb_cfg=TEST_DD_ONE', ['cmb_cfg' => 'TEST_DD_ONE', 'big_cfg' => 'TEST_DD', 'sml_cfg' => 'ONE', 'cfg_name' => '값', 'cfg_type' => 'dropdown', 'cfg_val' => 'N']);
         $this->assertSame(200, $edited->status, $edited->body);
         $this->assertSame('N', TestDb::value("SELECT cfg_val FROM tbl_sys_cfg WHERE cmb_cfg = 'TEST_DD_ONE'"));
 
