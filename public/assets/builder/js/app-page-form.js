@@ -580,7 +580,7 @@ function applyFrmValues(form, data, fields = [], triggerEvent = true) {
                         });
                     }else{
                         if(groupAttrs[groupName].envelope_name) {
-                            if(!Object.hasOwn(data, groupName)) return;
+                            if(!data || !Object.hasOwn(data, groupName)) return;
 
                             let frmData = data[groupName];
                             if(groupAttrs[groupName].group_repeater) {
