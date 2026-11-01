@@ -702,7 +702,12 @@ class MY_Builder_API extends MY_Controller_API
                 continue;
             }
 
-            if(!is_object($value) && !is_array($value)) $data[$field] = trim(preg_replace('/\s\s+/', ' ', $value));
+            if(!is_object($value) && !is_array($value)) {
+                // 줄 구분이 뜻을 가지는 칸(모델의 multilineList)은 공백을 합치지 않는다. 브라우저가 보내는 CRLF 만 LF 로 맞춘다
+                $data[$field] = in_array($field, $model->multilineList, true)
+                    ? trim(str_replace("\r\n", "\n", $value))
+                    : trim(preg_replace('/\s\s+/', ' ', $value));
+            }
             // 빈 값(null·''·false·[])만 ''로 맞춘다. empty()는 '0'·0 도 비워서 문자열 컬럼에 0 을 저장할 수 없었음
             if(in_array($field, $model->strList) && empty($value) && !is_numeric($value)) $data[$field] = '';
             if(in_array($field, $model->intList)) {

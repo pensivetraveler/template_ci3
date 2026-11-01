@@ -26,6 +26,7 @@ $config['options'] = [
     'cfg_type' => [
         'text' => '텍스트',
         'password' => '비밀번호',
+        'dropdown' => '드롭다운',
     ],
     'target' => [
         '_self' => 'self',

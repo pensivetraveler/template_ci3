@@ -12,9 +12,10 @@ class Model_Sys_Cfg extends Model_Common
 	public array   $primaryKeyList = ['cmb_cfg'];
 	public array   $uniqueKeyList = [];
 	public array   $notNullList = ['cmb_cfg','big_cfg','sml_cfg','cfg_name','cfg_type'];
-	public array   $nullList = ['cfg_val','cfg_desc'];
-	public array   $strList = ['cmb_cfg','big_cfg','sml_cfg','cfg_name','cfg_type','cfg_val','cfg_desc',];
+	public array   $nullList = ['cfg_val','cfg_desc','cfg_options'];
+	public array   $strList = ['cmb_cfg','big_cfg','sml_cfg','cfg_name','cfg_type','cfg_val','cfg_desc','cfg_options',];
 	public array   $intList = [];
+	public array   $multilineList = ['cfg_options'];
 	public array   $fileList = [];
     public array   $defaultOrderBy = [
         ['big_cfg' => 'ASC'],

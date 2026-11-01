@@ -357,6 +357,12 @@ function resetFrmInputs(form, fields = []) {
         }
     })
 
+    // 값에 따라 보이던 칸을 처음처럼 숨긴다
+    fields.forEach(function(item) {
+        const target = item.form_attributes?.show_if_field;
+        if(target && form[target]) form[target].closest('.form-validation-unit')?.classList.add('d-none');
+    })
+
     // repeater 초기화
     if($('[data-repeater-type="jquery"]').length) {
         $('[data-repeater-type="jquery"]').attr('data-repeater-count', 1);

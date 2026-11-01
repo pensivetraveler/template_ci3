@@ -70,6 +70,7 @@ $lang['system'] = [
     'cfg_val' => 'Config Value',
     'cfg_desc' => 'Config Desc.',
     'cfg_type' => 'Config Type',
+    'cfg_options' => 'Dropdown Options',
     'cmb_cd' => 'Code Key',
     'big_cd' => 'Category',
     'sml_cd' => 'Sub Category',

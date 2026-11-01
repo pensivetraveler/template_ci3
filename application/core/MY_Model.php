@@ -12,6 +12,7 @@ class MY_Model extends CI_Model
     public array   $foreignKeyList = [];
     public array   $notNullList = [];
     public array   $nullList = [];
+    public array $multilineList = []; // 줄바꿈을 유지하는 칸 (MY_Builder_API 가 공백을 합치지 않음)
     public array   $strList = [];
     public array   $intList = [];
     public array   $fileList = [];

@@ -594,6 +594,18 @@ $config['form_sys_cfg_config'] = [
         'option_attributes' => [
             'option_type' => 'field',
         ],
+        'form_attributes' => [
+            'show_if_field' => 'cfg_options',
+            'show_if_value' => 'dropdown',
+        ],
+    ],
+    [
+        'field' => 'cfg_options',
+        'label' => 'lang:system.cfg_options',
+        'rules' => 'trim',
+        'type' => 'textarea',
+        'subtype' => 'autosize',
+        'form_text' => '드롭다운 선택지를 한 줄에 하나씩 값|표시명 으로 적습니다. 예: Y|사용',
     ],
 ];
 

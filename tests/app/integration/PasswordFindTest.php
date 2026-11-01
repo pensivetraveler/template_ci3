@@ -185,6 +185,29 @@ class PasswordFindTest extends ApiTestCase
         $this->assertSame(404, $sys->request('POST', '/admin/api/userCfg/save', [])->status);
     }
 
+    public function testDropdownTypeRequiresOptions(): void
+    {
+        $sys = $this->systemAdmin();
+        $sys->request('POST', '/admin/api/sysCfg', ['cmb_cfg' => 'TEST_DD_000', 'big_cfg' => 'TEST_DD', 'sml_cfg' => '000', 'cfg_name' => '시험', 'cfg_type' => 'text', 'cfg_val' => '', 'cfg_desc' => '']);
+        $value = ['cmb_cfg' => 'TEST_DD_ONE', 'big_cfg' => 'TEST_DD', 'sml_cfg' => 'ONE', 'cfg_name' => '값', 'cfg_val' => 'Y'];
+
+        $this->assertSame(400, $sys->request('POST', '/admin/api/sysCfg', $value + ['cfg_type' => 'dropdown', 'cfg_options' => ''])->status, '선택지 없음');
+        $this->assertSame(422, $sys->request('POST', '/admin/api/sysCfg', $value + ['cfg_type' => 'nope'])->status, '없는 유형');
+
+        $options = "Y|사용\r\nN|사용 안 함";
+        $added = $sys->request('POST', '/admin/api/sysCfg', $value + ['cfg_type' => 'dropdown', 'cfg_options' => $options]);
+        $this->assertSame(201, $added->status, $added->body);
+        $this->assertSame("Y|사용\nN|사용 안 함", TestDb::value("SELECT cfg_options FROM tbl_sys_cfg WHERE cmb_cfg = 'TEST_DD_ONE'"), '줄바꿈 유지');
+
+        // 수정 화면은 바뀐 칸만 보낸다
+        $edited = $sys->request('POST', '/admin/api/sysCfg/TEST_DD_ONE', ['cmb_cfg' => 'TEST_DD_ONE', 'big_cfg' => 'TEST_DD', 'sml_cfg' => 'ONE', 'cfg_name' => '값', 'cfg_type' => 'dropdown', 'cfg_val' => 'N']);
+        $this->assertSame(200, $edited->status, $edited->body);
+        $this->assertSame('N', TestDb::value("SELECT cfg_val FROM tbl_sys_cfg WHERE cmb_cfg = 'TEST_DD_ONE'"));
+
+        $this->assertSame(200, $sys->request('DELETE', '/admin/api/sysCfg/TEST_DD_ONE')->status);
+        $this->assertSame(200, $sys->request('DELETE', '/admin/api/sysCfg/TEST_DD_000')->status);
+    }
+
     public function testCategoryRules(): void
     {
         $sys = $this->systemAdmin();

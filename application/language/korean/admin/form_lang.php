@@ -70,6 +70,7 @@ $lang['system'] = [
     'cfg_val' => '환경설정 값',
     'cfg_desc' => '환경설정 설명',
     'cfg_type' => '환경설정 유형',
+    'cfg_options' => '드롭다운 선택지',
     'cmb_cd' => '코드 Key',
     'big_cd' => '대구분',
     'sml_cd' => '소구분',
