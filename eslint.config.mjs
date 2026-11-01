@@ -6,7 +6,7 @@ const ownFiles = ['public/assets/builder/js/**/*.js', 'public/assets/admin/js/**
 
 // 화면 스크립트는 모듈 없이 전역을 함께 쓴다. 파일 맨 위에 선언한 이름을 전역으로 알려 주면 no-undef 가 오타만 잡는다
 const sharedGlobals = {};
-for (const file of globSync([...ownFiles, 'public/assets/base/js/*.js'], { exclude: (name) => name.endsWith('.bak.js') })) {
+for (const file of globSync([...ownFiles, 'public/assets/base/js/*.js'])) {
     for (const [, name] of readFileSync(file, 'utf8').matchAll(/^(?:async\s+)?(?:function\*?|class|let|const|var)\s+([\w$]+)/gm)) {
         sharedGlobals[name] = 'writable';
     }
@@ -17,8 +17,8 @@ for (const file of globSync([...ownFiles, 'public/assets/base/js/*.js'], { exclu
 
 export default [
     {
-        // app-page-helpers 는 어디서도 불러오지 않는 vendor/js/helpers.js 사본, app-calendar·app-charts 는 테마 예제다
-        ignores: ['**/*.bak.js', '**/vendor/**', '**/libs/**', 'public/assets/base/**', '**/app-page-helpers.js', '**/app-calendar*.js', '**/app-charts.js'],
+        // app-calendar·app-charts 는 테마 예제다
+        ignores: ['**/vendor/**', '**/libs/**', 'public/assets/base/**', '**/app-calendar*.js', '**/app-charts.js'],
     },
     js.configs.recommended,
     {
@@ -48,6 +48,7 @@ export default [
                 ClipboardJS: 'readonly',
                 PerfectScrollbar: 'readonly',
                 TemplateCustomizer: 'readonly',
+                Helpers: 'readonly',
                 MegaDropdown: 'readonly',
                 Menu: 'readonly',
                 monthSelectPlugin: 'readonly',
