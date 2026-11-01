@@ -878,6 +878,9 @@ class MY_Builder_API extends MY_Controller_API
     {
         $dto = $this->beforeModify($key, $dto);
 
+        // 없는 행·삭제된 행 수정은 404. 권한 표처럼 행을 먼저 만드는 곳이 있어 beforeModify 다음에 확인한다
+        if(count($this->idData)) $this->checkDataExist(['where' => $this->idData], null, true);
+
         $this->checkDataScopeValues($dto, false);
         $this->checkUserGradeTarget();
         $this->checkUserGradeValue($dto);

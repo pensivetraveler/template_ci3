@@ -120,7 +120,9 @@
 - [x] (2026-11-01: `setCurrentMenu`가 `$commonMethods`도 현재 메뉴로 인정, USR001 실제 파일 다운로드 확인) 시스템 관리자가 아니면 `{화면}/downloader/{file_id}`가 파일 대신 대시보드로 이동
 - [ ] `tbl_user.approve_yn`: 가입 때 N 으로 넣지만 로그인이 확인하지 않음. 승인 절차가 필요한 프로젝트가 생기면 넣을 것
 - [ ] `web_form_config`의 `form_signup_config`에 예전 프로젝트 필드(`code`·`grade`, 없는 `student` 표 검사)가 남아 있어 가입을 켜면 필수값·500 → 가입을 쓰는 프로젝트가 생기면 정리
-- [ ] `PUT /api/boards/999999`처럼 없는 행 수정이 200 "수정되었습니다"를 돌려줌 (2026-11-01 관찰, `/admin/api/*`도 같은 경로로 보임)
+- [x] (2026-11-01: modify 에서 beforeModify 다음에 행을 확인해 404. 삭제된 행이 실제로 수정되던 것도 같이 막힘) `PUT /api/boards/999999`처럼 없는 행 수정이 200 "수정되었습니다"를 돌려줌 (2026-11-01 관찰, `/admin/api/*`도 같은 경로로 보임)
+- [ ] `api/Common::message_read_patch` 없는 메시지도 성공 응답 (modify 를 거치지 않는 전용 경로, 2026-11-01 코드로 확인, 위험 작음)
+- [ ] `MenuAuth` 없는 menu_id 로 PATCH 하면 `ensureAuthRow`가 고아 권한 행을 만들고 200 (PartnerAuth 도 같은 구조로 보임, 2026-11-01 관찰)
 
 ### 구조
 - [ ] `MY_Builder_API`(약 2000줄), `MY_Builder_WEB`(약 1300줄) 기능별 분리 (Validator, Exporter, 권한 서비스)
