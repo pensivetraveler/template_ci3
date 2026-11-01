@@ -258,6 +258,7 @@ $config['route_config'] = [
                 'category' => 'list',
                 'type' => 'table',
                 'subtype' => 'datatable',
+                'resourceConfig' => 'company',
                 'buttons' => [
                     'excel' => false,
                 ],
@@ -267,6 +268,7 @@ $config['route_config'] = [
                 ],
                 'properties' => [
                     'formExist' => true,
+                    'formConfig' => 'company',
                 ]
             ]
         ]

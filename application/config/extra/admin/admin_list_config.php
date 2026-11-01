@@ -146,24 +146,24 @@ $config['list_company_config'] = [
         'subtype'  => 'identifier',
     ],
     [
-        'field' => 'comp_code',
-        'label' => 'lang:company.comp_code',
+        'field' => 'company_code',
+        'label' => 'lang:company.company_code',
     ],
     [
-        'field' => 'comp_name',
-        'label' => 'lang:company.comp_name',
+        'field' => 'company_name',
+        'label' => 'lang:company.company_name',
     ],
     [
-        'field' => 'comp_ceo',
-        'label' => 'lang:company.comp_ceo',
+        'field' => 'company_ceo',
+        'label' => 'lang:company.company_ceo',
     ],
     [
-        'field' => 'comp_tel',
-        'label' => 'lang:company.comp_tel',
+        'field' => 'company_bizno',
+        'label' => 'lang:company.company_bizno',
     ],
     [
-        'field' => 'comp_addr',
-        'label' => 'lang:company.comp_addr',
+        'field' => 'company_addr1',
+        'label' => 'lang:company.company_addr1',
     ],
 ];
 
