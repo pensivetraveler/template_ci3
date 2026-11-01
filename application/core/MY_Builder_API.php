@@ -1085,25 +1085,35 @@ class MY_Builder_API extends MY_Controller_API
             'params' => $idExist ? json_encode($this->idData, JSON_UNESCAPED_UNICODE) : null,
         ]);
 
-        $this->purgeUserLogs();
+        $this->purgeLogs();
     }
 
     /**
-     * 보관 기간(회원 설정 LOG_KEEP_DAYS)이 지난 사용자 로그를 지운다. 비었거나 0 이면 지우지 않는다.
-     * 예약 실행 환경이 없어 로그를 남길 때 하루 한 번, 요청이 길어지지 않게 1000행까지만 지운다
+     * 보관 기간(회원 설정 LOG_KEEP_DAYS)이 지난 사용자 로그·요청 로그를 지운다. 비었거나 0 이면 지우지 않는다.
+     * 예약 실행 환경이 없어 로그를 남길 때 지운다
      */
-    protected function purgeUserLogs(): void
+    protected function purgeLogs(): void
     {
         $days = (int)user_cfg('LOG_KEEP_DAYS');
         if($days <= 0) return;
 
-        $today = date('Y-m-d');
-        if($this->cache->file->get('user_logs_purged') === $today) return;
-        $this->cache->file->save('user_logs_purged', $today, 172800);
+        $before = time() - $days * 86400;
+        $this->purgeLogRows('user_logs_purged', $this->db, $this->Model_User_Logs->table, 'datetime', date('Y-m-d H:i:s', $before));
+        if($this->config->item('rest_enable_logging')) {
+            $this->purgeLogRows('rest_logs_purged', $this->rest->db, $this->config->item('rest_logs_table'), 'time', $before);
+        }
+    }
 
-        $this->db->where('datetime <', date('Y-m-d H:i:s', time() - $days * 86400))
-            ->limit(1000)
-            ->delete($this->Model_User_Logs->table);
+    /**
+     * 요청이 길어지지 않게 한 번에 1000행까지만 지운다. 더 남았으면 다음 요청에서 잇고, 다 지운 날은 다시 보지 않는다
+     */
+    protected function purgeLogRows(string $cacheKey, $db, string $table, string $column, $before): void
+    {
+        $today = date('Y-m-d');
+        if($this->cache->file->get($cacheKey) === $today) return;
+
+        $db->where($column.' <', $before)->limit(1000)->delete($table);
+        if($db->affected_rows() < 1000) $this->cache->file->save($cacheKey, $today, 172800);
     }
 
     protected function beforeResponse($data, $isFetch = false)

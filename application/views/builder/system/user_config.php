@@ -33,11 +33,11 @@
                     <div class="form-text">메일 설정이 있으면 재설정 링크를 메일로 보내고, 없으면 확인 후 재설정 화면을 바로 보여 줍니다. 메일 없이는 시스템 관리자 계정을 재설정할 수 없습니다.</div>
                 </div>
 
-                <h5 class="text-primary fw-bolder mt-6">사용자 로그</h5>
+                <h5 class="text-primary fw-bolder mt-6">로그 보관</h5>
                 <div class="mb-6">
                     <label class="form-label" for="log_keep_days">보관 기간(일)</label>
                     <input class="form-control w-px-200" type="number" min="0" id="log_keep_days" value="<?=html_escape($logKeepDays)?>">
-                    <div class="form-text">기간이 지난 로그는 하루 한 번 1,000건씩 지웁니다. 비우거나 0이면 지우지 않습니다. 법적 보관 의무가 있으면 그 기간 이상으로 정하세요.</div>
+                    <div class="form-text">사용자 로그와 요청 로그에 함께 적용합니다. 기간이 지난 로그는 요청을 처리할 때 1,000건씩 나누어 지웁니다. 비우거나 0이면 지우지 않습니다. 법적 보관 의무가 있으면 그 기간 이상으로 정하세요.</div>
                 </div>
                 <div class="text-end">
                     <button type="submit" class="btn btn-primary" id="btnSaveUserCfg"><?=lang('Submit')?></button>

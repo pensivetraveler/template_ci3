@@ -50,6 +50,38 @@ class AdminRecordTest extends ApiTestCase
         $this->assertSame(json_encode(['administrator_id' => (string)$id]), TestDb::value("SELECT params FROM tbl_user_logs WHERE class = 'administrators' AND type = 'update' ORDER BY id DESC LIMIT 1"));
     }
 
+    public function testExpiredLogsArePurgedAcrossRequests(): void
+    {
+        [$id] = self::makeUser('USR001');
+        $client = $this->login($id);
+        $old = time() - 40 * 86400;
+        $oldDate = date('Y-m-d H:i:s', $old);
+        TestDb::exec("DELETE FROM tbl_rest_logs");
+        TestDb::exec("DELETE FROM tbl_user_logs");
+        // 1000행 넘게 밀린 요청 로그는 한 번에 다 지워지지 않고 다음 요청에서 이어진다
+        for ($i = 0; $i < 11; $i++) {
+            TestDb::exec("INSERT INTO tbl_rest_logs (uri, method, api_key, time) VALUES ".implode(',', array_fill(0, 100, "('old', 'get', '', $old)")));
+        }
+        TestDb::exec("INSERT INTO tbl_rest_logs (uri, method, api_key, time) VALUES ('keep', 'get', '', ".(time() - 86400).")");
+        TestDb::exec("INSERT INTO tbl_user_logs (log_id, user_id, class, method, type, title, datetime) VALUES (0, 1, 'old', 'index', '', '', '$oldDate'), (0, 1, 'keep', 'index', '', '', NOW())");
+        $this->setUserCfg(['LOG_KEEP_DAYS' => '30']);
+        @unlink(APPPATH.'cache/user_logs_purged');
+        @unlink(APPPATH.'cache/rest_logs_purged');
+
+        try {
+            $this->assertSame(200, $client->request('GET', '/admin/api/administrators')->status);
+            $this->assertSame('100', TestDb::value("SELECT COUNT(*) FROM tbl_rest_logs WHERE uri = 'old'"));
+            $this->assertSame('0', TestDb::value("SELECT COUNT(*) FROM tbl_user_logs WHERE class = 'old'"));
+
+            $this->assertSame(200, $client->request('GET', '/admin/api/administrators')->status);
+            $this->assertSame('0', TestDb::value("SELECT COUNT(*) FROM tbl_rest_logs WHERE uri = 'old'"));
+            $this->assertSame('1', TestDb::value("SELECT COUNT(*) FROM tbl_rest_logs WHERE uri = 'keep'"));
+            $this->assertSame('1', TestDb::value("SELECT COUNT(*) FROM tbl_user_logs WHERE class = 'keep'"));
+        } finally {
+            $this->clearUserCfg();
+        }
+    }
+
     public function testMissingAndDeletedRowsAre404(): void
     {
         $sys = $this->systemAdmin();

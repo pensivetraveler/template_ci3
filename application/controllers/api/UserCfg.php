@@ -40,7 +40,7 @@ class UserCfg extends Common
         $this->saveCfg('SIGNUP_EMAIL_YN', '가입 필드: 이메일 사용', $emailYn);
         $this->saveCfg('SIGNUP_TEL_YN', '가입 필드: 전화번호 사용', $telYn);
         $this->saveCfg('PASSWORD_FIND_MODE', '비밀번호 찾기 방식 (show, reset)', $mode);
-        $this->saveCfg('LOG_KEEP_DAYS', '사용자 로그 보관 기간(일)', $keepDays);
+        $this->saveCfg('LOG_KEEP_DAYS', '로그 보관 기간(일)', $keepDays);
 
         $this->response(['code' => DATA_EDITED]);
     }
@@ -49,7 +49,7 @@ class UserCfg extends Common
     {
         $key = 'USER_'.$sml;
         if($this->Model->getCntWhere(['cmb_cfg' => $key])) {
-            $this->Model->modData(['cfg_val' => $value], ['cmb_cfg' => $key]);
+            $this->Model->modData(['cfg_name' => $name, 'cfg_val' => $value], ['cmb_cfg' => $key]);
         }else{
             $this->Model->addData([
                 'cmb_cfg' => $key,

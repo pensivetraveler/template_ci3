@@ -399,5 +399,5 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] (2026-10-26 C-5-2: form 규칙은 한 번, 모델별 필수·고유값만 모델마다) `MY_Builder_API::beforePost/beforePut` `validateFormRules()`가 파이프라인 모델 수만큼 같은 formConfig로 반복 실행
 - [x] (2026-10-26 C-5-3: Common::getUserLoginId 요청 단위 캐시, Comments는 이미 일괄 조회. bizsoft Partners는 bizsoft에서) `api/Common::transformView` 행마다 사용자 2회 조회(N+1), `Comments::transformList`(행당 3회+), `Partners::transformView`(회사 수만큼) → 목록 크기에 비례한 쿼리 수
 - [x] (2026-11-01 결정: 조회는 모두 남기고 USR000 은 운영에서 남기지 않는 지금 정책 유지. 회원 설정에 보관 기간 추가, 대상 식별자를 params 에 기록, MenuList 기록 누락 수정) (2026-10-26 C-5-4 보류: 조회 로그 정책 결정 필요 — 후보: 단건만 남기기 + api_method_config로 엔티티별 조정) `MY_Builder_API::loggingUserlog` 모든 GET(DataTable 재조회·옵션 조회 포함)마다 user_log INSERT, `log_id`는 RestController 요청 로그 id(`rest_enable_logging` 꺼져 있으면 `''`). `MenuList::beforeResponse`는 parent를 부르지 않아 메뉴 변경 로그 누락
-- [ ] `tbl_rest_logs`(요청 로그)는 지우는 기능이 없어 계속 늘어남 (2026-11-01 확인, 사용자 로그 보관 기간과 별개)
+- [x] (2026-11-01: 회원 설정 보관 기간을 함께 적용, 밀린 행은 요청마다 1000행씩 이어서 지움) `tbl_rest_logs`(요청 로그)는 지우는 기능이 없어 계속 늘어남
 - [x] (2026-10-26 C-5-5: 기본키가 하나면 URL 키를 그 값으로, 복합키는 쿼리 파라미터) `MY_Builder_API::checkIdentifierExist` non-AI 모델은 URL key를 무시하고 GET의 PK 파라미터만 사용 → `SysCode::beforeRemove`처럼 `$key`와 `idData`가 서로 다른 출처에서 올 수 있음
