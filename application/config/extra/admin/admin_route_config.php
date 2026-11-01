@@ -35,6 +35,11 @@ $config['route_config'] = [
                 'type' => 'auth',
                 'subtype' => 'find_password',
             ],
+            'resetPassword' => [
+                'category' => 'form',
+                'type' => 'auth',
+                'subtype' => 'reset_password',
+            ],
         ],
     ],
 	'dashboard' => [

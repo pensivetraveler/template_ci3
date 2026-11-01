@@ -290,35 +290,136 @@ class Auth extends Common
         if(signup_field_enabled('tel')) $params['tel'] = $this->input->post('tel');
         if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
 
-        $count = $this->Model->getCntWhere($params);
+        // 찾기 방식은 회원 설정 화면에서 정한다. 정하지 않았으면 비밀번호 표시 또는 문의
+        if(user_cfg('PASSWORD_FIND_MODE') === 'reset') $this->requestPasswordReset($params);
 
-        if(!$count) {
-            $this->response(['code' => USER_NOT_EXIST,]);
-        }else{
-            if(PASSWORD_DECRYPTABLE) {
-                $stored = $this->Model->getDataWhere(['password'], $params);
-                $password = $this->encryption->decrypt($stored);
+        if(!$this->Model->getCntWhere($params)) $this->response(['code' => USER_NOT_EXIST]);
 
-                $this->response([
-                    'code' => DATA_RETRIEVED,
-                    'data' => [
-                        'result' => [
-                            'password' => get_starred_password($password),
-                        ],
-                        'redirect_to' => '',
-                    ],
-                ]);
-            }else{
-                // 이메일 활성되어있다면 이메일로 발송
-                // TODO email check and send email
+        $stored = PASSWORD_DECRYPTABLE ? $this->Model->getDataWhere(['password'], $params) : '';
+        $password = $stored && !is_password_hash($stored) ? $this->encryption->decrypt($stored) : false;
+        if($password === false) $this->askAdministrator();
 
-                // 관리자에게 문의해달라고 팝업
-                $this->response([
-                    'code' => BAD_REQUEST,
-                    'msg' => '관리자에게 문의해주세요.',
+        $this->response([
+            'code' => DATA_RETRIEVED,
+            'data' => [
+                'result' => [
+                    'password' => get_starred_password($password),
+                ],
+                'redirect_to' => '',
+            ],
+        ]);
+    }
+
+    private function askAdministrator(): void
+    {
+        $this->response([
+            'code' => BAD_REQUEST,
+            'msg' => '관리자에게 문의해주세요.',
+        ]);
+    }
+
+    /**
+     * 메일 설정이 있으면 링크를 메일로 보내고(계정 유무와 관계없이 같은 응답), 없으면 재설정 화면으로 보낸다.
+     * 메일 없이는 시스템 관리자 계정을 재설정하지 않는다
+     */
+    private function requestPasswordReset(array $params): void
+    {
+        if(!$this->db->table_exists('password_reset')) $this->askAdministrator();
+
+        $this->load->model('Model_Password_Reset');
+        $user = $this->Model->getDataWhere([], array_merge($params, ['withdraw_yn' => 'N']));
+        $path = $this->config->item('password_reset_path');
+
+        if(password_reset_mail_ready()) {
+            if($user && !$this->isPasswordResetCoolingDown($user->user_id)) {
+                $token = $this->createPasswordResetToken($user->user_id, 1800);
+                $this->sendEmail([
+                    'to' => $user->email,
+                    'subject' => '비밀번호 재설정 안내',
+                    'template' => 'password_reset',
+                    'doc_id' => $user->user_id,
+                    'no_bcc' => true,
+                    'link' => rtrim(getenv('APP_URL'), '/').'/'.$path.'?token='.$token,
+                    'minutes' => 30,
                 ]);
             }
+            $this->response([
+                'code' => DATA_PROCESSED,
+                'msg' => '입력하신 정보가 맞으면 재설정 링크를 메일로 보냈습니다.',
+            ]);
         }
+
+        if(!$user) $this->response(['code' => USER_NOT_EXIST]);
+        if($user->user_cd === 'USR000') $this->askAdministrator();
+
+        $token = $this->createPasswordResetToken($user->user_id, 600);
+        $this->response([
+            'code' => DATA_PROCESSED,
+            'data' => [
+                'redirect_to' => base_url($path).'?token='.$token,
+            ],
+        ]);
+    }
+
+    private function isPasswordResetCoolingDown($userId): bool
+    {
+        return $this->Model_Password_Reset->getCntWhere([
+            'user_id' => $userId,
+            'created_dt >' => date('Y-m-d H:i:s', time() - 60),
+        ]) > 0;
+    }
+
+    /**
+     * 새 토큰을 만들고 이전 토큰은 지운다. 원문은 돌려주기만 하고 저장하지 않는다
+     */
+    private function createPasswordResetToken($userId, int $lifetime): string
+    {
+        $token = bin2hex(random_bytes(32));
+        $this->db->where('user_id', $userId)->delete($this->Model_Password_Reset->table);
+        $this->Model_Password_Reset->addData([
+            'user_id' => $userId,
+            'token_hash' => hash('sha256', $token),
+            'expires_dt' => date('Y-m-d H:i:s', time() + $lifetime),
+            'request_ip' => $this->input->ip_address(),
+            'created_dt' => date('Y-m-d H:i:s'),
+        ]);
+        return $token;
+    }
+
+    public function resetPassword_post()
+    {
+        if(!find_password_enabled() || user_cfg('PASSWORD_FIND_MODE') !== 'reset' || !$this->db->table_exists('password_reset')) show_404();
+
+        $this->load->model('Model_Password_Reset');
+        $this->load->model('Model_User_Token');
+
+        $invalid = ['code' => BAD_REQUEST, 'msg' => '링크가 만료되었거나 이미 사용되었습니다. 비밀번호 찾기를 다시 해 주세요.'];
+        $row = $this->Model_Password_Reset->findValid((string)$this->input->post('token'));
+        if(!$row) $this->response($invalid);
+
+        $this->validateFormRules('form_reset_password_config');
+
+        // 같은 토큰으로 동시에 들어와도 한 번만 쓰이도록 먼저 지운다
+        $this->db->where('reset_id', $row->reset_id)->delete($this->Model_Password_Reset->table);
+        if($this->db->affected_rows() < 1 || !$this->Model->getCntWhere(['user_id' => $row->user_id, 'withdraw_yn' => 'N'])) $this->response($invalid);
+
+        $this->Model->modData([
+            'password' => create_hash($this->input->post('password')),
+        ], [
+            'user_id' => $row->user_id,
+        ]);
+
+        // 이전 비밀번호로 만든 자동 로그인·API 토큰은 쓰지 못하게 한다
+        $this->db->where('user_id', $row->user_id)->delete($this->Model_User_Autologin->table);
+        $this->db->where('user_id', $row->user_id)->delete($this->Model_User_Token->table);
+
+        $this->response([
+            'code' => DATA_EDITED,
+            'data' => [
+                'notice' => '비밀번호를 변경했습니다. 새 비밀번호로 로그인해 주세요.',
+                'redirect_to' => base_url($this->flag.'/auth/login'),
+            ],
+        ]);
     }
 
     public function withdraw_post()

@@ -57,6 +57,7 @@ $lang['m ago'] = '분 전';
 $lang['just now'] = '방금 전';
 $lang['My Info'] = '내 정보';
 $lang['Find ID'] = '아이디 찾기';
+$lang['Reset Password'] = '비밀번호 재설정';
 $lang['Find Password'] = '비밀번호 찾기';
 $lang['Administrator'] = '관리자';
 $lang['Registration'] = '등록';

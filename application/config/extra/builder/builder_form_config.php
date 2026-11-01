@@ -307,6 +307,34 @@ $config['form_find_id_config'] = [
     ],
 ];
 
+$config['form_reset_password_config'] = [
+    [
+        'field' => 'password',
+        'label' => 'lang:user.password',
+        'rules' => 'trim|required|min_length[4]|max_length[15]|strong_password',
+        'category' => 'base',
+        'type' => 'password',
+        'icon' => 'ri-lock-password-line',
+        'form_text' => 'Please enter 4 to 15 characters, including letters and numbers',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+    ],
+    [
+        'field' => 'password_confirm',
+        'label' => 'lang:user.password_confirm',
+        'rules' => 'trim|required|password_matches[password]',
+        'category' => 'base',
+        'type' => 'password',
+        'icon' => 'ri-lock-password-fill',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+    ],
+];
+
 $config['form_find_password_config'] = [
     [
         'field' => 'user_cd',

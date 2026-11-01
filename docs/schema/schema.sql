@@ -4,7 +4,7 @@
 -- 기본 행은 seed.sql. 시스템 관리자(USR000)는 설치 화면(Setup addSystemUser)에서 만든다.
 -- 규칙: DB 구조를 바꾸면 이 파일과 docs/migrations/<날짜>-<주제>.sql 을 같이 고친다 (docs/schema/README.md).
 -- 게시판 표(board·article·article_attachment·article_read·comment)는 playtalktalk 구조와 템플릿 모델·API 를 맞춰 2026-10-29 설계.
--- 아직 없는 표(모델은 있음, 기준 DB에 없음): reply, message, language_code, log_email, sys_version, sys_version_current, uuid_token
+-- 아직 없는 표(모델은 있음, 기준 DB에 없음): reply, message, language_code, sys_version, sys_version_current, uuid_token
 -- 문장 안에 세미콜론을 쓰지 않는다 (설치 화면 addTables 가 ; 로 나눠 실행)
 
 SET NAMES utf8mb4;
@@ -404,3 +404,26 @@ CREATE TABLE `tbl_user_refresh_token` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='user refresh token';
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `tbl_password_reset` (
+  `reset_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'auto_increment',
+  `user_id` bigint(20) unsigned NOT NULL COMMENT 'User Key',
+  `token_hash` char(64) NOT NULL COMMENT '재설정 토큰의 SHA-256',
+  `expires_dt` datetime NOT NULL COMMENT '만료 일시',
+  `request_ip` char(45) NOT NULL DEFAULT '' COMMENT '요청 IP',
+  `created_dt` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
+  PRIMARY KEY (`reset_id`),
+  UNIQUE KEY `uk_password_reset_token` (`token_hash`),
+  KEY `idx_password_reset_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `tbl_log_email` (
+  `log_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'auto_increment',
+  `email_type` varchar(100) NOT NULL COMMENT '메일 종류 (뷰 이름)',
+  `doc_id` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT '관련 행 Key',
+  `email_address` varchar(100) NOT NULL COMMENT '받는 주소',
+  `success_yn` enum('Y','N') NOT NULL COMMENT '성공 여부',
+  `debug_message` longtext DEFAULT NULL COMMENT '실패 내용',
+  `created_dt` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

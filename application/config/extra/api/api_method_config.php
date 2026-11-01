@@ -50,6 +50,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 // 회원가입으로 만들 회원 등급. 비어 있으면 회원가입을 받지 않는다(404). 관리자 등급(USR000·USR001·USR002)을 넣지 말 것
 $config['signup_user_cd'] = getenv('SIGNUP_USER_CD') ?: '';
+// 비밀번호 재설정 화면 경로. 웹 로그인 화면이 있는 프로젝트는 그쪽으로 바꾼다
+$config['password_reset_path'] = 'admin/auth/resetPassword';
 
 $config['api_method_config'] = [
     // 시스템 설정 화면(route system 의 메서드)이 쓰는 API → 메뉴 system/{메서드} (isSuper 메뉴라 시스템 관리자만)
@@ -73,7 +75,9 @@ $config['api_method_config'] = [
         'login'         => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         'signup'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
         'findId'        => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
-        'findPassword'  => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 10, 'time' => 60]],
+        // 비밀번호 찾기·재설정은 계정을 바꿀 수 있어 IP 별 300초에 5회
+        'findPassword'  => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 5, 'time' => 300]],
+        'resetPassword' => ['post' => ['auth' => 'none', 'key' => false, 'log' => false, 'limit' => 5, 'time' => 300]],
         'passwordCheck' => ['post' => ['auth' => 'none', 'key' => false, 'log' => false]],
         // 로그인 상태에서 쓰는 엔드포인트: 인증은 rest_auth(session) 그대로
         'withdraw'      => ['post' => ['key' => false, 'log' => false]],

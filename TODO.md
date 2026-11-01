@@ -23,7 +23,8 @@
     - 되돌릴 수 없는 작업이므로 실행 전 확인 프롬프트, 재실행 시 안전(멱등)하게
 - [x] 순서: 비밀번호 일괄 전환 → `.env` 변경 (bizsoft 운영 2026-10-17: bcrypt 전환 후 `PASSWORD_DECRYPTABLE=FALSE`)
 - [x] `.env.production`이 git 추적 중이라 서버에서 수정하면 `git pull` 시 충돌/덮어쓰기 위험 → 4번 항목과 함께 정리 (`57b0483`)
-- [ ] 해시 모드의 `findPassword_post`: 현재 "관리자에게 문의" 응답 → 이메일 재설정 링크(토큰) 방식 검토 (`Auth.php` TODO 주석)
+- [x] (2026-11-01: 시스템 > 회원 설정에서 표시·재설정 선택. 재설정은 MAIL_HOST·APP_URL 이 있으면 메일 링크, 없으면 화면 직접(USR000 제외). 마이그레이션 2026-11-01-password-reset.sql, 2026-11-01-user-cfg-menu.sql) 해시 모드의 `findPassword_post`: 현재 "관리자에게 문의" 응답 → 이메일 재설정 링크(토큰) 방식 검토 (`Auth.php` TODO 주석)
+    - [ ] 메일 없는 재설정은 세 값(전화번호를 끄면 두 값)을 아는 사람이 USR001·USR002 까지 바꿀 수 있음 (2026-11-01 사용자 결정으로 USR000 만 제외). 메일 방식도 응답 시간으로 계정 유무를 추측할 수 있음 (발송 큐 없음)
 - [x] `composer.json`에 `"ext-mbstring": "*"` 추가 (`get_starred_*`가 `mb_*` 사용, 2026-10-26)
 
 ## 2. API 권한(인가) 검사

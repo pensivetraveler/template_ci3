@@ -66,6 +66,30 @@ class Auth extends Common
         $this->viewApp($data);
     }
 
+    public function resetPassword()
+    {
+        if($this->isLoggedIn) redirect($this->loggedInRedirect);
+        if(!find_password_enabled() || user_cfg('PASSWORD_FIND_MODE') !== 'reset' || !$this->db->table_exists('password_reset')) show_404();
+
+        $this->load->model('Model_Password_Reset');
+        $token = (string)$this->input->get('token');
+        if(!$this->Model_Password_Reset->findValid($token)) {
+            alert('링크가 만료되었거나 이미 사용되었습니다. 비밀번호 찾기를 다시 해 주세요.', base_url($this->noLoginRedirect));
+        }
+
+        $this->addJsVars([
+            'API_URI_ADD' => 'resetPassword',
+            'REDIRECT_URI' => base_url($this->noLoginRedirect),
+        ]);
+
+        $data['subPage'] = 'admin/auth/reset_password';
+        $data['backLink'] = WEB_HISTORY_BACK;
+        $data['token'] = $token;
+        $data['formData'] = restructure_admin_form_data($this->jsVars['FORM_DATA'], 'page');
+
+        $this->viewApp($data);
+    }
+
     public function findPassword()
     {
         if($this->isLoggedIn) redirect($this->loggedInRedirect);

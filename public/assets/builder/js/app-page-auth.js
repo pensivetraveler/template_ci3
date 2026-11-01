@@ -116,7 +116,14 @@ $(function() {
                 console.log(response)
 				if(response.data !== undefined && response.data.length > 0) {
 					const data = response.data[0];
-					if(data.result !== undefined) {
+					if(data.notice !== undefined) {
+						showAlert({
+							type: 'success',
+							html: escapeHtml(data.notice),
+							callback: redirect,
+							params: data.redirect_to??common.REDIRECT_URI??null,
+						})
+					}else if(data.result !== undefined) {
 						let key = Object.keys(data.result)[0];
 						let val = data.result[key];
 						showAlert({

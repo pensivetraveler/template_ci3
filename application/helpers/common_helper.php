@@ -315,6 +315,17 @@ if ( ! function_exists('find_password_enabled'))
     }
 }
 
+if ( ! function_exists('password_reset_mail_ready'))
+{
+    /**
+     * 재설정 링크를 메일로 보낼 수 있는지. 링크는 요청 Host 가 아니라 APP_URL 로만 만든다 (Host 조작 방지)
+     */
+    function password_reset_mail_ready(): bool
+    {
+        return (bool)getenv('MAIL_HOST') && (bool)getenv('APP_URL');
+    }
+}
+
 if ( ! function_exists('filter_auth_form'))
 {
     /**
