@@ -32,6 +32,8 @@ class MenuList extends Common
         $this->Model_Partner_Auth->truncate();
 
         $this->cache->file->delete('menu_done');
+        $this->loggingUserlog();
+
         $this->response(['code' => DATA_PROCESSED]);
     }
 
@@ -63,6 +65,8 @@ class MenuList extends Common
         }
 
         if(count($changed)) $this->cachingMenu();
+
+        $this->loggingUserlog();
 
         $this->response([
             'code' => DATA_PROCESSED,
@@ -96,6 +100,8 @@ class MenuList extends Common
         }
 
         if(count($added)) $this->cachingMenu();
+
+        $this->loggingUserlog();
 
         $this->response(['code' => DATA_PROCESSED, 'data' => $added]);
     }
@@ -200,6 +206,8 @@ class MenuList extends Common
 
         $this->cachingMenu();
 
+        $this->loggingUserlog();
+
         $this->response(['code' => DATA_PROCESSED]);
     }
 
@@ -284,7 +292,7 @@ class MenuList extends Common
     {
         if(!$isFetch) $this->cachingMenu();
 
-        return $data;
+        return parent::beforeResponse($data, $isFetch);
     }
 
     protected function cachingMenu()

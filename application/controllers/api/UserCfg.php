@@ -25,9 +25,13 @@ class UserCfg extends Common
         $emailYn = $this->input->post('signup_email_yn');
         $telYn = $this->input->post('signup_tel_yn');
         $mode = (string)$this->input->post('password_find_mode');
+        $keepDays = trim((string)$this->input->post('log_keep_days'));
 
         if(!in_array($emailYn, ['Y', 'N'], true) || !in_array($telYn, ['Y', 'N'], true) || !in_array($mode, ['', 'show', 'reset'], true)) {
             $this->response(['code' => BAD_REQUEST, 'msg' => '설정값이 올바르지 않습니다.'], RestController::HTTP_BAD_REQUEST);
+        }
+        if($keepDays !== '' && !ctype_digit($keepDays)) {
+            $this->response(['code' => BAD_REQUEST, 'msg' => '로그 보관 기간은 0 이상의 정수(일)로 입력하세요.'], RestController::HTTP_BAD_REQUEST);
         }
         if($mode === 'show' && !PASSWORD_DECRYPTABLE) {
             $this->response(['code' => BAD_REQUEST, 'msg' => '복호화할 수 없는 저장 방식에서는 비밀번호 표시를 고를 수 없습니다.'], RestController::HTTP_BAD_REQUEST);
@@ -36,6 +40,7 @@ class UserCfg extends Common
         $this->saveCfg('SIGNUP_EMAIL_YN', '가입 필드: 이메일 사용', $emailYn);
         $this->saveCfg('SIGNUP_TEL_YN', '가입 필드: 전화번호 사용', $telYn);
         $this->saveCfg('PASSWORD_FIND_MODE', '비밀번호 찾기 방식 (show, reset)', $mode);
+        $this->saveCfg('LOG_KEEP_DAYS', '사용자 로그 보관 기간(일)', $keepDays);
 
         $this->response(['code' => DATA_EDITED]);
     }

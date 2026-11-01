@@ -47,6 +47,7 @@ class System extends Common
         $data['signupTelYn'] = signup_field_enabled('tel') ? 'Y' : 'N';
         $data['passwordFindMode'] = user_cfg('PASSWORD_FIND_MODE');
         $data['canShowPassword'] = (bool)PASSWORD_DECRYPTABLE;
+        $data['logKeepDays'] = user_cfg('LOG_KEEP_DAYS');
 
         $this->addJS['tail'][] = [
             base_url('public/assets/builder/js/app-page-user-config.js'),

@@ -11,6 +11,7 @@ $(function() {
                 signup_email_yn: form.signup_email_yn.checked ? 'Y' : 'N',
                 signup_tel_yn: form.signup_tel_yn.checked ? 'Y' : 'N',
                 password_find_mode: mode ? mode.value : '',
+                log_keep_days: form.log_keep_days.value,
             },
             success: function(response) {
                 showAlert({

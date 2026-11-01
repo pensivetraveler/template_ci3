@@ -1078,7 +1078,29 @@ class MY_Builder_API extends MY_Controller_API
             'message' => $message ?? '',
             'log_id' => $this->_insert_id,
             'type' => $type ?? '',
+            // 대상 행의 식별자만 남긴다 (요청 본문에는 비밀번호가 섞일 수 있다)
+            'params' => $idExist ? json_encode($this->idData, JSON_UNESCAPED_UNICODE) : null,
         ]);
+
+        $this->purgeUserLogs();
+    }
+
+    /**
+     * 보관 기간(회원 설정 LOG_KEEP_DAYS)이 지난 사용자 로그를 지운다. 비었거나 0 이면 지우지 않는다.
+     * 예약 실행 환경이 없어 로그를 남길 때 하루 한 번, 요청이 길어지지 않게 1000행까지만 지운다
+     */
+    protected function purgeUserLogs(): void
+    {
+        $days = (int)user_cfg('LOG_KEEP_DAYS');
+        if($days <= 0) return;
+
+        $today = date('Y-m-d');
+        if($this->cache->file->get('user_logs_purged') === $today) return;
+        $this->cache->file->save('user_logs_purged', $today, 172800);
+
+        $this->db->where('datetime <', date('Y-m-d H:i:s', time() - $days * 86400))
+            ->limit(1000)
+            ->delete($this->Model_User_Logs->table);
     }
 
     protected function beforeResponse($data, $isFetch = false)
