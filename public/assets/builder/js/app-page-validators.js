@@ -1,3 +1,8 @@
+// 일치 검증의 비교 대상. 그룹 이름으로 묶인 입력(group[field])도 찾는다
+function findCompareField(form, field) {
+	return form.querySelector(`[name="${field}"]`) ?? form.querySelector(`[name$="[${field}]"]`);
+}
+
 const customValidatorsPreset = {
 	inflector: function(name) {
 		let res = '';
@@ -70,7 +75,7 @@ const customValidatorsPreset = {
 			options : function(form, item, matches) {
 				return {
 					compare: function() {
-						return form.querySelector(`[name="${matches[1]}"]`).value;
+						return findCompareField(form, matches[1]).value;
 					},
 				};
 			},
@@ -81,7 +86,7 @@ const customValidatorsPreset = {
 			options : function(form, item, matches) {
 				return {
 					compare: function() {
-						return form.querySelector(`[name="${matches[1]}"]`).value;
+						return findCompareField(form, matches[1]).value;
 					},
 				};
 			},

@@ -6,7 +6,7 @@
 			<div class="form-floating form-floating-outline">
 				<?php
 					echo form_password([
-						'name' => $password['field'],
+						'name' => $password['name'],
 						'id' => $password['id'],
 					], $password['default'], $password['attributes']);
 				?>
@@ -26,7 +26,7 @@
 			<div class="form-floating form-floating-outline">
 				<?php
 					echo form_password([
-						'name' => $password_confirm['field'],
+						'name' => $password_confirm['name'],
 						'id' => $password_confirm['id'],
 					], $password_confirm['default'], $password_confirm['attributes']);
 				?>

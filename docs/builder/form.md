@@ -390,6 +390,8 @@ JS 가 직접 읽는 attributes:
 | false | false | `field` | `form_side-field` |
 | true | false | `group[field]` | `form_side-group-field` |
 | true | true | `group[0][field]` | `form_side-group-0-field` |
+
+`envelope_name=true`이면 그룹 값이 한 덩어리(`group` 키)로 넘어온다. 서버는 풀어서 컬럼에 나눠 저장하지 않으므로, 메뉴 `attr`처럼 받을 컬럼이나 컨트롤러 처리가 있어야 한다. `new_password`·`addr_daum`처럼 컬럼이 나뉜 그룹은 `false`로 쓴다. `repeater_jquery` 뷰는 jquery-repeater 가 이름을 `group[순번][field]`로 바꾸므로 `field`를 그대로 출력한다.
 | false | true | `field[0]` | `form_side-field-0` |
 
 이 name 을 실제로 쓰는 뷰는 `form_side_group_base.php`(`get_side_form_input_by_type()` 경유)뿐이다. `addr_daum`, `new_password`, `reply_list`, `repeater_base`, `repeater_jquery` 의 일반 입력과 모든 custom 뷰는 `$item['field']` 를 name 으로 쓴다. jquery 리피터는 `data-repeater-list="{group}"` 로 플러그인이 name 을 `group[i][field]` 로 바꾼다.

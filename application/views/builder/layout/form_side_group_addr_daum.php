@@ -5,7 +5,7 @@
 		<div class="form-floating form-floating-outline">
 			<?php
 				echo form_input([
-					'name' => $zipcode['field'],
+					'name' => $zipcode['name'],
 					'id' => $zipcode['id'],
 				], $zipcode['default'], $zipcode['attributes']);
 				echo form_label(lang($zipcode['label']), $zipcode['id']);
@@ -23,7 +23,7 @@
 		<div class="form-floating form-floating-outline">
 			<?php
 				echo form_input([
-					'name' => $addr1['field'],
+					'name' => $addr1['name'],
 					'id' => $addr1['id'],
 				], $addr1['default'], $addr1['attributes']);
 				echo form_label(lang($addr1['label']), $addr1['id']);
@@ -34,7 +34,7 @@
 		<div class="form-floating form-floating-outline">
 			<?php
 				echo form_input([
-					'name' => $addr2['field'],
+					'name' => $addr2['name'],
 					'id' => $addr2['id'],
 				], $addr2['default'], $addr2['attributes']);
 				echo form_label(lang($addr2['label']), $addr2['id']);

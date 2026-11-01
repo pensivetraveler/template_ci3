@@ -5,7 +5,7 @@
 		<?php
 			echo get_admin_form_ico($password);
 			echo form_password([
-				'name' => $password['field'],
+				'name' => $password['name'],
 				'id' => $password['id'],
 			], $password['default'], $password['attributes']);
 		?>
@@ -21,7 +21,7 @@
 		<?php
 			echo get_admin_form_ico($password_confirm);
 			echo form_password([
-				'name' => $password_confirm['field'],
+				'name' => $password_confirm['name'],
 				'id' => $password_confirm['id'],
 			], $password_confirm['default'], $password_confirm['attributes']);
 		?>

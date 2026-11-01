@@ -19,7 +19,7 @@
             <?php
                 echo form_textarea(
                     [
-                        'name' => $reply_content['field'],
+                        'name' => $reply_content['name'],
                         'id' => $reply_content['id'],
                         'rows' => $reply_content['attributes']['rows']
                     ],
