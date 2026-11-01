@@ -113,7 +113,7 @@
 - [x] (2026-11-01 결정: 삭제한 회원의 아이디 재사용 유지. 삭제되지 않은 행에서만 값을 갖는 생성 컬럼 `active_id`·`active_email`에 UNIQUE, `docs/migrations/2026-11-01-user-unique-active.sql`, 파생 프로젝트는 확인 쿼리로 기존 중복을 본 뒤 실행) `tbl_user.id`·`email` 고유 인덱스 없음
 - [ ] `Model_Child` 수정 경로는 쓰는 엔티티가 없어 미시험
 - [x] (2026-11-01: 화면을 가리키는 메뉴가 따로 있으면 그 메뉴를 볼 수 있어야 함 `findPageMenus`) 같은 class 메뉴를 하나만 볼 수 있어도 옆 메뉴 화면이 열림 (`logs/userAccess`로 `logs/errors`, `system/menuAuth`로 `system/sysCfg`·`sysCode`·`menuList`). `setCurrentMenu`가 route 안의 method면 다른 메뉴를 대신 인정
-- [ ] 시스템 관리자가 아니면 `{화면}/downloader/{file_id}`가 파일 대신 대시보드로 이동 (2026-11-01 관찰, 없는 file_id 로 시험): `setCurrentMenu`가 `$commonMethods`를 몰라 현재 메뉴가 비어 `setupPlatformPage`가 redirect
+- [x] (2026-11-01: `setCurrentMenu`가 `$commonMethods`도 현재 메뉴로 인정, USR001 실제 파일 다운로드 확인) 시스템 관리자가 아니면 `{화면}/downloader/{file_id}`가 파일 대신 대시보드로 이동
 - [ ] `tbl_user.approve_yn`: 가입 때 N 으로 넣지만 로그인이 확인하지 않음. 승인 절차가 필요한 프로젝트가 생기면 넣을 것
 - [ ] `web_form_config`의 `form_signup_config`에 예전 프로젝트 필드(`code`·`grade`, 없는 `student` 표 검사)가 남아 있어 가입을 켜면 필수값·500 → 가입을 쓰는 프로젝트가 생기면 정리
 - [ ] `PUT /api/boards/999999`처럼 없는 행 수정이 200 "수정되었습니다"를 돌려줌 (2026-11-01 관찰, `/admin/api/*`도 같은 경로로 보임)

@@ -1402,6 +1402,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 $this->router->method === $this->routeConfig['properties']['baseMethod']
                 ||
                 in_array($this->router->method, array_keys($this->routeConfig['methods']))
+                ||
+                in_array($this->router->method, $this->commonMethods, true)
             ) {
                 // 같은 class 메뉴가 여럿이면(frameLogs/summary·traffics 등) method 가 같은 메뉴를 우선 (권한 행이 메뉴마다 다름)
                 $currentExact = !empty($this->currentMenu) && $this->router->method === ($this->currentMenu['method'] ?? null);
