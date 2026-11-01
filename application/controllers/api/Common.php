@@ -123,12 +123,14 @@ class Common extends MY_Builder_API
 
     protected function sendEmail($dto = [])
     {
+        $this->load->library('email');
         $this->email->initialize([
             'protocol'  => 'smtp',
             'smtp_host' => getenv('MAIL_HOST'),
-            'smtp_port' => getenv('MAIL_PORT'),
-            'smtp_user' => getenv('MAIL_USERNAME'),
-            'smtp_pass' => getenv('MAIL_PASSWORD'),
+            'smtp_port' => getenv('MAIL_PORT') ?: 25,
+            'smtp_user' => (string)getenv('MAIL_USERNAME'),
+            'smtp_pass' => (string)getenv('MAIL_PASSWORD'),
+            'smtp_crypto' => (string)getenv('MAIL_ENCRYPTION'),
             'mailtype'  => 'html',
             'charset'   => 'utf-8',
             'newline'   => "\r\n",
@@ -136,7 +138,8 @@ class Common extends MY_Builder_API
         // 발신자·숨은참조는 .env 로 정한다 (MAIL_FROM_ADDRESS, MAIL_FROM_NAME, MAIL_BCC)
         $this->email->from(getenv('MAIL_FROM_ADDRESS') ?: getenv('MAIL_USERNAME'), getenv('MAIL_FROM_NAME') ?: (getenv('APP_NAME_KR') ?: ''));
         $this->email->to($dto['to']);
-        if(getenv('MAIL_BCC')) $this->email->bcc(getenv('MAIL_BCC'));
+        // 재설정 링크처럼 본인만 받아야 하는 메일은 no_bcc
+        if(getenv('MAIL_BCC') && empty($dto['no_bcc'])) $this->email->bcc(getenv('MAIL_BCC'));
 
         $this->email->subject($dto['subject']);
         $this->email->message($this->load->view("email/{$dto['template']}", $dto, true));
@@ -144,7 +147,14 @@ class Common extends MY_Builder_API
         $this->load->model('Model_Email_Log');
 
         $debug_message = '';
-        if (!$this->email->send()) $debug_message = $this->email->print_debugger();
+        // 본문(재설정 링크 등)이 기록에 남지 않게 헤더만 남긴다. 발송 실패는 호출한 쪽 응답에 영향을 주지 않는다
+        // 메일 서버에 연결하지 못할 때 나는 PHP 경고가 오류 응답이 되지 않게 한다
+        $reporting = error_reporting(0);
+        if (!$this->email->send(false)) $debug_message = $this->email->print_debugger(['headers']);
+        error_reporting($reporting);
+        $this->email->clear();
+
+        if (!$this->db->table_exists($this->Model_Email_Log->table)) return;
 
         $this->Model_Email_Log->addData([
             'email_type' => $dto['template'],
