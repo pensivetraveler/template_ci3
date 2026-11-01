@@ -237,7 +237,7 @@ class Auth extends Common
     }
 
     /**
-     * 가입 필드 설정(환경값 USER 카테고리)에 맞춘 폼 항목으로 검증한다
+     * 가입 필드 설정(환경값 SYS_USER 카테고리)에 맞춘 폼 항목으로 검증한다
      */
     private function validateAuthForm(string $configName, string $form): void
     {
@@ -293,7 +293,7 @@ class Auth extends Common
         if(signup_field_enabled('tel')) $params['tel'] = $this->input->post('tel');
         if($this->input->post('user_cd')) $params['user_cd'] = $this->input->post('user_cd');
 
-        // 찾기 방식은 환경값 USER_PASSWORD_FIND_MODE 로 정한다. 정하지 않았으면 비밀번호 표시 또는 문의
+        // 찾기 방식은 환경값 SYS_USER_PASSWORD_FIND_MODE 로 정한다. 정하지 않았으면 비밀번호 표시 또는 문의
         if(user_cfg('PASSWORD_FIND_MODE') === 'reset') $this->requestPasswordReset($params);
 
         if(!$this->Model->getCntWhere($params)) $this->response(['code' => USER_NOT_EXIST]);

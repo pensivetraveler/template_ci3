@@ -83,14 +83,14 @@ abstract class ApiTestCase extends TestCase
     protected function setUserCfg(array $values): void
     {
         foreach ($values as $sml => $value) {
-            $key = 'USER_'.$sml;
-            TestDb::exec("REPLACE INTO tbl_sys_cfg (cmb_cfg, big_cfg, sml_cfg, cfg_name, cfg_val, cfg_type, created_id) VALUES ('$key', 'USER', '$sml', '$sml', '".TestDb::esc($value)."', 'text', 1)");
+            $key = 'SYS_USER_'.$sml;
+            TestDb::exec("REPLACE INTO tbl_sys_cfg (cmb_cfg, big_cfg, sml_cfg, cfg_name, cfg_val, cfg_type, created_id) VALUES ('$key', 'SYS_USER', '$sml', '$sml', '".TestDb::esc($value)."', 'text', 1)");
         }
     }
 
     protected function clearUserCfg(): void
     {
-        TestDb::exec("DELETE FROM tbl_sys_cfg WHERE big_cfg = 'USER'");
+        TestDb::exec("DELETE FROM tbl_sys_cfg WHERE big_cfg = 'SYS_USER' AND sml_cfg <> 'TOKEN_LIFETIME' AND sml_cfg <> '000'");
     }
 
     protected function assertNoPlainPassword(string $password, ApiResponse $response): void

@@ -241,6 +241,22 @@ class AdminRecordTest extends ApiTestCase
         @unlink($file);
     }
 
+    public function testTokenLifetimeReadsSysUserKey(): void
+    {
+        [$id, $pk] = self::makeUser('USR001');
+        $client = $this->login($id);
+        $before = TestDb::value("SELECT cfg_val FROM tbl_sys_cfg WHERE cmb_cfg = 'SYS_USER_TOKEN_LIFETIME'");
+        TestDb::exec("UPDATE tbl_user_token SET created_dt = DATE_SUB(NOW(), INTERVAL 2 HOUR) WHERE user_id = $pk");
+        try {
+            TestDb::exec("UPDATE tbl_sys_cfg SET cfg_val = '0' WHERE cmb_cfg = 'SYS_USER_TOKEN_LIFETIME'");
+            $this->assertSame(200, $client->request('GET', '/admin/api/administrators')->status, '0 은 만료 없음');
+            TestDb::exec("UPDATE tbl_sys_cfg SET cfg_val = '3600' WHERE cmb_cfg = 'SYS_USER_TOKEN_LIFETIME'");
+            $this->assertSame(403, $client->request('GET', '/admin/api/administrators')->status, '1시간 지난 토큰은 만료');
+        } finally {
+            TestDb::exec("UPDATE tbl_sys_cfg SET cfg_val = '".TestDb::esc((string)$before)."' WHERE cmb_cfg = 'SYS_USER_TOKEN_LIFETIME'");
+        }
+    }
+
     public function testPartnerAuthScreenHasPartnerFilter(): void
     {
         $page = $this->systemAdmin()->request('GET', '/admin/partnerAuth');

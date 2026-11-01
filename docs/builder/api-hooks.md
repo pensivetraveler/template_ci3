@@ -749,7 +749,7 @@ $config['api_method_config'] = [
 - 부모·자식 표의 수정 대상은 메인 행이 가리키는 행으로 정한다 (`executeModify()`). 본문의 `user_id` 같은 부모 키는 대상 지정에도 저장에도 쓰지 않는다.
 - 본문의 식별자·부모 키가 비어 있지 않은데 수정 대상과 다르면 검증 전에 403 `reason=body_key` (`checkBodyKeys()`). 등록은 부모 키를 받지 않는다. `is_unique`가 이 값으로 자기 행을 제외하므로, 그대로 두면 다른 회원의 `id`로 바꿀 수 있기 때문이다.
 - 업로드 설정에 `'private' => true`를 넣은 필드는 `application/uploads/{화면}/{연도}/`에 저장하고, `file_link`는 `{플랫폼}/{화면}/downloader/{file_id}`로 응답한다. 받으려면 로그인, 올린 화면과 같은 주소, 그 화면 읽기 권한이 필요하고, 행 단위 소유 확인은 화면 컨트롤러에서 `canDownloadFile($file)`을 재정의한다. S3를 쓰면 CDN에서 `application/uploads` 경로를 막아야 하고, nginx는 `application/` 차단을 서버 설정에 넣어야 한다. 이미 올린 파일은 옮기지 않는다.
-- 가입 필드와 비밀번호 찾기 방식은 시스템 > 환경값 설정의 USER 카테고리(`tbl_sys_cfg` `big_cfg=USER`)에서 정한다. 이메일을 쓰지 않으면 비밀번호 찾기, 전화번호를 쓰지 않으면 아이디 찾기가 404다. 재설정은 `MAIL_HOST`와 `APP_URL`이 있으면 메일 링크(`APP_URL` 기준), 없으면 재설정 화면으로 바로 보내고 시스템 관리자는 제외한다. 값을 정하지 않으면 복호화 가능한 행은 일부를 가린 비밀번호, 아니면 "관리자에게 문의"다.
+- 가입 필드와 비밀번호 찾기 방식은 시스템 > 환경값 설정의 SYS_USER 카테고리(`tbl_sys_cfg` `big_cfg=SYS_USER`)에서 정한다. 이메일을 쓰지 않으면 비밀번호 찾기, 전화번호를 쓰지 않으면 아이디 찾기가 404다. 재설정은 `MAIL_HOST`와 `APP_URL`이 있으면 메일 링크(`APP_URL` 기준), 없으면 재설정 화면으로 바로 보내고 시스템 관리자는 제외한다. 값을 정하지 않으면 복호화 가능한 행은 일부를 가린 비밀번호, 아니면 "관리자에게 문의"다.
 - 이름에 `password`가 들어간 필드와 `token`·`secret`·`api_key`·`authorization`은 요청 로그(`tbl_rest_logs`)와 오류 응답에서 가린다 (`is_sensitive_field()`). 다른 민감 필드가 있으면 이 함수에 추가한다.
 - `/api/auth/*`는 `.env WEB_AUTH_API`를 켠 프로젝트만 받고, 끄면 404다 (`permission.web`). `/admin/api/auth/*`와 가입은 이 값과 관계없다.
 - 회원가입은 `.env SIGNUP_USER_CD`가 있을 때만 `/api/auth/signup`으로 받고, 등급은 요청 값 대신 이 값으로 저장한다. 받는 값은 `form_signup_config`의 아이디·비밀번호·이름·이메일·전화번호이고, 템플릿에 가입 화면은 없다. 비어 있으면 404, `/admin/api/auth/signup`은 항상 404. 관리자 등급(`USR000`~`USR002`)을 넣지 않는다.
@@ -812,7 +812,7 @@ API의 `formConfig`도 화면과 같은 `BuilderColumnsTrait::setFormColumn()`�
 ### 인증 토큰 유효기간 (2026-10-28)
 
 - 로그인할 때 발급하는 토큰(`user_token`, `MY_Controller::setToken`)은 발급 시각(`created_dt`)부터 유효 시간(초, 0이면 만료 없음)가 지나면 만료된다(`common_helper` `is_token_expired`). 쓰는 동안 늘어나지 않는다(발급 후 고정 시간).
-- 유효 시간은 `common_helper` `token_lifetime()`이 시스템 환경값(`tbl_sys_cfg` `SYS_AUTH_TOKEN_LIFETIME`, 관리자 > 시스템 > 환경값 설정) → `.env` `TOKEN_LIFETIME` → 43200(12시간) 순서로 정한다. 환경값이 비었거나 숫자가 아니면 다음으로 넘어간다(숫자가 아니면 error 로그). 저장할 때 `api/SysCfg`가 0 이상 정수만 받는다. 행은 `docs/migrations/2026-10-28-sys-cfg-token-lifetime.sql`로 넣는다.
+- 유효 시간은 `common_helper` `token_lifetime()`이 시스템 환경값(`tbl_sys_cfg` `SYS_USER_TOKEN_LIFETIME`, 관리자 > 시스템 > 환경값 설정) → `.env` `TOKEN_LIFETIME` → 43200(12시간) 순서로 정한다. 환경값이 비었거나 숫자가 아니면 다음으로 넘어간다(숫자가 아니면 error 로그). 저장할 때 `api/SysCfg`가 0 이상 정수만 받는다. 행은 `docs/migrations/2026-10-28-sys-cfg-token-lifetime.sql`로 넣는다.
 - 값을 바꾸면 다음 요청부터 이미 발급된 토큰에도 적용된다(발급 시각 기준이라 줄이면 바로 만료될 수 있음).
 - API: API 키 검사가 켜져 있으면(`rest_enable_keys`, 운영) 만료 토큰은 키가 없는 것과 같다(`RestController::_detect_api_key`).
 - 화면: `MY_Builder_WEB` 생성자가 만료를 보면 로그인 값만 지우고(`clearLoginSession`), 자동 로그인 쿠키가 있으면 새 토큰으로 다시 로그인한다. 없으면 "로그인 유효 시간이 지나 로그아웃되었습니다" 후 로그인 화면.

@@ -22,10 +22,9 @@ INSERT INTO `tbl_sys_code` (`cmb_cd`, `big_cd`, `sml_cd`, `cd_name`, `cd_val`, `
 ('USR002', 'USR', '002', '파트너', NULL, NULL, NULL, 2, 'Y', NOW());
 
 INSERT INTO `tbl_sys_cfg` (`cmb_cfg`, `big_cfg`, `sml_cfg`, `cfg_name`, `cfg_type`, `cfg_val`, `cfg_desc`, `created_dt`, `created_id`) VALUES
-('SYS_AUTH_TOKEN_LIFETIME', 'SYS_AUTH', 'TOKEN_LIFETIME', '토큰 유효 시간(초)', 'text', '43200', '로그인 후 이 시간이 지나면 다시 로그인(자동 로그인 쿠키가 있으면 새 토큰). 초 단위, 43200 = 12시간, 0 = 만료 없음, 비우면 .env TOKEN_LIFETIME', NOW(), 0),
-('SYS_AUTH_000', 'SYS_AUTH', '000', '인증', 'text', NULL, NULL, NOW(), 0),
-('USER_000', 'USER', '000', '회원', 'text', NULL, NULL, NOW(), 0),
-('USER_LOG_KEEP_DAYS', 'USER', 'LOG_KEEP_DAYS', '로그 보관 기간(일)', 'text', '', '사용자 로그와 요청 로그에 함께 적용합니다. 기간이 지난 로그는 요청을 처리할 때 1,000건씩 나누어 지웁니다. 비우거나 0이면 지우지 않습니다. 법적 보관 의무가 있으면 그 기간 이상으로 정하세요.', NOW(), 0),
-('USER_PASSWORD_FIND_MODE', 'USER', 'PASSWORD_FIND_MODE', '비밀번호 찾기 방식', 'text', '', 'show(비밀번호 일부 가려 표시, 복호화할 수 있는 저장 방식에서만) 또는 reset(메일 설정이 있으면 재설정 링크를 메일로 보내고, 없으면 확인 후 재설정 화면을 보여 줌. 메일 없이는 시스템 관리자 계정을 재설정할 수 없음). 비우면 비밀번호 표시 또는 문의 안내입니다.', NOW(), 0),
-('USER_SIGNUP_EMAIL_YN', 'USER', 'SIGNUP_EMAIL_YN', '가입 필드: 이메일 사용', 'text', 'Y', 'Y 또는 N. N 이면 비밀번호 찾기를 쓸 수 없고, 아이디 찾기는 이름과 전화번호로 확인합니다.', NOW(), 0),
-('USER_SIGNUP_TEL_YN', 'USER', 'SIGNUP_TEL_YN', '가입 필드: 전화번호 사용', 'text', 'Y', 'Y 또는 N. N 이면 아이디 찾기를 쓸 수 없습니다.', NOW(), 0);
+('SYS_USER_TOKEN_LIFETIME', 'SYS_USER', 'TOKEN_LIFETIME', '토큰 유효 시간(초)', 'text', '43200', '로그인 후 이 시간이 지나면 다시 로그인(자동 로그인 쿠키가 있으면 새 토큰). 초 단위, 43200 = 12시간, 0 = 만료 없음, 비우면 .env TOKEN_LIFETIME', NOW(), 0),
+('SYS_USER_000', 'SYS_USER', '000', '회원·인증', 'text', NULL, NULL, NOW(), 0),
+('SYS_USER_LOG_KEEP_DAYS', 'SYS_USER', 'LOG_KEEP_DAYS', '로그 보관 기간(일)', 'text', '', '사용자 로그와 요청 로그에 함께 적용합니다. 기간이 지난 로그는 요청을 처리할 때 1,000건씩 나누어 지웁니다. 비우거나 0이면 지우지 않습니다. 법적 보관 의무가 있으면 그 기간 이상으로 정하세요.', NOW(), 0),
+('SYS_USER_PASSWORD_FIND_MODE', 'SYS_USER', 'PASSWORD_FIND_MODE', '비밀번호 찾기 방식', 'text', '', 'show(비밀번호 일부 가려 표시, 복호화할 수 있는 저장 방식에서만) 또는 reset(메일 설정이 있으면 재설정 링크를 메일로 보내고, 없으면 확인 후 재설정 화면을 보여 줌. 메일 없이는 시스템 관리자 계정을 재설정할 수 없음). 비우면 비밀번호 표시 또는 문의 안내입니다.', NOW(), 0),
+('SYS_USER_SIGNUP_EMAIL_YN', 'SYS_USER', 'SIGNUP_EMAIL_YN', '가입 필드: 이메일 사용', 'text', 'Y', 'Y 또는 N. N 이면 비밀번호 찾기를 쓸 수 없고, 아이디 찾기는 이름과 전화번호로 확인합니다.', NOW(), 0),
+('SYS_USER_SIGNUP_TEL_YN', 'SYS_USER', 'SIGNUP_TEL_YN', '가입 필드: 전화번호 사용', 'text', 'Y', 'Y 또는 N. N 이면 아이디 찾기를 쓸 수 없습니다.', NOW(), 0);

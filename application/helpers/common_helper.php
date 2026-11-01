@@ -319,7 +319,7 @@ if ( ! function_exists('csp_nonce'))
 if ( ! function_exists('user_cfg'))
 {
     /**
-     * 사용자 관련 환경값 (tbl_sys_cfg big_cfg = USER, 관리자 > 시스템 > 환경값 설정).
+     * 사용자 관련 환경값 (tbl_sys_cfg big_cfg = SYS_USER, 관리자 > 시스템 > 환경값 설정).
      * 표가 없는 설치 전이나 값이 없으면 기본값. 한 요청 안에서는 한 번만 읽는다.
      */
     function user_cfg(string $name, string $default = ''): string
@@ -330,7 +330,7 @@ if ( ! function_exists('user_cfg'))
             $values = [];
             $CI =& get_instance();
             if (isset($CI->db) && $CI->db->table_exists('sys_cfg')) {
-                $rows = $CI->db->select('sml_cfg, cfg_val')->where('big_cfg', 'USER')->get('sys_cfg')->result();
+                $rows = $CI->db->select('sml_cfg, cfg_val')->where('big_cfg', 'SYS_USER')->get('sys_cfg')->result();
                 foreach ($rows as $row) $values[$row->sml_cfg] = trim((string)$row->cfg_val);
             }
         }
@@ -400,7 +400,7 @@ if ( ! function_exists('token_lifetime'))
 {
     /**
      * 인증 토큰 유효 시간(초), 0 이면 만료 없음.
-     * 시스템 환경값(tbl_sys_cfg SYS_AUTH_TOKEN_LIFETIME, 관리자 > 시스템 > 환경값 설정) → .env TOKEN_LIFETIME → 기본 12시간(43200).
+     * 시스템 환경값(tbl_sys_cfg SYS_USER_TOKEN_LIFETIME, 관리자 > 시스템 > 환경값 설정) → .env TOKEN_LIFETIME → 기본 12시간(43200).
      * 환경값이 비었거나 숫자가 아니면 다음 순서로 넘어간다. 한 요청 안에서는 한 번만 읽는다
      */
     function token_lifetime(): int
@@ -411,10 +411,10 @@ if ( ! function_exists('token_lifetime'))
         $value = null;
         $CI =& get_instance();
         if (isset($CI->db)) {
-            $row = $CI->db->select('cfg_val')->where('cmb_cfg', 'SYS_AUTH_TOKEN_LIFETIME')->get('sys_cfg')->row();
+            $row = $CI->db->select('cfg_val')->where('cmb_cfg', 'SYS_USER_TOKEN_LIFETIME')->get('sys_cfg')->row();
             $value = $row ? trim((string)$row->cfg_val) : null;
             if ($value !== null && $value !== '' && !ctype_digit($value)) {
-                log_message('error', 'sys_cfg SYS_AUTH_TOKEN_LIFETIME is not a number: '.$value);
+                log_message('error', 'sys_cfg SYS_USER_TOKEN_LIFETIME is not a number: '.$value);
                 $value = null;
             }
         }

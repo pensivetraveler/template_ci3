@@ -98,19 +98,19 @@ class SysCfg extends Common
         if($cmbCfg === '') $cmbCfg = $key ?: ($data['big_cfg'] ?? '').'_'.($data['sml_cfg'] ?? '');
 
         switch ($cmbCfg) {
-            case 'SYS_AUTH_TOKEN_LIFETIME' :
+            case 'SYS_USER_TOKEN_LIFETIME' :
                 // 인증 토큰 유효 시간(common_helper token_lifetime). 비우면 .env TOKEN_LIFETIME
                 if(!ctype_digit($value)) $this->cfgError('cfg_val', $value, '토큰 유효 시간은 0 이상의 정수(초)로 입력하세요. 0 은 만료 없음입니다.');
                 break;
-            case 'USER_SIGNUP_EMAIL_YN' :
-            case 'USER_SIGNUP_TEL_YN' :
+            case 'SYS_USER_SIGNUP_EMAIL_YN' :
+            case 'SYS_USER_SIGNUP_TEL_YN' :
                 if(!in_array($value, ['Y', 'N'], true)) $this->cfgError('cfg_val', $value, 'Y 또는 N 으로 입력하세요.');
                 break;
-            case 'USER_PASSWORD_FIND_MODE' :
+            case 'SYS_USER_PASSWORD_FIND_MODE' :
                 if(!in_array($value, ['show', 'reset'], true)) $this->cfgError('cfg_val', $value, 'show 또는 reset 으로 입력하세요.');
                 if($value === 'show' && !PASSWORD_DECRYPTABLE) $this->cfgError('cfg_val', $value, '복호화할 수 없는 저장 방식에서는 비밀번호 표시를 고를 수 없습니다.');
                 break;
-            case 'USER_LOG_KEEP_DAYS' :
+            case 'SYS_USER_LOG_KEEP_DAYS' :
                 if(!ctype_digit($value)) $this->cfgError('cfg_val', $value, '로그 보관 기간은 0 이상의 정수(일)로 입력하세요.');
                 break;
         }
