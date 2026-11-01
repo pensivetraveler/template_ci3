@@ -146,7 +146,9 @@
 - [ ] vendor: jQuery 3벌(1.11/2.1/3.7), SweetAlert 1·2 공존 → 정리, `package.json` 도입
 - [ ] PHPExcel → PhpSpreadsheet (추가: `MY_Builder_WEB::getExcelSample`의 `Excel_lib`)
 - [ ] 기본 컨트롤러 `Welcome` 교체
-- [ ] 프로젝트 테스트(PHPUnit), ESLint 도입
+- [x] (2026-11-01: PHPUnit 도입, scripts/test.sh, tests/app/README.md) 프로젝트 테스트(PHPUnit)
+- [ ] ESLint 도입
+- [ ] `vendor` 일부 파일이 git 에 추적되고 composer.lock 과 맞지 않음 (.gitignore 에 /vendor/ 가 있는데 init 커밋에 들어감. composer install 을 하면 추적 파일 339개가 바뀌거나 지워짐, autoload 에 aws·htmlpurifier 없음. 2026-11-01 관찰)
 
 ## 6. 빌더 설정 조사 (2026-10-23)
 

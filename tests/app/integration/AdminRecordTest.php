@@ -1,0 +1,192 @@
+<?php
+/**
+ * 관리자·회원 권한, 없는 행, 비밀번호 로그, 시스템 코드, 업체, 파트너, 메뉴 권한
+ */
+class AdminRecordTest extends ApiTestCase
+{
+    const PLAIN = 'Qq7!plainPw1';
+
+    private static bool $granted = false;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if (!self::$granted) {
+            self::grant('USR001', 'administrators');
+            self::grant('USR001', 'articles');
+            self::$granted = true;
+        }
+    }
+
+    private function adminData(array $override = []): array
+    {
+        $id = self::uniqueId('ad');
+        return array_merge([
+            'user_cd' => 'USR001', 'id' => $id, 'password' => self::PLAIN, 'password_confirm' => self::PLAIN,
+            'name' => '관리', 'email' => $id.'@example.test', 'tel' => '01000001111',
+        ], $override);
+    }
+
+    public function testPasswordNeverReachesResponseOrLog(): void
+    {
+        $sys = $this->systemAdmin();
+        $ok = $sys->request('POST', '/admin/api/administrators', $this->adminData());
+        $this->assertSame(201, $ok->status, $ok->body);
+        $this->assertNoPlainPassword(self::PLAIN, $ok);
+
+        $bad = $sys->request('POST', '/admin/api/administrators', $this->adminData(['password_confirm' => 'Zz7!otherPw1']));
+        $this->assertSame(422, $bad->status);
+        $this->assertNoPlainPassword(self::PLAIN, $bad);
+        $this->assertStringNotContainsString('Zz7!otherPw1', $bad->body);
+    }
+
+    public function testUserLogKeepsOnlyIdentifier(): void
+    {
+        if (!self::devMode()) $this->markTestSkipped('운영 모드는 시스템 관리자 기록을 남기지 않는다');
+        $sys = $this->systemAdmin();
+        $sys->request('POST', '/admin/api/administrators', $this->adminData());
+        $id = (int)TestDb::value('SELECT administrator_id FROM tbl_administrator ORDER BY administrator_id DESC LIMIT 1');
+        $this->assertSame(200, $sys->request('PATCH', "/admin/api/administrators/$id", ['name' => '바꿈'])->status);
+        $this->assertSame(json_encode(['administrator_id' => (string)$id]), TestDb::value("SELECT params FROM tbl_user_logs WHERE class = 'administrators' AND type = 'update' ORDER BY id DESC LIMIT 1"));
+    }
+
+    public function testMissingAndDeletedRowsAre404(): void
+    {
+        $sys = $this->systemAdmin();
+        foreach (['/admin/api/articles/999999', '/admin/api/boards/999999', '/admin/api/sysCode/ZZZ999', '/admin/api/administrators/999999'] as $path) {
+            $this->assertSame(404, $sys->request('PATCH', $path, ['name' => 'x', 'subject' => 'x', 'cd_name' => 'x', 'board_name' => 'x'])->status, $path);
+        }
+        TestDb::exec("INSERT INTO tbl_board (board_id, board_cd, board_name, created_id) VALUES (9001, 'BRD001', 'b', 1) ON DUPLICATE KEY UPDATE board_name = 'b'");
+        TestDb::exec("INSERT INTO tbl_article (article_id, board_id, subject, del_yn, created_id) VALUES (9001, 9001, '원래', 'Y', 1) ON DUPLICATE KEY UPDATE subject = '원래', del_yn = 'Y'");
+        $this->assertSame(404, $sys->request('PATCH', '/admin/api/articles/9001', ['subject' => '바꿈'])->status);
+        $this->assertSame('원래', TestDb::value('SELECT subject FROM tbl_article WHERE article_id = 9001'));
+    }
+
+    public function testBodyKeyCannotRetargetRows(): void
+    {
+        $sys = $this->systemAdmin();
+        $created = $this->adminData();
+        $sys->request('POST', '/admin/api/administrators', $created);
+        $row = TestDb::row("SELECT a.administrator_id, u.user_id FROM tbl_administrator a JOIN tbl_user u USING(user_id) WHERE u.id = '{$created['id']}'");
+
+        $response = $sys->request('PATCH', "/admin/api/administrators/{$row['administrator_id']}", ['user_id' => 1, 'name' => 'x']);
+        $this->assertSame(403, $response->status, $response->body);
+        $this->assertSame('body_key', $response->reason());
+
+        $same = $sys->request('PATCH', "/admin/api/administrators/{$row['administrator_id']}", ['user_id' => $row['user_id'], 'name' => '같음']);
+        $this->assertSame(200, $same->status, $same->body);
+    }
+
+    public function testGradeCannotBeRaised(): void
+    {
+        [$id] = self::makeUser('USR001');
+        $admin = $this->login($id);
+        $response = $admin->request('POST', '/admin/api/administrators', $this->adminData(['user_cd' => 'USR000']));
+        $this->assertSame(403, $response->status, $response->body);
+        $this->assertSame('grade', $response->reason());
+    }
+
+    public function testMenuPermissionsApply(): void
+    {
+        [$plain] = self::makeUser('USR003');
+        $this->assertSame(403, $this->login($plain)->request('GET', '/admin/api/administrators')->status);
+        [$admin] = self::makeUser('USR001');
+        $this->assertSame(200, $this->login($admin)->request('GET', '/admin/api/administrators')->status);
+        $this->assertSame(403, $this->login($admin)->request('GET', '/admin/api/sysCfg')->status);
+        $this->assertSame(401, (new ApiClient())->request('GET', '/admin/api/administrators')->status);
+    }
+
+    public function testSysCodeKeysAndCategories(): void
+    {
+        $sys = $this->systemAdmin();
+        $code = ['big_cd' => 'BRD', 'sml_cd' => '901', 'cd_name' => '코드', 'cd_srt' => 1, 'use_yn' => 'Y'];
+        $this->assertSame(422, $sys->request('POST', '/admin/api/sysCode', $code)->status, '키 없음');
+        $this->assertSame(201, $sys->request('POST', '/admin/api/sysCode', $code + ['cmb_cd' => 'BRD901'])->status);
+        $this->assertSame(422, $sys->request('PATCH', '/admin/api/sysCode/BRD901', ['cmb_cd' => 'BRD901'])->status);
+        $this->assertSame(200, $sys->request('PATCH', '/admin/api/sysCode/BRD901', ['cd_name' => '바꿈'])->status);
+        $this->assertSame(200, $sys->request('DELETE', '/admin/api/sysCode/BRD901')->status);
+
+        $category = ['sml_cd' => '000', 'cd_srt' => 0, 'use_yn' => 'N', 'cd_val' => '', 'cd_desc' => '', 'cd_nick' => ''];
+        $big = 'Z'.chr(65 + getmypid() % 26).chr(65 + (int)(microtime(true)) % 26);
+        $this->assertSame(422, $sys->request('POST', '/admin/api/sysCode', $category + ['cmb_cd' => 'zzz000', 'big_cd' => 'zzz', 'cd_name' => 'x'])->status);
+        $this->assertSame(201, $sys->request('POST', '/admin/api/sysCode', $category + ['cmb_cd' => $big.'000', 'big_cd' => $big, 'cd_name' => '카테고리'])->status);
+        $this->assertSame(409, $sys->request('POST', '/admin/api/sysCode', $category + ['cmb_cd' => $big.'000', 'big_cd' => $big, 'cd_name' => '중복'])->status);
+        $this->assertSame(200, $sys->request('DELETE', "/admin/api/sysCode/{$big}000")->status);
+    }
+
+    public function testCompanyCrud(): void
+    {
+        $sys = $this->systemAdmin();
+        $code = str_pad((string)(getmypid() % 900000 + 100000), 6, '0');
+        $data = ['company_cd' => 'COM002', 'company_code' => $code, 'company_name' => '업체'];
+
+        $this->assertSame(422, $sys->request('POST', '/admin/api/companies', ['company_cd' => 'COM999'] + $data)->status);
+        $this->assertSame(422, $sys->request('POST', '/admin/api/companies', ['company_code' => ''] + $data)->status);
+        $this->assertSame(201, $sys->request('POST', '/admin/api/companies', $data)->status);
+        $this->assertSame(409, $sys->request('POST', '/admin/api/companies', $data)->status);
+        $this->assertSame(200, $sys->request('GET', '/admin/api/companies')->status);
+
+        $id = (int)TestDb::value("SELECT company_id FROM tbl_company WHERE company_code = '$code'");
+        $this->assertSame(200, $sys->request('PATCH', "/admin/api/companies/$id", ['company_name' => '바꿈'])->status);
+        $this->assertSame(200, $sys->request('DELETE', "/admin/api/companies/$id")->status);
+        $this->assertSame(201, $sys->request('POST', '/admin/api/companies', $data)->status, '삭제한 코드는 다시 쓸 수 있다');
+    }
+
+    public function testPartnerCompanyIdsLimit(): void
+    {
+        $sys = $this->systemAdmin();
+        TestDb::exec("INSERT IGNORE INTO tbl_company (company_id, company_name, company_cd, company_code, created_id) VALUES (7101, '가', 'COM001', '710100', 1), (7102, '나', 'COM002', '710200', 1)");
+        $partner = function (string $companies) {
+            $id = self::uniqueId('pa');
+            return ['user_cd' => 'USR002', 'id' => $id, 'password' => self::PLAIN, 'password_confirm' => self::PLAIN, 'name' => '파트너', 'email' => $id.'@example.test', 'tel' => '01000002222', 'company_ids' => $companies];
+        };
+
+        $this->assertSame(201, $sys->request('POST', '/admin/api/partners', $partner('7101,7102'))->status);
+        $list = $sys->request('GET', '/admin/api/partners?_mode=list');
+        $this->assertSame(200, $list->status, $list->body);
+        $this->assertStringContainsString('가,나', $list->body, '목록은 회사명');
+        $this->assertSame(422, $sys->request('POST', '/admin/api/partners', $partner('9999'))->status);
+
+        $long = implode(',', array_fill(0, 60, '7101'));
+        $this->assertGreaterThan(255, strlen($long));
+        $this->assertSame(422, $sys->request('POST', '/admin/api/partners', $partner($long))->status);
+        $fit = implode(',', array_fill(0, 51, '7101'));
+        $this->assertLessThanOrEqual(255, strlen($fit));
+        $saved = $partner($fit);
+        $this->assertSame(201, $sys->request('POST', '/admin/api/partners', $saved)->status);
+        $this->assertSame(strlen($fit), (int)TestDb::value("SELECT CHAR_LENGTH(p.company_ids) FROM tbl_partner p JOIN tbl_user u USING(user_id) WHERE u.id = '{$saved['id']}'"));
+    }
+
+    public function testMenuAuthOnlyAcceptsListedMenus(): void
+    {
+        $sys = $this->systemAdmin();
+        $count = function () { return (int)TestDb::value('SELECT COUNT(*) FROM tbl_menu_auth'); };
+        $before = $count();
+        $super = (int)TestDb::value('SELECT menu_id FROM tbl_menu WHERE is_super = 1 LIMIT 1');
+        foreach ([999999, $super] as $menuId) {
+            $this->assertSame(404, $sys->request('PATCH', "/admin/api/menuAuth?grade_cd=USR002&menu_id=$menuId", ['is_show' => 1])->status);
+        }
+        $this->assertSame($before, $count());
+
+        $menu = self::menuId('administrators');
+        TestDb::exec("DELETE FROM tbl_menu_auth WHERE grade_cd = 'USR002' AND menu_id = $menu");
+        $this->assertSame(200, $sys->request('PATCH', "/admin/api/menuAuth?grade_cd=USR002&menu_id=$menu", ['is_show' => 1])->status);
+        $this->assertSame('1', TestDb::value("SELECT is_show FROM tbl_menu_auth WHERE grade_cd = 'USR002' AND menu_id = $menu"));
+    }
+
+    public function testServerRunsInRequestedMode(): void
+    {
+        $cookie = preg_grep('/^Set-Cookie:/i', (new ApiClient())->request('GET', '/admin/auth')->headers);
+        $secure = stripos(implode("\n", $cookie), 'secure') !== false;
+        $this->assertSame(!self::devMode(), $secure, '운영 모드만 Secure 쿠키');
+    }
+
+    public function testCspHeaderOnlyWhenEnabled(): void
+    {
+        $has = function (ApiResponse $response) {
+            return count(preg_grep('/^Content-Security-Policy-Report-Only:/i', $response->headers)) > 0;
+        };
+        $this->assertFalse($has((new ApiClient())->request('GET', '/admin/auth')));
+        $this->assertTrue($has((new ApiClient())->request('GET', '/admin/auth', [], ['CSP_REPORT_ONLY' => 'TRUE'])));
+    }
+}
