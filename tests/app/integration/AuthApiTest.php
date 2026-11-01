@@ -63,6 +63,17 @@ class AuthApiTest extends ApiTestCase
         $this->assertSame(422, (new ApiClient())->request('POST', '/api/auth/signup', $duplicate, $env)->status);
     }
 
+    public function testSignupErrorsShowLabelsNotLanguageKeys(): void
+    {
+        $data = $this->signupData();
+        unset($data['password']);
+        $response = (new ApiClient())->request('POST', '/api/auth/signup', $data, ['SIGNUP_USER_CD' => 'USR003']);
+        $this->assertSame(422, $response->status);
+        $messages = implode(' ', array_column($response->json['errors'], 'msg'));
+        $this->assertStringNotContainsString('user.', $messages, $messages);
+        $this->assertStringContainsString('비밀번호', $messages, $messages);
+    }
+
     public function testSignupNotOpenOnAdminPath(): void
     {
         $response = (new ApiClient())->request('POST', '/admin/api/auth/signup', $this->signupData(), ['SIGNUP_USER_CD' => 'USR003']);

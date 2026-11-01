@@ -16,6 +16,9 @@ class Auth extends Common
 
         $this->setProperties($this->Model, false);
 
+        // 폼 라벨(lang:user.*)은 관리자 언어 파일에 있다. /api 경로에서도 오류 문구에 라벨이 나오게 한다
+        $this->lang->load('admin/form', $this->config->item('language'));
+
         // 자동 로그인 쿠키 이름·기간·사용자당 개수 (WEB 의 loginWithAutologinCookie 와 같은 설정)
         $this->config->load('extra/autologin_config', false);
 

@@ -109,12 +109,18 @@ class Common extends MY_Builder_API
     public function message_read_patch($key)
     {
         $this->load->model('Model_Message');
-        $this->Model_Message->modData([
-            'read_yn' => 'Y'
-        ], [
+        $where = [
             'message_id' => $key,
             'user_id' => $this->session->userdata('user_id'),
-        ]);
+        ];
+        // 메시지 표가 없는 프로젝트(템플릿 기본)와 없는 메시지는 404
+        if(!$this->db->table_exists($this->Model_Message->table) || !$this->Model_Message->getCntWhere($where)) {
+            $this->response(['code' => DATA_NOT_EXIST], RestController::HTTP_NOT_FOUND);
+        }
+
+        $this->Model_Message->modData([
+            'read_yn' => 'Y'
+        ], $where);
 
         $this->response([
             'code' => DATA_PROCESSED,

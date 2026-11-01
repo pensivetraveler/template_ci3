@@ -267,6 +267,19 @@ class MenuList extends Common
         return [$key, $data];
     }
 
+    protected function executeRemove($key, $data, $bool): array
+    {
+        $menuId = $this->idData['menu_id'] ?? 0;
+        $data = parent::executeRemove($key, $data, $bool);
+
+        // 표에 외래 키가 없어 메뉴와 함께 권한 행도 지운다
+        $this->load->model('Model_Partner_Auth');
+        $this->db->where('menu_id', $menuId)->delete($this->Model_Menu_Auth->table);
+        $this->db->where('menu_id', $menuId)->delete($this->Model_Partner_Auth->table);
+
+        return $data;
+    }
+
     protected function afterModify($key, $dto)
     {
         $cnt = $this->Model->getCnt([

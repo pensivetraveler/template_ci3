@@ -122,15 +122,17 @@
 - [ ] `tbl_user.approve_yn`: 가입 때 N 으로 넣지만 로그인이 확인하지 않음. 승인 절차가 필요한 프로젝트가 생기면 넣을 것
     - 2026-11-01 확인: `docs/schema/schema.sql`의 tbl_user 에 approve_yn 컬럼이 없음 (코드에서 넣어도 저장 안 되는 것으로 보임)
     - 사용자 구상(2026-11-01, 당장 반영 아님): tbl_sys_cfg 에 사용자 관련 대구분을 두고 APPROVE_YN 을 소구분으로 넣어, 켜져 있으면 가입 때 USR000·USR001 에게 승인을 요청. 사용자 관련 환경설정값을 같은 방식으로 모음
-- [ ] 가입 검증 오류 문구에 라벨 대신 `user.password` 같은 언어 키가 그대로 나옴 (2026-11-01 관찰, `/api/auth/signup`)
+- [x] (2026-11-01: api/Auth 가 admin/form 언어 파일을 읽음) 가입 검증 오류 문구에 라벨 대신 `user.password` 같은 언어 키가 그대로 나옴 (2026-11-01 관찰, `/api/auth/signup`)
 - [x] (2026-11-01: 공통 동작이었음. 요청 로그 tbl_rest_logs 에도 평문 저장되던 것을 함께 가림. 기존 행은 docs/migrations/2026-11-01-rest-logs-mask-password.sql) 검증 실패(422) 응답 data 에 보낸 비밀번호가 그대로 담김
 - [x] (2026-11-01: 옛 필드·user_cd 필드 삭제, 등급을 검증 전에 넣음, 비밀번호 required) `web_form_config`의 `form_signup_config`에 예전 프로젝트 필드(`code`·`grade`, 없는 `student` 표 검사)가 남아 있어 가입을 켜면 필수값·500 → 가입을 쓰는 프로젝트가 생기면 정리
 - [x] (2026-11-01: modify 에서 beforeModify 다음에 행을 확인해 404. 삭제된 행이 실제로 수정되던 것도 같이 막힘) `PUT /api/boards/999999`처럼 없는 행 수정이 200 "수정되었습니다"를 돌려줌 (2026-11-01 관찰, `/admin/api/*`도 같은 경로로 보임)
-- [ ] `api/Common::message_read_patch` 없는 메시지도 성공 응답 (modify 를 거치지 않는 전용 경로, 2026-11-01 코드로 확인, 위험 작음)
+- [x] (2026-11-01: 없는 메시지·표 없음 404) `api/Common::message_read_patch` 없는 메시지도 성공 응답 (modify 를 거치지 않는 전용 경로, 2026-11-01 코드로 확인, 위험 작음)
 - [x] (2026-11-01: auth none 을 빼 비로그인 401, IP 별 300초 5회 제한) `api/Auth::passwordCheck_post` 로그인하지 않은 요청이 500 (세션 사용자 행이 없어 Notice, 2026-11-01 관찰, 수정 전 코드도 같음). `/admin/api/auth/passwordCheck` 도 auth none 이라 같을 것으로 보임
 - [x] (2026-11-01: 컬럼 추가, 연결 표는 필요해지면 검토) `/admin/api/partners` 목록이 500: `Model_Partner` nullList 의 company_ids 컬럼이 템플릿 tbl_partner 에 없음 (2026-11-01 로컬 관찰, 이번 변경과 무관. bizsoft 파트너 시험은 통과)
 - [x] (2026-11-01 사용자 결정: varchar(255) 까지만, 넘으면 422) `tbl_partner.company_ids` 60자에서 값이 조용히 잘림 (20개 이상 담당 가능)
-- [ ] 메뉴를 삭제해도 tbl_menu_auth·tbl_partner_auth 행이 남을 수 있음 (외래 키 없음, 2026-11-01 코드로 확인, 동작 미시험)
+- [ ] `api/Comments` 게시판 3번(board_id 하드코딩)에 다른 사람이 댓글을 달면 없는 tbl_message 에 넣음 (템플릿 기본 표에 없음, 2026-11-01 코드로 확인, 미시험)
+- [ ] 하위 메뉴가 있는 메뉴를 삭제하면 하위 메뉴 행이 남음 (2026-11-01 코드로 확인, 미시험)
+- [x] (2026-11-01: 메뉴 삭제 때 권한 행도 지움) 메뉴를 삭제해도 tbl_menu_auth·tbl_partner_auth 행이 남을 수 있음 (외래 키 없음, 2026-11-01 코드로 확인, 동작 미시험)
 - [x] (2026-11-01: 목록 화면과 같은 조건의 메뉴가 아니면 404) `MenuAuth` 없는 menu_id 로 PATCH 하면 `ensureAuthRow`가 고아 권한 행을 만들고 200 (PartnerAuth 도 같은 구조로 보임, 2026-11-01 관찰)
 
 ### 구조

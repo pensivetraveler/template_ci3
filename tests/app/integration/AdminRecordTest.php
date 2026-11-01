@@ -174,6 +174,25 @@ class AdminRecordTest extends ApiTestCase
         $this->assertSame('1', TestDb::value("SELECT is_show FROM tbl_menu_auth WHERE grade_cd = 'USR002' AND menu_id = $menu"));
     }
 
+    public function testMessageReadIs404WithoutRow(): void
+    {
+        $this->assertSame(404, $this->systemAdmin()->request('PATCH', '/admin/api/boards/message_read/999999', ['x' => '1'])->status);
+    }
+
+    public function testDeletingMenuRemovesAuthRows(): void
+    {
+        TestDb::exec("INSERT INTO tbl_menu (parent_id, code, title, class, method, depth, srt, is_sub_menu, is_login, is_auth, is_super, is_use, base_auth) VALUES (0, '', 'tmp', 'tmpmenu', 'index', 1, 99, 0, 1, 1, 0, 1, '111111')");
+        $menu = (int)TestDb::conn()->insert_id;
+        TestDb::exec("INSERT INTO tbl_menu_auth (menu_id, grade_cd, is_show, menu_auth) VALUES ($menu, 'USR002', 1, '111111')");
+        TestDb::exec("INSERT INTO tbl_partner_auth (menu_id, partner_id, is_show, menu_auth) VALUES ($menu, 1, 1, '111111')");
+
+        $response = $this->systemAdmin()->request('DELETE', "/admin/api/menuList/$menu");
+        $this->assertSame(200, $response->status, $response->body);
+        $this->assertSame('0', TestDb::value("SELECT COUNT(*) FROM tbl_menu WHERE menu_id = $menu"));
+        $this->assertSame('0', TestDb::value("SELECT COUNT(*) FROM tbl_menu_auth WHERE menu_id = $menu"));
+        $this->assertSame('0', TestDb::value("SELECT COUNT(*) FROM tbl_partner_auth WHERE menu_id = $menu"));
+    }
+
     public function testServerRunsInRequestedMode(): void
     {
         // 개발 모드 화면에만 CI 프로파일러가 붙는다 (Secure 쿠키는 두 모드 모두라 구분이 안 된다)
