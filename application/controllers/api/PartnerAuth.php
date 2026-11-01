@@ -190,9 +190,20 @@ class PartnerAuth extends Common
         $this->response(['code' => DATA_PROCESSED, 'data' => ['filled' => $filled]]);
     }
 
+    /**
+     * 권한을 줄 수 있는 메뉴인지 (목록 화면과 같은 조건). 아니면 404 — 없는 메뉴의 권한 행이 생기지 않게 한다
+     */
+    protected function requireAuthMenu($menuId): void
+    {
+        if(!$this->Model_Menu->getCnt(['where' => ['menu_id' => $menuId, 'is_super' => 0, 'is_auth' => 1, 'is_use' => 1]])) {
+            $this->response(['code' => DATA_NOT_EXIST], RestController::HTTP_NOT_FOUND);
+        }
+    }
+
     protected function beforeModify($key, $dto): array
     {
         $this->requirePartnerId($this->idData['partner_id'] ?? '');
+        $this->requireAuthMenu($this->idData['menu_id'] ?? 0);
         $this->ensureAuthRow($this->idData);
 
         $field = array_key_first($dto);
@@ -230,7 +241,7 @@ class PartnerAuth extends Common
     protected function afterModify($key, $dto)
     {
         $subMenuList = $this->Model_Menu->getList([], [
-            'where' => ['parent_id' => $this->idData['menu_id'],]
+            'where' => ['parent_id' => $this->idData['menu_id'], 'is_super' => 0, 'is_auth' => 1, 'is_use' => 1]
         ]);
         if(count($subMenuList)) {
             foreach ($subMenuList as $subMenuData) {
