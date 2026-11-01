@@ -288,9 +288,7 @@ function isMyData(dataId, showError = true) {
 }
 
 function logout() {
-    let result = false;
     executeAjax({
-        async: false,
         url: common.API_BASE_URI + '/auth/logout',
         method: 'post',
         dataType: 'json',
@@ -305,7 +303,6 @@ function logout() {
             });
         },
     });
-    return result;
 }
 
 function getIdentifiersData(data, identifiers = [], asString = false) {
@@ -369,7 +366,6 @@ function getRedirectActionUrl(button, url, identifiers = []) {
 
 function prepareExports(kind, filterData = null) {
     executeAjax({
-        async: false,
         data : {
             exportType: kind !== 'csv' ? 'xlsx' : kind,
             filters: filterData

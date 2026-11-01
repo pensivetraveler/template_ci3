@@ -1023,21 +1023,31 @@ function deleteSelectedRecords() {
 
 		let done = 0;
 		let failed = 0;
-		targets.forEach(function(idData) {
+		// 순서 값을 다시 매기는 표가 있어 한 건씩 차례로 지운다
+		const removeNext = function(index) {
+			if(index >= targets.length) {
+				showDeleteResult();
+				return;
+			}
+			const idData = targets[index];
 			executeAjax({
-				async: false,
 				url: getUrlWithIdentifiers(common.API_URI, Object.keys(idData).length === 1 ? Object.values(idData)[0] : idData, common.API_PARAMS),
 				method: 'delete',
 				success: function() { done++; },
 				error: function() { failed++; },
+				complete: function() { removeNext(index + 1); },
 			});
-		});
+		};
 
-		showAlert({
-			type: failed ? 'warning' : 'success',
-			text: getLocale('Deleted', common.LOCALE) + ` ${done}` + (failed ? ` / ` + getLocale('Failed', common.LOCALE) + ` ${failed}` : ''),
-			callback: function() { table.ajax.reload(null, false); },
-		});
+		const showDeleteResult = function() {
+			showAlert({
+				type: failed ? 'warning' : 'success',
+				text: getLocale('Deleted', common.LOCALE) + ` ${done}` + (failed ? ` / ` + getLocale('Failed', common.LOCALE) + ` ${failed}` : ''),
+				callback: function() { table.ajax.reload(null, false); },
+			});
+		};
+
+		removeNext(0);
 	});
 }
 

@@ -11,7 +11,8 @@ $(function () {
 	preparePlugins(formRecord);
 	resetFrmInputs(formRecord, common.FORM_DATA);
 	readyFrmInputs(formRecord, 'edit', common.FORM_DATA);
-	fetchFrmValues(formRecord, common.KEY);
+	// 프로젝트 onload 스크립트가 첫 로드 때 record 를 바로 읽는다
+	fetchFrmValues(formRecord, common.KEY, {}, {async: false});
 	applyFrmValues(formRecord, record, common.FORM_DATA);
 	refreshPlugins(formRecord, record);
 

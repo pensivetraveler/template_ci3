@@ -34,7 +34,7 @@ function getAjaxOptions(obj = {}) {
 		}
 
 		const ajaxOption = {
-			async: obj.async === undefined?false:obj.async,
+			async: obj.async === undefined?true:obj.async,
 			url: url,
 			method: method,
 			data: data,

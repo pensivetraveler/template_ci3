@@ -451,11 +451,14 @@ function readyFrmInputs(form, mode = null, fields = []) {
  * @param key
  * @returns {*}
  */
-function fetchFrmValues(form = null, key = {}, params = {}) {
+/**
+ * 값은 fetchFrmValues 이벤트와 전역 record 로 받는다. 화면 첫 로드처럼 바로 record 를 읽는 곳만 options.async = false 를 넘긴다
+ */
+function fetchFrmValues(form = null, key = {}, params = {}, options = {}) {
     let data;
 
     executeAjax({
-        async: false,
+        async: options.async ?? true,
         url : getUrlWithIdentifiers(common.API_URI, key, common.API_PARAMS),
         data: {
             _mode : 'form',

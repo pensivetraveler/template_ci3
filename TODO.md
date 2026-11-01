@@ -139,7 +139,8 @@
 - [ ] `MY_Builder_API`(약 2000줄), `MY_Builder_WEB`(약 1300줄) 기능별 분리 (Validator, Exporter, 권한 서비스)
 - [ ] 환경별 config 중복 제거 (development/production 차이 3줄뿐, 세션 테이블명 차이 의도 확인)
 - [ ] 빌더 config: `method.layout` 미구현, `normalize_route_config` 미사용(병합 로직 2벌) (추가: `method_base_config.widgets`도 읽는 코드 없음, `get_route_method_base_config()`가 없는 `route_list_datatable_config`·`route_view_base_config`·`route_excel_base_config` 참조)
-- [ ] AJAX 기본 동기(`app-page-ajax.js:30`) → 비동기 전환, 비JSON 에러 응답 처리 (추가: DataTable 조회·export 준비, `app-page-form.js::fetchFrmValues`가 동기로 UI 멈춤)
+- [x] (2026-11-02: 기본 비동기, 저장 중 버튼 잠금, 비JSON 오류 안내. 일괄 삭제는 한 건씩 차례로) AJAX 기본 동기(`app-page-ajax.js`) → 비동기 전환, 비JSON 에러 응답 처리
+- [ ] 남은 동기 호출: `getData`·`isMyData`(값을 바로 돌려줌, 호출부 변경 필요), `getJSON`(`base/js/utils.js`), 수정 화면 첫 `fetchFrmValues`(프로젝트 onload 가 `record` 를 바로 읽음)
 - [ ] `RestController` 부모 클래스 직접 수정 → 어댑터로 분리
 
 ### 정리

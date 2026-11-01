@@ -1,6 +1,5 @@
 function setViewCount() {
 	executeAjax({
-		async: false,
 		url: common.API_BASE_URI + 'articleRead/',
         method: 'put',
 		data: isObject(common.KEY) ? common.KEY : {
