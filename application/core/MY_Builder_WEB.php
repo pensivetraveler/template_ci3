@@ -32,6 +32,8 @@ class MY_Builder_WEB extends MY_Controller_WEB
     public array $viewColumns = [];
     public string $viewPath = '';
     public array $menuList = [];
+    // 권한 필터 전 전체 메뉴 (화면을 가리키는 메뉴가 따로 있는지 볼 때 씀)
+    protected array $fullMenuList = [];
     public array $currentMenu = [];
     public array $formAssets = [];
     public bool $isLoggedIn = false;
@@ -1317,6 +1319,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
     protected function setupPlatformMenu(): array
     {
         $menuList = $this->setMenuList();
+        $this->fullMenuList = $menuList;
 
         if($this->isLoggedIn){
             // 메뉴 DB·권한을 쓰지 않는 모드: 현재 메뉴만 정하고 권한은 전체 허용(setupPlatformPage가 INIT_AUTH_CHAR 사용)
@@ -1414,11 +1417,18 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 redirect(base_url($this->loggedInRedirect));
             }
 
-            $this->pageAuth = $this->currentMenu['menuAuth'] ?? INIT_AUTH_CHAR;
-            $this->scope = $this->currentMenu['scopeCd'] ?? '';
-
             $baseMethod = $this->routeConfig['properties']['baseMethod'];
             $currMethod = $this->router->method === 'index' ? $baseMethod : $this->router->method;
+
+            // 이 화면을 가리키는 메뉴가 따로 있으면 그 메뉴를 볼 수 있어야 한다 (같은 class 의 다른 메뉴로 대신하지 않음)
+            if(count($this->findPageMenus($this->fullMenuList, $currMethod, $baseMethod))) {
+                $ownMenus = $this->findPageMenus($this->menuList, $currMethod, $baseMethod);
+                if(!count($ownMenus)) alert('Not Authorized', base_url($this->loggedInRedirect));
+                $this->currentMenu = $ownMenus[0];
+            }
+
+            $this->pageAuth = $this->currentMenu['menuAuth'] ?? INIT_AUTH_CHAR;
+            $this->scope = $this->currentMenu['scopeCd'] ?? '';
 
             // 메뉴가 가리키는 화면(메뉴의 method 또는 기준 화면)은 메뉴 표시만 확인 — 표시 = 첫 화면 열람
             $menuMethod = $this->currentMenu['method'] ?? '';
@@ -1434,6 +1444,21 @@ class MY_Builder_WEB extends MY_Controller_WEB
 
             alert('Not Authorized', $this->href . DIRECTORY_SEPARATOR . $baseMethod);
         }
+    }
+
+    /**
+     * 메뉴 목록에서 지금 class 의 이 화면을 가리키는 항목 (메뉴 method 가 비었거나 index 면 기준 화면)
+     */
+    protected function findPageMenus(array $menus, string $method, string $baseMethod): array
+    {
+        $found = [];
+        foreach ($menus as $menu) {
+            if(!empty($menu['subMenu'])) $found = array_merge($found, $this->findPageMenus($menu['subMenu'], $method, $baseMethod));
+            if(($menu['class'] ?? '') !== $this->router->class) continue;
+            $menuMethod = $menu['method'] ?? '';
+            if(($menuMethod === '' || $menuMethod === 'index' ? $baseMethod : $menuMethod) === $method) $found[] = $menu;
+        }
+        return $found;
     }
 
     /**

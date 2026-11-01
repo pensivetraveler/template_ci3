@@ -112,6 +112,8 @@
 - [x] (2026-11-01: 본문 키가 수정 대상과 다르면 403 `checkBodyKeys`, 등록은 부모 키 거절) `is_unique[user.id.user_id]`가 본문 `user_id`로 자기 행을 제외해, 다른 회원의 `id`로 바꿀 수 있었음 (bizsoft 세션 지적, 로컬 재현: 같은 `id` 행 2개 저장, 로그인은 먼저 읽힌 행의 비밀번호로 확인)
 - [x] (2026-11-01 결정: 삭제한 회원의 아이디 재사용 유지. 삭제되지 않은 행에서만 값을 갖는 생성 컬럼 `active_id`·`active_email`에 UNIQUE, `docs/migrations/2026-11-01-user-unique-active.sql`, 파생 프로젝트는 확인 쿼리로 기존 중복을 본 뒤 실행) `tbl_user.id`·`email` 고유 인덱스 없음
 - [ ] `Model_Child` 수정 경로는 쓰는 엔티티가 없어 미시험
+- [x] (2026-11-01: 화면을 가리키는 메뉴가 따로 있으면 그 메뉴를 볼 수 있어야 함 `findPageMenus`) 같은 class 메뉴를 하나만 볼 수 있어도 옆 메뉴 화면이 열림 (`logs/userAccess`로 `logs/errors`, `system/menuAuth`로 `system/sysCfg`·`sysCode`·`menuList`). `setCurrentMenu`가 route 안의 method면 다른 메뉴를 대신 인정
+- [ ] 시스템 관리자가 아니면 `{화면}/downloader/{file_id}`가 파일 대신 대시보드로 이동 (2026-11-01 관찰, 없는 file_id 로 시험): `setCurrentMenu`가 `$commonMethods`를 몰라 현재 메뉴가 비어 `setupPlatformPage`가 redirect
 - [ ] `tbl_user.approve_yn`: 가입 때 N 으로 넣지만 로그인이 확인하지 않음. 승인 절차가 필요한 프로젝트가 생기면 넣을 것
 - [ ] `web_form_config`의 `form_signup_config`에 예전 프로젝트 필드(`code`·`grade`, 없는 `student` 표 검사)가 남아 있어 가입을 켜면 필수값·500 → 가입을 쓰는 프로젝트가 생기면 정리
 - [ ] `PUT /api/boards/999999`처럼 없는 행 수정이 200 "수정되었습니다"를 돌려줌 (2026-11-01 관찰, `/admin/api/*`도 같은 경로로 보임)
@@ -156,7 +158,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `MY_Builder_WEB::setListActions` `actions.duplicate`는 권한 필터 대상이 아님 (create 권한 없이 복제 아이콘 노출) → 등록(create) 권한으로 필터 (2026-10-25)
 - [x] `MY_Builder_API::uploadExcel_post` 기본 `validateExcelData`가 데이터를 그대로 반환하고 form rules·`checkUniqueExist`·`defaultList`·`fileList`를 거치지 않고 `Model->addList()`로 INSERT (검증 없는 대량 INSERT, POST 경로와 규칙 이원화 — form rules 재사용 검토) → `validateExcelData()`가 행마다 form rules(required_mod[add]→required)·notNullList·고유키(DB·요청 안 중복)·defaultList를 검사해 422(행·필드별 오류), 저장은 `setData()` 후 `addList()`(트랜잭션) (2026-10-25)
 - [x] `app-page-excel.js::validateData`/`submitData` `validateExcel`·`uploadExcel` AJAX에 `Authorization` 헤더 없음 (다른 호출과 인증 방식 불일치, 서버 측 우회 여부 확인 필요) → `Authorization` 헤더 추가 (2026-10-25)
-- [ ] `MY_Builder_WEB::setupPlatformPage` mode 검사를 원본 `routeConfig['methods'][baseMethod]['category']`가 list일 때만 수행 (category 없는 baseMethod면 notice, list가 아닌 baseMethod route는 add/edit/excel 등 mode 권한 검사 전무)
+- [x] (2026-11-01 확인: 2026-10-25 재작성으로 이미 해결, 권한별 시험 통과) `MY_Builder_WEB::setupPlatformPage` mode 검사를 원본 `routeConfig['methods'][baseMethod]['category']`가 list일 때만 수행 (category 없는 baseMethod면 notice, list가 아닌 baseMethod route는 add/edit/excel 등 mode 권한 검사 전무)
 - [x] `MY_Builder_API::deleteExcelFile_patch` `class` 입력을 검증 없이 파일 경로에 붙여 `unlink` (경로 조작으로 임의 `*_upload_sample.xlsx` 삭제 가능) (추가: admin 확인도 없음, `public/sample` 밖 경로 삭제 가능) → class 형식(`^[A-Za-z][A-Za-z0-9_]*$`) 검사. admin 확인은 API 권한 검사(2장)에서 (2026-10-25)
 
 ### 버그
@@ -168,7 +170,7 @@ README·docs/builder 작성 중 코드 조사에서 나온 항목. 문서에는 
 - [x] `BuilderCommonTrait::getMenuBaseAuth` 메뉴 `method`가 route `methods`에 없으면 undefined index, `class`를 대소문자 구분 매칭 (`myInfo` 메뉴 ↔ `myinfo` route → base_auth `000000`) → `resourceLoader->routeKey()`로 대소문자 무관 route 매칭, methods에 없는 메뉴 method는 baseMethod 설정으로 계산 (2026-10-25)
 - [x] `MY_Builder_WEB::setupPlatformMenuAuth` `array_reduce` 초기값 없음 (허용 메뉴 0개면 `null` → `array` 타입 속성 대입 오류) → `array_reduce` 초기값 `[]` 지정 (2026-10-25)
 - [x] `MY_Builder_WEB::setupPlatformRedirect` `menuList[0]` 직접 접근 (`isUse=false`로 첫 항목이 빠지면 `array_filter`가 키를 유지해 notice, 잘못된 redirect) → `menuList`를 순회해 class 있는 첫 메뉴(하위 메뉴 포함)로 정하고, 없으면 `platform_config.loggedInRedirect` 유지 (2026-10-25)
-- [ ] `MY_Builder_WEB::setupPlatformPage` `pageAuth === '000000'`이면 mode 검사를 건너뜀 (list 버튼/액션은 전부 false인데 add/edit 직접 URL 접근은 허용) (보류: 비관리자 권한 의미 변경이고 mode 검사 재설계는 TODO 2장 범위)
+- [x] (2026-11-01 확인: 2026-10-25 재작성으로 이미 해결, `000000`의 add·edit·view 거절 시험) `MY_Builder_WEB::setupPlatformPage` `pageAuth === '000000'`이면 mode 검사를 건너뜀 (list 버튼/액션은 전부 false인데 add/edit 직접 URL 접근은 허용) (보류: 비관리자 권한 의미 변경이고 mode 검사 재설계는 TODO 2장 범위)
 - [x] `MY_Builder_WEB::setRouteConfig` route가 없는 클래스면 `trigger_error` 후 `$config['']`로 계속 진행 (에러 연쇄 — `EmailLogs`, `Company` 컨트롤러가 해당) → route 없으면 `trigger_error` 후 return (routeConfig 비움 → `checkLoggedIn()`의 'Incorrect Access'), 메시지에 실제 클래스명 (2026-10-25)
 - [x] `MY_Builder_WEB::setMethodConfig` methods에 없는 method면 생성자 안에서 `$this->index()` 호출, 이 시점 `isLoggedIn`은 항상 false (로그인 상태여도 `noLoginRedirect`, allowNoLogin route면 `_remap` 전에 baseMethod 렌더링) → 생성자에서 `index()` 호출 대신 `methodNotInRoute` 표시 + baseMethod 설정 사용, `_remap()`이 `checkLoggedIn()` 뒤 `$this->href`(route index)로 redirect (2026-10-25)
 - [x] `MY_Builder_WEB::viewApp` 뷰를 못 찾으면 `$view['subPage']`에 blank 지정 (`$data['subPage']` 미설정으로 빈 페이지 + notice, `builder/layout/blank` 미사용)

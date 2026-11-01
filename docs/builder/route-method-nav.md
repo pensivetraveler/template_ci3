@@ -239,7 +239,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
 
 | 키 | 타입 | 값/기본값 | 설명 |
 |---|---|---|---|
-| `category` | string | `list` / `form` / `view` / `excel` / `action` / (`base`) | 레이어링 1단계, `setJSVariables()` 분기. `setupPlatformPage()`는 **baseMethod 원본 항목의 category**가 `list`인지 본다. `make_base_auth_from_method()`는 list와 action만 계산 |
+| `category` | string | `list` / `form` / `view` / `excel` / `action` / (`base`) | 레이어링 1단계, `setJSVariables()` 분기. `make_base_auth_from_method()`는 list와 action만 계산 |
 | `type` | string | `'base'` | 레이어링 2단계. list는 `'table'`일 때만 `LIST_*` JS 변수를 만든다. form(add/edit)에서는 `$formType`이 되어 `layout/form_{type}.php`를 include(`prepareFormData()`, `layout/form.php`) |
 | `subtype` | string | `'base'` | 레이어링 3단계. list: `addListScripts(subtype)`(datatable일 때만 asset 로드). form: JS `FORM_TYPE`, `$formSubType` → `form_base.php`가 `base`/`grid`로 분기. view: **`'view'`일 때만** view 데이터·`VIEW_COLUMNS` 준비 |
 | `mode` | string | `read`/`create`/`update`/`delete`/`export`/`import`(권한 비트), `authenticate`/`process`/`''`(항상 허용) | 아래 [mode와 메뉴 권한](#mode와-메뉴-권한) 참고 |
@@ -300,11 +300,11 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
 
 - 6자리 auth 문자열 자리 순서: **create, read, update, delete, export, import** (`builder_auth_helper.php` `auth_char_map()`). `INIT_AUTH_CHAR='111111'`, `BASE_AUTH_CHAR='000000'`(`custom_constants.php`).
 - `get_auth_value($mode, $auth)` / `is_auth_avaliable()`: mode가 위 6개가 아니면(`authenticate`, `process`, `''` 등) **기본값 true**. form 기본 mode가 `''`이므로 add/edit에는 `mode`를 명시해야 권한 검사가 걸린다.
-- `MY_Builder_WEB::setupPlatformPage()`는 다음을 **모두** 만족할 때 `methodConfig.mode` 비트가 0이면 `alert('Not Authorized')` 후 baseMethod로 보낸다.
-  1. 로그인 상태이고 시스템 관리자(`is_sys_admin`)가 아님
-  2. `currentMenu`가 존재함(없으면 `loggedInRedirect`로 redirect)
-  3. `pageAuth`(= 메뉴의 `menu_auth`)가 `'000000'`이 아님(**000000이면 검사 없이 통과**)
-  4. route의 **baseMethod 항목이 list category**이고 현재 method가 baseMethod가 아님
+- `MY_Builder_WEB::setupPlatformPage()`는 시스템 관리자가 아닌 로그인 사용자에게 다음 순서로 적용한다.
+  1. `currentMenu`가 없으면 `loggedInRedirect`로 redirect
+  2. 요청한 화면을 가리키는 메뉴가 전체 메뉴에 따로 있으면(메뉴 `method`, 비었거나 `index`면 baseMethod) 그 메뉴를 볼 수 있어야 한다. 아니면 `alert('Not Authorized')` 후 `loggedInRedirect`. 같은 class의 다른 메뉴로 대신하지 않는다
+  3. 메뉴가 가리키는 화면은 메뉴 표시만 확인한다
+  4. 그 밖의 화면은 `getPageAuthMode()` 자리가 켜져 있어야 한다. 목록은 메뉴 표시만, 상세(`category: view`)는 `read|update`, 그 밖에는 `mode`, 없으면 이름(`add`·`edit`·`view`·`excel`)으로 정한다. **이름도 mode도 없는 사용자 정의 화면은 메뉴 표시만 확인**하므로 권한이 필요하면 `mode`를 적는다. 실패하면 `alert('Not Authorized')` 후 baseMethod
 - list 화면 버튼/액션 권한 필터(`pageAuth` 기준): `buttons.add`→create, `buttons.excel`→import, `actions.view`→read, `actions.edit`→update, `actions.delete`→delete, `exports.*`→export. 시스템 관리자는 `pageAuth=INIT_AUTH_CHAR`(전체 허용).
 - 메뉴 기본 권한(`base_auth`)은 `builder_menu_helper.php` `make_base_auth_from_method()`가 **list category method에 대해서만** 계산한다: C=`buttons.add`, R=`actions.view`, U=`actions.edit`, D=`actions.delete`, E=`exports` 중 하나라도 true, I=`buttons.excel`이 true이고 같은 route에 excel method(키 `excel` 또는 category `excel`)가 있을 때(`route_has_excel_method()`). list가 아니면 `'000000'`. 예: administrators.list → `101100`.
 - `category: 'action'` 메서드는 `mode` 자리만 켠다(예: `export` → `000010`, mode 생략 시 `read`). `getMenuBaseAuth()`는 baseMethod 권한에 같은 route의 action 메서드 권한을 합친다. 그래서 다운로드처럼 화면 없는 메서드가 요구하는 권한도 메뉴 권한 화면에서 줄 수 있다.
@@ -327,7 +327,6 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
 > **주의**
 > - view 파이프라인은 `subtype === 'view'`에서만 동작하는데 그런 config가 없다 — 현재 `VIEW_COLUMNS`/`prepareViewData()`는 어디서도 실행되지 않음. dashboard는 `builder/layout/view.php`가 잡혀 `$viewType` 미정의.
 > - form 페이지의 `$formType`은 `type`, JS `FORM_TYPE`은 `subtype` — 이름은 같고 의미가 다르다. `layout/form_{type}.php`는 base/side/modal/tabs만 있어 auth/menu/article type은 컨트롤러가 `subPage`를 직접 지정해야 한다.
-> - baseMethod 항목에 `category`가 없으면 `setupPlatformPage()`에서 notice, list가 아닌 baseMethod route는 mode 검사를 전혀 하지 않는다.
 > - `buttons.excel=true` 기본값이어도 route에 excel method가 없으면 base_auth의 I 비트와 엑셀 버튼은 꺼진다(2026-10-26).
 > - excel 페이지는 `getExcelHeaders()` 버그로 현재 항상 에러 — [view-excel.md](view-excel.md) 참고.
 
