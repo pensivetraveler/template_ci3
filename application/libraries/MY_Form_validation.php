@@ -85,7 +85,7 @@ class MY_Form_validation extends CI_Form_validation
      * 값이 비어 있어도 실행해야 하는 규칙. CI3 는 빈 값에 required·isset·matches 외 규칙을 건너뛰어
      * 조건부 필수 규칙이 서버에서 동작하지 않았다.
      */
-    protected array $emptyAwareRules = ['required_mod', 'required_if_value', 'required_if_empty_data', 'password_matches'];
+    protected array $emptyAwareRules = ['required_mod', 'required_if_value', 'required_if_empty_data', 'password_matches', 'concat'];
 
     protected function _execute($row, $rules, $postdata = NULL, $cycles = 0)
     {
@@ -387,9 +387,10 @@ class MY_Form_validation extends CI_Form_validation
 
         if(count($fields)) {
             $fields = array_map(function ($item) {
-                return $this->_field_data[$item]['postdata'];
+                return $this->_field_data[$item]['postdata'] ?? null;
             }, $fields);
-            $valid = implode($separator, $fields) === $value;
+            // 비교할 필드가 요청에 없으면(부분 PATCH 등) 일치를 확인할 수 없으므로 실패
+            $valid = !in_array(null, $fields, true) && implode($separator, $fields) === $value;
         }
 
         return $valid;

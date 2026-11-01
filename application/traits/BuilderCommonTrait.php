@@ -414,7 +414,7 @@ trait BuilderCommonTrait
             $list = reorder($list, $target, $sortColumn);
 
             foreach ($list as $item) {
-                if(!empty($target) && $item[$idColumn] === $target[$idColumn]) continue;
+                if(!is_empty($target, $idColumn) && $item[$idColumn] === $target[$idColumn]) continue;
                 $model->modData([
                     $sortColumn => $item[$sortColumn],
                 ], [
