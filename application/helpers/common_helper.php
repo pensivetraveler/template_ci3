@@ -295,6 +295,27 @@ if ( ! function_exists('mask_sensitive_fields'))
     }
 }
 
+if ( ! function_exists('csp_nonce_attr'))
+{
+    /**
+     * 인라인 <script> 에 붙이는 nonce 속성. 요청마다 값이 하나다 (CSP 헤더는 MY_Hooks)
+     */
+    function csp_nonce_attr(): string
+    {
+        return ' nonce="'.csp_nonce().'"';
+    }
+}
+
+if ( ! function_exists('csp_nonce'))
+{
+    function csp_nonce(): string
+    {
+        static $nonce = null;
+        if ($nonce === null) $nonce = base64_encode(random_bytes(16));
+        return $nonce;
+    }
+}
+
 if ( ! function_exists('user_cfg'))
 {
     /**

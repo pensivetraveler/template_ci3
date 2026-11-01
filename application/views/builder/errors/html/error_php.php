@@ -18,7 +18,7 @@ if(!in_array('modal_prepend', config_item('loaded_views'))) {
 	// 메시지에 요청 값이 섞일 수 있어 스크립트를 벗어나지 않게 JSON 으로 출력한다
 	$toJs = function ($value) { return json_encode((string)$value, JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_INVALID_UTF8_SUBSTITUTE); };
 	?>
-	<script>
+	<script<?=function_exists('csp_nonce_attr') ? csp_nonce_attr() : ''?>>
 		<?=$this->config->config['phptojs']['namespace']?>.ERRORS.push({
 			type : 'php',
 			views : <?=json_encode(config_item('loaded_views'), JSON_HEX_TAG)?>,

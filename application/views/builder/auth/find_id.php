@@ -10,7 +10,7 @@ extract(trans_formdata_dit_type($formData));
 				<div class="app-brand justify-content-center mt-5">
 					<a href="/" class="app-brand-link gap-2">
 						<span class="app-brand-logo demo">
-							<img src="//placehold.co/400x200?text=Logo" alt="">
+							<img src="https://placehold.co/400x200?text=Logo" alt="">
 						</span>
 					</a>
 				</div>
@@ -22,7 +22,7 @@ extract(trans_formdata_dit_type($formData));
 					echo form_open('', [
 						'id' => 'formAuth',
 						'class' => "needs-validation form-type-page",
-						'onsubmit' => 'return false',
+						'data-no-submit' => 'true',
 					], []);
 					?>
 					<?php if(isset($email)): ?>

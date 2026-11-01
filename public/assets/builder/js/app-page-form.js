@@ -927,13 +927,13 @@ function setFormListItemFile(field, item, identifier = '') {
                     <span class="not-draggable">${escapeHtml(item.orig_name)}</span>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                    <button class="btn btn-primary waves-effect p-1" type="button" onclick="downloadFile(${Number(fileId)})">
+                    <button class="btn btn-primary waves-effect p-1" type="button" data-action="download-file" data-file-id="${Number(fileId)}">
                         <i class="ri-file-download-line ri-16px align-middle"></i>
                     </button>
         `;
         if(field.form_attributes.list_delete.length > 0){
             output += `
-                    <button class="btn btn-danger waves-effect p-1 ms-1" type="button" onclick="deleteFile(this, '${field.form_attributes.list_delete}')">
+                    <button class="btn btn-danger waves-effect p-1 ms-1" type="button" data-action="delete-file" data-file-type="${escapeHtml(field.form_attributes.list_delete)}">
                         <i class="ri-close-line ri-16px align-middle"></i>
                     </button>
             `;
@@ -970,7 +970,7 @@ function setFormListItemThumbnail(field, item, identifier = '') {
                         <span class="h6 mb-0 align-middle">${escapeHtml(item.orig_name)}</span>
                     </a>
                 </div>
-                <button class="btn btn-danger waves-effect p-1" type="button" onclick="deleteFile(this, '${field.form_attributes.list_delete || field.field}')">
+                <button class="btn btn-danger waves-effect p-1" type="button" data-action="delete-file" data-file-type="${escapeHtml(field.form_attributes.list_delete || field.field)}">
                     <i class="ri-close-line ri-16px align-middle"></i>
                 </button>
             </div>

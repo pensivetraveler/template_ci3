@@ -14,7 +14,7 @@ extract(trans_formdata_dit_type($formData));
 							<?php if(file_exists(PLATFORM_ASSET_IMG_PATH.'logo.png')): ?>
 							<img src="<?=base_url(PLATFORM_ASSET_IMG_URI.'logo.png')?>" alt="logo">
 							<?php else: ?>
-							<img src="//placehold.co/400x200?text=Logo" alt="logo-sample">
+							<img src="https://placehold.co/400x200?text=Logo" alt="logo-sample">
 							<?php endif; ?>
 						</span>
 					</a>
@@ -28,7 +28,7 @@ extract(trans_formdata_dit_type($formData));
 						echo form_open('', [
 							'id' => 'formAuth',
 							'class' => "needs-validation form-type-page",
-							'onsubmit' => 'return false',
+							'data-no-submit' => 'true',
 						], []);
 					?>
 						<div class="col-sm-12 form-validation-unit">

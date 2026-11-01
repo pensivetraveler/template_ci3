@@ -101,7 +101,7 @@ function get_menu_item_tree($item, $depth, $srt = 1)
 
 function get_menu_href($href = '', $params = [])
 {
-    $url = 'javascript:void(0)';
+    $url = '#';
     if($href) {
         $parsed = parse_url($href);
         if(!array_key_exists('host', $parsed)) {

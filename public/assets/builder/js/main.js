@@ -582,7 +582,7 @@ if (typeof $ !== 'undefined') {
       //           header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Files</h6>',
       //           suggestion: function ({ src, name, subtitle, meta }) {
       //             return (
-      //               '<a href="javascript:;">' +
+      //               '<a href="#">' +
       //               '<div class="d-flex w-50">' +
       //               '<img class="me-3" src="' +
       //               assetsPath +

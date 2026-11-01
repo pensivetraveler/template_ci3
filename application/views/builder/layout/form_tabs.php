@@ -3,7 +3,7 @@
         'id' => 'formRecord',
         'name' => 'formRecord',
         'class' => "add-new-record needs-validation form-type-page form-type-{$formType} form-subtype-{$formSubType}",
-        'onsubmit' => 'return false',
+        'data-no-submit' => 'true',
     ], [
         '_mode' => $this->router->method,
         '_event' => '',
@@ -115,7 +115,7 @@
     </div>
     <div class="col-sm-6 text-end">
         <?php if(in_array('list', $actions)): ?>
-            <button type="button" class="btn btn-outline-dark waves-effect" onclick="<?=WEB_HISTORY_BACK?>"><?=lang('List')?></button>
+            <button type="button" class="btn btn-outline-dark waves-effect" data-action="history-back"><?=lang('List')?></button>
         <?php endif; ?>
         <button type="submit" class="btn btn-primary waves-effect waves-light"><?=lang('Submit')?></button>
         <?php if(in_array('delete', $actions)): ?>

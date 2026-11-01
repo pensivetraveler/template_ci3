@@ -2,7 +2,7 @@
 		class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme container-<?=!isset($containerFluid)||$containerFluid?'fluid':'xxl'?>"
 		id="layout-navbar">
 	<div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
-		<a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
+		<a class="nav-item nav-link px-0 me-xl-6" href="#">
 			<i class="ri-menu-fill ri-22px"></i>
 		</a>
 	</div>
@@ -11,14 +11,14 @@
 		<!-- Search -->
 <!--		<div class="navbar-nav align-items-center">-->
 <!--			<div class="nav-item navbar-search-wrapper mb-0">-->
-<!--				<a class="nav-item nav-link search-toggler px-0" href="javascript:void(0);">-->
+<!--				<a class="nav-item nav-link search-toggler px-0" href="#">-->
 <!--					<span class="d-inline-block text-body-secondary fw-normal" id="autocomplete"></span>-->
 <!--				</a>-->
 <!--			</div>-->
 <!--		</div>-->
 <!--		<div class="navbar-nav align-items-center">-->
 <!--			<div class="nav-item navbar-search-wrapper mb-0">-->
-<!--				<a class="nav-item nav-link search-toggler fw-normal px-0" href="javascript:void(0);">-->
+<!--				<a class="nav-item nav-link search-toggler fw-normal px-0" href="#">-->
 <!--					<i class="ri-search-line ri-22px scaleX-n1-rtl me-3"></i>-->
 <!--					<span class="d-none d-md-inline-block text-muted">Search (Ctrl+/)</span>-->
 <!--				</a>-->
@@ -31,7 +31,7 @@
 			<li class="nav-item nav-profiler">
 				<a
 						class="nav-link btn btn-text-secondary rounded-pill btn-icon"
-						href="javascript:void(0);"
+						href="#"
 						data-bs-toggle="modal"
 						data-bs-target="#profilerModal">
 					<i class="ri-dashboard-2-line ri-22px"></i>
@@ -44,7 +44,7 @@
 			<li class="nav-item nav-error">
 				<a
 						class="nav-link btn btn-text-secondary rounded-pill btn-icon"
-						href="javascript:void(0);"
+						href="#"
 						data-bs-toggle="modal"
 						data-bs-target="#errorModal">
 					<i class="ri-error-warning-line ri-22px"></i>
@@ -57,7 +57,7 @@
 			<!--li class="nav-item dropdown-notifications navbar-dropdown dropdown me-4 me-xl-1">
 				<a
 						class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
-						href="javascript:void(0);"
+						href="#"
 						data-bs-toggle="dropdown"
 						data-bs-auto-close="outside"
 						aria-expanded="false">
@@ -72,7 +72,7 @@
 							<div class="d-flex align-items-center">
 								<span class="badge rounded-pill bg-label-primary fs-xsmall me-2">8 New</span>
 								<a
-										href="javascript:void(0)"
+										href="#"
 										class="btn btn-text-secondary rounded-pill btn-icon dropdown-notifications-all"
 										data-bs-toggle="tooltip"
 										data-bs-placement="top"
@@ -97,10 +97,10 @@
 										<small class="text-muted">1h ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -119,10 +119,10 @@
 										<small class="text-muted">12hr ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -141,10 +141,10 @@
 										<small class="text-muted">1h ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -165,10 +165,10 @@
 										<small class="text-muted">1 day ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -189,10 +189,10 @@
 										<small class="text-muted">2 days ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -213,10 +213,10 @@
 										<small class="text-muted">3 days ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -235,10 +235,10 @@
 										<small class="text-muted">4 days ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -257,10 +257,10 @@
 										<small class="text-muted">5 days ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -283,10 +283,10 @@
 										<small class="text-muted">5 days ago</small>
 									</div>
 									<div class="flex-shrink-0 dropdown-notifications-actions">
-										<a href="javascript:void(0)" class="dropdown-notifications-read"
+										<a href="#" class="dropdown-notifications-read"
 										><span class="badge badge-dot"></span
 											></a>
-										<a href="javascript:void(0)" class="dropdown-notifications-archive"
+										<a href="#" class="dropdown-notifications-archive"
 										><span class="ri-close-line ri-20px"></span
 											></a>
 									</div>
@@ -296,7 +296,7 @@
 					</li>
 					<li class="border-top">
 						<div class="d-grid p-4">
-							<a class="btn btn-primary btn-sm d-flex" href="javascript:void(0);">
+							<a class="btn btn-primary btn-sm d-flex" href="#">
 								<small class="align-middle">View all notifications</small>
 							</a>
 						</div>
@@ -308,7 +308,7 @@
 			<?php if(isset($headerData)): ?>
 			<!-- User -->
 			<li class="nav-item navbar-dropdown dropdown-user dropdown">
-				<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+				<a class="nav-link dropdown-toggle hide-arrow" href="#" data-bs-toggle="dropdown">
 					<div class="avatar avatar-online bg-primary rounded-circle d-flex justify-content-center align-items-center">
 						<span class="text-white"><?=html_escape(mb_substr($headerData['name'],0,1))?></span>
 					</div>
@@ -340,7 +340,7 @@
 					</li>
 					<li>
 						<div class="d-grid px-4 pt-2 pb-1">
-							<a class="btn btn-sm btn-danger d-flex" href="javascript:logout();" target="_self">
+							<a class="btn btn-sm btn-danger d-flex" href="#" data-action="logout" target="_self">
 								<small class="align-middle"><?=lang('Logout')?></small>
 								<i class="ri-logout-box-r-line ms-2 ri-16px"></i>
 							</a>

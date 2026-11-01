@@ -33,7 +33,7 @@
 		<iframe id="downloadFrame" name="downloadFrame" style="display:none;"></iframe>
 
 		<?php if($this->config->config['life_cycle'] === 'post_controller'): ?>
-		<script>
+		<script<?=csp_nonce_attr()?>>
 			$(function() {
 				if(
 					<?=$this->config->item('phptojs.namespace')?>.HOOK_PHPTOJS_VAR_DIALOG !== null

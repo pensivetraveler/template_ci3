@@ -26,7 +26,7 @@
                         type="button"
                         data-rel-field="domain"
                         class="btn btn-outline-primary waves-effect btn-domain-check"
-                        onclick="this.closest('.domain-register-init').__domainRegister.checkDomain()"
+                        data-action="check-domain-register"
                         disabled="disabled">확인</button>
                 </div>
             </div>

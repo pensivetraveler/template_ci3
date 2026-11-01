@@ -287,4 +287,23 @@ class AdminRecordTest extends ApiTestCase
         $this->assertFalse($has((new ApiClient())->request('GET', '/admin/auth')));
         $this->assertTrue($has((new ApiClient())->request('GET', '/admin/auth', [], ['CSP_REPORT_ONLY' => 'TRUE'])));
     }
+
+    public function testEnforcedCspAllowsOnlyNoncedInlineScripts(): void
+    {
+        $response = (new ApiClient())->request('GET', '/admin/auth', [], ['CSP_ENFORCE' => 'TRUE']);
+        $headers = preg_grep('/^Content-Security-Policy:/i', $response->headers);
+        $this->assertCount(1, $headers);
+        $header = reset($headers);
+        $this->assertStringNotContainsString('unsafe-eval', $header);
+        $this->assertSame(1, preg_match("/'nonce-([^']+)'/", $header, $nonce));
+        $this->assertStringNotContainsString("script-src 'self' 'unsafe-inline'", $header);
+
+        preg_match_all('/<script\\b([^>]*)>/i', $response->body, $tags);
+        foreach ($tags[1] as $attrs) {
+            if (stripos($attrs, 'src=') === false) $this->assertStringContainsString('nonce="'.$nonce[1].'"', $attrs);
+        }
+        // 개발 모드의 CI 프로파일러는 인라인 onclick 을 쓴다
+        if (!self::devMode()) $this->assertSame(0, preg_match('/\\son[a-z]+\\s*=\\s*["\']/i', $response->body), '인라인 on* 속성');
+        $this->assertStringNotContainsString('javascript:', $response->body);
+    }
 }

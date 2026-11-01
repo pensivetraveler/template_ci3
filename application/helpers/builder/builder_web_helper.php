@@ -27,7 +27,7 @@ if ( ! function_exists('get_breadcrumbs'))
             $html .= "<li class='breadcrumb-item {$active}'>";
             $title = html_escape($CI->lang->line('nav.'.$title));
             if($i !== count($title_list)-1) {
-                $html .= "<a href='javascript:void(0);' class='pe-2'>{$title}</a><i class='breadcrumb-icon icon-base ri ri-arrow-right-s-line align-middle'></i>";
+                $html .= "<a href='#' class='pe-2'>{$title}</a><i class='breadcrumb-icon icon-base ri ri-arrow-right-s-line align-middle'></i>";
             }else{
                 $html .= $title;
             }
@@ -98,8 +98,9 @@ if ( ! function_exists('show_alert'))
     function show_alert($type = 'error', $text = 'error occurred', $parent = false): string
     {
         $func = $parent?'window.parent.showAlert':'showAlert';
+        $nonce = csp_nonce_attr();
         echo "
-        <script>
+        <script{$nonce}>
             $func({
                 type: '$type',
                 text: '$text',

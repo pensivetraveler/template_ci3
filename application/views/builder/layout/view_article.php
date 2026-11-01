@@ -14,7 +14,7 @@ $uploads = isset($viewFields['uploads']);
 		echo form_open('', [
 				'id' => 'formRecord',
 				'class' => "view-record",
-				'onsubmit' => 'return false',
+				'data-no-submit' => 'true',
 		], [
 				'_mode' => 'view',
 				'_event' => '',
@@ -47,7 +47,7 @@ $uploads = isset($viewFields['uploads']);
 					</button>
 					<div class="dropdown-menu dropdown-menu-end" aria-labelledby="actionBtns">
 						<?php foreach ($actions as $action): ?>
-							<a class="dropdown-item text-center btn-view-<?=$action?>" href="javascript:void(0);"><?=lang(ucfirst($action))?></a>
+							<a class="dropdown-item text-center btn-view-<?=$action?>" href="#"><?=lang(ucfirst($action))?></a>
 						<?php endforeach; ?>
 					</div>
 				</div>

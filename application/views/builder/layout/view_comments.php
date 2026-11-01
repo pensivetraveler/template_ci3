@@ -4,7 +4,7 @@
 		echo form_open('', [
 			'id' => 'formComment',
 			'class' => "needs-validation",
-			'onsubmit' => 'return false',
+			'data-no-submit' => 'true',
 		], [
 			'_mode' => 'add',
 			'_event' => '',

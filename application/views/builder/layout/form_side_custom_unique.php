@@ -31,7 +31,7 @@
 				'type' => 'button',
 				'class' => 'btn btn-outline-primary waves-effect btn-dup-check',
 			], lang('Check'), [
-				'onclick' => "checkDuplicate(this)",
+				'data-action' => 'check-duplicate',
 				'disabled' => "disabled",
 			]);
 		?>

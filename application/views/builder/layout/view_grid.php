@@ -18,14 +18,14 @@
 							if(count($buttons)) :
 								foreach ($buttons as $button=>$attr):
 						?>
-						<a class="dropdown-item text-center btn-view-<?=$button?>" href="javascript:void(0);"><?=lang($attr['text'])?></a>
+						<a class="dropdown-item text-center btn-view-<?=$button?>" href="#"><?=lang($attr['text'])?></a>
 						<?php
 								endforeach;
 								echo '<hr class="my-2">';
 							endif;
 						?>
 						<?php foreach ($actions as $action): ?>
-						<a class="dropdown-item text-center btn-view-<?=$action?>" href="javascript:void(0);"><?=lang(ucfirst($action))?></a>
+						<a class="dropdown-item text-center btn-view-<?=$action?>" href="#"><?=lang(ucfirst($action))?></a>
 						<?php endforeach; ?>
 					</div>
 				</div>
@@ -38,7 +38,7 @@
                 'id' => 'formRecord',
 				'name' => 'formRecord',
                 'class' => "view-form needs-validation view-type-{$viewType}",
-                'onsubmit' => 'return false',
+                'data-no-submit' => 'true',
             ], [
                 '_mode' => $this->router->method,
                 '_event' => '',

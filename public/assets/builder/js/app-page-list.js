@@ -1183,7 +1183,7 @@ function getListActions(btns, full, identifiers = []) {
 		const title = pascalize(btn);
 
 		const a = document.createElement('a');
-		a.href = 'javascript:void(0);';
+		a.href = '#';
 		a.classList.add('btn', 'btn-sm', 'btn-icon', 'btn-text-secondary', 'rounded-pill', 'waves-effect', `${btn}-record`);
 		a.setAttribute('data-bs-toggle', 'tooltip');
 		a.setAttribute('title', `${title} Record`);

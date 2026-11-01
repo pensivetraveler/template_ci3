@@ -33,7 +33,7 @@
 												</div>
 											</div>
 											<div class="btn-home-wrap d-flex justify-content-center align-items-center mt-6 d-none">
-												<button type="button" class="btn btn-primary waves-effect waves-light" onclick="location.href='<?=base_url('admin')?>'">Back to home</button>
+												<button type="button" class="btn btn-primary waves-effect waves-light" data-action="go" data-href="<?=base_url('admin')?>">Back to home</button>
 											</div>
 										</div>
 									</div>
@@ -90,7 +90,7 @@
 												</div>
 											</div>
 											<div class="btn-home-wrap d-flex justify-content-center align-items-center mt-6 d-none">
-												<button type="button" class="btn btn-primary waves-effect waves-light" onclick="location.href='<?=base_url('admin')?>'">Back to home</button>
+												<button type="button" class="btn btn-primary waves-effect waves-light" data-action="go" data-href="<?=base_url('admin')?>">Back to home</button>
 											</div>
 										</div>
 									</div>

@@ -101,7 +101,7 @@ if ( ! function_exists('alert')) {
             $msg = lang('Incorrect Access');
         }
         echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-        echo '<script type="text/javascript">alert("' . $msg . '");';
+        echo '<script type="text/javascript"'.csp_nonce_attr().'>alert("' . $msg . '");';
         if (empty($url)) {
             echo 'history.go(-1);';
         }
@@ -124,7 +124,7 @@ if ( ! function_exists('alert_close')) {
             $msg = lang('Incorrect Access');
         }
         echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-        echo '<script type="text/javascript"> alert("' . $msg . '"); window.close(); </script>';
+        echo '<script type="text/javascript"'.csp_nonce_attr().'> alert("' . $msg . '"); window.close(); </script>';
         exit;
     }
 }
@@ -140,7 +140,7 @@ if ( ! function_exists('alert_refresh_close')) {
             $msg = lang('Incorrect Access');
         }
         echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-        echo '<script type="text/javascript"> alert("' . $msg . '"); window.opener.location.reload();window.close(); </script>';
+        echo '<script type="text/javascript"'.csp_nonce_attr().'> alert("' . $msg . '"); window.opener.location.reload();window.close(); </script>';
         exit;
     }
 }

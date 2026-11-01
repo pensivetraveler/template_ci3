@@ -61,19 +61,19 @@
 						<nav aria-label="Page navigation">
 							<ul class="pagination mb-2 float-end">
 								<li class="page-item first disabled">
-									<a class="page-link waves-effect" href="javascript:void(0);"><i class="icon-base ri ri-skip-back-mini-line icon-22px"></i></a>
+									<a class="page-link waves-effect" href="#"><i class="icon-base ri ri-skip-back-mini-line icon-22px"></i></a>
 								</li>
 								<li class="page-item prev disabled">
-									<a class="page-link waves-effect" href="javascript:void(0);"><i class="icon-base ri ri-arrow-left-s-line icon-22px"></i></a>
+									<a class="page-link waves-effect" href="#"><i class="icon-base ri ri-arrow-left-s-line icon-22px"></i></a>
 								</li>
 								<li class="page-item active">
-									<a class="page-link waves-effect" href="javascript:void(0);">1</a>
+									<a class="page-link waves-effect" href="#">1</a>
 								</li>
 								<li class="page-item next disabled">
-									<a class="page-link waves-effect" href="javascript:void(0);"><i class="icon-base ri ri-arrow-right-s-line icon-22px"></i></a>
+									<a class="page-link waves-effect" href="#"><i class="icon-base ri ri-arrow-right-s-line icon-22px"></i></a>
 								</li>
 								<li class="page-item last disabled">
-									<a class="page-link waves-effect" href="javascript:void(0);"><i class="icon-base ri ri-skip-forward-mini-line icon-22px"></i></a>
+									<a class="page-link waves-effect" href="#"><i class="icon-base ri ri-skip-forward-mini-line icon-22px"></i></a>
 								</li>
 							</ul>
 						</nav>
@@ -104,7 +104,7 @@
 	<li class="list-group-item list-group-timeline-{flag} mb-4">
 		<div class="item-header d-flex justify-content-between mb-2">
 			<h6 class="mb-0">
-				<a class="me-2" href="javascript:;">
+				<a class="me-2" href="#">
 					<span class="badge bg-label-{flag} rounded-pill text-uppercase">{level}</span>
 				</a>
 				{message}

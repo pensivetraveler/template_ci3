@@ -386,7 +386,7 @@ class CommonLogList {
 
         return `
             <li class="${classes}">
-                <a class="${linkClasses}" href="javascript:void(0);" ${dataAttr}>${content}</a>
+                <a class="${linkClasses}" href="#" ${dataAttr}>${content}</a>
             </li>
         `;
     }

@@ -62,7 +62,7 @@ class PHPtoJS
      */
     public function getJsVars()
     {
-        return '<script type="text/javascript">'.$this->jsToView.'</script>';
+        return '<script type="text/javascript"'.csp_nonce_attr().'>'.$this->jsToView.'</script>';
     }
 
     /**

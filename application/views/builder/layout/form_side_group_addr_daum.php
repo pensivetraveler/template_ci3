@@ -16,7 +16,8 @@
 			'type' => 'button',
 			'class' => 'btn btn-outline-primary waves-effect',
 		], lang('Search'), [
-			'onclick' => "findAddress(document.getElementById('daumAddrWrap_{$zipcode['group']}'))",
+			'data-action' => 'find-address',
+			'data-target' => "daumAddrWrap_{$zipcode['group']}",
 		])?>
 	</div>
 	<div class="input-group input-group-merge mb-3">
@@ -44,8 +45,8 @@
 	<?=get_admin_form_text($item)?>
 	<div class="daum-addr-container">
 		<div id="daumAddrWrap_<?=$item['group']?>" data-group-name="<?=$item['group']?>">
-			<img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnFoldWrap" onclick="foldDaumPostcode(this.parentElement)" alt="접기 버튼">
+			<img src="https://t1.daumcdn.net/postcode/resource/images/close.png" id="btnFoldWrap" data-action="fold-parent" alt="접기 버튼">
 		</div>
 	</div>
-	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </div>

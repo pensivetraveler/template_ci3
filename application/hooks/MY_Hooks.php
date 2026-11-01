@@ -149,11 +149,17 @@ class MY_Hooks
             ->set_header("X-Frame-Options: SAMEORIGIN")
             ->set_header("X-XSS-Protection: 1; mode=block");
 
-        // CSP 는 위반을 브라우저 콘솔로 보기만 한다 (차단하지 않음). 켜는 값: .env CSP_REPORT_ONLY
-        if(filter_var(getenv('CSP_REPORT_ONLY'), FILTER_VALIDATE_BOOLEAN)) {
-            $CI->output->set_header('Content-Security-Policy-Report-Only: '.implode('; ', [
+        // CSP: CSP_ENFORCE 는 차단, CSP_REPORT_ONLY 는 위반을 브라우저 콘솔로 보기만 한다
+        $cspHeader = '';
+        if(filter_var(getenv('CSP_ENFORCE'), FILTER_VALIDATE_BOOLEAN)) {
+            $cspHeader = 'Content-Security-Policy';
+        }elseif(filter_var(getenv('CSP_REPORT_ONLY'), FILTER_VALIDATE_BOOLEAN)) {
+            $cspHeader = 'Content-Security-Policy-Report-Only';
+        }
+        if($cspHeader !== '') {
+            $CI->output->set_header($cspHeader.': '.implode('; ', [
                 "default-src 'self'",
-                "script-src 'self' https://t1.daumcdn.net https://cdnjs.cloudflare.com",
+                "script-src 'self' 'nonce-".csp_nonce()."' https://t1.daumcdn.net https://cdnjs.cloudflare.com",
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                 "font-src 'self' data: https://fonts.gstatic.com",
                 "img-src 'self' data: blob: https:",

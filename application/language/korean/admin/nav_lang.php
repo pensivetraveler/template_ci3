@@ -23,6 +23,7 @@ $lang['nav']['Categories Management'] = '카테고리 관리';
 $lang['nav']['Boards'] = '게시판';
 $lang['nav']['Boards Management'] = '게시판 관리';
 $lang['nav']['Articles Management'] = '게시글 관리';
+$lang['nav']['Companies Management'] = '업체 관리';
 
 $lang['nav']['Visitors'] = '접속자';
 $lang['nav']['Visitors Management'] = '접속자 관리';

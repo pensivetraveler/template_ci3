@@ -18,7 +18,7 @@
 						'id' => 'viewRecord',
 						'name' => 'viewRecord',
 						'class' => "view-form view-type-{$viewType}",
-						'onsubmit' => 'return false',
+						'data-no-submit' => 'true',
 					], [
 						'_mode' => 'view',
 						'_event' => '',

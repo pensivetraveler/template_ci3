@@ -3,7 +3,7 @@
 		'id' => $formName??'formRecord',
 		'name' => $formName??'formRecord',
 		'class' => "add-new-record pt-0 row g-3 needs-validation form-type-{$formType} form-subtype-{$formSubType}",
-		'onsubmit' => 'return false',
+		'data-no-submit' => 'true',
 	], [
 		'_mode' => '',
 		'_event' => '',

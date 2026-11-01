@@ -225,7 +225,7 @@ class MktLogger
             $data = urlencode($data);
 
             $script = "
-				<script type='text/javascript'>
+				<script type='text/javascript'".csp_nonce_attr().">
 				window.addEventListener('load', function(e) {(new Image()).src = '/mktlog/_library_connect_log_act.php?type=connect_in&data=".$data."';
 				});
 

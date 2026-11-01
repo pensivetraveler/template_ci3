@@ -62,6 +62,7 @@
 	<script src="<?php echo base_url('public/assets/base/js/html5.min.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/placeholder.min.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/clipboard.js');?>"></script>
+	<script src="<?php echo base_url('public/assets/base/js/actions.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/utils.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/josa.js');?>"></script>
 	<script src="<?php echo base_url('public/assets/base/js/pattern.js');?>"></script>
@@ -86,7 +87,7 @@
 	<script src="<?php echo base_url('public/assets/builder/js/app-page-errors.js');?>"></script>
 
 	<?php if(!isset($status_code) || !in_array($status_code, [404, 500])): ?>
-	<script>
+	<script<?=csp_nonce_attr()?>>
 		const appName = '<?=$this->config->config['phptojs']['namespace']?>';
 		window.<?=$this->config->config['phptojs']['namespace']?> = window.<?=$this->config->config['phptojs']['namespace']?> || {};
 	</script>
@@ -97,7 +98,7 @@
 		if(property_exists($this, 'phptojs')):
 			echo $this->phptojs->getJsVars();
 	?>
-	<script>
+	<script<?=csp_nonce_attr()?>>
 		if(!Object.hasOwn(window[appName], 'API_PARAMS') || !isObject(window[appName].API_PARAMS)) window[appName].API_PARAMS = {};
 	</script>
 	<?php
@@ -106,7 +107,7 @@
 	<?php endif; ?>
 
 	<?php if(IS_PRODUCTION): ?>
-	<script>
+	<script<?=csp_nonce_attr()?>>
 		document.oncontextmenu = function(){return false;}
 	</script>
 	<?php endif; ?>

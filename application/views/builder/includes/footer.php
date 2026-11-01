@@ -7,9 +7,7 @@
 								<div class="container d-flex flex-wrap justify-content-between flex-md-row flex-column text-center text-md-start">
 									<div class="mb-2 mb-md-0">
 										<span class="footer-text"><span class="text-primary"><?=APP_NAME?></span> ©
-										  <script>
-											document.write(new Date().getFullYear());
-										  </script>
+										  <?=date('Y')?>
 										  , Made by
 										</span>
 										<a href="<?=COMP_URL?>" target="_blank" class="footer-link fw-medium footer-theme-link text-primary"><?=COMP_NAME?></a>
