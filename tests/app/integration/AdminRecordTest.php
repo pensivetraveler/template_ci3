@@ -257,6 +257,48 @@ class AdminRecordTest extends ApiTestCase
         }
     }
 
+    public function testInactiveCategoryCanBeReopened(): void
+    {
+        $sys = $this->systemAdmin();
+        $parent = 900 + mt_rand(1, 9000);
+        $ids = [];
+        foreach ([1, 2, 3] as $srt) {
+            TestDb::exec("INSERT INTO tbl_category (parent_id, depth, category_name, category_nick, category_srt, use_yn) VALUES ($parent, 1, 'cat$srt', 'cat$srt', $srt, 'Y')");
+            $ids[$srt] = (int)TestDb::conn()->insert_id;
+        }
+        $order = function () use ($parent) {
+            $res = TestDb::conn()->query("SELECT category_name, category_srt, use_yn FROM tbl_category WHERE parent_id = $parent ORDER BY category_name");
+            $out = [];
+            while ($row = $res->fetch_row()) $out[] = implode('/', $row);
+            return $out;
+        };
+        $target = $ids[1];
+
+        // 미사용으로 바꾸면 순서 0, 나머지는 앞으로 당겨진다
+        $off = $sys->request('PATCH', "/admin/api/categories/$target", ['use_yn' => 'N']);
+        $this->assertSame(200, $off->status, $off->body);
+        $this->assertSame(['cat1/0/N', 'cat2/1/Y', 'cat3/2/Y'], $order());
+
+        // 관리 화면에서 찾아 열 수 있다
+        $this->assertSame(200, $sys->request('GET', "/admin/api/categories/$target")->status);
+        $this->assertSame(200, $sys->request('GET', "/admin/api/categories?category_id=$target&_mode=form")->status);
+        $this->assertStringContainsString('cat1', $sys->request('GET', '/admin/api/categories?length=500')->body);
+        // 선택지 조회에서는 빠진다
+        $this->assertStringNotContainsString('"cat1"', $sys->request('GET', "/admin/api/categories?_mode=option&where[parent_id]=$parent")->body);
+
+        // 다시 사용하면 맨 뒤로
+        $on = $sys->request('PATCH', "/admin/api/categories/$target", ['use_yn' => 'Y']);
+        $this->assertSame(200, $on->status, $on->body);
+        $this->assertSame(['cat1/3/Y', 'cat2/1/Y', 'cat3/2/Y'], $order());
+
+        // 순서를 바꾸면 같은 부모 안에서만 맞춘다
+        $move = $sys->request('PATCH', "/admin/api/categories/$target", ['category_srt' => 1]);
+        $this->assertSame(200, $move->status, $move->body);
+        $this->assertSame(['cat1/1/Y', 'cat2/2/Y', 'cat3/3/Y'], $order());
+
+        TestDb::exec("DELETE FROM tbl_category WHERE parent_id = $parent");
+    }
+
     public function testPartnerAuthScreenHasPartnerFilter(): void
     {
         $page = $this->systemAdmin()->request('GET', '/admin/partnerAuth');

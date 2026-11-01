@@ -153,9 +153,14 @@ $(function () {
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.warn(jqXHR.responseJSON)
 				if(jqXHR.status === 422) {
+					// 화면 검사기에 없는 칸(숨은 칸 등)의 오류는 표시할 곳이 없어 알림으로 보여 준다
+					const unshown = [];
 					jqXHR.responseJSON.errors.forEach((error) => {
 						const field = getFvFieldKey(fv, error.param);
-						if (!field) return;
+						if (!field) {
+							unshown.push(error.msg);
+							return;
+						}
 						// 서버 메시지 i18n(선택)
 						const msg = getLocale ? getLocale(error.msg, common.LOCALE) : error.msg;
 						// 서버 type → FV validator 매핑 (있으면 사용)
@@ -172,6 +177,7 @@ $(function () {
 							fv.updateFieldStatus(field, 'Invalid', 'server');
 						}
 					});
+					if(unshown.length) showAlert({type: 'warning', text: unshown.join('\n')});
 				}else{
 					showAlert({
 						type: 'warning',

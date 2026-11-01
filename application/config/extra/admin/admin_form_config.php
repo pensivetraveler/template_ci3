@@ -985,7 +985,8 @@ $config['form_categories_config'] = [
         'field' => 'category_srt',
         'label' => 'lang:category.category_srt',
         'form' => true,
-        'rules' => 'trim|required_mod[add]|min[1]|numeric',
+        // 미사용 행은 순서가 0 이다. 사용 행에 0 을 넣으면 맨 뒤로 간다 (Categories::executeAdd, executeModify)
+        'rules' => 'trim|required_mod[add]|min[0]|numeric',
         'errors' => [],
         'category' => 'base',
         'type' => 'number',

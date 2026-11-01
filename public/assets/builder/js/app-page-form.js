@@ -667,7 +667,8 @@ function applyFrmValuesByCategory(category, groupAttr, fieldName, fields, form, 
         case 'inputs' :
             switch (field.subtype) {
                 default:
-                    if(form[name] && data[fieldName] && data[fieldName] !== '0000-00-00') form[name].value = data[fieldName];
+                    // 0 도 값이다 (숨은 칸 기본값 parent_id = 0 이 비어서 등록이 422 가 됐다)
+                    if(form[name] && data[fieldName] !== undefined && data[fieldName] !== null && data[fieldName] !== '' && data[fieldName] !== '0000-00-00') form[name].value = data[fieldName];
             }
             break;
         case 'selects' :
