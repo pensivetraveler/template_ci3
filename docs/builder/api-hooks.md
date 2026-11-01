@@ -747,6 +747,7 @@ $config['api_method_config'] = [
 
 - 시스템 관리자가 아니면 자기보다 높은 회원 등급(코드 숫자가 작을수록 높음)을 저장할 수 없고(`checkUserGradeValue()`: 등록·수정·복제·엑셀 값), 그런 등급의 회원 행을 수정·삭제할 수 없다(`checkUserGradeTarget()`). 위반은 403 `reason=grade`. 등급 순서가 다른 프로젝트는 오버라이드한다.
 - 부모·자식 표의 수정 대상은 메인 행이 가리키는 행으로 정한다 (`executeModify()`). 본문의 `user_id` 같은 부모 키는 대상 지정에도 저장에도 쓰지 않는다.
+- 본문의 식별자·부모 키가 비어 있지 않은데 수정 대상과 다르면 검증 전에 403 `reason=body_key` (`checkBodyKeys()`). 등록은 부모 키를 받지 않는다. `is_unique`가 이 값으로 자기 행을 제외하므로, 그대로 두면 다른 회원의 `id`로 바꿀 수 있기 때문이다.
 - 회원가입은 `.env SIGNUP_USER_CD`가 있을 때만 `/api/auth/signup`으로 받고, 등급은 요청 값 대신 이 값으로 저장한다. 비어 있으면 404, `/admin/api/auth/signup`은 항상 404. 관리자 등급(`USR000`~`USR002`)을 넣지 않는다.
 - 메뉴와 API 설정은 URL 대소문자와 관계없이 찾는다 (`/admin/api/SysCfg`도 같은 검사).
 

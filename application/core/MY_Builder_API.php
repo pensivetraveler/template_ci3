@@ -2940,6 +2940,34 @@ class MY_Builder_API extends MY_Controller_API
     }
 
     /**
+     * 본문의 식별자·부모 키는 URL·쿼리로 정한 수정 대상과 같아야 한다 (등록은 부모 키를 받지 않음). 다르면 403.
+     * 수정 대상은 본문으로 바뀌지 않지만 is_unique 가 이 값으로 자기 행을 제외하므로, 그대로 두면 중복 검사를 피할 수 있다.
+     * 비어 있거나 없으면 통과 (폼의 hidden 값)
+     */
+    protected function checkBodyKeys(string $http, string $object, array $arguments): void
+    {
+        if(!in_array($http, ['post', 'put', 'patch'], true) || !property_exists($this, 'Model') || !$this->Model) return;
+        if($object !== 'index' && method_exists($this, "{$object}_{$http}")) return;
+
+        $idData = $this->checkIdentifierExist($object !== 'index' ? $object : ($arguments[0] ?? 0));
+        $expected = [];
+        if($this->Model->isAutoIncrement && $this->Model->identifier && count($idData)) {
+            $expected[$this->Model->identifier] = $idData[$this->Model->identifier] ?? '';
+        }
+        if(property_exists($this, 'Model_Parent')) {
+            $row = count($idData) ? $this->Model->getDataWhere([], $idData) : null;
+            $field = $this->Model_Parent->identifier;
+            $expected[$field] = is_object($row) ? ($row->{$field} ?? '') : '';
+        }
+
+        $body = ($http === 'patch' ? $this->patch() : $this->input->post_put()) ?: [];
+        foreach ($expected as $field => $value) {
+            if(!array_key_exists($field, $body) || $body[$field] === '') continue;
+            if(!is_scalar($body[$field]) || trim((string)$body[$field]) !== (string)$value) $this->denyApiPermission('body_key');
+        }
+    }
+
+    /**
      * 자기보다 높은 회원 등급은 저장할 수 없다 (등록·수정·복제·엑셀 값). 코드 숫자가 작을수록 높다. 시스템 관리자는 제한 없음
      */
     protected function checkUserGradeValue(array $dto): void
@@ -3122,6 +3150,9 @@ class MY_Builder_API extends MY_Controller_API
 
         // 데이터 범위 검사 (식별자로 지정한 행이 getDataScope() 범위 밖이면 404)
         $this->checkDataScopeTarget($http, (string)$object_called, $arguments);
+
+        // 본문의 식별자·부모 키가 수정 대상과 다르면 거절 (검증 전에)
+        $this->checkBodyKeys($http, (string)$object_called, $arguments);
 
         // 쓰기 요청은 한 트랜잭션으로 (RestController 가 인증·제한·요청 로그를 마친 뒤 beforeControllerMethod 에서 열고,
         // 응답할 때 커밋·롤백 — MY_Controller_API::finishRequestTransaction)
