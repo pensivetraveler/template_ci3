@@ -187,7 +187,7 @@ $(function() {
     //                 }
     //             },
     //             error: function(jqXHR, textStatus, errorThrown) {
-    //                 let msg = jqXHR.responseJSON.msg;
+    //                 let msg = getAjaxErrorMessage(jqXHR);
     //                 if(jqXHR.responseJSON.code === 4090 && param.title) msg = msg.replace('데이터가', Josa.r(param.title, '이/가'));
     //                 formText.text(msg).removeClass('d-none').focus();
     //             }

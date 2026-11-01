@@ -13,7 +13,7 @@ function setViewCount() {
 		error: function (jqXHR, textStatus, errorThrown) {
 			// showAlert({
 			// 	type: 'warning',
-			// 	text: jqXHR.responseJSON.msg,
+			// 	text: getAjaxErrorMessage(jqXHR),
 			// });
 		},
 	});

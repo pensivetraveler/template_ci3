@@ -279,7 +279,7 @@ function isMyData(dataId, showError = true) {
             if(showError) {
                 showAlert({
                     type: 'warning',
-                    text: jqXHR.responseJSON.msg,
+                    text: getAjaxErrorMessage(jqXHR),
                 });
             }
         },
@@ -301,7 +301,7 @@ function logout() {
             console.log(jqXHR)
             showAlert({
                 type: 'warning',
-                text: jqXHR.responseJSON.msg,
+                text: getAjaxErrorMessage(jqXHR),
             });
         },
     });

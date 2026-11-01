@@ -1,3 +1,10 @@
+/**
+ * 오류 응답의 안내 문구. HTML 오류 페이지·네트워크 끊김처럼 JSON 이 아닌 응답에도 안내가 나오게 한다
+ */
+function getAjaxErrorMessage(jqXHR) {
+	return jqXHR?.responseJSON?.msg || getLocale('Request Failed', common.LOCALE);
+}
+
 function getAjaxOptions(obj = {}) {
 	try {
 		if(obj.url === undefined) throw new Error(`getAjaxOptions : url is not valid !`);
@@ -74,7 +81,7 @@ function executeAjax(obj = {}, test = false) {
 				console.warn(jqXHR.responseJSON)
 				showAlert({
 					type: 'warning',
-					text: jqXHR.responseJSON.msg,
+					text: getAjaxErrorMessage(jqXHR),
 				});
 			}
 		}
@@ -87,7 +94,7 @@ function executeAjax(obj = {}, test = false) {
 			console.warn(jqXHR.responseJSON)
 			showAlert({
 				type: 'error',
-				text: jqXHR.responseJSON.msg,
+				text: getAjaxErrorMessage(jqXHR),
 			});
 		}
 	}
@@ -162,6 +169,18 @@ function submitAjax(selector, options = {}, queryString = false, test = false) {
 			node.removeAttribute('disabled');
 		});
 	}else{
+		// 응답을 기다리는 동안 다시 보내지 않는다 (두 번 눌러 두 건 저장되는 것을 막음)
+		if(form.dataset.submitting === 'true') return;
+		form.dataset.submitting = 'true';
+		const buttons = [...form.querySelectorAll('[type="submit"]')];
+		buttons.forEach((button) => { button.disabled = true; });
+
+		const complete = options.complete;
+		options.complete = function(...args) {
+			form.dataset.submitting = 'false';
+			buttons.forEach((button) => { button.disabled = false; });
+			if(typeof complete === 'function') complete.apply(this, args);
+		};
 		executeAjax(options);
 	}
 }

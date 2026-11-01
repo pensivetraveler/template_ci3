@@ -81,7 +81,7 @@ $(function () {
                     if(Math.floor(code/10) !== 200) {
                         showAlert({
                             type: 'warning',
-                            text: jqXHR.responseJSON.msg,
+                            text: getAjaxErrorMessage(jqXHR),
                         })
                     }
                 },
@@ -517,7 +517,7 @@ $(function () {
 					if(jqXHR.status === 422) {
 						// 화면 검사기에 없는 칸(숨은 칸 등)의 오류는 표시할 곳이 없어 알림으로 보여 준다
 						const unshown = [];
-						jqXHR.responseJSON.errors.forEach((error) => {
+						(jqXHR.responseJSON?.errors ?? []).forEach((error) => {
 							const field = getFvFieldKey(fv, error.param);
 							if (!field) {
 								unshown.push(error.msg);
@@ -543,7 +543,7 @@ $(function () {
 					}else{
 						showAlert({
 							type: 'warning',
-							text: jqXHR.responseJSON.msg,
+							text: getAjaxErrorMessage(jqXHR),
 						});
 					}
 				}
@@ -1228,7 +1228,7 @@ function afterSelectColumnChange(idData, field, value) {
 		error: function (jqXHR, textStatus, errorThrown) {
 			showAlert({
 				type: 'warning',
-				text: jqXHR.responseJSON.msg,
+				text: getAjaxErrorMessage(jqXHR),
 			});
 		}
 	});
@@ -1351,7 +1351,7 @@ function afterCheckboxColumnChange(idData, field, value) {
 		error: function (jqXHR, textStatus, errorThrown) {
 			showAlert({
 				type: 'warning',
-				text: jqXHR.responseJSON.msg,
+				text: getAjaxErrorMessage(jqXHR),
 			});
 		}
 	});

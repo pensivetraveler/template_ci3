@@ -63,7 +63,7 @@ function handleExcelAjaxError(xhr) {
 	}else{
 		showAlert({
 			type: "error",
-			text: xhr.responseJSON ? xhr.responseJSON.msg : "Unknown Error",
+			text: xhr.responseJSON ? getAjaxErrorMessage(xhr) : "Unknown Error",
 		});
 	}
 }
@@ -99,7 +99,7 @@ function resetExcelFile() {
 			console.log(jqXHR)
 			showAlert({
 				type: "error",
-				text: jqXHR.responseJSON ? jqXHR.responseJSON.msg : "Unknown Error",
+				text: jqXHR.responseJSON ? getAjaxErrorMessage(jqXHR) : "Unknown Error",
 			});
 		},
 	});

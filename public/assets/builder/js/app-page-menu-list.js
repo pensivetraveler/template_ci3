@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
             error: function(jqXHR, textStatus, errorThrown) {
                 console.warn(jqXHR.responseJSON)
                 if(jqXHR.status === 422) {
-                    jqXHR.responseJSON.errors.forEach(error => {
+                    (jqXHR.responseJSON?.errors ?? []).forEach(error => {
                         if(Object.hasOwn(fv.fields, error.param)) {
                             fv.updateFieldStatus(error.param, 'Invalid', customValidatorsPreset.inflector(error.type));
                         }
@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }else{
                     showAlert({
                         type: 'warning',
-                        text: jqXHR.responseJSON.msg,
+                        text: getAjaxErrorMessage(jqXHR),
                     });
                 }
             }

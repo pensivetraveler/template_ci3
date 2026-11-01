@@ -477,7 +477,7 @@ function fetchFrmValues(form = null, key = {}, params = {}) {
 
             const opt = {
                 type: 'warning',
-                text: jqXHR.responseJSON.msg,
+                text: getAjaxErrorMessage(jqXHR),
             };
 
             if(['view','edit'].includes(form._mode.value)) {

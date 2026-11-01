@@ -233,17 +233,17 @@ $(function () {
             error: function(jqXHR, textStatus, errorThrown) {
                 console.warn(jqXHR.responseJSON)
                 if(jqXHR.status === 422) {
-                    jqXHR.responseJSON.errors.forEach(error => {
+                    (jqXHR.responseJSON?.errors ?? []).forEach(error => {
                         if(Object.hasOwn(fv.fields, error.param)) {
                             fv.updateFieldStatus(error.param, 'Invalid', customValidatorsPreset.inflector(error.type));
                         }
                     });
                 }else{
                     // 환경값 검사(SysCfg::checkCfgValue)는 errors 에 이유를 담아 보낸다
-                    const errors = jqXHR.responseJSON.errors;
+                    const errors = jqXHR.responseJSON?.errors;
                     showAlert({
                         type: 'warning',
-                        text: Array.isArray(errors) && errors.length ? errors.map(error => error.msg).join('\n') : jqXHR.responseJSON.msg,
+                        text: Array.isArray(errors) && errors.length ? errors.map(error => error.msg).join('\n') : getAjaxErrorMessage(jqXHR),
                     });
                 }
             }
@@ -350,7 +350,7 @@ $(function () {
                 // 키 형식(regex_match)·USER 차단은 화면 검사기가 없어 서버 문구를 그대로 보여 준다
                 showAlert({
                     type: 'warning',
-                    text: [400, 422].includes(jqXHR.status) ? jqXHR.responseJSON.errors.map(error => error.msg).join('\n') : jqXHR.responseJSON.msg,
+                    text: [400, 422].includes(jqXHR.status) ? (jqXHR.responseJSON?.errors ?? []).map(error => error.msg).join('\n') : getAjaxErrorMessage(jqXHR),
                 });
             }
         }, true);
