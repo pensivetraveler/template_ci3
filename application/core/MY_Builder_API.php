@@ -2056,11 +2056,11 @@ class MY_Builder_API extends MY_Controller_API
         $sheet->getStyle('A1:'.$maxAlphabet.$rowMax)->applyFromArray(
             array(
                 'alignment' => array(
-                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                 ),
                 'borders' => array(
-                    'allborders' => array(
-                        'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'allBorders' => array(
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                     ),
                 ),
             )
@@ -2090,11 +2090,11 @@ class MY_Builder_API extends MY_Controller_API
         $sheet->getStyle("A1:{$maxAlphabet}1")
             ->getFont()->setBold(true);
         $sheet->getStyle("A1:{$maxAlphabet}1")
-            ->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle("A1:{$maxAlphabet}1")
             ->getFill()->getStartColor()->setRGB('EEEEEE');
         $sheet->getStyle("A1:{$maxAlphabet}1")
-            ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // body
         foreach ($dataset as $i=>$item) {
@@ -2111,7 +2111,7 @@ class MY_Builder_API extends MY_Controller_API
         $this->setExcelSheetStyle($sheet, $maxAlphabet, $rowMax);
 
         // 엑셀 Writer 생성 (XLSX 형식)
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($objPHPExcel, 'Xlsx');
 
         // 파일 저장
         error_clear_last(); // 이전 에러 초기화
@@ -2145,7 +2145,7 @@ class MY_Builder_API extends MY_Controller_API
                 $sheet->setCellValue($location, $diffInDays);
                 $sheet->getStyle($location)
                     ->getNumberFormat()
-                    ->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_YYYYMMDD2);
+                    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_YYYYMMDD);
             }
         }elseif(
             in_array($field, $formats['int'])
@@ -2154,10 +2154,11 @@ class MY_Builder_API extends MY_Controller_API
         ) {
             if(!$value) $value = 0;
 
+            // 숫자가 아니면 PhpSpreadsheet 가 예외를 던진다. 값을 잃지 않게 글자로 쓴다
             $sheet->setCellValueExplicit(
                 $location,
                 $value,
-                PHPExcel_Cell_DataType::TYPE_NUMERIC
+                is_numeric($value) ? \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC : \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
             );
 
             if(in_array($field, $formats['float'])) {
@@ -2168,7 +2169,7 @@ class MY_Builder_API extends MY_Controller_API
         }else {
             if(!$value) $value = '';
 
-            $sheet->setCellValueExplicit($location, $value, PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit($location, $value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
         }
     }
 

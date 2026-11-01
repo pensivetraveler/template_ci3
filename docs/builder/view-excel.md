@@ -169,7 +169,7 @@
 `MY_Builder_WEB::getExcelSample()`
 
 - 경로: `public/sample/{class}_upload_sample.xlsx`. 파일이 이미 있으면 다시 만들지 않는다(캐시).
-- PHPExcel(`application/libraries/Excel_lib.php`)로 1행에 라벨을 쓴다. required는 빨간 굵은 글씨, 열 너비 24, 헤더는 노란 배경 + 가운데 정렬, `A1:{마지막열}5`에 얇은 테두리. 열 문자는 `excel_helper.php` `number_to_alphabet()`로 만든다.
+- PhpSpreadsheet(`application/libraries/Excel_lib.php`)로 1행에 라벨을 쓴다. required는 빨간 굵은 글씨, 열 너비 24, 헤더는 노란 배경 + 가운데 정렬, `A1:{마지막열}5`에 얇은 테두리. 열 문자는 `excel_helper.php` `number_to_alphabet()`로 만든다.
 - 폴더가 없으면 `make_directory()`로 생성한다.
 - 헤더 설정을 바꾼 뒤에는 화면의 "샘플 파일 리셋"을 눌러야 새로 만들어진다. `resetExcelFile()`이 `PATCH {API_URI}/deleteExcelFile`(`class=body[data-class]`)을 보내고 → `MY_Builder_API::deleteExcelFile_patch()`가 `unlink` → 새로고침한다. `class` 값은 클래스 이름 형식(`^[A-Za-z][A-Za-z0-9_]*$`)만 받는다.
 

@@ -211,6 +211,24 @@ class AdminRecordTest extends ApiTestCase
         $this->assertSame(404, $this->systemAdmin()->request('PATCH', '/admin/api/boards/message_read/999999', ['x' => '1'])->status);
     }
 
+    public function testExcelExportWritesReadableFile(): void
+    {
+        $sys = $this->systemAdmin();
+        $added = $sys->request('POST', '/admin/api/administrators', $this->adminData(['name' => '=1+1']));
+        $this->assertSame(201, $added->status, $added->body);
+
+        $response = $sys->request('GET', '/admin/api/administrators/prepareExports?exportType=xlsx');
+        $this->assertSame(201, $response->status, $response->body);
+        $file = APPPATH.'cache/exports/'.basename(json_decode($response->body, true)['data'][0]['filename']);
+        $this->assertFileExists($file);
+
+        $sheet = (new \PhpOffice\PhpSpreadsheet\Reader\Xlsx())->load($file)->getActiveSheet();
+        $this->assertNotSame('', (string)$sheet->getCell('A1')->getValue());
+        $cells = array_merge(...$sheet->toArray(null, false, false));
+        $this->assertContains('=1+1', $cells, '수식이 아니라 글자로 저장');
+        @unlink($file);
+    }
+
     public function testMenuWithSubMenusCannotBeDeleted(): void
     {
         TestDb::exec("INSERT INTO tbl_menu (parent_id, code, title, class, method, depth, srt, is_sub_menu, is_login, is_auth, is_super, is_use, base_auth) VALUES (0, '', 'tmpparent', '', '', 1, 99, 1, 1, 1, 0, 1, '111111')");

@@ -1,11 +1,12 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-// Include PHP Excel library files
-require_once APPPATH . '/third_party/PHPExcel/PHPExcel.php';
-require_once APPPATH . '/third_party/PHPExcel/PHPExcel/IOFactory.php';
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class Excel_lib extends PHPExcel
+class Excel_lib
 {
     private string $today;
     private array $worksheetArr;
@@ -17,13 +18,12 @@ class Excel_lib extends PHPExcel
 
     function __construct()
     {
-        parent::__construct();
         log_message('Debug', 'Excel Library is loaded.');
 
         $this->today = date("Y-m-d");
         $this->worksheetArr = array();
         $this->defaultBorder = array(
-            'style' => PHPExcel_Style_Border::BORDER_THIN,
+            'borderStyle' => Border::BORDER_THIN,
             'color' => array('rgb' => 'A6A6A6')
         );
         $this->headBorder = array(
@@ -41,15 +41,15 @@ class Excel_lib extends PHPExcel
 
     function load()
     {
-        log_message('Debug', 'Third Party PHPExcel is loaded newly.');
-        return $this->objPHPExcel = new PHPExcel();
+        log_message('Debug', 'PhpSpreadsheet is loaded newly.');
+        return $this->objPHPExcel = new Spreadsheet();
     }
 
     public function readExcel($filename, $startRow = 1, $startCol = 0)
     {
         try {
             // 업로드 된 엑셀 형식에 맞는 Reader객체를 만든다.
-            $objReader = PHPExcel_IOFactory::createReaderForFile($filename);
+            $objReader = IOFactory::createReaderForFile($filename);
             // 읽기전용으로 설정
             $objReader->setReadDataOnly(true);
             // 엑셀파일을 읽는다
@@ -93,7 +93,7 @@ class Excel_lib extends PHPExcel
             ->setCategory(OPERATOR_KR);
         $this->objPHPExcel->getDefaultStyle()->getFont()->setName('Noto Sans');
         $this->objPHPExcel->getDefaultStyle()->getFont()->setSize(12);
-        $this->objPHPExcel->getDefaultStyle()->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        $this->objPHPExcel->getDefaultStyle()->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
         // Set active sheet index to the first sheet, so Excel opens this as the first sheet
         $this->objPHPExcel->setActiveSheetIndex(0);
@@ -159,7 +159,7 @@ class Excel_lib extends PHPExcel
         header('Pragma: public'); // HTTP/1.0
 
         // Excel 2007 포맷으로 저장
-        $objWriter = PHPExcel_IOFactory::createWriter($this->objPHPExcel, 'Excel2007');
+        $objWriter = IOFactory::createWriter($this->objPHPExcel, 'Xlsx');
 
         // 서버에 파일을 쓰지 않고 바로 다운로드
         $objWriter->save('php://output');

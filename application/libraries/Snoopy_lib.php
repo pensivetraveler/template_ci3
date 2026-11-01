@@ -7,7 +7,7 @@ require_once APPPATH . '/third_party/Snoopy/Snoopy.php';
 class Snoopy_lib extends Snoopy
 {
     private string $platform;
-    private object $obj;
+    private ?object $obj;
 
     function __construct()
     {
@@ -21,7 +21,7 @@ class Snoopy_lib extends Snoopy
     function load()
     {
         log_message('Debug', 'Third Party Snoopy is loaded newly.');
-        return $this->obj = new PHPExcel();
+        return $this->obj = new Snoopy();
     }
 
     function parse($url, $regexp)

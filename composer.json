@@ -17,7 +17,8 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "aws/aws-sdk-php": "^3.337",
-        "ezyang/htmlpurifier": "^4.17"
+        "ezyang/htmlpurifier": "^4.17",
+        "phpoffice/phpspreadsheet": "^1.30"
     },
     "suggest": {
         "paragonie/random_compat": "Provides better randomness in PHP 5.x"
