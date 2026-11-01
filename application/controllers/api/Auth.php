@@ -211,7 +211,9 @@ class Auth extends Common
         $this->validateFormRules('form_signup_config');
 
         // user_id 는 AUTO_INCREMENT 라 기본값을 넣지 않는다
+        // 등급도 모델 필수값이라 검증 전에 넣는다
         $this->defaultList = [
+            USER_CD_COLUMN_NAME => $userCd,
             'approve_yn' => 'N',
             'withdraw_yn' => 'N',
             'del_yn' => 'N',
