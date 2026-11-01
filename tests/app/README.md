@@ -8,7 +8,7 @@ CodeIgniter 본체 시험(`tests/phpunit.xml`)과 별개로, 이 프로젝트 �
 COMPOSER_VENDOR_DIR=.dev-vendor composer install --no-scripts
 ```
 
-시험 도구는 `.dev-vendor`에 따로 둔다. `vendor`는 일부 파일이 git 에 추적되어 있어 그냥 `composer install` 을 하면 추적 파일이 바뀐다.
+시험 도구는 `.dev-vendor`에 따로 둔다. `vendor`는 운영과 같게 `composer install --no-dev --no-scripts`로 설치한다.
 
 ## 실행
 

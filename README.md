@@ -26,6 +26,14 @@ CodeIgniter 3 기반 관리자 템플릿이다. 설정 파일(config)만으로 �
   - `aws/aws-sdk-php` ^3.337: S3 파일 저장소 (`libraries/Storage.php`). PHP 7.4를 지원하는 마지막 3.337.x로 고정
 - `symfony/http-client`는 PHP 8.1 이상이 필요해서 쓰지 않는다.
 
+`vendor`는 저장소에 없다. 저장소를 받은 뒤, 그리고 `composer.lock`이 바뀐 뒤 한 번 실행한다.
+
+```bash
+composer install --no-dev --no-scripts
+```
+
+Sentry 로그(`config/extra/sentry_config.php`)는 기본으로 꺼져 있고 패키지도 설치되지 않는다. 켜려면 패키지를 따로 설치한다.
+
 ### 환경 설정
 
 1. `.env.example`을 복사해서 `.env.development` / `.env.production`을 만든다. `.env.*`는 커밋하지 않는다.

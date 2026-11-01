@@ -4,7 +4,7 @@ define('BASEPATH', __DIR__.'/../../system/');
 define('FCPATH', dirname(__DIR__, 2).'/');
 define('APPPATH', FCPATH.'application/');
 
-// vendor 는 일부 파일이 git 에 추적되고 개발 패키지가 없어, 시험 도구는 .dev-vendor 에 따로 둔다 (tests/app/README.md)
+// vendor 는 운영과 같게 개발 패키지 없이 설치하므로, 시험 도구는 .dev-vendor 에 따로 둔다 (tests/app/README.md)
 require FCPATH.'.dev-vendor/autoload.php';
 require BASEPATH.'core/Common.php';
 require APPPATH.'helpers/common_helper.php';
