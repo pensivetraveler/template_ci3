@@ -82,3 +82,60 @@ $config['filter_articles_config'] = [
         ],
     ],
 ];
+
+$config['filter_partner_auth_config'] = [
+    'filters' => [
+        [
+            'field' => 'partner_id',
+            'label' => 'lang:partner.partner_id',
+            'type' => 'select',
+            'subtype' => 'select2',
+            'default' => '',
+            'attributes' => [
+                'placeholder' => 'filter.Select The User Kind',
+            ],
+            'option_attributes' => [
+                'option_type' => 'model',
+                'option_data' => [
+                    'model' => 'Model_Partner',
+                    'method' => 'getList',
+                    'params' => [
+                        'where' => [
+                            'user.del_yn' => 'N',
+                            'user.withdraw_yn' => 'N',
+                        ],
+                        'orderBy' => [
+                            'partner_id' => 'asc',
+                        ]
+                    ],
+                ],
+                'render' => [
+                    'id' => 'partner_id',
+                    'text' => 'user.name',
+                ],
+            ],
+            'form_attributes' => [
+                'set_default_first' => true,
+                'change_after' => [
+                    'callback' => 'onChangeTriggerAPIParams',
+                    'params' => [
+                        'target' => 'partner_id'
+                    ]
+                ]
+            ],
+            'filter_attributes' => [
+                'type' => 'where',
+            ],
+        ],
+    ],
+    'help_block' => [
+        'tag' => 'span',
+        'text' => '각 권한에 따라 체크박스에 체크를 해주세요.',
+        'attr' => [
+            'class' => 'small d-block mt-1 text-primary',
+        ],
+    ],
+    'actions' => [
+//        'reset' => false,
+    ]
+];

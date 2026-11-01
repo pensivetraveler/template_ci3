@@ -45,6 +45,18 @@ function getExcelColumnIndex(field) {
 	return ths.findIndex(th => th.getAttribute('data-field') === field);
 }
 
+/**
+ * 행을 지우거나 값을 고친 뒤 남은 행·오류 수에 맞춰 건수와 버튼을 맞춘다
+ */
+function refreshExcelErrorState() {
+	const rowCount = document.querySelectorAll('#inline-editable tbody tr[data-row]').length;
+	const errorCount = document.querySelectorAll('#inline-editable td.edit-required, #inline-editable tr.edit-required').length;
+	document.getElementById('totalRowCount').innerText = String(rowCount);
+	document.getElementById('totalErrorCount').innerText = String(errorCount);
+	document.getElementById('btnErrorFind').toggleAttribute('disabled', errorCount === 0);
+	document.getElementById('excelFormSubmit').toggleAttribute('disabled', errorCount > 0 || rowCount === 0);
+}
+
 function handleExcelAjaxError(xhr) {
 	if(xhr.status === 422 && xhr.responseJSON && Array.isArray(xhr.responseJSON.errors)) {
 		emitExcelErrors(xhr.responseJSON.errors);
@@ -146,6 +158,7 @@ $(function() {
 
 	$("#inline-editable").on('click', 'button[value="remove"]', function () {
 		this.closest('tr').remove();
+		refreshExcelErrorState();
 	});
 
 	document.getElementById('excelFile').addEventListener('change', function(event) {
@@ -299,10 +312,7 @@ $(function() {
 					}
 				}
 
-				if(!document.querySelectorAll('td.edit-required').length) {
-					document.getElementById('excelFormSubmit').removeAttribute('disabled');
-					document.getElementById('btnErrorFind').setAttribute('disabled', 'disabled');
-				}
+				refreshExcelErrorState();
 			});
 		};
 

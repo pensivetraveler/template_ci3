@@ -241,6 +241,13 @@ class AdminRecordTest extends ApiTestCase
         @unlink($file);
     }
 
+    public function testPartnerAuthScreenHasPartnerFilter(): void
+    {
+        $page = $this->systemAdmin()->request('GET', '/admin/partnerAuth');
+        $this->assertSame(200, $page->status);
+        $this->assertStringContainsString('where[partner_id]', $page->body);
+    }
+
     public function testMenuWithSubMenusCannotBeDeleted(): void
     {
         TestDb::exec("INSERT INTO tbl_menu (parent_id, code, title, class, method, depth, srt, is_sub_menu, is_login, is_auth, is_super, is_use, base_auth) VALUES (0, '', 'tmpparent', '', '', 1, 99, 1, 1, 1, 0, 1, '111111')");

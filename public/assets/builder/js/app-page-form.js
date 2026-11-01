@@ -927,7 +927,7 @@ function setFormListItemFile(field, item, identifier = '') {
                     <span class="not-draggable">${escapeHtml(item.orig_name)}</span>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                    <button class="btn btn-primary waves-effect p-1" type="button" data-action="download-file" data-file-id="${Number(fileId)}">
+                    <button class="btn btn-primary waves-effect p-1" type="button" data-action="download-file" data-download-id="${Number(fileId)}">
                         <i class="ri-file-download-line ri-16px align-middle"></i>
                     </button>
         `;
