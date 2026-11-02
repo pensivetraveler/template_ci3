@@ -45,7 +45,7 @@ function getAjaxOptions(obj = {}) {
 			},
 		};
 
-		for(const key of ['headers', 'complete', 'contentType', 'processData']){
+		for(const key of ['headers', 'complete', 'contentType', 'processData', 'xhrFields', 'responseFields']){
 			if(Object.hasOwn(obj, key)) ajaxOption[key] = obj[key];
 		}
 

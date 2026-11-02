@@ -241,6 +241,34 @@ class AdminRecordTest extends ApiTestCase
         @unlink($file);
     }
 
+    public function testExportDownloadReturnsFileOnce(): void
+    {
+        $sys = $this->systemAdmin();
+        $prepared = $sys->request('GET', '/admin/api/administrators/prepareExports?exportType=csv');
+        $this->assertSame(201, $prepared->status, $prepared->body);
+        $filename = json_decode($prepared->body, true)['data'][0]['filename'];
+        $url = '/admin/api/administrators/downloadExports?filename='.urlencode($filename);
+        $file = APPPATH.'cache/exports/'.basename($filename);
+        $expected = file_get_contents($file);
+
+        // 인증 헤더 없이 주소만 열면 막힌다 (운영 설정)
+        $blocked = json_decode(file_get_contents(ApiClient::BASE.$url, false, stream_context_create(['http' => ['ignore_errors' => true]])), true);
+        $this->assertSame(4060, $blocked['code']);
+        $this->assertFileExists($file);
+
+        $response = $sys->request('GET', $url);
+        $this->assertSame(200, $response->status, $response->body);
+        $this->assertSame($expected, $response->body);
+        $this->assertMatchesRegularExpression('/^Content-Disposition: attachment; filename="[^"]+\.csv"/mi', implode("\n", $response->headers));
+        $this->assertFileDoesNotExist($file);
+
+        // 실패는 화면이 안내할 수 있게 JSON
+        $again = $sys->request('GET', $url);
+        $this->assertSame(404, $again->status, $again->body);
+        $this->assertSame(4047, $again->code());
+        $this->assertNotEmpty($again->json['msg'] ?? '');
+    }
+
     public function testTokenLifetimeReadsSysUserKey(): void
     {
         [$id, $pk] = self::makeUser('USR001');

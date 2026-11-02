@@ -2203,24 +2203,20 @@ class MY_Builder_API extends MY_Controller_API
 
     public function downloadExports_get(): void
     {
-        $message = '';
-
         $encrypted = $this->input->get('filename');
-        if(empty($encrypted)) $message = $this->lang->status(EMPTY_REQUIRED_DATA);
+        if(empty($encrypted)) $this->response(['code' => EMPTY_REQUIRED_DATA], RestController::HTTP_BAD_REQUEST);
 
         // 암호화된 파일명만 허용 (경로 조작 방지)
-        if(!$message && !preg_match('/^[A-Za-z0-9_=-]+$/', (string)$encrypted)) $message = $this->lang->status(FILE_NOT_EXIST);
+        if(!preg_match('/^[A-Za-z0-9_=-]+$/', (string)$encrypted)) $this->response(['code' => FILE_NOT_EXIST], RestController::HTTP_NOT_FOUND);
         $fullPath = $this->getExportsDir() . $encrypted;
-        if(!$message && !file_exists($fullPath)) $message = $this->lang->status(FILE_NOT_EXIST);
+        if(!file_exists($fullPath)) $this->response(['code' => FILE_NOT_EXIST], RestController::HTTP_NOT_FOUND);
 
         $encrypted = strtr($encrypted, [
             '-' => '+',
             '_' => '/',
         ]);
-        $filename = $message ? false : $this->encryption->decrypt($encrypted);
-        if(!$message && $filename === false) $message = $this->lang->status(WRONG_TOKEN);
-
-        if($message) show_alert('error', $message, true);
+        $filename = $this->encryption->decrypt($encrypted);
+        if($filename === false) $this->response(['code' => WRONG_TOKEN], RestController::HTTP_BAD_REQUEST);
 
         $fileContents = file_get_contents($fullPath);
         @unlink($fullPath);

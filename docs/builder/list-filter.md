@@ -362,8 +362,8 @@ method config 기본값은 `method_list_base_config` + `method_list_table_datata
    - 파일 경로 `prepareExportsPath()`: `public/temps/` + `encryption->encrypt("{APP_NAME}_{class}_{YmdHis}.{ext}")` (`+`→`-`, `/`→`_`).
    - xlsx: `prepareExcel()`(`Excel_lib`, xlsx, 헤더 굵게/회색, 열 너비 20, 테두리). csv: `prepareCSV()`(`fputcsv`, 콤마, BOM 없음).
    - 응답 `{code: FILE_CREATED, data: [{filename: "<암호화된 파일명>"}]}`.
-3. JS가 숨김 iframe `#downloadFrame`(`views/builder/includes/tail.php`)의 `src`를 `{API_URI}/downloadExports?filename=…`로 지정.
-4. `MY_Builder_API::downloadExports_get()`: 파일 존재 확인 → 복호화해서 원래 파일명 획득(실패 시 `show_alert` 후 종료) → 내용 읽고 **즉시 삭제** → `force_download(원래 이름)`.
+3. JS `downloadExports()`가 `{API_URI}/downloadExports?filename=…`을 AJAX로 받아(운영의 AJAX·API 키 검사 때문에 주소를 바로 열 수 없음) Blob으로 저장. 파일명은 `Content-Disposition`에서 읽는다.
+4. `MY_Builder_API::downloadExports_get()`: 파일 존재 확인 → 복호화해서 원래 파일명 획득(실패 시 JSON 오류 응답, 화면이 안내 표시) → 내용 읽고 **즉시 삭제** → `force_download(원래 이름)`.
 
 > **주의**
 > - 서버(`prepareExports_get()`)에 export 권한 검사가 없다. 버튼 노출만 `setListExports()`로 제어된다.

@@ -372,10 +372,42 @@ function prepareExports(kind, filterData = null) {
         },
         url : getUrlWithIdentifiers(common.API_URI+'/prepareExports', {}, common.API_PARAMS),
         success: function(response, textStatus, jqXHR) {
-            // 파일명은 URL 인코딩해서 넘긴다
-            const filename = encodeURIComponent(response.data[0].filename);
-            const iframe = document.getElementById('downloadFrame');
-            iframe.src = common.API_URI+'/downloadExports?filename='+filename;
+            downloadExports(response.data[0].filename);
+        },
+    });
+}
+
+// API 는 AJAX·인증 헤더가 있어야 하므로(운영) 주소를 바로 열지 않고 요청으로 받아 저장한다
+function downloadExports(filename) {
+    executeAjax({
+        data : {filename: filename},
+        url : common.API_URI+'/downloadExports',
+        dataType : 'binary',
+        xhrFields : {responseType: 'blob'},
+        responseFields : {binary: 'responseBlob'},
+        success: function(blob, textStatus, jqXHR) {
+            const name = /filename="([^"]+)"/.exec(jqXHR.getResponseHeader('Content-Disposition') || '');
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name ? name[1] : 'export';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+        },
+        // 오류 응답(JSON)도 Blob 으로 온다
+        error: function(jqXHR) {
+            Promise.resolve(jqXHR.responseBlob?.text())
+                .then(JSON.parse)
+                .catch(() => undefined)
+                .then(function(json) {
+                    jqXHR.responseJSON = json;
+                    showAlert({
+                        type: 'error',
+                        text: getAjaxErrorMessage(jqXHR),
+                    });
+                });
         },
     });
 }
