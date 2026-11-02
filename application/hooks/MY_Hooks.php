@@ -52,6 +52,10 @@ class MY_Hooks
         if ($sessSavePath !== false && $sessSavePath !== '' && ($this->config['sess_driver'] ?? 'files') === 'files') {
             $this->config['sess_save_path'] = $sessSavePath;
         }
+        // 프록시(ALB) 뒤에서 세션 드라이버가 보는 REMOTE_ADDR 은 프록시 노드 주소라 연결마다 달라진다. 맞춰 보면 로그인이 끊긴다
+        if ((string)getenv('PROXY_IPS') !== '') {
+            $this->config['sess_match_ip'] = FALSE;
+        }
     }
 
     public function systemOfInspection()
