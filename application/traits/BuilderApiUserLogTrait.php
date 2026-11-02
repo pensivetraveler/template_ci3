@@ -22,7 +22,11 @@ trait BuilderApiUserLogTrait
             ]);
         }
 
-        if(!$this->devMode && $this->session->userdata('is_sys_admin')) return;
+        // 로그는 남기지 않아도 보관 기간 지난 로그는 지운다 (시스템 관리자만 쓰는 운영에서도 돌도록)
+        if(!$this->devMode && $this->session->userdata('is_sys_admin')) {
+            $this->purgeLogs();
+            return;
+        }
 
         $name = $this->session->userdata('name');
         $pp = $this->josa->__replace($name, '이');

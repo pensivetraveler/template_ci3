@@ -248,6 +248,22 @@ class AdminRecordTest extends ApiTestCase
         @unlink($file);
     }
 
+    public function testExpiredLogsArePurgedOnSystemAdminRequest(): void
+    {
+        $sys = $this->systemAdmin();
+        $oldDate = date('Y-m-d H:i:s', time() - 40 * 86400);
+        TestDb::exec("DELETE FROM tbl_user_logs");
+        TestDb::exec("INSERT INTO tbl_user_logs (log_id, user_id, class, method, type, title, datetime) VALUES (0, 1, 'old', 'index', '', '', '$oldDate')");
+        $this->setUserCfg(['LOG_KEEP_DAYS' => '30']);
+        @unlink(APPPATH.'cache/user_logs_purged');
+        try {
+            $this->assertSame(200, $sys->request('GET', '/admin/api/administrators')->status);
+            $this->assertSame('0', TestDb::value("SELECT COUNT(*) FROM tbl_user_logs WHERE class = 'old'"));
+        } finally {
+            $this->clearUserCfg();
+        }
+    }
+
     public function testExportDownloadReturnsFileOnce(): void
     {
         $sys = $this->systemAdmin();
