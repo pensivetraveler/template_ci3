@@ -77,6 +77,13 @@ class AdminRecordTest extends ApiTestCase
             $this->assertSame('0', TestDb::value("SELECT COUNT(*) FROM tbl_rest_logs WHERE uri = 'old'"));
             $this->assertSame('1', TestDb::value("SELECT COUNT(*) FROM tbl_rest_logs WHERE uri = 'keep'"));
             $this->assertSame('1', TestDb::value("SELECT COUNT(*) FROM tbl_user_logs WHERE class = 'keep'"));
+
+            // 정수가 아닌 값이면 지우지 않는다
+            TestDb::exec("INSERT INTO tbl_user_logs (log_id, user_id, class, method, type, title, datetime) VALUES (0, 1, 'old', 'index', '', '', '$oldDate')");
+            $this->setUserCfg(['LOG_KEEP_DAYS' => '30abc']);
+            @unlink(APPPATH.'cache/user_logs_purged');
+            $this->assertSame(200, $client->request('GET', '/admin/api/administrators')->status);
+            $this->assertSame('1', TestDb::value("SELECT COUNT(*) FROM tbl_user_logs WHERE class = 'old'"));
         } finally {
             $this->clearUserCfg();
         }
@@ -267,6 +274,23 @@ class AdminRecordTest extends ApiTestCase
         $this->assertSame(404, $again->status, $again->body);
         $this->assertSame(4047, $again->code());
         $this->assertNotEmpty($again->json['msg'] ?? '');
+    }
+
+    public function testDbUniqueViolationAnswersConflict(): void
+    {
+        if (self::devMode()) $this->markTestSkipped('개발은 db_debug 가 DB 오류 화면을 낸다');
+
+        $sys = $this->systemAdmin();
+        // 동시 요청은 재현이 어려워, 입력 검사를 지난 INSERT 가 고유 제약에 걸린 것과 같은 오류를 낸다
+        TestDb::exec("CREATE TRIGGER tmp_dup_user BEFORE INSERT ON tbl_user FOR EACH ROW SIGNAL SQLSTATE '23000' SET MYSQL_ERRNO = 1062, MESSAGE_TEXT = 'Duplicate entry'");
+        try {
+            $response = $sys->request('POST', '/admin/api/administrators', $this->adminData());
+        } finally {
+            TestDb::exec('DROP TRIGGER tmp_dup_user');
+        }
+        $this->assertSame(409, $response->status, $response->body);
+        $this->assertSame(4090, $response->code());
+        $this->assertNotEmpty($response->json['msg'] ?? '');
     }
 
     public function testTokenLifetimeReadsSysUserKey(): void

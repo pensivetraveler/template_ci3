@@ -1099,25 +1099,27 @@ class MY_Builder_API extends MY_Controller_API
      */
     protected function purgeLogs(): void
     {
-        $days = (int)user_cfg('LOG_KEEP_DAYS');
-        if($days <= 0) return;
+        // 지우면 되살릴 수 없으므로 정수가 아닌 값(저장 검사를 거치지 않은 값)이면 지우지 않는다
+        $value = user_cfg('LOG_KEEP_DAYS');
+        if(!ctype_digit($value) || (int)$value <= 0) return;
+        $days = (int)$value;
 
-        $before = time() - $days * 86400;
-        $this->purgeLogRows('user_logs_purged', $this->db, $this->Model_User_Logs->table, 'datetime', date('Y-m-d H:i:s', $before));
+        // 사용자 로그 datetime 은 DB 시각(current_timestamp)으로 쌓이므로 DB 시각으로, 요청 로그 time 은 PHP time() 으로 쌓이므로 그대로 비교한다
+        $this->purgeLogRows('user_logs_purged', $this->db, $this->Model_User_Logs->table, "`datetime` < NOW() - INTERVAL {$days} DAY");
         if($this->config->item('rest_enable_logging')) {
-            $this->purgeLogRows('rest_logs_purged', $this->rest->db, $this->config->item('rest_logs_table'), 'time', $before);
+            $this->purgeLogRows('rest_logs_purged', $this->rest->db, $this->config->item('rest_logs_table'), '`time` < '.(time() - $days * 86400));
         }
     }
 
     /**
      * 요청이 길어지지 않게 한 번에 1000행까지만 지운다. 더 남았으면 다음 요청에서 잇고, 다 지운 날은 다시 보지 않는다
      */
-    protected function purgeLogRows(string $cacheKey, $db, string $table, string $column, $before): void
+    protected function purgeLogRows(string $cacheKey, $db, string $table, string $condition): void
     {
         $today = date('Y-m-d');
         if($this->cache->file->get($cacheKey) === $today) return;
 
-        $db->where($column.' <', $before)->limit(1000)->delete($table);
+        $db->where($condition, null, false)->limit(1000)->delete($table);
         if($db->affected_rows() < 1000) $this->cache->file->save($cacheKey, $today, 172800);
     }
 
@@ -1167,6 +1169,9 @@ class MY_Builder_API extends MY_Controller_API
      */
     protected function responseDbWriteError(string $location, $model): void
     {
+        // 입력 검사를 지나 DB 고유 제약에 걸림 (동시 요청 등)
+        if($model->lastDbErrorCode === 1062) $this->response(['code' => DATA_ALREADY_EXIST], RestController::HTTP_CONFLICT);
+
         $this->responseError([
             'location' => $location,
             'param' => [

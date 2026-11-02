@@ -113,7 +113,7 @@ class SysCfg extends Common
                 if($value === 'show' && !PASSWORD_DECRYPTABLE) $this->cfgError('cfg_val', $value, '복호화할 수 없는 저장 방식에서는 비밀번호 표시를 고를 수 없습니다.');
                 break;
             case 'SYS_USER_LOG_KEEP_DAYS' :
-                if(!ctype_digit($value)) $this->cfgError('cfg_val', $value, '로그 보관 기간은 0 이상의 정수(일)로 입력하세요.');
+                if(!ctype_digit($value) || (int)$value > 36500) $this->cfgError('cfg_val', $value, '로그 보관 기간은 0 이상 36500 이하의 정수(일)로 입력하세요.');
                 break;
         }
     }

@@ -229,7 +229,8 @@ CREATE TABLE `tbl_user_logs` (
   `message` varchar(255) DEFAULT NULL,
   `params` longtext DEFAULT NULL,
   `datetime` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_user_logs_datetime` (`datetime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `tbl_user_limits` (
@@ -265,7 +266,8 @@ CREATE TABLE `tbl_rest_logs` (
   `response_code` smallint(3) DEFAULT 0 COMMENT 'response_code',
   `kind` enum('api','page','system') NOT NULL DEFAULT 'api',
   `created_dt` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_rest_logs_time` (`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `tbl_visitor` (

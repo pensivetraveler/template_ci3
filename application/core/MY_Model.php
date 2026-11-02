@@ -209,9 +209,13 @@ class MY_Model extends CI_Model
      * 쿼리 실패(db_debug=FALSE) 시 트랜잭션을 되돌리고 false 를 돌려준다.
      * 예전에는 db->error() 배열(truthy)을 돌려줘 호출부가 성공으로 처리했다.
      */
+    /** 마지막으로 실패한 쓰기의 DB 오류 번호 */
+    public int $lastDbErrorCode = 0;
+
     protected function failTrans(): bool
     {
         $error = $this->db->error();
+        $this->lastDbErrorCode = (int)($error['code'] ?? 0);
         $query_log = $this->db->last_query();
         log_message('error', " query failed : [".($error['code'] ?? '')."] ".($error['message'] ?? '')." '$query_log' ");
         $this->db->trans_rollback();

@@ -169,6 +169,7 @@ class PasswordFindTest extends ApiTestCase
     {
         $sys = $this->systemAdmin();
         $this->assertSame(400, $this->saveCfg($sys, 'LOG_KEEP_DAYS', 'abc')->status);
+        $this->assertSame(400, $this->saveCfg($sys, 'LOG_KEEP_DAYS', '36501')->status);
         $this->assertSame(400, $this->saveCfg($sys, 'SIGNUP_EMAIL_YN', 'yes')->status);
         $this->assertSame(400, $this->saveCfg($sys, 'PASSWORD_FIND_MODE', 'mail')->status);
         $this->assertSame(200, $this->saveCfg($sys, 'PASSWORD_FIND_MODE', 'reset')->status);
