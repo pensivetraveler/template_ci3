@@ -72,7 +72,7 @@ Sentry 로그(`config/extra/sentry_config.php`)는 기본으로 꺼져 있고 �
 | API | `core/MY_Builder_API.php` ← `controllers/api/Common.php` | 목록·상세·등록·수정·삭제, 검증, 파일 업로드, 엑셀 내보내기·가져오기를 처리한다. 스키마는 Model과 `form_*`/`list_*`/`view_*` 설정에서 가져온다. |
 | JS | `public/assets/builder/js/app-page-*.js` | WEB이 내려 준 변수로 DataTable과 폼을 그리고 API를 호출한다. |
 
-API는 책임별로 `traits/BuilderApi*Trait.php`(등록·수정·삭제, 검증, 사용자 로그, 내보내기, 엑셀 등록, 첨부, 복제, 권한, 데이터 범위)에 나뉘어 있다. 엔티티는 지금처럼 메서드를 오버라이드한다.
+API는 책임별로 `traits/BuilderApi*Trait.php`(등록·수정·삭제, 검증, 사용자 로그, 내보내기, 엑셀 등록, 첨부, 복제, 권한, 데이터 범위)에 나뉘어 있다. WEB은 `traits/BuilderWeb*Trait.php`(목록, 폼·상세, 엑셀 화면, 메뉴·권한), `libraries/RestController.php`는 `traits/Rest*Trait.php`(인증, 요청 값, 요청 로그)에 나뉘어 있다. 엔티티는 지금처럼 메서드를 오버라이드한다.
 
 WEB과 API가 함께 쓰는 로직은 `traits/BuilderInitTrait.php`, `BuilderCommonTrait.php`, `BuilderColumnsTrait.php`와 `helpers/builder/*.php`에 있다.
 
