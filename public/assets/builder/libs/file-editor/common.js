@@ -943,7 +943,8 @@ function registerEditorPasteWorkaround(editor) {
  * Monaco Editor 중복 로드/중복 초기화 방지
  */
 (function () {
-    const MONACO_BASE_URL = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs';
+    // CSP script-src 에 이미 있는 cdnjs 에서 받는다 (editor.main.css·codicon.ttf 도 같은 폴더)
+    const MONACO_BASE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs';
     const MONACO_LOADER_URL = MONACO_BASE_URL + '/loader.js';
 
     window.__monacoLoaderPromise = window.__monacoLoaderPromise || null;

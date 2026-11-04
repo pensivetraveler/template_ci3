@@ -164,8 +164,10 @@ class MY_Hooks
             $CI->output->set_header($cspHeader.': '.implode('; ', [
                 "default-src 'self'",
                 "script-src 'self' 'nonce-".csp_nonce()."' https://t1.daumcdn.net https://cdnjs.cloudflare.com",
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-                "font-src 'self' data: https://fonts.gstatic.com",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+                "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+                // Monaco 편집기는 다른 출처의 워커 코드를 blob 워커로 띄운다. 막히면 메인 스레드에서 돌며 오류를 낸다
+                "worker-src 'self' blob:",
                 "img-src 'self' data: blob: https:",
                 "connect-src 'self'",
                 "frame-src 'self' https://www.youtube.com https://*.daum.net",
