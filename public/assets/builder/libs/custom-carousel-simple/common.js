@@ -310,7 +310,7 @@
         }
 
         this.container.classList.remove(
-            this.initClass임의
+            this.initClass
         );
 
         this.container = null;
