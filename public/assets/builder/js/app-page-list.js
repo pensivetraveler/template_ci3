@@ -601,7 +601,7 @@ function renderColumn(data, type, full, meta, column) {
 
 		switch (column.type) {
 			case 'text':
-				inner = document.createTextNode(column.text?getLocale(column.text, common.LOCALE):getListOptionLabel(column, data));
+				inner = createListText(column.text?getLocale(column.text, common.LOCALE):getListOptionLabel(column, data));
 				break;
 			case 'button':
                 if(data === undefined) {
@@ -667,6 +667,20 @@ function getListOptionLabel(column, data) {
 	if(!options || typeof options !== 'object' || isArray(options) || !Object.keys(options).length) return data;
 	const seperator = column.option_attributes?.seperator ?? ',';
 	return String(data).split(seperator).map((value) => options[value.trim()] ?? value).join(`${seperator} `);
+}
+
+/**
+ * 목록 셀 글자. 서버 값의 줄바꿈(\n)은 <br> 로 그리고, 나머지는 텍스트 노드로만 넣는다
+ */
+function createListText(text) {
+	const lines = String(text ?? '').split(/\r?\n/);
+	if(lines.length === 1) return document.createTextNode(lines[0]);
+	const fragment = document.createDocumentFragment();
+	lines.forEach((line, index) => {
+		if(index) fragment.appendChild(document.createElement('br'));
+		fragment.appendChild(document.createTextNode(line));
+	});
+	return fragment;
 }
 
 function createListImage(src) {

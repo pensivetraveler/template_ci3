@@ -16,7 +16,7 @@ class Visitors extends Common
 
     protected function transformView($data): object
     {
-        $data->vi_datetime = $data->vi_date . '<br>' . $data->vi_time;
+        $data->vi_datetime = $data->vi_date . "\n" . $data->vi_time;
 
         if($data->vi_referrer) {
             $baseUrlParsed = parse_url(base_url());
