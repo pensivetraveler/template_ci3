@@ -636,6 +636,11 @@ class MY_Builder_WEB extends MY_Controller_WEB
             $this->isLoggedIn = false;
         }
 
+        // 플랫폼 첫 주소(/admin 등 → common/index): 로그인했으면 첫 화면, 아니면 로그인 화면으로 (경로 설정이 없어 아래에서 'Incorrect Access' 가 나던 것)
+        if($this->router->class === 'common' && $this->router->method === 'index') {
+            redirect($this->isLoggedIn ? "$this->baseUri/$this->defaultController" : $this->noLoginRedirect);
+        }
+
         if(empty($this->routeConfig)) {
             alert(lang('Incorrect Access'), base_url($this->noLoginRedirect));
         }
