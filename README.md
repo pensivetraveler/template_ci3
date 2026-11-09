@@ -5,6 +5,7 @@ CodeIgniter 3 기반 관리자 템플릿이다. 설정 파일(config)만으로 �
 - 대상 브랜치: `v3`
 - 빌더 설정 상세 문서: [`docs/builder/`](docs/builder/)
 - 이 템플릿으로 새 프로젝트 시작하기: [`docs/new-project.md`](docs/new-project.md)
+- 템플릿 외부 감사 단계(태그 `v3.N`): [`docs/template-audit.md`](docs/template-audit.md)
 - 남은 작업·알려진 문제: [`TODO.md`](TODO.md)
 
 ## 목차

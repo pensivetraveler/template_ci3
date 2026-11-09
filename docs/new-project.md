@@ -14,6 +14,8 @@ template_ci3 v3 로 새 프로젝트를 시작할 때의 골격 체크리스트�
 
 템플릿을 복제해 원격만 바꾼다. 템플릿 이력을 그대로 가져가야 나중에 merge 로 템플릿 변경을 받을 수 있다.
 
+감사를 통과한 가장 최근 태그(`v3.N`, [template-audit.md](template-audit.md))에서 시작하는 것이 기본이다. 태그 뒤 코드 변경이 필요하면 그 변경은 감사 전이라는 것을 `docs/<프로젝트>-setup.md` 에 적는다(설계 공격에서 그 부분을 줄이지 않는다). 아직 태그가 없으면 v3 최신에서 시작한다.
+
 ```bash
 git clone -b v3 https://github.com/pensivetraveler/template_ci3.git <프로젝트>
 cd <프로젝트>
@@ -28,7 +30,7 @@ git push -u origin v3                             # 기본 브랜치 이름은 �
 `docs/<프로젝트>-setup.md`(프로젝트 메모) 맨 위에 적는다. 템플릿 변경을 받을 때마다 고친다.
 
 ```markdown
-- 템플릿: template_ci3 v3 `<커밋>` (YYYY-MM-DD 기준). 받는 법: `git fetch upstream && git merge upstream/v3`
+- 템플릿: template_ci3 v3 `<커밋>` (감사 단계 `v3.N` 또는 "감사 전", YYYY-MM-DD 기준). 받는 법: `git fetch upstream && git merge upstream/v3`
 ```
 
 커밋은 `git rev-parse --short upstream/v3` 로 확인한다.
