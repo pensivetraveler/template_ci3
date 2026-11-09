@@ -521,7 +521,7 @@ $config['tabs_frames_config'] = [
 - 제외: `type=hidden`, `form_attributes.form_validation === false`.
 - selector 탐색 순서: `[name=field]` → `[name=field[]]` → 그룹(`[name^=group][name$=[field]]` / `[name^=field]`) → `#id`.
 - `errors.required` 가 있으면 `notEmpty`. `errors` 는 서버(`setColumnErrors()`)에서 규칙별 메시지로 채워진다.
-- `type=date` → `date(YYYY-MM-DD)`, `type=file` → `file(extension, maxFiles=max, type=accept)`.
+- `type=date` → `date(YYYY-MM-DD)`, `type=file` → `file(extension, maxFiles=max, type)`. `accept` 를 나눠 `.` 로 시작하는 항목은 extension, `/` 가 든 항목(MIME)은 type 으로 넘긴다. `attributes.extension` 이 있으면 그것을 쓴다.
 - 나머지 규칙(`required`, `trim` 제외)은 `customValidatorsPreset.rules` 또는 `FORM_REGEXP` 에서 찾는다. 없으면 console.warn 후 무시한다.
 
 | CI 규칙 | FV validator (`app-page-validators.js` `customValidatorsPreset`) | 비고 |
@@ -547,7 +547,7 @@ $config['tabs_frames_config'] = [
 
 `MY_Builder_API::validate()` → `validateFormRules()` → `validateManually()`. `beforePost()`/`beforePut()` 에서 모델 파이프라인마다 호출한다.
 
-1. `validateFormRules()`: rules 가 없으면 `do_nothing`, `type=common` 제외, 그룹별로 `set_rules/set_data/run`(7-5). 이어서 `file_rules`(`required_if_empty_file`, `max_files`, `regexp_config.php`)를 정규식으로 찾아 직접 호출한다.
+1. `validateFormRules()`: rules 가 없으면 `do_nothing`, `type=common` 제외, 그룹별로 `set_rules/set_data/run`(7-5). base 그룹의 `type=checkbox` 칸에 배열(`name[]`)이 오면 규칙 이름을 `field[]` 로 바꿔 등록한다(`set_array_checkbox_rule_fields()`). CI3 는 이름에 `[]` 가 없는 칸의 배열을 빈 값으로 보아 `required` 가 늘 실패하기 때문이다. 다중 select 는 콤마로 합친 전체 값에 규칙을 거는 경우가 있어 바꾸지 않는다. 이어서 `file_rules`(`required_if_empty_file`, `max_files`, `regexp_config.php`)를 정규식으로 찾아 직접 호출한다.
 2. 실패하면 HTTP **422** (`setValidateFormErrors()`, `MY_Controller_API::responseError()`):
    ```json
    {"code":null,"msg":null,"data":{...post},"errors":[{"location":"MY_Builder_API::validateFormRules","param":"group[0][field]","value":"...","type":"min_length","msg":"..."}]}
@@ -560,6 +560,7 @@ $config['tabs_frames_config'] = [
 > **주의**
 > - 그룹 param(`group[field]`)의 서버 에러는 FV 필드 키(`field`)와 달라 화면에 표시되지 않는다. `server` validator 도 `reformatFormData()` 에서 등록되지 않는다.
 > - PUT 은 POST 와 같이 전체 form rules 로 검증한다. PATCH 는 본문에 있는 필드의 rules 만 검증한다(`validatePatchFormRules()`). 프론트는 add/edit 모두 POST 로 보낸다(11-3).
+> - 칸 이름이 `gender` 이면 저장할 때 값을 대문자로 바꾼다(`BuilderApiCrudTrait`, 칸 이름만 본다). 선택지와 DB 값을 처음부터 대문자(`M`/`F`)로 둔다. 소문자로 저장된 값이 있으면 관리자가 한 번 수정할 때 바뀌어 라디오 선택이 풀린다.
 > - `checkUniqueExist()` 는 `_mode` 를 GET 에서만 읽어, 폼 POST(add)에서도 add 로 인식하지 않는다 → `editable=true` 가 아닌 고유키는 중복검사가 생략된다.
 > - CI3 는 빈 값에 `required/isset/matches` 외 규칙을 실행하지 않는다. 서버의 `required_mod`, `required_if_value`, `required_if_empty_data`, `password_matches` 는 빈 값에서 동작하지 않으므로 필수 검사는 클라이언트와 `validateManually()`(notNullList)에 의존한다.
 
@@ -593,7 +594,7 @@ $config['tabs_frames_config'] = [
 | WEB 업로드 설정 탐색 | `{web router class}_{field}_upload_config` → `{field}_upload_config` → `base_upload_config` | `setFormColumn()` |
 | 자동 속성 | `max_size = get_file_size_to_kb(max_size)` (CI 의 KB 값을 1024 로 나눠 MB 숫자가 됨, 예: 5120 → `5`, dropzone `dz-max-filesize` 용), `accept = .ext,...` (allowed_types 변환). 사용자 attributes 가 우선 | `setFormColumn()`, `MY_file_helper.php` `get_file_size_to_kb()`, `convert_allowed_types_to_accept()` |
 | 설정 파일 | `base_upload_config`(allowed_types 없음), `thumbnail_` / `uploads_` / `category_icon_upload_config` | `application/config/extra/custom_upload_config.php` |
-| 클라이언트 검증 | FV `file(extension, maxFiles=max, type=accept)` | `reformatFormData()` |
+| 클라이언트 검증 | FV `file(extension, maxFiles=max, type)`. `accept` 의 `.ext` 는 extension, MIME 은 type 으로 나눠 넘긴다(9-1) | `reformatFormData()` |
 | 제출 | 선택된 파일만. 1개면 `name`, 여러 개면 `name[]`. **주의** — `max` 속성이 있으면 다중 파일이 0개 전송됨 | `getFormData()` |
 | 서버 업로드 | 폼 설정이 아니라 모델 `fileList` 기준. `{api router class}_{key}_upload_config` → `{key}_upload_config` → `base_upload_config`. **allowed_types 가 없으면 예외** → base 설정으로는 업로드 불가 | `MY_Builder_API::uploadFileInList()` |
 | 서버 규칙 | `file_rules` 정규식(`required_if_empty_file`, `max_files`) 별도 실행 | `validateFormRules()` |

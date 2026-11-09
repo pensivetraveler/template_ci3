@@ -147,7 +147,7 @@ trait BuilderApiValidationTrait
             // 그룹마다 새로 검증한다. 앞 그룹 규칙이 남아 있으면 다음 그룹 run() 에서 다시 검사돼 같은 오류가 두 번 들어간다
             $this->form_validation->reset_validation();
             $this->form_validation->set_data(count($data) ? $data : ['_' => '']);
-            $this->form_validation->set_rules($groupConfig);
+            $this->form_validation->set_rules($group === 'base' ? set_array_checkbox_rule_fields($groupConfig, $data) : $groupConfig);
 
             if($group === 'base') {
                 $targetData = [];
@@ -263,7 +263,7 @@ trait BuilderApiValidationTrait
     protected function setValidateFormErrors($errors, $method, $group = 'base', $attr = [], $i = 0)
     {
         return array_reduce($errors, function ($carry, $item) use ($method, $group, $attr, $i) {
-            $param = $item['field'];
+            $param = preg_replace('/\[\]$/', '', $item['field']);
             if(!empty($attr)) {
                 if($attr['envelope_name']) {
                     $param = $group.($attr['group_repeater']?"[$i]":'')."[$param]";

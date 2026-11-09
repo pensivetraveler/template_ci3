@@ -1000,6 +1000,22 @@ function get_form_item_tab(array $item, array $tabs)
 }
 
 /**
+ * 다중 체크박스(name[])로 배열이 온 칸은 검증 규칙 이름에 [] 를 붙인다.
+ * CI3 Form_validation 은 이름에 [] 가 없는 칸에 배열이 오면 빈 값으로 보므로, 붙이지 않으면 required 가 늘 실패한다.
+ * 체크박스만 바꾼다. 다중 select(콤마로 합쳐 저장, max_length 등은 전체 값 기준)는 그대로 둔다.
+ */
+function set_array_checkbox_rule_fields(array $config, array $data): array
+{
+    return array_map(function ($item) use ($data) {
+        $field = $item['field'] ?? '';
+        if (($item['type'] ?? '') === 'checkbox' && strpos($field, '[') === false && is_array($data[$field] ?? null)) {
+            $item['field'] = $field.'[]';
+        }
+        return $item;
+    }, $config);
+}
+
+/**
  * 이 사용자에게 숨긴 탭에 든 필드 이름 (그룹에 속하면 그룹 이름도).
  * 서버(MY_Builder_API)는 저장할 때 이 값을 받지 않아 DB 의 기존 값이 그대로 남는다
  */

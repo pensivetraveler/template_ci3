@@ -309,10 +309,12 @@ function reformatFormData(form, data, regexp = {}, side = false) {
         }
 
         if(curr.type === 'file') {
+            // accept 는 서버가 allowed_types 로 만든 확장자 목록(.jpg,.png)일 수 있다. FormValidation 의 type 은 MIME 만 받으므로 나눠 넘긴다
+            const accept = (curr.attributes.accept ?? '').split(',').map(a => a.trim()).filter(a => a.length);
             item.validators.file = {
-                extension: curr.attributes.extension??null,
+                extension: curr.attributes.extension ?? (accept.filter(a => a.startsWith('.')).map(a => a.slice(1)).join(',') || null),
                 maxFiles : curr.attributes.max??null,
-                type : curr.attributes.accept??null,
+                type : accept.filter(a => a.includes('/')).join(',') || null,
                 message : '유효한 파일을 업로드해주세요.',
             };
         }
