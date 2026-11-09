@@ -6,6 +6,8 @@ class MY_Controller extends CI_Controller
     protected bool $devMode;
     public string $langCode = '';
     public string $siteLang = '';
+    // 이 화면에만 더할 CSP 출처 ['지시문' => [출처, ...]] (MY_Hooks::setHeaderSecure → csp_policy)
+    public array $cspExtra = [];
 
     function __construct()
     {

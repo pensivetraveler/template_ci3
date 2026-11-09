@@ -316,6 +316,39 @@ if ( ! function_exists('csp_nonce'))
     }
 }
 
+if ( ! function_exists('csp_policy'))
+{
+    /**
+     * CSP 헤더 값 (MY_Hooks::setHeaderSecure).
+     * $extra: 화면별로 더할 출처 ['지시문' => [출처, ...]]. 컨트롤러에서 $this->cspExtra 로 넣는다.
+     * 기본 목록에 없는 지시문은 default-src 값에서 시작한다 ('self' 가 빠지지 않게)
+     */
+    function csp_policy(string $nonce, array $extra = []): string
+    {
+        $directives = [
+            'default-src' => ["'self'"],
+            'script-src' => ["'self'", "'nonce-".$nonce."'", 'https://t1.daumcdn.net', 'https://cdnjs.cloudflare.com'],
+            'style-src' => ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
+            'font-src' => ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
+            // Monaco 편집기는 다른 출처의 워커 코드를 blob 워커로 띄운다. 막히면 메인 스레드에서 돌며 오류를 낸다
+            'worker-src' => ["'self'", 'blob:'],
+            'img-src' => ["'self'", 'data:', 'blob:', 'https:'],
+            'connect-src' => ["'self'"],
+            'frame-src' => ["'self'", 'https://www.youtube.com', 'https://*.daum.net'],
+            'object-src' => ["'none'"],
+            'base-uri' => ["'self'"],
+            'form-action' => ["'self'"],
+        ];
+        foreach ($extra as $name => $sources) {
+            $directives[$name] = array_values(array_unique(array_merge($directives[$name] ?? $directives['default-src'], (array)$sources)));
+        }
+
+        $parts = [];
+        foreach ($directives as $name => $sources) $parts[] = $name.' '.implode(' ', $sources);
+        return implode('; ', $parts);
+    }
+}
+
 if ( ! function_exists('user_cfg'))
 {
     /**
