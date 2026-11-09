@@ -56,6 +56,9 @@ class MY_Builder_API extends MY_Controller_API
     protected string $listConfigName = '';
     protected string $formConfigName = '';
     protected string $viewConfigName = '';
+    protected string $tabsConfigName = '';
+    /** 이 사용자에게 숨긴 폼 탭의 필드 (get_hidden_tab_fields). 저장 요청에서 이 값은 받지 않는다 */
+    protected array $hiddenTabFields = [];
 
     protected array $validateMessages = [];
     protected array $validateCallback = [];
@@ -120,6 +123,7 @@ class MY_Builder_API extends MY_Controller_API
         if($this->listConfigName === '') $this->listConfigName = $this->resourceLoader->entityConfigName('list', $resource);
         if($this->formConfigName === '') $this->formConfigName = $this->resourceLoader->entityConfigName('form', $resource);
         if($this->viewConfigName === '') $this->viewConfigName = $this->resourceLoader->entityConfigName('view', $resource);
+        if($this->tabsConfigName === '') $this->tabsConfigName = $this->resourceLoader->entityConfigName('tabs', $resource);
 
         if($this->router->method === 'index') {
             if($this->noIndexMethod) show_404();
@@ -469,6 +473,7 @@ class MY_Builder_API extends MY_Controller_API
     protected function beforePost($key = 0, $model = null): array
     {
         list($key, $data) = parent::beforePost($key);
+        $data = $this->removeHiddenTabFields($data);
 
         $this->checkIdentifierExist($key);
 
@@ -532,6 +537,7 @@ class MY_Builder_API extends MY_Controller_API
     protected function beforePut($key = 0, $model = null): array
     {
         list($key, $data) = parent::beforePut($key);
+        $data = $this->removeHiddenTabFields($data);
 
         $this->checkIdentifierExist($key);
 
@@ -570,6 +576,7 @@ class MY_Builder_API extends MY_Controller_API
         $this->checkIdentifierExist($key);
 
         list($key, $data) = parent::beforePatch($key);
+        $data = $this->removeHiddenTabFields($data);
 
         if(is_array($data) && count($data)) {
             $this->validatePatchFormRules($data);
@@ -633,6 +640,7 @@ class MY_Builder_API extends MY_Controller_API
                 return array_merge($this->config->get('builder_list_base'), $item);
             }, $this->resourceLoader->entityConfig($this->listConfigName, [], false));
             $this->formConfig = $this->resolveFormConfig($this->resourceLoader->entityConfig($this->formConfigName, [], false));
+            if($this->input->method() !== 'get') $this->setHiddenTabFields();
             $this->viewConfig = array_map(function ($item) {
                 return array_merge($this->config->get('builder_view_base'), $item);
             }, $this->resourceLoader->entityConfig($this->viewConfigName, [], false));
@@ -654,6 +662,30 @@ class MY_Builder_API extends MY_Controller_API
 
             // form 설정이 없는 엔티티(MenuAuth 등)도 POST를 받으므로 막지 않는다 (서버 form rules 검증만 생략됨)
         }
+    }
+
+    /**
+     * 폼 탭 정의(tabs_{엔티티}_config)에서 이 사용자에게 숨긴 탭의 필드를 찾아,
+     * 저장 요청에서 받지 않도록 하고 form 설정에서도 뺀다 (검증·onoff 기본값 N 이 그 필드에 돌지 않도록)
+     */
+    protected function setHiddenTabFields(): void
+    {
+        $tabs = resolve_form_tabs($this->resourceLoader->entityConfig($this->tabsConfigName, [], false), $this->session->userdata('user_cd'));
+        $this->hiddenTabFields = get_hidden_tab_fields($this->formConfig, $tabs);
+        if(!count($this->hiddenTabFields)) return;
+
+        $this->formConfig = array_values(array_filter($this->formConfig, function ($item) {
+            return !isset($item['field']) || !in_array($item['field'], $this->hiddenTabFields, true);
+        }));
+    }
+
+    /**
+     * 숨긴 탭의 값을 요청에서 뺀다. 수정이면 DB 의 기존 값이 남는다
+     */
+    protected function removeHiddenTabFields($data)
+    {
+        if(!is_array($data) || !count($this->hiddenTabFields)) return $data;
+        return array_diff_key($data, array_flip($this->hiddenTabFields));
     }
 
     /**

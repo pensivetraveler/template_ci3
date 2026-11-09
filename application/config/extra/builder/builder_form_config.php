@@ -23,6 +23,8 @@ $config['builder_form_base'] = [
     'group_attributes' => [],
     'list' => false,
     'list_attributes' => [],
+    // tabs 레이아웃: 탭 이름(tabs_{엔티티}_config 의 키). 비우면 tab_index(탭 정의의 n번째)
+    'tab' => '',
     'tab_index' => 0,
 ];
 

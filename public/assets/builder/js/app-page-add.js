@@ -178,6 +178,7 @@ $(function () {
 						}
 					});
 					if(unshown.length) showAlert({type: 'warning', text: unshown.join('\n')});
+					showInvalidFieldTab(formRecord);
 				}else{
 					showAlert({
 						type: 'warning',
@@ -189,6 +190,7 @@ $(function () {
 	}).on('core.form.invalid', function () {
 		// if fields are invalid
 		console.log('core.form.invalid')
+		showInvalidFieldTab(formRecord);
 	});
 
 	if(common.PAGE_LIST_URI === undefined) $('.btn-list').addClass('d-none');

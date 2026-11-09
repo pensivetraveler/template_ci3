@@ -519,7 +519,7 @@ class MY_Builder_WEB extends MY_Controller_WEB
                 $this->formExist = true;
                 $this->formColumns = $this->setFormColumns($methodConfig['resourceConfig']);
                 $this->addJsVars([
-                    'FORM_DATA' => $this->setFormData(),
+                    'FORM_DATA' => $this->skipHiddenTabValidation($this->setFormData()),
                     'FORM_REGEXP' => $this->config->item('regexp'),
                     'FORM_TYPE' => $methodConfig['subtype']??'base',
                 ]);

@@ -690,13 +690,10 @@ function restructure_admin_form_data($form_data, $form_type = 'side', $form_sub_
 
             $form_data = array_diff_key($form_data, array_flip($indexes));
 
-            // 20260923 tab_index 추가
-            if(array_key_exists('tab_index', $attr)) {
-                $tab_index = $attr['tab_index'];
-                unset($attr['tab_index']);
-            }else{
-                $tab_index = 0;
-            }
+            // 그룹 블록의 탭은 group_attributes 의 tab(탭 이름) 또는 tab_index
+            $tab = $attr['tab'] ?? '';
+            $tab_index = $attr['tab_index'] ?? 0;
+            unset($attr['tab'], $attr['tab_index']);
 
             $form_data[$idx] = [
                 'id' => $group_name,
@@ -708,6 +705,7 @@ function restructure_admin_form_data($form_data, $form_type = 'side', $form_sub_
                 'attr' => $attr,
                 'data' => $data,
                 'colspan' => $attr['colspan'] ?? 12,
+                'tab' => $tab,
                 'tab_index' => $tab_index,
             ];
 
@@ -892,13 +890,16 @@ function get_side_form_input_adds($item, $formType): string
     }
 }
 
-function restructure_form_data_by_type($form_data, $form_type = 'side', $form_sub_type = 'base'): array
+/**
+ * $tabs: tabs 레이아웃의 탭 정의 (resolve_form_tabs() 결과). 비우면 tab_index 번호로 탭을 나눈다
+ */
+function restructure_form_data_by_type($form_data, $form_type = 'side', $form_sub_type = 'base', array $tabs = []): array
 {
     $form_data = restructure_admin_form_data($form_data, $form_type, $form_sub_type);
-    return reformat_form_data_by_type($form_data, $form_type, $form_sub_type);
+    return reformat_form_data_by_type($form_data, $form_type, $form_sub_type, $tabs);
 }
 
-function reformat_form_data_by_type($form_data, $form_type = 'side', $form_sub_type = 'base'): array
+function reformat_form_data_by_type($form_data, $form_type = 'side', $form_sub_type = 'base', array $tabs = []): array
 {
     if($form_type === 'custom') {
         return trans_formdata_dit_type($form_data);
@@ -921,18 +922,103 @@ function reformat_form_data_by_type($form_data, $form_type = 'side', $form_sub_t
     })));
 
     if($form_type === 'tabs') {
-        $tab_indexes = array_column($fields, 'tab_index');
-        for($i = min($tab_indexes); $i <= max($tab_indexes); $i++) {
-            $tab_fields = array_values(array_filter($fields, function($item) use ($i) {
-                return ($item['tab_index'] ?? null) === $i;
-            }));
-            $data['fields'][$i] = set_form_field_data($tab_fields, $form_sub_type);
+        $tab_fields = [];
+        foreach ($fields as $item) {
+            $key = get_form_item_tab($item, $tabs);
+            if(count($tabs) && !array_key_exists($key, $tabs)) {
+                log_message('error', "Form tab '{$key}' is not defined in the tabs config. Moved to the first tab.");
+                $key = array_key_first($tabs);
+            }
+            $tab_fields[$key][] = $item;
+        }
+
+        // 탭 정의가 없으면 탭 번호(tab_index) 순서대로, 이름은 번호
+        if(!count($tabs)) {
+            ksort($tab_fields);
+            $tabs = resolve_form_tabs(array_map(function ($key) {
+                return ['label' => is_int($key) ? 'Tab '.($key + 1) : (string)$key];
+            }, array_combine(array_keys($tab_fields), array_keys($tab_fields))), null);
+        }
+
+        // 화면에 그릴 탭 (헤더를 숨긴 탭도 내용은 그린다 — 화면 스크립트가 FORM_DATA 의 모든 필드를 찾으므로)
+        $data['tabs'] = [];
+        foreach ($tabs as $key => $tab) {
+            if(!isset($tab_fields[$key]) && $tab['hide_empty']) continue;
+            $data['tabs'][] = $tab;
+            $data['fields'][$key] = set_form_field_data($tab_fields[$key] ?? [], $form_sub_type);
         }
     }else{
         $data['fields'] = set_form_field_data($fields, $form_sub_type);
     }
 
     return $data;
+}
+
+/**
+ * 폼 탭 정의(tabs_{엔티티}_config)를 정리한다. 배열 순서가 화면 순서, 키가 탭 이름.
+ *   label      : 탭 이름 ('lang:...' 이면 언어 파일)
+ *   icon       : 아이콘 클래스 (예: ri-image-line)
+ *   user_cd    : 이 사용자 코드에게만 탭을 보인다. 비우면 모두.
+ *                못 보는 사용자가 보낸 그 탭의 값은 서버가 받지 않는다 (get_hidden_tab_fields)
+ *   hide_empty : 탭에 들어갈 필드가 없으면 탭을 뺀다
+ * 결과: [탭 이름 => 탭 + key(탭 이름), visible(이 사용자에게 보일지)]
+ */
+function resolve_form_tabs($tabs, $user_cd): array
+{
+    if(!is_array($tabs)) return [];
+
+    $result = [];
+    foreach ($tabs as $key => $tab) {
+        $tab = array_merge(['label' => '', 'icon' => '', 'user_cd' => [], 'hide_empty' => false], is_array($tab) ? $tab : []);
+        $user_cds = array_map('strval', (array)$tab['user_cd']);
+        $tab['key'] = (string)$key;
+        $tab['visible'] = !count($user_cds) || in_array((string)$user_cd, $user_cds, true);
+        $result[(string)$key] = $tab;
+    }
+
+    return $result;
+}
+
+/**
+ * 폼 항목이 들어갈 탭 이름. tab(탭 이름)이 먼저, 없으면 tab_index (탭 정의의 n번째, 탭 정의가 없으면 그 번호).
+ * 그룹에 속한 필드는 group_attributes 의 값을 쓴다 (그룹 블록 전체가 한 탭에 들어가므로)
+ */
+function get_form_item_tab(array $item, array $tabs)
+{
+    $source = $item;
+    if(($item['group'] ?? 'base') !== 'base' && !empty($item['group_attributes']) && is_array($item['group_attributes'])) {
+        $source = $item['group_attributes'];
+    }
+
+    if(is_string($source['tab'] ?? null) && $source['tab'] !== '') return $source['tab'];
+
+    $index = (int)($source['tab_index'] ?? 0);
+    if(!count($tabs)) return $index;
+
+    $keys = array_keys($tabs);
+    return (string)($keys[$index] ?? $keys[0]);
+}
+
+/**
+ * 이 사용자에게 숨긴 탭에 든 필드 이름 (그룹에 속하면 그룹 이름도).
+ * 서버(MY_Builder_API)는 저장할 때 이 값을 받지 않아 DB 의 기존 값이 그대로 남는다
+ */
+function get_hidden_tab_fields(array $form_config, array $tabs): array
+{
+    $hidden = array_keys(array_filter($tabs, function ($tab) {
+        return !$tab['visible'];
+    }));
+    if(!count($hidden)) return [];
+
+    $fields = [];
+    foreach ($form_config as $item) {
+        if(($item['type'] ?? '') === 'common' || !isset($item['field'])) continue;
+        if(!in_array((string)get_form_item_tab($item, $tabs), $hidden, true)) continue;
+        $fields[] = $item['field'];
+        if(($item['group'] ?? 'base') !== 'base') $fields[] = $item['group'];
+    }
+
+    return array_values(array_unique($fields));
 }
 
 function set_form_field_data($fields, $form_sub_type)

@@ -14,8 +14,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Resource_converter
 {
-    /** 엔티티 설정 종류 → 분할형 파일 이름의 종류 부분 ({flag}_{이것}_config.php) */
-    public const KIND_FILES = ['route' => 'route', 'form' => 'form', 'list' => 'list', 'filter' => 'filter', 'view' => 'view', 'excel' => 'excel'];
+    /** 엔티티 설정 종류 → 분할형 파일 이름의 종류 부분 ({flag}_{이것}_config.php). 탭 정의는 form 파일에 둔다 */
+    public const KIND_FILES = ['route' => 'route', 'form' => 'form', 'list' => 'list', 'filter' => 'filter', 'view' => 'view', 'excel' => 'excel', 'tabs' => 'form'];
 
     /* --------------------------------------------------------------- */
     /* PHP 배열 내보내기                                                 */

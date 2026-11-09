@@ -22,88 +22,51 @@
 			);
 		endforeach;
 	}
+
+	// 탭 정의(tabs_{엔티티}_config, resolve_form_tabs). 헤더를 숨긴 탭(visible=false)도 내용은 그린다
+	// — 화면 스크립트가 FORM_DATA 의 모든 필드를 찾기 때문. 그 탭의 값은 서버가 받지 않는다 (MY_Builder_API::setHiddenTabFields)
+	$tabs = $formData['tabs'] ?? [];
+	$activeKey = null;
+	foreach ($tabs as $tab) {
+		if($tab['visible']) { $activeKey = $tab['key']; break; }
+	}
+	$tabId = function ($key) {
+		return 'form-tab-'.preg_replace('/[^A-Za-z0-9_-]/', '_', (string)$key);
+	};
 ?>
 <div class="row">
     <div class="nav-align-top mb-6">
         <ul class="nav nav-pills mb-4 nav-fill" role="tablist">
+            <?php foreach ($tabs as $tab): if(!$tab['visible']) continue; ?>
+            <?php
+                $label = (string)$tab['label'];
+                if(sscanf($label, 'lang:%s', $line) === 1) $label = lang($line);
+            ?>
             <li class="nav-item mb-1 mb-sm-0">
                 <button
                     type="button"
-                    class="nav-link active"
+                    class="nav-link<?=$tab['key'] === $activeKey ? ' active' : ''?>"
                     role="tab"
                     data-bs-toggle="tab"
-                    data-bs-target="#navs-pills-justified-home"
-                    aria-controls="navs-pills-justified-home"
-                    aria-selected="false">
-                    <i class="tf-icons ri-home-smile-line me-2"></i> 기본
+                    data-bs-target="#<?=$tabId($tab['key'])?>"
+                    aria-controls="<?=$tabId($tab['key'])?>"
+                    aria-selected="<?=$tab['key'] === $activeKey ? 'true' : 'false'?>">
+                    <?php if($tab['icon'] !== ''): ?><i class="tf-icons <?=html_escape($tab['icon'])?> me-2"></i><?php endif; ?>
+                    <?=html_escape($label)?>
                 </button>
             </li>
-            <li class="nav-item mb-1 mb-sm-0">
-                <button
-                    type="button"
-                    class="nav-link"
-                    role="tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#navs-pills-justified-banner"
-                    aria-controls="navs-pills-justified-banner"
-                    aria-selected="false">
-					<i class="tf-icons ri-image-line me-2"></i> 배너관리
-                </button>
-            </li>
-            <li class="nav-item">
-                <button
-                    type="button"
-                    class="nav-link"
-                    role="tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#navs-pills-justified-style"
-                    aria-controls="navs-pills-justified-style"
-                    aria-selected="false">
-					<i class="tf-icons ri-paint-brush-line me-2"></i> 색상 및 폰트
-                </button>
-            </li>
-            <li class="nav-item">
-                <button
-                    type="button"
-                    class="nav-link"
-                    role="tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#navs-pills-justified-features"
-                    aria-controls="navs-pills-justified-features"
-                    aria-selected="false">
-					<i class="tf-icons ri-equalizer-line me-2"></i> 기능
-                </button>
-            </li>
+            <?php endforeach; ?>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane show active" id="navs-pills-justified-home" role="tabpanel">
+            <?php foreach ($tabs as $tab): ?>
+            <div class="tab-pane<?=$tab['key'] === $activeKey ? ' show active' : ' fade'?>" id="<?=$tabId($tab['key'])?>" role="tabpanel">
                 <?php builder_view("{$platformName}/layout/form_inputs", [
-                    'formData' => $formData['fields'][0],
+                    'formData' => $formData['fields'][$tab['key']] ?? [],
                     'formType' => $formType,
                     'formSubType' => $formSubType,
                 ]); ?>
             </div>
-            <div class="tab-pane fade" id="navs-pills-justified-banner" role="tabpanel">
-				<?php builder_view("{$platformName}/layout/form_inputs", [
-						'formData' => $formData['fields'][1],
-						'formType' => $formType,
-						'formSubType' => $formSubType,
-				]); ?>
-            </div>
-            <div class="tab-pane fade" id="navs-pills-justified-style" role="tabpanel">
-				<?php builder_view("{$platformName}/layout/form_inputs", [
-						'formData' => $formData['fields'][2],
-						'formType' => $formType,
-						'formSubType' => $formSubType,
-				]); ?>
-            </div>
-            <div class="tab-pane fade" id="navs-pills-justified-features" role="tabpanel">
-				<?php builder_view("{$platformName}/layout/form_inputs", [
-						'formData' => $formData['fields'][3],
-						'formType' => $formType,
-						'formSubType' => $formSubType,
-				]); ?>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </div>

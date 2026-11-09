@@ -57,6 +57,7 @@ return [
     'filter' => [ /* = filter_projects_config */ ],
     'view'   => [ /* = view_projects_config   */ ],
     'excel'  => [ /* = excel_projects_config  */ ],
+    'tabs'   => [ /* = tabs_projects_config (폼 탭 정의, form.md 8-4) */ ],
 
     'methods' => [                       // 메서드별 설정
         'add' => ['form' => [ /* = form_projects_add_config */ ]],
@@ -71,7 +72,7 @@ return [
 | 통합형 | 들어가는 설정 키 |
 |---|---|
 | `route` | `route_config[{클래스}]` |
-| `form` / `list` / `filter` / `view` / `excel` | `{종류}_{builder_config_name(클래스)}_config` |
+| `form` / `list` / `filter` / `view` / `excel` / `tabs` | `{종류}_{builder_config_name(클래스)}_config` |
 | `methods[{메서드}][{종류}]` | `{종류}_{클래스}_{builder_config_name(메서드)}_config` |
 | `nav` | `{flag}_nav_menu` 안의 해당 클래스 항목 |
 
@@ -92,7 +93,7 @@ return [
 
 - **엔티티 단위로 한 형식만 쓴다.** 통합형 파일이 넣으려는 키(route, 엔티티 설정)가 분할형에 이미 있으면, 개발 환경(`ENVIRONMENT=development`)에서는 에러로 멈추고 그 밖에서는 error 로그를 남기고 통합형 파일을 건너뛴다. 섹션 일부만 나눠 쓰는 것은 허용하지 않는다.
 - 메뉴 트리에서 클래스를 참조하는 것(`['class' => 'projects']`)은 중복이 아니다.
-- 최상위 키는 `route`, `nav`, `form`, `list`, `filter`, `view`, `excel`, `methods`, `model`만 쓴다. 다른 키가 있으면 에러.
+- 최상위 키는 `route`, `nav`, `form`, `list`, `filter`, `view`, `excel`, `tabs`, `methods`, `model`만 쓴다. 다른 키가 있으면 에러.
 - 파일 이름이 클래스 이름이다(`projects.php` → `projects`).
 
 ## 6. 확인 명령
@@ -103,7 +104,7 @@ DB 연결이 되는 환경에서 실행한다.
 php index.php module/cli resource_dump admin projects
 ```
 
-리소스가 어느 형식에 있는지(`split`/`merged`), route 메서드별로 form·list·filter·view·excel을 어떤 키로 읽는지, API가 읽는 키, 메뉴 항목을 출력한다.
+리소스가 어느 형식에 있는지(`split`/`merged`), route 메서드별로 form·list·filter·view·excel·tabs를 어떤 키로 읽는지, API가 읽는 키, 메뉴 항목을 출력한다.
 
 ```bash
 php index.php module/cli resource_check admin
@@ -135,7 +136,7 @@ php index.php module/cli resource_to_merged admin administrators apply
 php index.php module/cli resource_to_split admin administrators apply
 ```
 
-- 통합형 섹션을 `{flag}_{종류}_config.php` 끝에 설정 문장(`$config['route_config']['{클래스}'] = …;`, `$config['form_{클래스}_config'] = …;`)으로 붙인다. 종류 파일이 없으면 만든다.
+- 통합형 섹션을 `{flag}_{종류}_config.php` 끝에 설정 문장(`$config['route_config']['{클래스}'] = …;`, `$config['form_{클래스}_config'] = …;`)으로 붙인다. 종류 파일이 없으면 만든다. `tabs` 는 `{flag}_form_config.php` 에 붙인다.
 - 붙인 문장 위에 `// {클래스}: resource_to_split 로 통합형에서 옮김` 주석을 단다. 다시 통합형으로 옮길 때 이 주석도 함께 지운다.
 - `nav`는 분할형에 자리가 없으므로 통합형 파일에 `nav`(와 `model`)만 남긴다. 둘 다 없으면 통합형 파일을 지운다.
 - 이미 같은 키가 분할형에 있으면 멈춘다.

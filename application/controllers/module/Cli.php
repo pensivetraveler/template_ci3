@@ -75,7 +75,7 @@ class Cli extends Common
         echo PHP_EOL."api      : ".implode(', ', array_map(function ($kind) use ($loader, $class) {
             $name = $loader->entityConfigName($kind, $class);
             return $name.($this->config->item($name) !== null ? '' : ' (none)');
-        }, ['form', 'list', 'view'])).PHP_EOL;
+        }, ['form', 'list', 'view', 'tabs'])).PHP_EOL;
 
         $nav = $this->findNavItem($this->config->item("{$flag}_nav_menu") ?: [], $class);
         echo "nav      : ".($nav ? json_encode(array_intersect_key($nav, array_flip(['class', 'method', 'title', 'icon'])), JSON_UNESCAPED_UNICODE) : '-').PHP_EOL;
@@ -225,7 +225,8 @@ class Cli extends Common
         echo "resource_to_split {$flag} {$class}".PHP_EOL;
         foreach ($append as $kind => $statements) {
             $file = APPPATH."config/extra/{$flag}/{$flag}_".Resource_converter::KIND_FILES[$kind].'_config.php';
-            $code = file_exists($file) ? file_get_contents($file) : $converter->newSplitFileContent();
+            // 탭 정의는 form 파일에 붙으므로 같은 파일에 앞서 붙인 내용에 이어 붙인다
+            $code = $changes[$file] ?? (file_exists($file) ? file_get_contents($file) : $converter->newSplitFileContent());
             $changes[$file] = $converter->appendStatements($code, $statements, "{$class}: resource_to_split 로 통합형에서 옮김");
             foreach ($statements as [$keys]) echo "  append : ".basename($file).": \$config['".implode("']['", $keys)."']".PHP_EOL;
         }

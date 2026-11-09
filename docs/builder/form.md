@@ -114,7 +114,8 @@
 | `group_attributes` | array | `[]` | 그룹 설정 (7장). 같은 그룹 안에서 뒤 항목 값이 앞 항목 값에 누적 병합 | `setFormData()` |
 | `list` | bool | `false` | 리스트 컬럼 노출 → [list-filter.md](list-filter.md) | `MY_Builder_API::setProperties()` |
 | `list_attributes` | array | `[]` | 리스트 렌더링 설정 → [list-filter.md](list-filter.md). 폼 렌더링 전에 제거됨 | `restructure_admin_form_data()` |
-| `tab_index` | int | `0` | `tabs` 레이아웃의 탭 번호. **정수 strict 비교**(`'1'` 문자열 불가) | `reformat_form_data_by_type()` |
+| `tab` | string | `''` | `tabs` 레이아웃의 탭 이름(탭 정의의 키, 8-4). 있으면 `tab_index` 보다 먼저 | `get_form_item_tab()` |
+| `tab_index` | int | `0` | `tabs` 레이아웃의 탭 번호. 탭 정의가 있으면 그 **n번째 탭**(화면 순서), 없으면 번호 그대로. 새로 쓸 때는 `tab` 권장 | `get_form_item_tab()` |
 | `colspan` | int | grid `6`, 그 외 `12` | grid 행 분할(12 컬럼)과 `col-md-{colspan}` | `reformat_form_data_by_type()`, `set_form_rows()` |
 
 ### 3-1. 자동 생성 키 (설정에 쓰지 않음)
@@ -375,7 +376,8 @@ JS 가 직접 읽는 attributes:
 | `repeater_id` | string | `''` | 행 식별 필드. 비어있는 행은 서버 호출 없이 삭제 | `preparePlugins()` 리피터 hide 콜백 |
 | `repeater_count` | int | `1` | repeater_base 초기 행 수 | `form_side_group_repeater_base.php` |
 | `colspan` | int | `12` | grid 열 너비 | `restructure_admin_form_data()` |
-| `tab_index` | int | `0` | tabs 레이아웃의 탭 (그룹 블록에는 항목이 아니라 이 값이 쓰임) | 동일 |
+| `tab` | string | `''` | tabs 레이아웃의 탭 이름 (그룹에 속한 필드는 항목이 아니라 이 값이 쓰임) | `get_form_item_tab()` |
+| `tab_index` | int | `0` | tabs 레이아웃의 탭 번호 (`tab` 이 없을 때. 그룹에 속한 필드는 이 값이 쓰임) | 동일 |
 
 같은 그룹의 `group_attributes` 는 첫 항목 값에 이후 항목 값이 누적 병합되므로(`setFormData()`) **공통 설정은 첫 항목에** 두고 뒤 항목에는 `key` 만 둔다.
 
@@ -450,7 +452,7 @@ JS 가 직접 읽는 attributes:
 | methodConfig.type | 뷰 | 설명 |
 |---|---|---|
 | `base` | `form_base.php` | subtype `base`: 한 줄에 라벨(col-2) + 입력(col-10). subtype `grid`: 12 컬럼 행(`set_form_rows()`) |
-| `tabs` | `form_tabs.php` | `fields[0..3]` 을 각 탭에서 `form_inputs.php` 로 렌더. **주의** — 탭 4개(이름 포함)가 하드코딩 |
+| `tabs` | `form_tabs.php` | 탭 정의(8-4) 순서대로 탭마다 `form_inputs.php` 로 렌더 |
 | `modal` | `form_modal.php` | `form_base` 를 `formType='base'` 로 포함 |
 | `side` | `form_side.php` | 사이드 레이아웃 |
 | `auth`, `article` 등 | 각 전용 뷰 | `custom` 타입은 `trans_formdata_dit_type()` 으로 `[field\|group => item]` 맵을 받는다 |
@@ -478,7 +480,35 @@ JS 가 직접 읽는 attributes:
 ### 8-4. grid / tabs
 
 - grid: colspan 합이 12 를 넘으면 다음 행으로 넘긴다(`set_form_rows()`). 그룹 블록의 colspan 은 `group_attributes.colspan`.
-- tabs: `min(tab_index)..max(tab_index)` 범위로 `fields[i]` 를 만든다(`reformat_form_data_by_type()`). `form_inputs.php` 가 **행 배열**을 기대하므로 `subtype=grid` 와 함께 써야 한다. tab_index 종류가 4개 미만이면 `form_tabs.php` 에서 undefined index 가 난다.
+- tabs: `form_inputs.php` 가 **행 배열**을 기대하므로 `subtype=grid` 와 함께 쓴다. 탭마다 `fields[탭 이름]` 을 만든다(`reformat_form_data_by_type()`).
+
+#### 탭 정의 (`tabs_{엔티티}_config`)
+
+탭 이름·아이콘·순서·보일 사용자는 form 설정 파일 안의 별도 설정에 둔다. 배열 순서가 화면 순서, 키가 탭 이름이다.
+
+```php
+// admin_form_config.php
+$config['tabs_frames_config'] = [
+    'home'     => ['label' => 'lang:frame.tab_home', 'icon' => 'ri-home-smile-line'],
+    'banner'   => ['label' => 'lang:frame.tab_banner', 'icon' => 'ri-image-line'],
+    'columns'  => ['label' => 'lang:frame.tab_columns', 'user_cd' => ['USR000'], 'hide_empty' => true],
+    'features' => ['label' => 'lang:frame.tab_features', 'user_cd' => ['USR000']],
+];
+// 필드: 'tab' => 'banner'  (그룹이면 group_attributes.tab)
+```
+
+| 키 | 기본값 | 설명 |
+|---|---|---|
+| `label` | `''` | 탭 이름. `lang:` 이면 언어 파일 |
+| `icon` | `''` | 아이콘 클래스 |
+| `user_cd` | `[]` | 이 사용자 코드에게만 탭 헤더를 보인다. 비우면 모두 |
+| `hide_empty` | `false` | 들어갈 필드가 없으면 탭을 뺀다 |
+
+- 찾는 순서: 메서드 `properties.tabsConfig`(없으면 `resourceConfig`) → `tabs_{class}_{method}_config` → `tabs_{class}_config` (`getFormTabs()`). API 는 form 설정과 같은 리소스 이름으로 `tabs_{resource}_config` 를 읽는다. 통합형 리소스 파일에서는 최상위 `tabs`(메서드별은 `methods[m].tabs`).
+- 탭 정의가 없으면 `tab_index` 번호 순서로 탭을 나누고 이름은 `Tab n`.
+- 탭 정의에 없는 `tab` 이름은 error 로그를 남기고 첫 탭에 넣는다.
+- 처음 열리는 탭은 보이는 탭 중 첫 번째. 저장할 때 오류 칸이 다른 탭에 있으면 그 탭을 연다 (`showInvalidFieldTab()`).
+- **`user_cd` 로 숨긴 탭**: 헤더만 빼고 내용은 그린다(화면 스크립트가 FORM_DATA 의 모든 필드를 찾으므로). 그 탭 필드의 화면 검증은 끄고(`skipHiddenTabValidation()`), 서버는 그 사용자가 보낸 값과 파일을 받지 않는다(`MY_Builder_API::setHiddenTabFields()`) — 수정이면 DB 의 기존 값이 남고, 등록이면 `defaultList`·DB 기본값이 들어간다.
 
 ---
 

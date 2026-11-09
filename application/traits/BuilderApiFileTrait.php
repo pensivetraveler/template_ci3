@@ -15,6 +15,8 @@ trait BuilderApiFileTrait
 
             $files = $_FILES;
             foreach ($model->fileList as $key) {
+                // 이 사용자에게 숨긴 폼 탭의 파일은 받지 않는다 (MY_Builder_API::setHiddenTabFields)
+                if(in_array($key, $this->hiddenTabFields, true)) continue;
                 if(is_file_posted($key)) {
                     $config = $this->config->item($this->router->class . '_' . $key . '_upload_config')
                         ?: $this->config->item($key . '_upload_config')

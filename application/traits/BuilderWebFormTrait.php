@@ -62,7 +62,7 @@ trait BuilderWebFormTrait
     {
         $data['formType'] = $this->methodConfig['type'];
         $data['formSubType'] = $this->methodConfig['subtype'];
-        $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType'], $data['formSubType']);
+        $data['formData'] = restructure_form_data_by_type($this->jsVars['FORM_DATA'], $data['formType'], $data['formSubType'], $this->getFormTabs());
 
         $data['actions'] = array_values(array_filter(reformat_bool_type_list($this->methodConfig['actions']), function ($action) {
             return $action === 'delete' || in_array($action, $this->routeConfig['properties']['allows']);
@@ -75,6 +75,35 @@ trait BuilderWebFormTrait
         $this->addFormScripts();
 
         return $data;
+    }
+
+    /**
+     * tabs 레이아웃의 탭 정의 (resolve_form_tabs()). 찾는 순서는 다른 엔티티 설정과 같다:
+     * properties.tabsConfig(없으면 resourceConfig) → tabs_{class}_{method}_config → tabs_{class}_config
+     */
+    protected function getFormTabs(): array
+    {
+        if(($this->methodConfig['type'] ?? '') !== 'tabs') return [];
+
+        $add = ($this->methodConfig['properties']['tabsConfig'] ?? '') ?: ($this->methodConfig['resourceConfig'] ?: null);
+        return resolve_form_tabs(
+            $this->resourceLoader->entityConfig($this->setConfigList('tabs', $add), [], false),
+            $this->session->userdata('user_cd')
+        );
+    }
+
+    /**
+     * 이 사용자에게 숨긴 탭의 필드는 화면 검증을 끈다 (보이지 않는 칸의 오류로 저장이 막히지 않도록, 서버도 그 값을 받지 않음)
+     */
+    protected function skipHiddenTabValidation(array $formData): array
+    {
+        $hidden = get_hidden_tab_fields($formData, $this->getFormTabs());
+        if(!count($hidden)) return $formData;
+
+        return array_map(function ($item) use ($hidden) {
+            if(isset($item['field']) && in_array($item['field'], $hidden, true)) $item['form_attributes']['form_validation'] = false;
+            return $item;
+        }, $formData);
     }
 
     protected function setFormData($formColumns = []): array

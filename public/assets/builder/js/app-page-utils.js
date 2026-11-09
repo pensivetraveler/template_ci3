@@ -387,6 +387,17 @@ function reformatFormData(form, data, regexp = {}, side = false) {
 }
 
 /**
+ * 탭 폼(form_tabs)에서 첫 오류 칸이 다른 탭에 있으면 그 탭을 연다
+ */
+function showInvalidFieldTab(form) {
+    const invalid = form?.querySelector('.is-invalid');
+    const pane = invalid?.closest('.tab-pane');
+    if(!pane || pane.classList.contains('active') || !pane.id) return;
+    const button = form.querySelector(`[data-bs-toggle="tab"][data-bs-target="#${pane.id}"]`);
+    if(button) bootstrap.Tab.getOrCreateInstance(button).show();
+}
+
+/**
  * 서버 검증 에러 param(group[field], group[0][field], field[0])을 FV 필드 키로 변환
  */
 function getFvFieldKey(fv, param) {

@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * WEB(MY_Builder_WEB)과 API(MY_Builder_API)가 엔티티별 설정을 찾을 때 모두 이 클래스를 거친다.
  * - route 설정  : route_config[{class}]
- * - 엔티티 설정 : {kind}_{name}_config (kind = form | list | filter | view | excel)
+ * - 엔티티 설정 : {kind}_{name}_config (kind = form | list | filter | view | excel | tabs)
  *
  * 지금은 분할형(종류별 파일: admin_form_config.php 등)만 읽는다.
  * 엔티티당 파일 하나인 통합형은 이 클래스에 추가해서, WEB·API 코드는 바꾸지 않고 지원할 예정이다.
@@ -60,7 +60,7 @@ class Resource_loader
     }
 
     /* --------------------------------------------------------------- */
-    /* 엔티티 설정 (form / list / filter / view / excel)                 */
+    /* 엔티티 설정 (form / list / filter / view / excel / tabs)          */
     /* --------------------------------------------------------------- */
 
     /**
@@ -106,16 +106,16 @@ class Resource_loader
     public array $mergedResources = [];
 
     /** 통합형 파일에서 쓸 수 있는 최상위 키 */
-    public const MERGED_KEYS = ['route', 'nav', 'form', 'list', 'filter', 'view', 'excel', 'methods', 'model'];
+    public const MERGED_KEYS = ['route', 'nav', 'form', 'list', 'filter', 'view', 'excel', 'tabs', 'methods', 'model'];
 
-    /** 통합형 파일 안의 엔티티 설정 종류 */
-    public const ENTITY_KINDS = ['form', 'list', 'filter', 'view', 'excel'];
+    /** 통합형 파일 안의 엔티티 설정 종류 (tabs: 폼 탭 정의, resolve_form_tabs()) */
+    public const ENTITY_KINDS = ['form', 'list', 'filter', 'view', 'excel', 'tabs'];
 
     /**
      * config/extra/{flag}/resources/{클래스}.php 를 읽어, 분할형과 같은 설정 키로 넣는다.
      * 그래서 설정을 읽는 쪽(WEB·API·메뉴)은 형식을 몰라도 된다.
      *   route              → route_config[{클래스}]
-     *   form|list|...      → {kind}_{클래스}_config
+     *   form|list|...|tabs → {kind}_{클래스}_config
      *   methods[m][kind]   → {kind}_{클래스}_{m}_config
      *   nav                → {flag}_nav_menu 의 해당 클래스 항목 (트리·순서는 nav 설정이 정함)
      * 같은 엔티티가 분할형에도 있으면 개발 환경에서는 에러, 그 밖에는 error 로그 후 통합형을 건너뛴다.
