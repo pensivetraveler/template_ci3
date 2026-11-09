@@ -134,11 +134,12 @@ trait BuilderWebFormTrait
                 $item['subtype'] = 'autosize';
             }
 
-            // 페이지 폼의 textarea + quill 은 custom quill 뷰(form_{type}_custom_quill.php)로 그린다
-            // (전에는 일반 textarea 로 나왔음). 그 폼 type 의 quill 뷰가 없으면 textarea 그대로
+            // 페이지 폼의 textarea + quill 은 custom quill 뷰(form_{subtype}_custom_quill.php)로 그린다
+            // (전에는 일반 textarea 로 나왔음). 화면이 custom 뷰를 subtype(base·grid)으로 찾으므로 같은 이름으로 확인하고,
+            // 그 뷰가 없으면 textarea 그대로
             if(!$this->listForm && $item['type'] === 'textarea' && $item['subtype'] === 'quill') {
-                $pageFormType = $this->methodConfig['type'] ?? 'base';
-                if(is_file(APPPATH."views/builder/layout/form_{$pageFormType}_custom_quill.php")) $item['type'] = 'custom';
+                $pageFormSubType = $this->methodConfig['subtype'] ?? 'base';
+                if(is_file(APPPATH."views/builder/layout/form_{$pageFormSubType}_custom_quill.php")) $item['type'] = 'custom';
             }
 
             if ($item['group'] !== 'base') {
