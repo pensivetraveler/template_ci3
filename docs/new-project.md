@@ -124,3 +124,12 @@ scripts/test.sh all
 - 쓰기 권한: `application/cache/`, `application/logs/`, `application/uploads/`, `public/temps/`
 - nginx 면 `application/` 차단을 서버 설정으로 한다(Apache 는 `.htaccess` 가 막음)
 - 운영은 `CI_ENV=production` 을 서버 설정으로 준다(저장소의 `.htaccess` 는 development)
+
+## 파생 프로젝트 (core 동기화 기준점)
+
+템플릿 변경을 보낼 때, 감사 계기(파생 프로젝트 운영 배포 전, [template-audit.md](template-audit.md) 2)를 판단할 때 본다. 프로젝트가 템플릿 변경을 받으면 담당 세션이 알려 주고 이 표를 고친다. 전체 장부는 ai-collab `docs/projects.md`.
+
+| 프로젝트 | 저장소 | 담당 세션 | 받는 방식 | 기반 커밋 (받은 날) |
+|---|---|---|---|---|
+| koreadesk (외주개발) | `~/Programming/Projects/koreadesk` | "koreadesk 외주 개발" | upstream merge | `05c7a0d` (2026-11-10, koreadesk `0dd248d`) |
+| bizsoft | — | "프레임 관리 다운로드 버튼" 등 | diff 적용(`core: <이전>..<새>`) | 확인 필요 |
