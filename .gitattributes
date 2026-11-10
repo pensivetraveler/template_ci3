@@ -22,7 +22,28 @@ tests/travis/ export-ignore
 user_guide_src export-ignore
 user_guide export-ignore
 
-* text eol=auto
 *.html linguist-detectable=false
 *.css linguist-detectable=false
 * text=auto eol=lf
+
+# 바이너리는 줄바꿈 변환을 하지 않는다. 예전 "* text eol=auto" 가 모든 파일을 텍스트로 다뤄
+# 70bebc1(2026-03-30)에서 글꼴·이미지 451개가 손상된 채 저장됐다
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.ttf binary
+*.otf binary
+*.eot binary
+*.woff binary
+*.woff2 binary
+*.mp3 binary
+*.mp4 binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.xlsx binary
+*.xls binary
+*.docx binary

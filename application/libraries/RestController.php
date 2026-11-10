@@ -1,6 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+require_once APPPATH . 'traits/RestAuthTrait.php';
+require_once APPPATH . 'traits/RestRequestTrait.php';
+require_once APPPATH . 'traits/RestLogTrait.php';
+
 /**
  * CodeIgniter Rest Controller
  * A fully RESTful server implementation for CodeIgniter using one library, one config file and one controller.
@@ -14,6 +18,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @version         3.0.0
  */
 abstract class RestController extends \MY_Controller {
+    use RestAuthTrait;
+    use RestRequestTrait;
+    use RestLogTrait;
 
     // Note: Only the widely used HTTP status codes are documented
 
@@ -585,8 +592,12 @@ abstract class RestController extends \MY_Controller {
         $this->_end_rtime = microtime(TRUE);
 
         // Log the loading time to the log table
-        if ($this->config->item('rest_enable_logging') === TRUE)
-        {
+        if (
+            $this->config->item('rest_enable_logging') === TRUE &&
+            !empty($this->_insert_id) &&
+            isset($this->rest) &&
+            isset($this->rest->db)
+        ) {
             $this->_log_access_time();
         }
     }
@@ -662,10 +673,17 @@ abstract class RestController extends \MY_Controller {
                 exit;
             }
 
-            $this->response([
-                $this->config->item('rest_status_field_name') => FALSE,
-                $this->config->item('rest_message_field_name') => sprintf($this->lang->line('text_rest_invalid_api_key'), $this->rest->key)
-            ], self::HTTP_FORBIDDEN);
+            if(empty($this->rest->key)) {
+                $this->response([
+                    $this->config->item('rest_status_field_name') => FALSE,
+                    $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_empty_api_key')
+                ], self::HTTP_FORBIDDEN);
+            }else{
+                $this->response([
+                    $this->config->item('rest_status_field_name') => FALSE,
+                    $this->config->item('rest_message_field_name') => sprintf($this->lang->line('text_rest_invalid_api_key'), $this->rest->key)
+                ], self::HTTP_FORBIDDEN);
+            }
         }
 
         // Check to see if this key has access to the requested controller
@@ -720,7 +738,8 @@ abstract class RestController extends \MY_Controller {
         }
 
         //check request limit by ip without login
-        elseif ($this->config->item('rest_limits_method') == "IP_ADDRESS" && $this->config->item('rest_enable_limits') && $this->_check_limit($controller_method) === FALSE)
+        // API 키 없이 부르는 엔드포인트(로그인 등)도 limit 이 정해져 있으면 IP 별로 센다 (전에는 IP_ADDRESS 방식일 때만 검사)
+        elseif (($this->config->item('rest_limits_method') == "IP_ADDRESS" || isset($this->methods[$controller_method]['limit'])) && $this->config->item('rest_enable_limits') && $this->_check_limit($controller_method) === FALSE)
         {
             $response = [$this->config->item('rest_status_field_name') => FALSE, $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_ip_address_time_limit')];
             $this->response($response, self::HTTP_UNAUTHORIZED);
@@ -731,6 +750,10 @@ abstract class RestController extends \MY_Controller {
         {
             $this->_log_request($authorized = TRUE);
         }
+
+        // 인증·요청 제한·요청 로그를 마친 뒤, 컨트롤러 메서드 직전 (MY_Builder_API 가 요청 트랜잭션을 여기서 연다 —
+        // 로그·제한 카운터가 트랜잭션 안에 들어가 실패 응답 때 함께 롤백되지 않도록)
+        $this->beforeControllerMethod($controller_method);
 
         // Call the controller method and passed arguments
         try
@@ -747,6 +770,13 @@ abstract class RestController extends \MY_Controller {
             $_error = &load_class('Exceptions', 'core');
             $_error->show_exception($ex);
         }
+    }
+
+    /**
+     * 컨트롤러 메서드를 부르기 직전 (하위 클래스에서 오버라이드)
+     */
+    protected function beforeControllerMethod(string $controller_method): void
+    {
     }
 
     /**
@@ -1013,9 +1043,27 @@ abstract class RestController extends \MY_Controller {
         $this->rest->ignore_limits = FALSE;
 
         // Find the key from server or arguments
-        if (($key = isset($this->_args[$api_key_variable]) ? $this->_args[$api_key_variable] : $this->input->server($key_name)))
+        if ($key = $this->_args[$api_key_variable] ?? $this->input->server($key_name))
         {
+            if ($this->config->item('rest_key_bearer') === TRUE && $api_key_variable === 'Authorization') {
+                if (!preg_match('/^Bearer\s+(.+)$/i', $key, $matches)) {
+                    return FALSE;
+                }
+
+                $key = trim($matches[1]);
+
+                if ($key === '') {
+                    return FALSE;
+                }
+            }
+
             if ( ! ($row = $this->rest->db->where($this->config->item('rest_key_column'), $key)->get($this->config->item('rest_keys_table'))->row()))
+            {
+                return FALSE;
+            }
+
+            // 발급 후 token_lifetime() 이 지난 토큰은 받지 않는다 (common_helper is_token_expired, 0 이면 만료 없음)
+            if (property_exists($row, 'created_dt') && function_exists('is_token_expired') && is_token_expired($row->created_dt))
             {
                 return FALSE;
             }
@@ -1102,34 +1150,6 @@ abstract class RestController extends \MY_Controller {
     }
 
     /**
-     * Add the request to the log table
-     *
-     * @access protected
-     * @param bool $authorized TRUE the user is authorized; otherwise, FALSE
-     * @return bool TRUE the data was inserted; otherwise, FALSE
-     */
-    protected function _log_request($authorized = FALSE)
-    {
-        // Insert the request into the log table
-        $is_inserted = $this->rest->db
-            ->insert(
-                $this->config->item('rest_logs_table'), [
-                'uri' => $this->uri->uri_string(),
-                'method' => $this->request->method,
-                'params' => $this->_args ? ($this->config->item('rest_logs_json_params') === TRUE ? json_encode($this->_args) : serialize($this->_args)) : NULL,
-                'api_key' => isset($this->rest->key) ? $this->rest->key : '',
-                'ip_address' => $this->input->ip_address(),
-                'time' => time(),
-                'authorized' => $authorized
-            ]);
-
-        // Get the last insert id to update at a later stage of the request
-        $this->_insert_id = $this->rest->db->insert_id();
-
-        return $is_inserted;
-    }
-
-    /**
      * Check if the requests to a controller method exceed a limit
      *
      * @access protected
@@ -1139,7 +1159,8 @@ abstract class RestController extends \MY_Controller {
     protected function _check_limit($controller_method)
     {
         // They are special, or it might not even have a limit
-        if (empty($this->rest->ignore_limits) === FALSE)
+        // 로그인 토큰은 ignore_limits 라 제한을 건너뛴다. limit_always 인 메서드는 그래도 센다
+        if (empty($this->rest->ignore_limits) === FALSE && empty($this->methods[$controller_method]['limit_always']))
         {
             // Everything is fine
             return TRUE;
@@ -1173,9 +1194,34 @@ abstract class RestController extends \MY_Controller {
                 break;
         }
 
+        // API 키가 없으면 IP 별로 센다 (빈 키로 세면 모든 사용자가 한 카운터를 같이 써서, 로그인 제한이 사이트 전체를 막음)
+        if ($api_key === '' || $api_key === NULL)
+        {
+            $api_key = $this->input->ip_address();
+        }
+
         if (isset($this->methods[$controller_method]['limit']) === FALSE )
         {
             // Everything is fine
+            return TRUE;
+        }
+
+        // 제한 표 구조가 다르면(uri·api_key 컬럼 없음) 요청 전체가 500 이 되므로, 제한만 건너뛰고 오류 로그를 남긴다
+        // 맞추는 SQL: docs/migrations/2026-10-27-rest-user-limits.sql
+        static $limitsTableReady = NULL;
+        if ($limitsTableReady === NULL)
+        {
+            $table = $this->config->item('rest_limits_table');
+            $limitsTableReady = $this->rest->db->table_exists($table)
+                && $this->rest->db->field_exists('uri', $table)
+                && $this->rest->db->field_exists('api_key', $table);
+            if ( ! $limitsTableReady)
+            {
+                log_message('error', __METHOD__.' : rest limits table "'.$table.'" needs uri·api_key columns — limit skipped. See docs/migrations/2026-10-27-rest-user-limits.sql');
+            }
+        }
+        if ( ! $limitsTableReady)
+        {
             return TRUE;
         }
 
@@ -1235,980 +1281,9 @@ abstract class RestController extends \MY_Controller {
         return TRUE;
     }
 
-    /**
-     * Check if there is a specific auth type set for the current class/method/HTTP-method being called
-     *
-     * @access protected
-     * @return bool
-     */
-    protected function _auth_override_check()
-    {
-        // Assign the class/method auth type override array from the config
-        $auth_override_class_method = $this->config->item('auth_override_class_method');
-
-        // Check to see if the override array is even populated
-        if ( ! empty($auth_override_class_method))
-        {
-            // Check for wildcard flag for rules for classes
-            if ( ! empty($auth_override_class_method[$this->router->class]['*'])) // Check for class overrides
-            {
-                // No auth override found, prepare nothing but send back a TRUE override flag
-                if ($auth_override_class_method[$this->router->class]['*'] === 'none')
-                {
-                    return TRUE;
-                }
-
-                // Basic auth override found, prepare basic
-                if ($auth_override_class_method[$this->router->class]['*'] === 'basic')
-                {
-                    $this->_prepare_basic_auth();
-
-                    return TRUE;
-                }
-
-                // Digest auth override found, prepare digest
-                if ($auth_override_class_method[$this->router->class]['*'] === 'digest')
-                {
-                    $this->_prepare_digest_auth();
-
-                    return TRUE;
-                }
-
-                // Session auth override found, check session
-                if ($auth_override_class_method[$this->router->class]['*'] === 'session')
-                {
-                    $this->_check_php_session();
-
-                    return TRUE;
-                }
-
-                // Whitelist auth override found, check client's ip against config whitelist
-                if ($auth_override_class_method[$this->router->class]['*'] === 'whitelist')
-                {
-                    $this->_check_whitelist_auth();
-
-                    return TRUE;
-                }
-            }
-
-            // Check to see if there's an override value set for the current class/method being called
-            if ( ! empty($auth_override_class_method[$this->router->class][$this->router->method]))
-            {
-                // None auth override found, prepare nothing but send back a TRUE override flag
-                if ($auth_override_class_method[$this->router->class][$this->router->method] === 'none')
-                {
-                    return TRUE;
-                }
-
-                // Basic auth override found, prepare basic
-                if ($auth_override_class_method[$this->router->class][$this->router->method] === 'basic')
-                {
-                    $this->_prepare_basic_auth();
-
-                    return TRUE;
-                }
-
-                // Digest auth override found, prepare digest
-                if ($auth_override_class_method[$this->router->class][$this->router->method] === 'digest')
-                {
-                    $this->_prepare_digest_auth();
-
-                    return TRUE;
-                }
-
-                // Session auth override found, check session
-                if ($auth_override_class_method[$this->router->class][$this->router->method] === 'session')
-                {
-                    $this->_check_php_session();
-
-                    return TRUE;
-                }
-
-                // Whitelist auth override found, check client's ip against config whitelist
-                if ($auth_override_class_method[$this->router->class][$this->router->method] === 'whitelist')
-                {
-                    $this->_check_whitelist_auth();
-
-                    return TRUE;
-                }
-            }
-        }
-
-        // Assign the class/method/HTTP-method auth type override array from the config
-        $auth_override_class_method_http = $this->config->item('auth_override_class_method_http');
-
-        // Check to see if the override array is even populated
-        if ( ! empty($auth_override_class_method_http))
-        {
-            // check for wildcard flag for rules for classes
-            if ( ! empty($auth_override_class_method_http[$this->router->class]['*'][$this->request->method]))
-            {
-                // None auth override found, prepare nothing but send back a TRUE override flag
-                if ($auth_override_class_method_http[$this->router->class]['*'][$this->request->method] === 'none')
-                {
-                    return TRUE;
-                }
-
-                // Basic auth override found, prepare basic
-                if ($auth_override_class_method_http[$this->router->class]['*'][$this->request->method] === 'basic')
-                {
-                    $this->_prepare_basic_auth();
-
-                    return TRUE;
-                }
-
-                // Digest auth override found, prepare digest
-                if ($auth_override_class_method_http[$this->router->class]['*'][$this->request->method] === 'digest')
-                {
-                    $this->_prepare_digest_auth();
-
-                    return TRUE;
-                }
-
-                // Session auth override found, check session
-                if ($auth_override_class_method_http[$this->router->class]['*'][$this->request->method] === 'session')
-                {
-                    $this->_check_php_session();
-
-                    return TRUE;
-                }
-
-                // Whitelist auth override found, check client's ip against config whitelist
-                if ($auth_override_class_method_http[$this->router->class]['*'][$this->request->method] === 'whitelist')
-                {
-                    $this->_check_whitelist_auth();
-
-                    return TRUE;
-                }
-            }
-
-            // Check to see if there's an override value set for the current class/method/HTTP-method being called
-            if ( ! empty($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method]))
-            {
-                // None auth override found, prepare nothing but send back a TRUE override flag
-                if ($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method] === 'none')
-                {
-                    return TRUE;
-                }
-
-                // Basic auth override found, prepare basic
-                if ($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method] === 'basic')
-                {
-                    $this->_prepare_basic_auth();
-
-                    return TRUE;
-                }
-
-                // Digest auth override found, prepare digest
-                if ($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method] === 'digest')
-                {
-                    $this->_prepare_digest_auth();
-
-                    return TRUE;
-                }
-
-                // Session auth override found, check session
-                if ($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method] === 'session')
-                {
-                    $this->_check_php_session();
-
-                    return TRUE;
-                }
-
-                // Whitelist auth override found, check client's ip against config whitelist
-                if ($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method] === 'whitelist')
-                {
-                    $this->_check_whitelist_auth();
-
-                    return TRUE;
-                }
-            }
-        }
-        return FALSE;
-    }
-
-    /**
-     * Parse the GET request arguments
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _parse_get()
-    {
-        // Merge both the URI segments and query parameters
-        $this->_get_args = array_merge($this->_get_args, $this->_query_args);
-    }
-
-    /**
-     * Parse the POST request arguments
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _parse_post()
-    {
-        $this->_post_args = $_POST;
-
-        if ($this->request->format)
-        {
-            $this->request->body = $this->input->raw_input_stream;
-        }
-    }
-
-    /**
-     * Parse the PUT request arguments
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _parse_put()
-    {
-        if ($this->request->format)
-        {
-            $this->request->body = $this->input->raw_input_stream;
-            if ($this->request->format === 'json')
-            {
-                $this->_put_args = json_decode($this->input->raw_input_stream);
-            }
-        }
-        else if ($this->input->method() === 'put')
-        {
-            // If no file type is provided, then there are probably just arguments
-            $this->_put_args = $this->input->input_stream();
-        }
-    }
-
-    /**
-     * Parse the HEAD request arguments
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _parse_head()
-    {
-        // Parse the HEAD variables
-        parse_str(parse_url($this->input->server('REQUEST_URI'), PHP_URL_QUERY), $head);
-
-        // Merge both the URI segments and HEAD params
-        $this->_head_args = array_merge($this->_head_args, $head);
-    }
-
-    /**
-     * Parse the OPTIONS request arguments
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _parse_options()
-    {
-        // Parse the OPTIONS variables
-        parse_str(parse_url($this->input->server('REQUEST_URI'), PHP_URL_QUERY), $options);
-
-        // Merge both the URI segments and OPTIONS params
-        $this->_options_args = array_merge($this->_options_args, $options);
-    }
-
-    /**
-     * Parse the PATCH request arguments
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _parse_patch()
-    {
-        // It might be a HTTP body
-        if ($this->request->format)
-        {
-            $this->request->body = $this->input->raw_input_stream;
-        }
-        else if ($this->input->method() === 'patch')
-        {
-            // If no file type is provided, then there are probably just arguments
-            $this->_patch_args = $this->input->input_stream();
-        }
-    }
-
-    /**
-     * Parse the DELETE request arguments
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _parse_delete()
-    {
-        // These should exist if a DELETE request
-        if ($this->input->method() === 'delete')
-        {
-            $this->_delete_args = $this->input->input_stream();
-        }
-    }
-
-    /**
-     * Parse the query parameters
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _parse_query()
-    {
-        $this->_query_args = $this->input->get();
-    }
-
     // INPUT FUNCTION --------------------------------------------------------------
 
-    /**
-     * Retrieve a value from a GET request
-     *
-     * @access public
-     * @param NULL $key Key to retrieve from the GET request
-     * If NULL an array of arguments is returned
-     * @param NULL $xss_clean Whether to apply XSS filtering
-     * @return array|string|NULL Value from the GET request; otherwise, NULL
-     */
-    public function get($key = NULL, $xss_clean = NULL)
-    {
-        if ($key === NULL)
-        {
-            return $this->_get_args;
-        }
-
-        return isset($this->_get_args[$key]) ? $this->_xss_clean($this->_get_args[$key], $xss_clean) : NULL;
-    }
-
-    /**
-     * Retrieve a value from a OPTIONS request
-     *
-     * @access public
-     * @param NULL $key Key to retrieve from the OPTIONS request.
-     * If NULL an array of arguments is returned
-     * @param NULL $xss_clean Whether to apply XSS filtering
-     * @return array|string|NULL Value from the OPTIONS request; otherwise, NULL
-     */
-    public function options($key = NULL, $xss_clean = NULL)
-    {
-        if ($key === NULL)
-        {
-            return $this->_options_args;
-        }
-
-        return isset($this->_options_args[$key]) ? $this->_xss_clean($this->_options_args[$key], $xss_clean) : NULL;
-    }
-
-    /**
-     * Retrieve a value from a HEAD request
-     *
-     * @access public
-     * @param NULL $key Key to retrieve from the HEAD request
-     * If NULL an array of arguments is returned
-     * @param NULL $xss_clean Whether to apply XSS filtering
-     * @return array|string|NULL Value from the HEAD request; otherwise, NULL
-     */
-    public function head($key = NULL, $xss_clean = NULL)
-    {
-        if ($key === NULL)
-        {
-            return $this->_head_args;
-        }
-
-        return isset($this->_head_args[$key]) ? $this->_xss_clean($this->_head_args[$key], $xss_clean) : NULL;
-    }
-
-    /**
-     * Retrieve a value from a POST request
-     *
-     * @access public
-     * @param NULL $key Key to retrieve from the POST request
-     * If NULL an array of arguments is returned
-     * @param NULL $xss_clean Whether to apply XSS filtering
-     * @return array|string|NULL Value from the POST request; otherwise, NULL
-     */
-    public function post($key = NULL, $xss_clean = NULL)
-    {
-        if ($key === NULL)
-        {
-            return $this->_post_args;
-        }
-
-        return isset($this->_post_args[$key]) ? $this->_xss_clean($this->_post_args[$key], $xss_clean) : NULL;
-    }
-
-    /**
-     * Retrieve a value from a PUT request
-     *
-     * @access public
-     * @param NULL $key Key to retrieve from the PUT request
-     * If NULL an array of arguments is returned
-     * @param NULL $xss_clean Whether to apply XSS filtering
-     * @return array|string|NULL Value from the PUT request; otherwise, NULL
-     */
-    public function put($key = NULL, $xss_clean = NULL)
-    {
-        if ($key === NULL)
-        {
-            return $this->_put_args;
-        }
-
-        return isset($this->_put_args[$key]) ? $this->_xss_clean($this->_put_args[$key], $xss_clean) : NULL;
-    }
-
-    /**
-     * Retrieve a value from a DELETE request
-     *
-     * @access public
-     * @param NULL $key Key to retrieve from the DELETE request
-     * If NULL an array of arguments is returned
-     * @param NULL $xss_clean Whether to apply XSS filtering
-     * @return array|string|NULL Value from the DELETE request; otherwise, NULL
-     */
-    public function delete($key = NULL, $xss_clean = NULL)
-    {
-        if ($key === NULL)
-        {
-            return $this->_delete_args;
-        }
-
-        return isset($this->_delete_args[$key]) ? $this->_xss_clean($this->_delete_args[$key], $xss_clean) : NULL;
-    }
-
-    /**
-     * Retrieve a value from a PATCH request
-     *
-     * @access public
-     * @param NULL $key Key to retrieve from the PATCH request
-     * If NULL an array of arguments is returned
-     * @param NULL $xss_clean Whether to apply XSS filtering
-     * @return array|string|NULL Value from the PATCH request; otherwise, NULL
-     */
-    public function patch($key = NULL, $xss_clean = NULL)
-    {
-        if ($key === NULL)
-        {
-            return $this->_patch_args;
-        }
-
-        return isset($this->_patch_args[$key]) ? $this->_xss_clean($this->_patch_args[$key], $xss_clean) : NULL;
-    }
-
-    /**
-     * Retrieve a value from the query parameters
-     *
-     * @access public
-     * @param NULL $key Key to retrieve from the query parameters
-     * If NULL an array of arguments is returned
-     * @param NULL $xss_clean Whether to apply XSS filtering
-     * @return array|string|NULL Value from the query parameters; otherwise, NULL
-     */
-    public function query($key = NULL, $xss_clean = NULL)
-    {
-        if ($key === NULL)
-        {
-            return $this->_query_args;
-        }
-
-        return isset($this->_query_args[$key]) ? $this->_xss_clean($this->_query_args[$key], $xss_clean) : NULL;
-    }
-
-    /**
-     * Sanitizes data so that Cross Site Scripting Hacks can be
-     * prevented
-     *
-     * @access protected
-     * @param string $value Input data
-     * @param bool $xss_clean Whether to apply XSS filtering
-     * @return string
-     */
-    protected function _xss_clean($value, $xss_clean)
-    {
-        is_bool($xss_clean) || $xss_clean = $this->_enable_xss;
-
-        return $xss_clean === TRUE ? $this->security->xss_clean($value) : $value;
-    }
-
-    /**
-     * Retrieve the validation errors
-     *
-     * @access public
-     * @return array
-     */
-    public function validation_errors()
-    {
-        $string = strip_tags($this->form_validation->error_string());
-
-        return explode(PHP_EOL, trim($string, PHP_EOL));
-    }
-
     // SECURITY FUNCTIONS ---------------------------------------------------------
-
-    /**
-     * Perform LDAP Authentication
-     *
-     * @access protected
-     * @param string $username The username to validate
-     * @param string $password The password to validate
-     * @return bool
-     */
-    protected function _perform_ldap_auth($username = '', $password = NULL)
-    {
-        if (empty($username))
-        {
-            log_message('debug', 'LDAP Auth: failure, empty username');
-            return FALSE;
-        }
-
-        log_message('debug', 'LDAP Auth: Loading configuration');
-
-        $this->config->load('ldap.php', TRUE);
-
-        $ldap = [
-            'timeout' => $this->config->item('timeout', 'ldap'),
-            'host' => $this->config->item('server', 'ldap'),
-            'port' => $this->config->item('port', 'ldap'),
-            'rdn' => $this->config->item('binduser', 'ldap'),
-            'pass' => $this->config->item('bindpw', 'ldap'),
-            'basedn' => $this->config->item('basedn', 'ldap'),
-        ];
-
-        log_message('debug', 'LDAP Auth: Connect to ' . (isset($ldaphost) ? $ldaphost : '[ldap not configured]'));
-
-        // Connect to the ldap server
-        $ldapconn = ldap_connect($ldap['host'], $ldap['port']);
-        if ($ldapconn)
-        {
-            log_message('debug', 'Setting timeout to '.$ldap['timeout'].' seconds');
-
-            ldap_set_option($ldapconn, LDAP_OPT_NETWORK_TIMEOUT, $ldap['timeout']);
-
-            log_message('debug', 'LDAP Auth: Binding to '.$ldap['host'].' with dn '.$ldap['rdn']);
-
-            // Binding to the ldap server
-            $ldapbind = ldap_bind($ldapconn, $ldap['rdn'], $ldap['pass']);
-
-            // Verify the binding
-            if ($ldapbind === FALSE)
-            {
-                log_message('error', 'LDAP Auth: bind was unsuccessful');
-                return FALSE;
-            }
-
-            log_message('debug', 'LDAP Auth: bind successful');
-        }
-
-        // Search for user
-        if (($res_id = ldap_search($ldapconn, $ldap['basedn'], "uid=$username")) === FALSE)
-        {
-            log_message('error', 'LDAP Auth: User '.$username.' not found in search');
-            return FALSE;
-        }
-
-        if (ldap_count_entries($ldapconn, $res_id) !== 1)
-        {
-            log_message('error', 'LDAP Auth: Failure, username '.$username.'found more than once');
-            return FALSE;
-        }
-
-        if (($entry_id = ldap_first_entry($ldapconn, $res_id)) === FALSE)
-        {
-            log_message('error', 'LDAP Auth: Failure, entry of search result could not be fetched');
-            return FALSE;
-        }
-
-        if (($user_dn = ldap_get_dn($ldapconn, $entry_id)) === FALSE)
-        {
-            log_message('error', 'LDAP Auth: Failure, user-dn could not be fetched');
-            return FALSE;
-        }
-
-        // User found, could not authenticate as user
-        if (($link_id = ldap_bind($ldapconn, $user_dn, $password)) === FALSE)
-        {
-            log_message('error', 'LDAP Auth: Failure, username/password did not match: ' . $user_dn);
-            return FALSE;
-        }
-
-        log_message('debug', 'LDAP Auth: Success '.$user_dn.' authenticated successfully');
-
-        $this->_user_ldap_dn = $user_dn;
-
-        ldap_close($ldapconn);
-
-        return TRUE;
-    }
-
-    /**
-     * Perform Library Authentication - Override this function to change the way the library is called
-     *
-     * @access protected
-     * @param string $username The username to validate
-     * @param string $password The password to validate
-     * @return bool
-     */
-    protected function _perform_library_auth($username = '', $password = NULL)
-    {
-        if (empty($username))
-        {
-            log_message('error', 'Library Auth: Failure, empty username');
-            return FALSE;
-        }
-
-        $auth_library_class = strtolower($this->config->item('auth_library_class'));
-        $auth_library_function = strtolower($this->config->item('auth_library_function'));
-
-        if (empty($auth_library_class))
-        {
-            log_message('debug', 'Library Auth: Failure, empty auth_library_class');
-            return FALSE;
-        }
-
-        if (empty($auth_library_function))
-        {
-            log_message('debug', 'Library Auth: Failure, empty auth_library_function');
-            return FALSE;
-        }
-
-        if (is_callable([$auth_library_class, $auth_library_function]) === FALSE)
-        {
-            $this->load->library($auth_library_class);
-        }
-
-        return $this->{$auth_library_class}->$auth_library_function($username, $password);
-    }
-
-    /**
-     * Check if the user is logged in
-     *
-     * @access protected
-     * @param string $username The user's name
-     * @param bool|string $password The user's password
-     * @return bool
-     */
-    protected function _check_login($username = NULL, $password = FALSE)
-    {
-        if (empty($username))
-        {
-            return FALSE;
-        }
-
-        $auth_source = strtolower($this->config->item('auth_source'));
-        $rest_auth = strtolower($this->config->item('rest_auth'));
-        $valid_logins = $this->config->item('rest_valid_logins');
-
-        if ( ! $this->config->item('auth_source') && $rest_auth === 'digest')
-        {
-            // For digest we do not have a password passed as argument
-            return md5($username.':'.$this->config->item('rest_realm').':'.(isset($valid_logins[$username]) ? $valid_logins[$username] : ''));
-        }
-
-        if ($password === FALSE)
-        {
-            return FALSE;
-        }
-
-        if ($auth_source === 'ldap')
-        {
-            log_message('debug', "Performing LDAP authentication for $username");
-
-            return $this->_perform_ldap_auth($username, $password);
-        }
-
-        if ($auth_source === 'library')
-        {
-            log_message('debug', "Performing Library authentication for $username");
-
-            return $this->_perform_library_auth($username, $password);
-        }
-
-        if (array_key_exists($username, $valid_logins) === FALSE)
-        {
-            return FALSE;
-        }
-
-        if ($valid_logins[$username] !== $password)
-        {
-            return FALSE;
-        }
-
-        return TRUE;
-    }
-
-    /**
-     * Check to see if the user is logged in with a PHP session key
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _check_php_session()
-    {
-        // Get the auth_source config item
-        $key = $this->config->item('auth_source');
-
-        // If false, then the user isn't logged in
-        if ( ! $this->session->userdata($key))
-        {
-            // Display an error response
-            $this->response([
-                $this->config->item('rest_status_field_name') => FALSE,
-                $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_unauthorized')
-            ], self::HTTP_UNAUTHORIZED);
-        }
-    }
-
-    /**
-     * Prepares for basic authentication
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _prepare_basic_auth()
-    {
-        // If whitelist is enabled it has the first chance to kick them out
-        if ($this->config->item('rest_ip_whitelist_enabled'))
-        {
-            $this->_check_whitelist_auth();
-        }
-
-        // Returns NULL if the SERVER variables PHP_AUTH_USER and HTTP_AUTHENTICATION don't exist
-        $username = $this->input->server('PHP_AUTH_USER');
-        $http_auth = $this->input->server('HTTP_AUTHENTICATION');
-
-        $password = NULL;
-        if ($username !== NULL)
-        {
-            $password = $this->input->server('PHP_AUTH_PW');
-        }
-        elseif ($http_auth !== NULL)
-        {
-            // If the authentication header is set as basic, then extract the username and password from
-            // HTTP_AUTHORIZATION e.g. my_username:my_password. This is passed in the .htaccess file
-            if (strpos(strtolower($http_auth), 'basic') === 0)
-            {
-                // Search online for HTTP_AUTHORIZATION workaround to explain what this is doing
-                list($username, $password) = explode(':', base64_decode(substr($this->input->server('HTTP_AUTHORIZATION'), 6)));
-            }
-        }
-
-        // Check if the user is logged into the system
-        if ($this->_check_login($username, $password) === FALSE)
-        {
-            $this->_force_login();
-        }
-    }
-
-    /**
-     * Prepares for digest authentication
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _prepare_digest_auth()
-    {
-        // If whitelist is enabled it has the first chance to kick them out
-        if ($this->config->item('rest_ip_whitelist_enabled'))
-        {
-            $this->_check_whitelist_auth();
-        }
-
-        // We need to test which server authentication variable to use,
-        // because the PHP ISAPI module in IIS acts different from CGI
-        $digest_string = $this->input->server('PHP_AUTH_DIGEST');
-        if ($digest_string === NULL)
-        {
-            $digest_string = $this->input->server('HTTP_AUTHORIZATION');
-        }
-
-        $unique_id = uniqid();
-
-        // The $_SESSION['error_prompted'] variable is used to ask the password
-        // again if none given or if the user enters wrong auth information
-        if (empty($digest_string))
-        {
-            $this->_force_login($unique_id);
-        }
-
-        // We need to retrieve authentication data from the $digest_string variable
-        $matches = [];
-        preg_match_all('@(username|nonce|uri|nc|cnonce|qop|response)=[\'"]?([^\'",]+)@', $digest_string, $matches);
-        $digest = (empty($matches[1]) || empty($matches[2])) ? [] : array_combine($matches[1], $matches[2]);
-
-        // For digest authentication the library function should return already stored md5(username:restrealm:password) for that username see rest.php::auth_library_function config
-        $username = $this->_check_login($digest['username'], TRUE);
-        if (array_key_exists('username', $digest) === FALSE || $username === FALSE)
-        {
-            $this->_force_login($unique_id);
-        }
-
-        $md5 = md5(strtoupper($this->request->method).':'.$digest['uri']);
-        $valid_response = md5($username.':'.$digest['nonce'].':'.$digest['nc'].':'.$digest['cnonce'].':'.$digest['qop'].':'.$md5);
-
-        // Check if the string don't compare (case-insensitive)
-        if (strcasecmp($digest['response'], $valid_response) !== 0)
-        {
-            // Display an error response
-            $this->response([
-                $this->config->item('rest_status_field_name') => FALSE,
-                $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_invalid_credentials')
-            ], self::HTTP_UNAUTHORIZED);
-        }
-    }
-
-    /**
-     * Checks if the client's ip is in the 'rest_ip_blacklist' config and generates a 401 response
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _check_blacklist_auth()
-    {
-        // Match an ip address in a blacklist e.g. 127.0.0.0, 0.0.0.0
-        $pattern = sprintf('/(?:,\s*|^)\Q%s\E(?=,\s*|$)/m', $this->input->ip_address());
-
-        // Returns 1, 0 or FALSE (on error only). Therefore implicitly convert 1 to TRUE
-        if (preg_match($pattern, $this->config->item('rest_ip_blacklist')))
-        {
-            // Display an error response
-            $this->response([
-                $this->config->item('rest_status_field_name') => FALSE,
-                $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_ip_denied')
-            ], self::HTTP_UNAUTHORIZED);
-        }
-    }
-
-    /**
-     * Check if the client's ip is in the 'rest_ip_whitelist' config and generates a 401 response
-     *
-     * @access protected
-     * @return void
-     */
-    protected function _check_whitelist_auth()
-    {
-        $whitelist = explode(',', $this->config->item('rest_ip_whitelist'));
-
-        array_push($whitelist, '127.0.0.1', '0.0.0.0');
-
-        foreach ($whitelist as &$ip)
-        {
-            // As $ip is a reference, trim leading and trailing whitespace, then store the new value
-            // using the reference
-            $ip = trim($ip);
-        }
-
-        if (in_array($this->input->ip_address(), $whitelist) === FALSE)
-        {
-            $this->response([
-                $this->config->item('rest_status_field_name') => FALSE,
-                $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_ip_unauthorized')
-            ], self::HTTP_UNAUTHORIZED);
-        }
-    }
-
-    /**
-     * Force logging in by setting the WWW-Authenticate header
-     *
-     * @access protected
-     * @param string $nonce A server-specified data string which should be uniquely generated
-     * each time
-     * @return void
-     */
-    protected function _force_login($nonce = '')
-    {
-        $rest_auth = $this->config->item('rest_auth');
-        $rest_realm = $this->config->item('rest_realm');
-        if (strtolower($rest_auth) === 'basic')
-        {
-            // See http://tools.ietf.org/html/rfc2617#page-5
-            header('WWW-Authenticate: Basic realm="'.$rest_realm.'"');
-        }
-        elseif (strtolower($rest_auth) === 'digest')
-        {
-            // See http://tools.ietf.org/html/rfc2617#page-18
-            header(
-                'WWW-Authenticate: Digest realm="'.$rest_realm
-                .'", qop="auth", nonce="'.$nonce
-                .'", opaque="' . md5($rest_realm).'"');
-        }
-
-        // Display an error response
-        $this->response([
-            $this->config->item('rest_status_field_name') => FALSE,
-            $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_unauthorized')
-        ], self::HTTP_UNAUTHORIZED);
-    }
-
-    /**
-     * Updates the log table with the total access time
-     *
-     * @access protected
-     * @author Chris Kacerguis
-     * @return bool TRUE log table updated; otherwise, FALSE
-     */
-    protected function _log_access_time()
-    {
-        $payload['rtime'] = $this->_end_rtime - $this->_start_rtime;
-
-        return $this->rest->db->update(
-            $this->config->item('rest_logs_table'), $payload, [
-            'id' => $this->_insert_id
-        ]);
-    }
-
-    /**
-     * Updates the log table with HTTP response code
-     *
-     * @access protected
-     * @author Justin Chen
-     * @param $http_code int HTTP status code
-     * @return bool TRUE log table updated; otherwise, FALSE
-     */
-    protected function _log_response_code($http_code)
-    {
-        $payload['response_code'] = $http_code;
-
-        return $this->rest->db->update(
-            $this->config->item('rest_logs_table'), $payload, [
-            'id' => $this->_insert_id
-        ]);
-    }
-
-    /**
-     * Check to see if the API key has access to the controller and methods
-     *
-     * @access protected
-     * @return bool TRUE the API key has access; otherwise, FALSE
-     */
-    protected function _check_access()
-    {
-        // If we don't want to check access, just return TRUE
-        if ($this->config->item('rest_enable_access') === FALSE)
-        {
-            return TRUE;
-        }
-
-        //check if the key has all_access
-        $accessRow = $this->rest->db
-            ->where('key', $this->rest->key)
-            ->get($this->config->item('rest_access_table'))->row_array();
-
-        if (!empty($accessRow) && !empty($accessRow['all_access']))
-        {
-            return TRUE;
-        }
-
-        // Fetch controller based on path and controller name
-        $controller = implode(
-            '/', [
-            $this->router->directory,
-            $this->router->class
-        ]);
-
-        // Remove any double slashes for safety
-        $controller = str_replace('//', '/', $controller);
-
-        // Query the access table and get the number of results
-        return $this->rest->db
-                ->where('key', $this->rest->key)
-                ->where('controller', $controller)
-                ->get($this->config->item('rest_access_table'))
-                ->num_rows() > 0;
-    }
 
     /**
      * Checks allowed domains, and adds appropriate headers for HTTP access control (CORS)
@@ -2219,38 +1294,57 @@ abstract class RestController extends \MY_Controller {
     protected function _check_cors()
     {
         // Convert the config items into strings
-        $allowed_headers = implode(' ,', $this->config->item('allowed_cors_headers'));
-        $allowed_methods = implode(' ,', $this->config->item('allowed_cors_methods'));
+        $allowed_headers = $this->config->item('allowed_cors_headers');
+        $allowed_methods = $this->config->item('allowed_cors_methods');
 
-        // If we want to allow any domain to access the API
-        if ($this->config->item('allow_any_cors_domain') === TRUE)
-        {
+        if (!is_array($allowed_headers)) {
+            $allowed_headers = [];
+        }
+
+        if (!is_array($allowed_methods)) {
+            $allowed_methods = [];
+        }
+
+        // Automatically include the configured API key header in the allowed CORS headers.
+        $rest_key_name = $this->config->item('rest_key_name');
+
+        if (!empty($rest_key_name) && !in_array($rest_key_name, $allowed_headers, true)) {
+            $allowed_headers[] = $rest_key_name;
+        }
+
+        // Include headers commonly used by CORS preflight requests.
+        foreach (['Access-Control-Request-Method', 'Access-Control-Request-Headers'] as $header) {
+            if (!in_array($header, $allowed_headers, true)) {
+                $allowed_headers[] = $header;
+            }
+        }
+
+        // Remove duplicate values and convert the arrays into header-safe strings.
+        $allowed_headers = implode(', ', array_unique($allowed_headers));
+        $allowed_methods = implode(', ', array_unique($allowed_methods));
+
+        if ($this->config->item('allow_any_cors_domain') === true) {
+            // Allow requests from any origin.
             header('Access-Control-Allow-Origin: *');
-            header('Access-Control-Allow-Headers: '.$allowed_headers);
-            header('Access-Control-Allow-Methods: '.$allowed_methods);
-        }
-        else
-        {
-            // We're going to allow only certain domains access
-            // Store the HTTP Origin header
-            $origin = $this->input->server('HTTP_ORIGIN');
-            if ($origin === NULL)
-            {
-                $origin = '';
-            }
+        } else {
+            $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-            // If the origin domain is in the allowed_cors_origins list, then add the Access Control headers
-            if (in_array($origin, $this->config->item('allowed_cors_origins')))
-            {
-                header('Access-Control-Allow-Origin: '.$origin);
-                header('Access-Control-Allow-Headers: '.$allowed_headers);
-                header('Access-Control-Allow-Methods: '.$allowed_methods);
+            $allowed_origins = $this->config->item('allowed_cors_origins');
+
+            // Allow the request origin only when it is explicitly listed.
+            if (is_array($allowed_origins) && in_array($origin, $allowed_origins, true)) {
+                header('Access-Control-Allow-Origin: ' . $origin);
+                header('Vary: Origin');
             }
         }
 
-        // If the request HTTP method is 'OPTIONS', kill the response and send it to the client
-        if ($this->input->method() === 'options')
-        {
+        // Send the allowed headers and methods for CORS.
+        header('Access-Control-Allow-Headers: ' . $allowed_headers);
+        header('Access-Control-Allow-Methods: ' . $allowed_methods);
+
+        // Stop here for preflight requests.
+        // The actual controller method should not be executed for OPTIONS requests.
+        if ($this->input->method() === 'options') {
             exit;
         }
     }

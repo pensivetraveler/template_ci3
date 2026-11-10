@@ -9,7 +9,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | Set to force the use of HTTPS for REST API calls
 |
 */
-$config['force_https'] = false;
+$config['force_https'] = ENVIRONMENT !== 'development';
 
 /*
 |--------------------------------------------------------------------------
@@ -72,7 +72,7 @@ $config['rest_status_field_name'] = 'status';
 | The field name for the message inside the response
 |
 */
-$config['rest_message_field_name'] = 'error';
+$config['rest_message_field_name'] = 'msg';
 
 /*
 |--------------------------------------------------------------------------
@@ -110,7 +110,7 @@ $config['rest_realm'] = 'REST API';
 |           authorization key
 |
 */
-$config['rest_auth'] = false;
+$config['rest_auth'] = 'session';
 
 /*
 |--------------------------------------------------------------------------
@@ -126,7 +126,7 @@ $config['rest_auth'] = false;
 | Note: If 'rest_auth' is set to 'session' then change 'auth_source' to the name of the session variable
 |
 */
-$config['auth_source'] = 'ldap';
+$config['auth_source'] = 'user_id';
 
 /*
 |--------------------------------------------------------------------------
@@ -179,10 +179,6 @@ $config['auth_library_function'] = '';
 | Acceptable values are; 'none', 'digest' and 'basic'.
 |
 */
-// $config['auth_override_class_method']['deals']['view'] = 'none';
-// $config['auth_override_class_method']['deals']['insert'] = 'digest';
-// $config['auth_override_class_method']['accounts']['user'] = 'basic';
-// $config['auth_override_class_method']['dashboard']['*'] = 'basic';
 
 // ---Uncomment list line for the wildard unit test
 // $config['auth_override_class_method']['wildcard_test_cases']['*'] = 'basic';
@@ -201,6 +197,9 @@ $config['auth_library_function'] = '';
 
 // ---Uncomment list line for the wildcard unit test
 // $config['auth_override_class_method_http']['wildcard_test_cases']['*']['options'] = 'basic';
+
+// 엔드포인트별 인증 덮어쓰기는 config/extra/{API 폴더}/{API 폴더}_method_config.php (기본 config/extra/api/api_method_config.php) 의 'auth' 키로 관리한다.
+// (MY_Controller_API::applyApiMethodConfig()가 이 항목으로 넣어 준다)
 
 /*
 |--------------------------------------------------------------------------
@@ -336,7 +335,8 @@ $config['rest_keys_table'] = 'user_token';
 |   ) ;
 |  |
 */
-$config['rest_enable_keys'] = false;
+// .env REST_STRICT=true 면 개발 환경에서도 운영과 같게 검사 (로컬 검증용)
+$config['rest_enable_keys'] = ENVIRONMENT !== 'development' || filter_var(getenv('REST_STRICT'), FILTER_VALIDATE_BOOLEAN);
 //$config['rest_enable_keys'] = true;
 
 /*
@@ -389,9 +389,21 @@ $config['rest_key_length'] = 40;
 | Note: Custom headers with the X- prefix are deprecated as of
 | 2012/06/12. See RFC 6648 specification for more details
 |
+| $config['rest_key_name'] = 'X-API-KEY'; // X-API-Key should be in header
+| $config['rest_key_name'] = 'Authorization'; // Authorization should be in header
 */
-//$config['rest_key_name'] = 'X-API-KEY';
 $config['rest_key_name'] = 'Authorization';
+
+/*
+|--------------------------------------------------------------------------
+| REST API Key Bearer
+|--------------------------------------------------------------------------
+|
+| Whether to read API key from "Authorization: Bearer {token}" format.
+| Only valid when rest_key_name is Authorization
+|
+*/
+$config['rest_key_bearer'] = false;
 
 /*
 |--------------------------------------------------------------------------
@@ -443,7 +455,7 @@ $config['rest_enable_logging'] = true;
 | table name to match e.g. my_logs
 |
 */
-$config['rest_logs_table'] = 'user_logs';
+$config['rest_logs_table'] = 'rest_logs';
 
 /*
 |--------------------------------------------------------------------------
@@ -490,7 +502,7 @@ $config['rest_logs_table'] = 'user_logs';
 |      EXECUTE PROCEDURE upd_timestamp();
 |
 */
-$config['rest_enable_access'] = true;
+$config['rest_enable_access'] = false;
 
 /*
 |--------------------------------------------------------------------------
@@ -587,7 +599,7 @@ $config['rest_ignore_http_accept'] = false;
 | Hint: This is good for production environments
 |
 */
-$config['rest_ajax_only'] = false;
+$config['rest_ajax_only'] = ENVIRONMENT !== 'development' || filter_var(getenv('REST_STRICT'), FILTER_VALIDATE_BOOLEAN);
 
 /*
 |--------------------------------------------------------------------------
@@ -609,7 +621,7 @@ $config['rest_language'] = 'korean';
 | will access it through a browser
 |
 */
-$config['check_cors'] = false;
+$config['check_cors'] = true;
 
 /*
 |--------------------------------------------------------------------------
@@ -649,11 +661,13 @@ $config['allowed_cors_methods'] = [
 | CORS Allow Any Domain
 |--------------------------------------------------------------------------
 |
+
 | Set to TRUE to enable Cross-Origin Resource Sharing (CORS) from any
 | source domain
 |
 */
-$config['allow_any_cors_domain'] = false;
+// 기본은 같은 출처만. 다른 출처가 필요하면 .env 의 CORS_ALLOWED_ORIGINS(쉼표 구분) 또는 CORS_ALLOW_ANY=true
+$config['allow_any_cors_domain'] = function_exists('env') && env('CORS_ALLOW_ANY', false) === true;
 
 /*
 |--------------------------------------------------------------------------
@@ -666,7 +680,9 @@ $config['allow_any_cors_domain'] = false;
 | e.g. $config['allowed_origins'] = ['http://www.example.com', 'https://spa.example.com']
 |
 */
-$config['allowed_cors_origins'] = [];
+$config['allowed_cors_origins'] = function_exists('env') && env('CORS_ALLOWED_ORIGINS')
+    ? array_values(array_filter(array_map('trim', explode(',', (string)env('CORS_ALLOWED_ORIGINS')))))
+    : [];
 
 /*
 |--------------------------------------------------------------------------

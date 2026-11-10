@@ -8,19 +8,20 @@ function get_site_title($site_name, $title_list = [])
     }
 }
 
-function is_active_page($nav_link, $params = [], $current_uri = '')
+function is_current_uri($nav_link, $params = [], $current_uri = '')
 {
-    if(!$current_uri) $current_uri = $_SERVER['PATH_INFO'];
+    if(!$current_uri) $current_uri = $_SERVER['PATH_INFO'] ?? '/';
     if(count($params) > 0) {
-        $queries = array_reduce(explode('&', $_SERVER['QUERY_STRING']),
+        $queries = array_reduce(explode('&', $_SERVER['QUERY_STRING'] ?? ''),
             function($carry, $item) {
                 if(!is_empty($item)) {
-                    $data = explode('=', $item);
-                    $carry[$data[0]] = $data[1];
+                    $data = explode('=', $item, 2);
+                    $carry[$data[0]] = $data[1] ?? '';
                 }
                 return $carry;
             }, []);
-        return $current_uri === $nav_link && empty(array_diff_assoc($params, $queries));
+        // 쿼리에 없는 params(예: ?layout=side-menu 없이 진입)는 비교하지 않고, 있는 값만 일치해야 함
+        return $current_uri === $nav_link && empty(array_diff_assoc(array_intersect_key($params, $queries), $queries));
     }else{
         return $current_uri === $nav_link;
     }
@@ -49,6 +50,48 @@ function add_javascript($list)
 }
 
 /**
+ * 로컬 js/css 주소에 ?v=파일수정시각 추가 (배포 후 브라우저 캐시로 이전 파일이 쓰이는 것 방지)
+ *
+ * - 대상: base_url() 또는 '/'로 시작하는 같은 서버의 .js / .css 주소
+ * - 외부 주소, 파일이 없는 주소, 이미 v= 쿼리가 있는 주소는 변경하지 않음
+ *
+ * @param string $html
+ * @return string
+ */
+function add_asset_version(string $html): string
+{
+    $baseUrl = base_url();
+    $basePath = (string)parse_url($baseUrl, PHP_URL_PATH);
+
+    return preg_replace_callback(
+        '/\b(src|href)\s*=\s*(["\'])([^"\'?#]+\.(?:js|css))(\?[^"\'#]*)?\2/i',
+        function (array $matches) use ($baseUrl, $basePath): string {
+            $url = $matches[3];
+            $query = $matches[4] ?? '';
+
+            if (preg_match('/[?&]v=/', $query)) return $matches[0];
+
+            if (strpos($url, $baseUrl) === 0) {
+                $path = substr($url, strlen($baseUrl));
+            } elseif ($url[0] === '/' && strpos($url, '//') !== 0) {
+                $path = $basePath !== '' && strpos($url, $basePath) === 0 ? substr($url, strlen($basePath)) : $url;
+            } else {
+                return $matches[0];
+            }
+
+            $file = FCPATH . ltrim(rawurldecode($path), '/');
+            $mtime = is_file($file) ? filemtime($file) : false;
+            if (!$mtime) return $matches[0];
+
+            $query = ($query === '' ? '?' : $query . '&') . 'v=' . $mtime;
+
+            return $matches[1] . '=' . $matches[2] . $url . $query . $matches[2];
+        },
+        $html
+    ) ?? $html;
+}
+
+/**
  * Alert 띄우기
  */
 if ( ! function_exists('alert')) {
@@ -58,7 +101,7 @@ if ( ! function_exists('alert')) {
             $msg = lang('Incorrect Access');
         }
         echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-        echo '<script type="text/javascript">alert("' . $msg . '");';
+        echo '<script type="text/javascript"'.csp_nonce_attr().'>alert("' . $msg . '");';
         if (empty($url)) {
             echo 'history.go(-1);';
         }
@@ -81,7 +124,7 @@ if ( ! function_exists('alert_close')) {
             $msg = lang('Incorrect Access');
         }
         echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-        echo '<script type="text/javascript"> alert("' . $msg . '"); window.close(); </script>';
+        echo '<script type="text/javascript"'.csp_nonce_attr().'> alert("' . $msg . '"); window.close(); </script>';
         exit;
     }
 }
@@ -97,7 +140,7 @@ if ( ! function_exists('alert_refresh_close')) {
             $msg = lang('Incorrect Access');
         }
         echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-        echo '<script type="text/javascript"> alert("' . $msg . '"); window.opener.location.reload();window.close(); </script>';
+        echo '<script type="text/javascript"'.csp_nonce_attr().'> alert("' . $msg . '"); window.opener.location.reload();window.close(); </script>';
         exit;
     }
 }

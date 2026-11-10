@@ -134,7 +134,7 @@ if ( ! function_exists('get_error_views_path'))
 
 if ( ! function_exists('get_error_response'))
 {
-	function get_error_response($preset, $error): array
+	function get_error_response($status_code, $preset, $error): array
 	{
 		$msg = null;
 		if(isset($error['msg'])) {
@@ -145,30 +145,27 @@ if ( ! function_exists('get_error_response'))
 			}
 		}
 
-		if(get_path() === 'api') {
-			$response = [
-				'errorCode' => $preset['code'],
-				'errorMessage' => $preset['msg'],
-				'errorBody' => [
-					'Type' => addslashes($error['type']),
-					'Message' => $msg,
-					'Filename' => $error['location']??null,
-					'Line Number' => $error['line']??null,
-				],
-			];
-		}else{
-			$response = array_merge($preset, [
-				'errors' => [[
-					'location' => $error['location']??null,
-					'param' => null,
-					'value' => $error['line']??null,
-					'type' => addslashes($error['type']),
-					'msg' => $msg,
-				]]
-			]);
-		}
+        $location = $error['location']??null;
 
-		return $response;
+        $param = null;
+        if($status_code === 404 && !is_null($location)) {
+            $parsed = parse_url($location);
+            parse_str($parsed['query'] ?? '', $query);
+            $location = $parsed['path'];
+            $param = $query;
+        }
+
+        $value = $error['line']??null;
+
+        return array_merge($preset, [
+            'errors' => [[
+                'location' => $location,
+                'param' => $param,
+                'value' => $value,
+                'type' => addslashes($error['type']),
+                'msg' => $msg,
+            ]]
+        ]);
 	}
 }
 
@@ -199,7 +196,7 @@ if ( ! function_exists('response_error'))
 		if(isset($lang['status_code'], $lang['status_code'][$code])) $preset['msg'] = $lang['status_code'][$code];
 		$preset['data'] = [];
 
-		$response = get_error_response($preset, $error);
+		$response = get_error_response($status_code, $preset, $error);
 
 		if(array_search('API_NOT_EXIST', $response)) $response[array_search('API_NOT_EXIST', $response)] = API_NOT_EXIST;
 		if(array_search('INTERNAL_SERVER_ERROR', $response)) $response[array_search('INTERNAL_SERVER_ERROR', $response)] = INTERNAL_SERVER_ERROR;
@@ -207,6 +204,6 @@ if ( ! function_exists('response_error'))
 		header('Content-Type: application/json');
 		set_status_header($status_code);
 		echo json_encode($response, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);
-		exit(4);
+		exit;
 	}
 }

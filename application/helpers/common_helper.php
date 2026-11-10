@@ -30,15 +30,22 @@ if ( ! function_exists('is_empty'))
             }
             return false;
         }else{
-            switch (gettype($data)) {
-                case 'object' :
+            if(gettype($data) === 'object' || gettype($data) === 'array') {
+                if(gettype($data) === 'object') {
                     if(!property_exists($data, $key)) return true;
-                    return empty($data->{$key});
-                case 'array' :
+                    $data = get_object_vars($data);
+                }else{
                     if(!array_key_exists($key, $data)) return true;
+                }
+
+                if(gettype($data[$key]) === 'array' || gettype($data[$key]) === 'object') {
+                    if(gettype($data[$key]) === 'object') $data[$key] = get_object_vars($data[$key]);
                     return empty($data[$key]);
-                default :
-                    return true;
+                }else{
+                    return empty($data[$key])&&!strlen($data[$key]);
+                }
+            }else{
+                return true;
             }
         }
     }
@@ -118,3 +125,354 @@ if ( ! function_exists( 'str_ends_with' ) )
         return mb_substr( $haystack, -$len, $len ) === $needle;
     }
 }
+
+if ( ! function_exists('is_serialized_string'))
+{
+    function is_serialized_string( $data ) {
+        // 문자열이 아니면 바로 false
+        if ( ! is_string( $data ) ) {
+            return false;
+        }
+        $data = trim( $data );
+
+        // serialize 포맷의 최소 길이 (예: b:0;)
+        if ( strlen( $data ) < 4 ) {
+            return false;
+        }
+
+        // 시작 문자 및 마지막 세미콜론/중괄호 검사
+        if ( ! preg_match( '/^(?:s|a|O|b|i|d):/', $data ) ) {
+            return false;
+        }
+        $last = substr( $data, -1 );
+        if ( $last !== ';' && $last !== '}' ) {
+            return false;
+        }
+
+        // 실제로 unserialize 해보고 에러 없이 값이 돌아오면 true
+        try {
+            $unserialized = @unserialize( $data );
+            return $unserialized !== false || $data === 'b:0;';
+        } catch ( Exception $e ) {
+            return false;
+        }
+    }
+}
+
+if ( ! function_exists('get_time_text'))
+{
+    function get_time_text($datetime) {
+        if(strtotime($datetime) + 60 > time()) {
+            // 1분 내
+            return lang('just now');
+        }else {
+            $div = strtotime($datetime) - time();
+            if(strtotime($datetime) + 60*60 > time()) {
+                // 1시간 내
+                $div = floor(abs($div)/60);
+                return $div.lang('m ago');
+            }else if(strtotime($datetime) + 60*60*24 > time()) {
+                // 1일 내
+                $div = floor(abs($div) / (60 * 60));
+                return $div . lang('h ago');
+            }else{
+                // 수일
+                $div = floor(abs($div)/(60*60*24));
+                if($div > 1) {
+                    return $div.lang('days ago');
+                }else{
+                    return $div.lang('day ago');
+                }
+            }
+        }
+    }
+}
+
+if ( ! function_exists('str_contains'))
+{
+    function str_contains($haystack, $needle) {
+        return strpos($haystack, $needle) !== false;
+    }
+}
+
+if ( ! function_exists('is_ajax'))
+{
+    function is_ajax(): bool
+    {
+        $ci =& get_instance();
+
+        return $ci->input->is_ajax_request();
+    }
+}
+
+if ( ! function_exists('is_web'))
+{
+    function is_web(): bool
+    {
+        $ci =& get_instance();
+
+        // AJAX면 웹 페이지 호출로 보지 않음
+        if ($ci->input->is_ajax_request()) {
+            return false;
+        }
+
+        $accept = $ci->input->server('HTTP_ACCEPT') ?? '';
+        $secFetchMode = $ci->input->server('HTTP_SEC_FETCH_MODE') ?? '';
+        $secFetchDest = $ci->input->server('HTTP_SEC_FETCH_DEST') ?? '';
+
+        // 브라우저의 일반 페이지 이동 요청일 가능성이 높음
+        if (stripos($accept, 'text/html') !== false) {
+            return true;
+        }
+
+        // 최신 브라우저에서 페이지 이동 요청일 때 들어오는 경우가 많음
+        if ($secFetchMode === 'navigate') {
+            return true;
+        }
+
+        if ($secFetchDest === 'document') {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+if ( ! function_usable('search_item'))
+{
+    function search_item($list, $field, $value)
+    {
+        $columns = array_column($list, $field);
+        $index = array_search($value, $columns);
+        return $index !== FALSE
+            ? $list[$index]
+            : null;
+    }
+}
+
+if ( ! function_usable('recursive_ksort')) {
+    function recursive_ksort(array &$array): void
+    {
+        ksort($array);
+
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                recursive_ksort($value);
+            }
+        }
+
+        unset($value);
+    }
+}
+
+if ( ! function_exists('is_sensitive_field'))
+{
+    /**
+     * 로그·오류 응답에 값을 남기면 안 되는 필드 (password 가 들어간 이름, 토큰·키류)
+     */
+    function is_sensitive_field($name): bool
+    {
+        $name = strtolower((string)$name);
+        return strpos($name, 'password') !== false
+            || (bool)preg_match('/(^|[_\[])(token|secret|api_key|authorization)($|[_\]])/', $name);
+    }
+}
+
+if ( ! function_exists('mask_sensitive_fields'))
+{
+    /**
+     * 민감한 필드의 값을 *** 로 바꾼다. 중첩 배열·객체까지
+     */
+    function mask_sensitive_fields($data)
+    {
+        if (is_object($data)) $data = (array)$data;
+        if (!is_array($data)) return $data;
+
+        foreach ($data as $key => $value) {
+            $data[$key] = is_string($key) && is_sensitive_field($key) ? '***' : mask_sensitive_fields($value);
+        }
+        return $data;
+    }
+}
+
+if ( ! function_exists('csp_nonce_attr'))
+{
+    /**
+     * 인라인 <script> 에 붙이는 nonce 속성. 요청마다 값이 하나다 (CSP 헤더는 MY_Hooks)
+     */
+    function csp_nonce_attr(): string
+    {
+        return ' nonce="'.csp_nonce().'"';
+    }
+}
+
+if ( ! function_exists('csp_nonce'))
+{
+    function csp_nonce(): string
+    {
+        static $nonce = null;
+        if ($nonce === null) $nonce = base64_encode(random_bytes(16));
+        return $nonce;
+    }
+}
+
+if ( ! function_exists('csp_policy'))
+{
+    /**
+     * CSP 헤더 값 (MY_Hooks::setHeaderSecure).
+     * $extra: 화면별로 더할 출처 ['지시문' => [출처, ...]]. 컨트롤러에서 $this->cspExtra 로 넣는다.
+     * 기본 목록에 없는 지시문은 default-src 값에서 시작한다 ('self' 가 빠지지 않게)
+     */
+    function csp_policy(string $nonce, array $extra = []): string
+    {
+        $directives = [
+            'default-src' => ["'self'"],
+            'script-src' => ["'self'", "'nonce-".$nonce."'", 'https://t1.daumcdn.net', 'https://cdnjs.cloudflare.com'],
+            'style-src' => ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
+            'font-src' => ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
+            // Monaco 편집기는 다른 출처의 워커 코드를 blob 워커로 띄운다. 막히면 메인 스레드에서 돌며 오류를 낸다
+            'worker-src' => ["'self'", 'blob:'],
+            'img-src' => ["'self'", 'data:', 'blob:', 'https:'],
+            'connect-src' => ["'self'"],
+            'frame-src' => ["'self'", 'https://www.youtube.com', 'https://*.daum.net'],
+            'object-src' => ["'none'"],
+            'base-uri' => ["'self'"],
+            'form-action' => ["'self'"],
+        ];
+        foreach ($extra as $name => $sources) {
+            $directives[$name] = array_values(array_unique(array_merge($directives[$name] ?? $directives['default-src'], (array)$sources)));
+        }
+
+        $parts = [];
+        foreach ($directives as $name => $sources) $parts[] = $name.' '.implode(' ', $sources);
+        return implode('; ', $parts);
+    }
+}
+
+if ( ! function_exists('user_cfg'))
+{
+    /**
+     * 사용자 관련 환경값 (tbl_sys_cfg big_cfg = SYS_USER, 관리자 > 시스템 > 환경값 설정).
+     * 표가 없는 설치 전이나 값이 없으면 기본값. 한 요청 안에서는 한 번만 읽는다.
+     */
+    function user_cfg(string $name, string $default = ''): string
+    {
+        static $values = null;
+
+        if ($values === null) {
+            $values = [];
+            $CI =& get_instance();
+            if (isset($CI->db) && $CI->db->table_exists('sys_cfg')) {
+                $rows = $CI->db->select('sml_cfg, cfg_val')->where('big_cfg', 'SYS_USER')->get('sys_cfg')->result();
+                foreach ($rows as $row) $values[$row->sml_cfg] = trim((string)$row->cfg_val);
+            }
+        }
+
+        return ($values[$name] ?? '') !== '' ? $values[$name] : $default;
+    }
+}
+
+if ( ! function_exists('signup_field_enabled'))
+{
+    /**
+     * 가입 필드 사용 여부 (email, tel). 설정이 없으면 사용
+     */
+    function signup_field_enabled(string $field): bool
+    {
+        return user_cfg('SIGNUP_'.strtoupper($field).'_YN', 'Y') !== 'N';
+    }
+}
+
+if ( ! function_exists('find_id_enabled'))
+{
+    function find_id_enabled(): bool
+    {
+        return signup_field_enabled('tel');
+    }
+}
+
+if ( ! function_exists('find_password_enabled'))
+{
+    function find_password_enabled(): bool
+    {
+        return signup_field_enabled('email');
+    }
+}
+
+if ( ! function_exists('password_reset_mail_ready'))
+{
+    /**
+     * 재설정 링크를 메일로 보낼 수 있는지. 링크는 요청 Host 가 아니라 APP_URL 로만 만든다 (Host 조작 방지)
+     */
+    function password_reset_mail_ready(): bool
+    {
+        return (bool)getenv('MAIL_HOST') && (bool)getenv('APP_URL');
+    }
+}
+
+if ( ! function_exists('filter_auth_form'))
+{
+    /**
+     * 가입 필드 설정에 맞춰 가입·찾기 폼 항목을 고른다 (signup, find_id, find_password).
+     * 이메일을 쓰지 않으면 아이디 찾기는 이름·전화번호로 확인한다.
+     */
+    function filter_auth_form(array $items, string $form): array
+    {
+        $except = [];
+        if (!signup_field_enabled('email') && $form !== 'find_id') $except[] = 'email';
+        if (!signup_field_enabled('tel')) $except[] = 'tel';
+        if ($form === 'find_id') $except[] = signup_field_enabled('email') ? 'name' : 'email';
+
+        return array_values(array_filter($items, function ($item) use ($except) {
+            return !in_array($item['field'] ?? '', $except, true);
+        }));
+    }
+}
+
+if ( ! function_exists('token_lifetime'))
+{
+    /**
+     * 인증 토큰 유효 시간(초), 0 이면 만료 없음.
+     * 시스템 환경값(tbl_sys_cfg SYS_USER_TOKEN_LIFETIME, 관리자 > 시스템 > 환경값 설정) → .env TOKEN_LIFETIME → 기본 12시간(43200).
+     * 환경값이 비었거나 숫자가 아니면 다음 순서로 넘어간다. 한 요청 안에서는 한 번만 읽는다
+     */
+    function token_lifetime(): int
+    {
+        static $lifetime = null;
+        if ($lifetime !== null) return $lifetime;
+
+        $value = null;
+        $CI =& get_instance();
+        if (isset($CI->db)) {
+            $row = $CI->db->select('cfg_val')->where('cmb_cfg', 'SYS_USER_TOKEN_LIFETIME')->get('sys_cfg')->row();
+            $value = $row ? trim((string)$row->cfg_val) : null;
+            if ($value !== null && $value !== '' && !ctype_digit($value)) {
+                log_message('error', 'sys_cfg SYS_USER_TOKEN_LIFETIME is not a number: '.$value);
+                $value = null;
+            }
+        }
+
+        if ($value === null || $value === '') {
+            $value = getenv('TOKEN_LIFETIME');
+            if ($value === false || $value === '') $value = 43200;
+        }
+
+        return $lifetime = max(0, (int)$value);
+    }
+}
+
+if ( ! function_exists('is_token_expired'))
+{
+    /**
+     * 발급 시각(user_token.created_dt)부터 token_lifetime() 이 지났는지 (발급 후 고정 시간 방식)
+     */
+    function is_token_expired($createdDt): bool
+    {
+        $lifetime = token_lifetime();
+        if ($lifetime === 0) return false;
+        $issued = $createdDt ? strtotime((string)$createdDt) : false;
+        if ($issued === false) return true;
+        return $issued + $lifetime < time();
+    }
+}
+

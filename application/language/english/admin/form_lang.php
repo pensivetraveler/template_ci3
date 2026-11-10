@@ -1,69 +1,165 @@
 <?php
 $lang['common'] = [
-	'row_num' => 'Num',
-	'actions' => 'Actions',
-	'created_dt' => 'Created Date',
-	'created_id' => 'Creater',
-	'updated_dt' => 'Updated Date',
-	'updated_id' => 'Updater',
-	'recent_dt' => 'Recent Date',
-	'recent_dt_list' => 'Date',
+    'row_num' => 'Num',
+    'actions' => 'Actions',
+    'created_dt' => 'Created Date',
+    'created_id' => 'Creater',
+    'updated_dt' => 'Updated Date',
+    'updated_id' => 'Updater',
+    'recent_dt' => 'Recent Date',
+    'recent_dt_list' => 'Date',
+    'lang_code' => 'Accessed Country',
+    'del_yn' => 'Delete YN',
+    'use_yn' => 'Use YN',
+    'year_month' => 'Year Month',
+    'thumbnail' => 'Thumbnail',
+    'ip_limit' => 'Limited IP List',
+    'preview' => 'Preview',
+    'date_range' => 'Date Range',
+    'date' => 'Date',
 ];
 
 $lang['auth'] = [
-	'autologin' => '자동 로그인',
+    'autologin' => 'Auto Login',
 ];
 
 $lang['user'] = [
-	'id' => 'ID',
-	'name' => 'Name',
-	'birth' => 'DOB',
-	'email' => 'Email',
-	'tel' => 'Tel',
-	'addr' => 'Address',
-	'memo' => 'Memo',
-	'password' => 'Password',
-	'password_confirm' => 'Password Confirm',
-	'zipcode' => 'Zipcode',
-	'addr1' => 'Address',
-	'addr2' => 'Extra Address',
-	'withdraw_dt' => 'Withdraw Date',
-];
-
-$lang['student'] = [
-	'code' => 'Student Code',
-	'grade' => 'Student Grade',
-	'disabilities_yn' => 'Enrolled Disabilities Class',
-	'aac_yn' => 'Enrolled AAC Class',
+    'id' => 'ID',
+    'password' => 'Password',
+    'password_confirm' => 'Password Confirm',
+    'name' => 'Name',
+    'birth' => 'DOB',
+    'email' => 'Email',
+    'tel' => 'Tel',
+    'addr' => 'Address',
+    'zipcode' => 'Zipcode',
+    'addr1' => 'Address',
+    'addr2' => 'Extra Address',
+    'memo' => 'Memo',
+    'withdraw_dt' => 'Withdraw Date',
+    'user_cd' => 'User Kind',
+    'user_api_key' => 'User API Key',
 ];
 
 $lang['board'] = [
-	'board_id' => 'Board',
-	'board_name' => 'Board Name',
-	'board_cd' => 'Kind',
+    'board_id' => 'Board',
+    'board_name' => 'Board Name',
+    'board_cd' => 'Kind',
+    'attach_max' => 'Max Attachments',
 ];
 
 $lang['article'] = [
-	'subject' => 'Subject',
-	'content' => 'Content',
-	'thumbnail' => 'Thumbnail',
-	'uploads' => 'Attachments',
-	'view_count' => 'Views',
-	'link' => 'Link',
-	'reply_yn' => 'Replied',
-	'reply' => 'Reply',
-	'reply_list' => 'Reply List',
-	'open_yn' => 'Opened',
+    'article_id' => 'Article',
+    'subject' => 'Subject',
+    'content' => 'Content',
+    'thumbnail' => 'Thumbnail',
+    'uploads' => 'Attachments',
+    'view_count' => 'Views',
+    'link' => 'Link',
+    'reply_yn' => 'Replied',
+    'reply' => 'Reply',
+    'reply_list' => 'Reply List',
+    'open_yn' => 'Opened',
+];
+
+$lang['system'] = [
+    'cmb_cfg' => 'Config Key',
+    'big_cfg' => 'Category',
+    'sml_cfg' => 'Sub Category',
+    'cfg_name' => 'Config Name',
+    'cfg_val' => 'Config Value',
+    'cfg_desc' => 'Config Desc.',
+    'cfg_type' => 'Config Type',
+    'cfg_options' => 'Dropdown Options',
+    'cmb_cd' => 'Code Key',
+    'big_cd' => 'Category',
+    'sml_cd' => 'Sub Category',
+    'cd_name' => 'Code Name',
+    'cd_val' => 'Code Value',
+    'cd_desc' => 'Code Desc.',
+    'cd_nick' => 'Code Nickname',
+    'cd_srt' => 'Code Sequence',
+];
+
+$lang['menu'] = [
+    'code' => 'Menu Code',
+    'parent_id' => 'Parent Menu',
+    'title' => 'Menu Title',
+    'icon' => 'Menu Icon',
+    'class' => 'Routing Class',
+    'method' => 'Routing Method',
+    'href' => 'link href',
+    'target' => 'link target',
+    'className' => 'link className',
+    'is_login' => 'Login Check YN',
+    'is_auth' => 'Auth Check YN',
+    'is_super' => 'Super Administrator Only',
+    'is_use' => 'Use YN',
+    'create' => 'Create',
+    'read' => 'Read',
+    'update' => 'Update',
+    'delete' => 'Delete',
+    'export' => 'Export',
+    'import' => 'Import',
+    'user_cd' => 'User Kind',
+    'is_show' => 'Show YN',
 ];
 
 $lang['company'] = [
-    'comp_code' => 'Company Code',
-    'comp_name' => 'Company Name',
-    'comp_ceo' => 'CEO',
-    'comp_tel' => 'Tel',
-    'comp_addr' => 'Address',
-    'comp_zipcode' => 'Zipcode',
-    'comp_addr1' => 'Address',
-    'comp_addr2' => 'Detail Address',
-    'comp_memo' => 'Memo',
+    'company_id' => 'Company',
+    'company_cd' => 'Company Kind',
+    'company_code' => 'Company Code',
+    'company_name' => 'Company Name',
+    'company_bizno' => 'Business No.',
+    'company_type' => 'Business Type',
+    'company_item' => 'Business Item',
+    'company_ceo' => 'CEO',
+    'company_tel' => 'Tel',
+    'company_addr' => 'Address',
+    'company_zipcode' => 'Zipcode',
+    'company_addr1' => 'Address',
+    'company_addr2' => 'Detail Address',
+    'company_memo' => 'Memo',
+];
+
+$lang['partner'] = [
+    'partner_id' => 'Partner',
+    'company_ids' => 'Companies',
+];
+
+$lang['category'] = [
+    'category_id' => 'Category',
+    'category_name' => 'Category Name',
+    'category_nick' => 'Category Nick',
+    'category_alias' => 'Category Alias',
+    'category_icon' => 'Category Icon',
+    'category_srt' => 'Category Sequence',
+];
+
+$lang['country'] = [
+    'code' => 'Country ISO Code',
+    'code3' => 'Country ISO Code 3',
+    'country_name' => 'Country Name',
+    'use_yn' => 'Use YN',
+    'lang_code' => 'Language Code',
+];
+
+$lang['visitor'] = [
+    'vi_ip' => 'IP Address',
+    'vi_datetime' => 'Visit Datetime',
+    'vi_referrer' => 'Referrer',
+    'vi_browser' => 'Browser',
+    'vi_device' => 'Device',
+    'vi_traffics' => 'Traffics(GB)',
+    'vi_visitors' => 'Visitors',
+    'vi_location' => 'Location',
+    'vi_hit_count' => 'Hit Count',
+];
+
+$lang['email_log'] = [
+    'email_type' => 'Email Type',
+    'doc_id' => 'Doc. ID',
+    'email_address' => 'Email',
+    'success_yn' => 'Send Success',
+    'debug_message' => 'Debug Message',
 ];

@@ -18,9 +18,4 @@ class Model_Sys_Version extends Model_Common
 	public bool    $isCreatedDt = true;
 	public bool    $isCreatedId = true;
 	public bool    $isUpdatedDt = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }

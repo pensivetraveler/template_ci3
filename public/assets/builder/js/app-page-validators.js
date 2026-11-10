@@ -1,7 +1,12 @@
+// 일치 검증의 비교 대상. 그룹 이름으로 묶인 입력(group[field])도 찾는다
+function findCompareField(form, field) {
+	return form.querySelector(`[name="${field}"]`) ?? form.querySelector(`[name$="[${field}]"]`);
+}
+
 const customValidatorsPreset = {
 	inflector: function(name) {
 		let res = '';
-		if(this.rules.hasOwnProperty(name) && this.rules[name].hasOwnProperty('validatorName')){
+		if(Object.hasOwn(this.rules, name) && Object.hasOwn(this.rules[name], 'validatorName')){
 			res = this.rules[name].validatorName;
 		}
 		return res;
@@ -44,36 +49,44 @@ const customValidatorsPreset = {
 			options : function(form, item, matches) {
 				return {
 					min: parseInt(matches[1]),
+					message: replaceValidationMessage(getLocale('form_validation_greater_than_equal_to'), {
+						field: form.querySelector(item.selector).name,
+						param: matches[1],
+					}),
 				};
 			},
-			validatorName : 'options',
+			validatorName : 'greaterThan',
 		},
 		max : {
 			regex : '^max\\[(\\d+)\\]$',
 			options : function(form, item, matches) {
 				return {
 					max: parseInt(matches[1]),
+					message: replaceValidationMessage(getLocale('form_validation_less_than_equal_to'), {
+						field: form.querySelector(item.selector).name,
+						param: matches[1],
+					}),
 				};
 			},
-			validatorName : 'options',
+			validatorName : 'lessThan',
 		},
 		matches : {
 			regex : '^matches\\[(.*?)\\]$',
 			options : function(form, item, matches) {
 				return {
 					compare: function() {
-						return form.querySelector(`[name="${matches[1]}"]`).value;
+						return findCompareField(form, matches[1]).value;
 					},
 				};
 			},
 			validatorName : 'identical',
 		},
 		password_matches : {
-			regex : '^password_matches$',
+			regex : '^password_matches\\[(.*?)\\]$',
 			options : function(form, item, matches) {
 				return {
 					compare: function() {
-						return form.querySelector(`[name="${password_matches[1]}"]`).value;
+						return findCompareField(form, matches[1]).value;
 					},
 				};
 			},
@@ -117,7 +130,7 @@ const customValidatorsPreset = {
 			validatorName : 'requiredIfEmpty',
 		},
 		required_mod : {
-			regex : '^required_mod\\[(\\w+)\\]$',
+			regex : '^required_mod\\[(.*?)\\]$',
 			options : function(form, item, matches) {
 				return {
 					mod: matches[1],
@@ -164,6 +177,16 @@ const customValidatorsPreset = {
 			validatorName : 'dropzoneRequired',
 			message : '최소 1개의 파일을 업로드하세요.'
 		},
+		concat : {
+			regex : '^concat\\[(.*?)\\]$',
+			options : function(form, item, matches) {
+				return {
+					fields: matches[1].split('|')[0],
+					separator: matches[1].split('|')[1],
+				};
+			},
+			validatorName : 'concatFields',
+		},
 	},
 	validators : {
 		baseValidator : function () {
@@ -179,7 +202,6 @@ const customValidatorsPreset = {
 						valid: valid,
 					};
 				},
-				message : 'hi',
 			}
 		},
 		requiredIfValue : function() {
@@ -194,7 +216,7 @@ const customValidatorsPreset = {
 
 					valid = true;
 					if(form.querySelector(`[name=${field}]`)) {
-						if(form.querySelector(`[name=${field}]`).value === value) valid = isEmpty(node.value);
+						if(form.querySelector(`[name=${field}]`).value == value) valid = !isEmpty(node.value);
 					}
 
 					return {
@@ -203,7 +225,6 @@ const customValidatorsPreset = {
 						valid: valid,
 					};
 				},
-				message : 'hi',
 			}
 		},
 		requiredMod : function() {
@@ -274,6 +295,28 @@ const customValidatorsPreset = {
 				}
 			}
 		},
+		server : function () {
+			// 서버 422 메시지 표시용. 값이 바뀌어 재검증되면 통과시켜 메시지를 지움
+			return {
+				validate: function(input) {
+					return { valid: true };
+				}
+			}
+		},
+		regexpMulti : function () {
+			return {
+				validate: function(input) {
+					const value = input.value;
+					if(value === '' || value === null || value === undefined) return { valid: true };
+					const failed = (input.options.list || []).find((item) => !item.regexp.test(value));
+					if(!failed) return { valid: true };
+					return {
+						valid: false,
+						...(failed.message && { message: failed.message }),
+					};
+				}
+			}
+		},
 		isUnique : function () {
 			return {
 				validate: function(input) {
@@ -287,7 +330,9 @@ const customValidatorsPreset = {
 					}else{
 						const mode = form['_mode'].value;
 						if(input.options.hiddenId) valid = form.querySelector(`#${input.options.hiddenId}`).value === '1';
-						if(!valid && mode === 'edit' && input.getAttribute('data-original-value') === input.value) valid = true;
+						if(!valid && mode === 'edit' && node.getAttribute('data-original-value') === node.value) valid = true;
+						// 읽기 전용 칸은 사용자가 바꿀 수 없으므로 중복 검사 대상이 아님
+						if(!valid && (node.readOnly || node.disabled)) valid = true;
 						if(!valid) message = '중복 검사를 실행해주세요.';
 					}
 
@@ -352,6 +397,35 @@ const customValidatorsPreset = {
 						valid: valid,
 						count: wrapper?wrapper.files.length:0,
 					}
+				}
+			}
+		},
+		concatFields : function () {
+			return {
+				validate: function (input) {
+					const node = input.element;
+					const form = node.closest('form');
+
+					const fields = input.options.fields.split(',');
+					const separator = input.options.separator;
+					let valid = fields.length > 0;
+					const values = [];
+
+					if(valid) {
+						for(const field of fields) {
+							if(!form[field].value.length) valid = false;
+							values.push(form[field].value);
+						}
+						if(valid) form[node.name].value = values.join(separator === undefined?'':entityToLiteral(separator));
+					}
+
+					return {
+						fields: fields,
+						concat: values.join(separator),
+						node: node,
+						form: form,
+						valid: valid,
+					};
 				}
 			}
 		}

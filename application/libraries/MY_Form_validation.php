@@ -5,6 +5,7 @@ class MY_Form_validation extends CI_Form_validation
 {
     private bool $_valid = false;
     private array $_failed_rules = [];
+    private array $_excepted_rules = ['trim'];
 
     function __construct($rules = array())
     {
@@ -80,11 +81,18 @@ class MY_Form_validation extends CI_Form_validation
     // CI_Form_validation Override
     // --------------------------------------------------------------------
 
+    /**
+     * 값이 비어 있어도 실행해야 하는 규칙. CI3 는 빈 값에 required·isset·matches 외 규칙을 건너뛰어
+     * 조건부 필수 규칙이 서버에서 동작하지 않았다.
+     */
+    protected array $emptyAwareRules = ['required_mod', 'required_if_value', 'required_if_empty_data', 'password_matches', 'concat'];
+
     protected function _execute($row, $rules, $postdata = NULL, $cycles = 0)
     {
         $result = parent::_execute($row, $rules, $postdata, $cycles);
+        $this->executeEmptyAwareRules($row, $rules, $postdata);
         foreach ($rules as $rule) {
-            if(! method_exists($this, $rule) ) {
+            if(!method_exists($this, $rule) && !in_array($rule, $this->_excepted_rules) ) {
                 log_message('debug', "Try Custom Method: {$rule} ");
                 if (isset($this->$rule) && is_callable($this->$rule)) {
                     $result = $this->$rule($postdata, $param = false);
@@ -97,6 +105,31 @@ class MY_Form_validation extends CI_Form_validation
             }
         }
         return $result;
+    }
+
+    protected function executeEmptyAwareRules($row, $rules, $postdata): void
+    {
+        if(!($postdata === null || $postdata === '')) return;
+        if(isset($this->_error_array[$row['field']])) return;
+
+        foreach ((array)$rules as $rule) {
+            if(!is_string($rule)) continue;
+            $param = null;
+            if(preg_match('/(.*?)\[(.*)\]/', $rule, $match)) {
+                $rule = $match[1];
+                $param = $match[2];
+            }
+            if(!in_array($rule, $this->emptyAwareRules, true) || !method_exists($this, $rule)) continue;
+
+            if($this->$rule($postdata ?? '', $param) === false) {
+                $message = $this->get_error_msg($rule, $row['label'] ?? $row['field'], $param ?? '', $row['errors'] ?? []);
+                if($message === '') $message = $this->_build_error_msg($this->_get_error_message($rule, $row['field']), $row['label'] ?? $row['field'], $param);
+                $this->_field_data[$row['field']]['error'] = $message;
+                $this->_error_array[$row['field']] = $message;
+                if(property_exists($this, '_failed_rules')) $this->_failed_rules[$row['field']] = $rule;
+                return;
+            }
+        }
     }
 
     protected function _get_error_message($rule, $field)
@@ -216,6 +249,21 @@ class MY_Form_validation extends CI_Form_validation
         }
     }
 
+    public function required_if_value($value, $params)
+    {
+        $exploded = explode('|', $params);
+        $targetField = $exploded[0];
+        $targetValue = $exploded[1];
+
+        if(!array_key_exists($targetField, $this->_field_data)) return true;
+
+        if($this->_field_data[$targetField]['postdata'] != $targetValue) {
+            return true;
+        }
+
+        return !empty($value);
+    }
+
     public function required_if_empty_data($value, $params)
     {
         list($table, $field, $identifier) = explode(".", $params);
@@ -247,10 +295,17 @@ class MY_Form_validation extends CI_Form_validation
                 $field_data =$this->_field_data;
                 $id = $field_data[$identifier]['postdata'];
             }
+
             $query = $this->CI->db
+                ->select($field)
                 ->where($identifier, $id)
                 ->get($table)->row();
-            return (is_null($query) || is_empty($query, $field)) && is_file_posted($field);
+
+            if(is_null($query) || is_null($query->{$field}) || is_empty($query->{$field})) {
+                return is_file_posted($field);
+            }else{
+                return true;
+            }
         }
     }
 
@@ -264,8 +319,16 @@ class MY_Form_validation extends CI_Form_validation
         if(!isset($this->CI->db)) return false;
 
         sscanf($params, '%[^.].%[^.].%[^.]', $table, $field, $key);
+
+        // 삭제 표시(del_yn = 'Y')된 행은 중복으로 보지 않음 (Model_Common::checkDuplicate와 같은 기준)
+        // del_yn 컬럼이 없는 테이블은 기존처럼 전체 행 기준
+        $hasDelYn = $this->CI->db->field_exists(DEL_YN_COLUMN_NAME, $table);
+
         if($key && isset($this->_field_data[$key], $this->_field_data[$key]['postdata'])) {
             $this->CI->db->where_not_in($key, [$this->_field_data[$key]['postdata']]);
+        }
+        if($hasDelYn) {
+            $this->CI->db->where(DEL_YN_COLUMN_NAME, 'N');
         }
 
         return $this->CI->db->limit(1)->get_where($table, array($field => $value))->num_rows() === 0;
@@ -313,5 +376,28 @@ class MY_Form_validation extends CI_Form_validation
                 return true;
             }
         }
+    }
+
+    public function alpha_uppercase($value): bool
+    {
+        return (bool)preg_match('/^[A-Z]+$/', (string)$value);
+    }
+
+    public function concat($value, $params)
+    {
+        $exploded = explode('|', $params);
+        $fields = explode(',', $exploded[0]);
+        $separator = isset($exploded[1])?entity_to_literal($exploded[1]):'';
+        $valid = false;
+
+        if(count($fields)) {
+            $fields = array_map(function ($item) {
+                return $this->_field_data[$item]['postdata'] ?? null;
+            }, $fields);
+            // 비교할 필드가 요청에 없으면(부분 PATCH 등) 일치를 확인할 수 없으므로 실패
+            $valid = !in_array(null, $fields, true) && implode($separator, $fields) === $value;
+        }
+
+        return $valid;
     }
 }

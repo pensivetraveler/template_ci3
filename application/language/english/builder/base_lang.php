@@ -29,6 +29,7 @@ $lang['Data Not Exist'] = 'Data Not Exist';
 $lang['An Error Occurred'] = 'An Error Occurred';
 $lang['Registered Successfully'] = 'Registered Successfully';
 $lang['Your Data Is Updated'] = 'Your Data Is Updated';
+$lang['Your Data Is Refreshed'] = 'Your Data Is Refreshed';
 $lang['Delete Completed'] = 'Delete Completed';
 $lang['Enter The 6-digit Code With Numbers'] = 'Enter The 6-digit Code With Numbers';
 $lang['out of'] = 'Out of';
@@ -40,6 +41,7 @@ $lang['Enter The Whole YouTube Link'] = 'Enter The Whole YouTube Link';
 $lang['Upload File Only'] = 'Upload File Only';
 $lang['Store'] = 'Store';
 $lang['Download'] = 'Download';
+$lang['Redirect'] = 'Redirect';
 $lang['Uploads List'] = 'Uploads List';
 $lang['Would you like to cancel the operation?'] = 'Would you like to cancel the operation?';
 $lang['Comments'] = 'Comments';
@@ -55,6 +57,7 @@ $lang['m ago'] = 'm ago';
 $lang['just now'] = 'Just now';
 $lang['My Info'] = 'My Info';
 $lang['Find ID'] = 'Find ID';
+$lang['Reset Password'] = 'Reset Password';
 $lang['Find Password'] = 'Find Password';
 $lang['Administrator'] = 'Administrator';
 $lang['Registration'] = 'Registration';
@@ -62,3 +65,66 @@ $lang['Add Event'] = 'Add Event';
 $lang['System Administrator Registration'] = 'System Administrator Registration';
 $lang['ADD DB SQL'] = 'Set DB';
 $lang['Check The User Table'] = 'The User table is empty.';
+$lang['Verify Admin Account'] = 'Verify Your Admin Username And Password';
+$lang['Settings'] = 'Settings';
+$lang['Add Record'] = 'New Record';
+$lang['Edit Record'] = 'Edit Record';
+$lang['Data replication has been completed'] = 'Data replication has been completed.';
+$lang['Drop files here or click to upload'] = 'Drop files here or click to upload.';
+$lang['Drop file here or click to upload'] = 'Drop a file here or click to upload.';
+$lang['No logs found'] = 'No logs found.';
+$lang['No logs match the current filters'] = 'No logs match the current filters.';
+$lang['No Option Available'] = 'No options available.';
+
+/**
+ * system
+ */
+$lang['Add New Menu'] = 'Add New Menu';
+$lang['Add New SubMenu'] = 'Add New SubMenu';
+$lang['Add Menu Code'] = 'Add Menu Code';
+$lang['Show Config'] = 'Show Config';
+$lang['Hide Config'] = 'Hide Config';
+$lang['Refresh Menu'] = 'Refresh Menu';
+$lang['Caching'] = 'Caching Menu';
+$lang['Import Menus From Config'] = 'Import Menus From Config';
+$lang['Fill Default Auth'] = 'Fill Default Auth';
+$lang['Menus without saved auth will get the default auth.'] = 'Menus without saved auth will get the default auth. Saved menus are not changed.';
+$lang['Request Failed'] = 'The request could not be processed. Please try again later.';
+$lang['Select'] = 'Select';
+$lang['Select a target first'] = 'Select a grade or partner first.';
+$lang['Filled'] = 'Filled menus';
+$lang['Add Row'] = 'Add';
+$lang['Delete Selected'] = 'Delete Selected';
+$lang['No rows selected'] = 'No rows selected.';
+$lang['Deleted'] = 'Deleted';
+$lang['Failed'] = 'Failed';
+$lang['Recalculate Base Auth'] = 'Recalculate Base Auth';
+$lang['No changes'] = 'No changes';
+$lang['MenuList'] = 'Menu List';
+$lang['MenuConf'] = 'Menu Config';
+$lang['MenuCode'] = 'Code';
+$lang['Unregistered'] = 'Unregistered';
+
+/**
+ * add system user
+ */
+$lang['id'] = 'ID';
+$lang['password'] = 'Password';
+$lang['name'] = 'Name';
+
+/**
+ * System Code
+ */
+$lang['Caution'] = 'Caution';
+$lang['Add Big Cd'] = 'Add Category';
+$lang['Edit Big Cd'] = 'Edit Category';
+$lang['Delete Big Cd'] = 'Delete Category';
+$lang['You Should Delete Codes In The Category'] = 'You Should Delete Codes In The Category.';
+$lang['You Should Delete Configs In The Category'] = 'You Should Delete Configs In The Category.';
+$lang['You Should Delete Sub Menus First'] = 'You Should Delete Sub Menus First.';
+$lang['What is System Code'] = 'What is System Code ?';
+$lang['What is System Config'] = 'What is System Config ?';
+$lang['View Record'] = 'View Record';
+$lang['Close'] = 'Close';
+$lang['Open In New Window'] = 'Open In New Window';
+$lang['File Not Found'] = 'File Not Found.';

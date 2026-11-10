@@ -1,57 +1,53 @@
 <?php
 	echo form_open_multipart('', [
-		'id' => 'formRecord',
-		'name' => 'formRecord',
-		'class' => "add-new-record pt-0 row g-3 needs-validation form-type-{$formType}",
-		'onsubmit' => 'return false',
+		'id' => $formName??'formRecord',
+		'name' => $formName??'formRecord',
+		'class' => "add-new-record pt-0 row g-3 needs-validation form-type-{$formType} form-subtype-{$formSubType}",
+		'data-no-submit' => 'true',
 	], [
 		'_mode' => '',
 		'_event' => '',
 	]);
 
-	foreach ($formData['hiddens'] as $item) :
-		echo form_input(
-			[
-				'type' => $item['type'],
-				'name' => $item['field'],
-				'id' => $item['id'],
-			],
-			set_admin_form_value($item['field'], $item['default'], null),
-			$item['attributes'],
-		);
-	endforeach;
+	if(!is_empty($formData, 'hiddens') && count($formData['hiddens']) > 0) {
+		foreach ($formData['hiddens'] as $item) :
+			echo form_input(
+					[
+							'type' => $item['type'],
+							'name' => $item['field'],
+							'id' => $item['id'],
+					],
+					set_admin_form_value($item['field'], $item['default'], null),
+					$item['attributes'],
+			);
+		endforeach;
+	}
 
-	foreach ($formData['fields'] as $item):
-		if($item['category'] === 'group'):
-			builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
-		elseif($item['category'] === 'custom'):
-			builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
-		else:
+	if(!is_empty($formData, 'fields') && count($formData['fields']) > 0) {
+		foreach ($formData['fields'] as $item):
+			if(!is_empty($item, 'group') && $item['group'] !== 'base'):
+				builder_view("{$platformName}/layout/form_{$formType}_group_".$item['view'], ['item' => $item]);
+			elseif($item['type'] === 'file' && strpos($item['subtype'], 'dropzone') !== false):
+				builder_view("{$platformName}/layout/form_{$formType}_file_".$item['view'], ['item' => $item]);
+			elseif($item['type'] === 'custom'):
+				builder_view("{$platformName}/layout/form_{$formType}_custom_".$item['view'], ['item' => $item]);
+			else:
 ?>
 <div class="col-sm-12 form-validation-unit">
 	<div class="input-group input-group-merge">
-		<?=get_admin_form_ico($item)?>
+		<?=get_admin_form_ico($item, $formType)?>
 		<div class="form-floating form-floating-outline">
-			<?=get_side_form_input_by_type($item, 'side')?>
+			<?=get_side_form_input_by_type($item, $formType)?>
 		</div>
-		<?php
-			if($item['subtype'] === 'unique')
-				echo form_button([
-					'data-rel-field' => $item['field'],
-					'type' => 'button',
-					'class' => 'btn btn-outline-primary waves-effect btn-dup-check',
-				], lang('Check'), [
-					'onclick' => "checkDuplicate(this)",
-					'disabled' => "disabled",
-				]);
-		?>
+		<?=get_side_form_input_adds($item, $formType)?>
 	</div>
 	<?=get_admin_form_text($item)?>
 	<?=get_admin_form_list_item($item, $formType)?>
 </div>
 <?php
-		endif;
-	endforeach;
+			endif;
+		endforeach;
+	}
 ?>
 <div class="col-sm-12">
 	<button type="submit" class="btn btn-primary data-submit me-sm-4 me-1"><?=lang('Submit')?></button>

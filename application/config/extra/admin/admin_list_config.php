@@ -3,26 +3,260 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $config['admin_list_config_loaded'] = true;
 
+$config['list_administrators_config'] = [
+    [
+        'field' => 'administrator_id',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+    ],
+    [
+        'field' => 'name',
+        'label' => 'lang:user.name',
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+    ],
+];
+
+$config['list_partners_config'] = [
+    [
+        'field' => 'partner_id',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+    ],
+    [
+        'field' => 'name',
+        'label' => 'lang:user.name',
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+    ],
+    [
+        'field' => 'company_ids',
+        'label' => 'lang:partner.company_ids',
+    ],
+];
+
+$config['list_partner_auth_config'] = [
+    [
+        'field' => 'menu_id',
+        'label' => 'lang:system.menu_id',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'partner_id',
+        'label' => 'lang:partner.partner_id',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'title',
+        'label' => 'lang:menu.title',
+    ],
+    [
+        'field' => 'code',
+        'label' => 'lang:menu.code',
+    ],
+    [
+        'field' => 'is_show',
+        'label' => 'lang:menu.is_show',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+    ],
+    [
+        'field' => 'create',
+        'label' => 'lang:menu.create',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
+    ],
+    [
+        'field' => 'read',
+        'label' => 'lang:menu.read',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
+    ],
+    [
+        'field' => 'update',
+        'label' => 'lang:menu.update',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
+    ],
+    [
+        'field' => 'delete',
+        'label' => 'lang:menu.delete',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
+    ],
+    [
+        'field' => 'export',
+        'label' => 'lang:menu.export',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
+    ],
+    [
+        'field' => 'import',
+        'label' => 'lang:menu.import',
+        'type' => 'checkbox',
+        'subtype' => 'boolean',
+        'render' => [
+            'callback' => 'renderMenuAuthCheckbox',
+        ]
+    ],
+];
+
 $config['list_company_config'] = [
     [
-        'field' => 'comp_code',
-        'label' => 'lang:company.comp_code',
+        'field' => 'company_id',
+        'label' => 'lang:company.company_id',
+        'type'  => 'hidden',
+        'subtype'  => 'identifier',
     ],
     [
-        'field' => 'comp_name',
-        'label' => 'lang:company.comp_name',
+        'field' => 'company_code',
+        'label' => 'lang:company.company_code',
     ],
     [
-        'field' => 'comp_ceo',
-        'label' => 'lang:company.comp_ceo',
+        'field' => 'company_name',
+        'label' => 'lang:company.company_name',
     ],
     [
-        'field' => 'comp_tel',
-        'label' => 'lang:company.comp_tel',
+        'field' => 'company_ceo',
+        'label' => 'lang:company.company_ceo',
     ],
     [
-        'field' => 'comp_addr',
-        'label' => 'lang:company.comp_addr',
+        'field' => 'company_bizno',
+        'label' => 'lang:company.company_bizno',
+    ],
+    [
+        'field' => 'company_addr1',
+        'label' => 'lang:company.company_addr1',
+    ],
+];
+
+$config['list_categories_config'] = [
+    [
+        'field' => 'category_id',
+        'label' => 'lang:category.category_id',
+        'type'  => 'hidden',
+        'subtype'  => 'identifier',
+    ],
+    [
+        'field' => 'category_name',
+        'label' => 'lang:category.category_name',
+    ],
+    [
+        'field' => 'category_nick',
+        'label' => 'lang:category.category_nick',
+    ],
+    [
+        'field' => 'category_icon',
+        'label' => 'lang:category.category_icon',
+        'type' => 'img',
+    ],
+    [
+        'field' => 'category_srt',
+        'label' => 'lang:category.category_srt',
+    ],
+    [
+        'field' => 'use_yn',
+        'label' => 'lang:common.use_yn',
+    ],
+];
+
+$config['list_boards_config'] = [
+    [
+        'field' => 'board_id',
+        'label' => 'lang:board.board_id',
+        'type'  => 'hidden',
+        'subtype'  => 'identifier',
+    ],
+    [
+        'field' => 'board_name',
+        'label' => 'lang:board.board_name',
+    ],
+    [
+        // 표시는 form 설정의 BRD 코드 옵션 라벨 (list 에 옵션이 없으면 form 옵션)
+        'field' => 'board_cd',
+        'label' => 'lang:board.board_cd',
+    ],
+    [
+        'field' => 'attach_max',
+        'label' => 'lang:board.attach_max',
+    ],
+    [
+        'field' => 'created_dt',
+        'label' => 'lang:common.created_dt',
+    ],
+];
+
+$config['list_articles_config'] = [
+    [
+        'field' => 'article_id',
+        'label' => 'lang:article.article_id',
+        'type'  => 'hidden',
+        'subtype'  => 'identifier',
+    ],
+    [
+        // 표시는 form 설정의 게시판 옵션 라벨
+        'field' => 'board_id',
+        'label' => 'lang:board.board_id',
+    ],
+    [
+        'field' => 'subject',
+        'label' => 'lang:article.subject',
+        'onclick' => [
+            'kind' => 'view',
+        ],
+    ],
+    [
+        'field' => 'open_yn',
+        'label' => 'lang:article.open_yn',
+    ],
+    [
+        'field' => 'view_count',
+        'label' => 'lang:article.view_count',
+    ],
+    [
+        'field' => 'created_id',
+        'label' => 'lang:common.created_id',
+    ],
+    [
+        'field' => 'created_dt',
+        'label' => 'lang:common.created_dt',
     ],
 ];
 
@@ -37,10 +271,46 @@ $config['list_project_config'] = [
     ],
     [
         'field' => 'start_dt',
+
         'label' => 'lang:project.start_dt',
     ],
     [
         'field' => 'end_dt',
         'label' => 'lang:project.end_dt',
+    ],
+];
+
+$config['list_visit_log_config'] = [
+    [
+        'field' => 'domain',
+        'label' => 'lang:frame.domain_name',
+    ],
+    [
+        'field' => 'frame_name',
+        'label' => 'lang:frame.frame_name',
+    ],
+    [
+        'field' => 'company_name',
+        'label' => 'lang:company.company_name',
+    ],
+    [
+        'field' => 'vi_ip',
+        'label' => 'lang:visitor.vi_ip',
+    ],
+    [
+        'field' => 'vi_datetime',
+        'label' => 'lang:visitor.vi_datetime',
+    ],
+    [
+        'field' => 'vi_referrer',
+        'label' => 'lang:visitor.vi_referrer',
+    ],
+    [
+        'field' => 'vi_browser',
+        'label' => 'lang:visitor.vi_browser',
+    ],
+    [
+        'field' => 'vi_device',
+        'label' => 'lang:visitor.vi_device',
     ],
 ];

@@ -3,68 +3,76 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Model_Common extends MY_Model
 {
+    /**
+     * 응답용 조회에서 뺄 컬럼 (notIncludeSelects). 기본 조회(getList·getData 의 빈 select)에는 영향 없음
+     */
+    public array $notIncludeColumns = [];
+
     function __construct()
     {
         parent::__construct();
     }
 
-    function getList($select = [], $where = [], $like = [], $limit = [], $orderBy = [], $filter = [])
+    function getList($select = [], $dto = [], $filter = [])
     {
-        $this->setFilter($filter);
-        $this->limit($limit);
-        $this->orderBy($orderBy);
-        $this->where($this->table, $where, $like);
+        if(has_inner_array($select)) show_error('Select Parameter is Unacceptable');
         if(empty($select)) $this->db->select($this->getSelectList());
-        if($this->isDelYn) $this->db->where($this->table.".".DEL_YN_COLUMN_NAME, 'N');
-        if($this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $where)) $this->db->where($this->table.".".USE_YN_COLUMN_NAME, 'Y');
-
+        if(count($filter) > 0) $this->setFilter($this->table, $filter);
+        $this->setCondition($this->table, $dto);
         return parent::getListPDO($this->table, $select);
     }
 
-    function getData($select = [], $where = [])
+    function getListWhere($select = [], $where = [])
     {
-        $this->where($this->table, $where, []);
-        if(empty($select)) $this->db->select($this->getSelectList());
-        if($this->isDelYn) $this->db->where($this->table.".".DEL_YN_COLUMN_NAME, 'N');
-        if($this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $where)) $this->db->where($this->table.".".USE_YN_COLUMN_NAME, 'Y');
+        return $this->getList($select, ['where' => $where]);
+    }
 
+    function getData($select = [], $dto = [])
+    {
+        if(has_inner_array($select)) show_error('Select Parameter is Unacceptable');
+        if(empty($select)) $this->db->select($this->getSelectList());
+        $this->setCondition($this->table, $dto, false);
         return parent::getDataPDO($this->table, $select);
     }
 
-    function getCnt($where = [], $like = [], $filter = [])
+    function getDataWhere($select = [], $where = [])
     {
-        $this->setFilter($filter);
-        $this->where($this->table, $where, $like);
-        if($this->isDelYn) $this->db->where($this->table.".".DEL_YN_COLUMN_NAME, 'N');
-        if($this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $where)) $this->db->where($this->table.".".USE_YN_COLUMN_NAME, 'Y');
+        return $this->getData($select, ['where' => $where]);
+    }
 
+    function getCnt($dto = [], $filter = [])
+    {
+        if(count($filter) > 0) $this->setFilter($this->table, $filter);
+        $this->setCondition($this->table, $dto, false);
         return parent::getCntPDO($this->table);
+    }
+
+    function getCntWhere($where = [])
+    {
+        return $this->getCnt(['where' => $where]);
     }
 
     function addList($set)
     {
-        $set = $this->getValidSetList($set);
+        $set = $this->getValidSetList($set, false);
 
         return parent::addListPDO($this->table, $set);
     }
 
     function addData($set, $bool = false)
     {
-        $this->setCreatedId($set);
-        if(!$this->isAutoincrement) $bool = false;
+        if(!$this->isAutoIncrement) $bool = false;
 
-        $set = $this->getValidSetData($set);
+        $set = $this->getValidSetData($set, false);
 
         return parent::addDataPDO($this->table, $set, $bool);
     }
 
     function modData($set, $where, $bool = false)
     {
-        if($this->isUpdatedDt) {
-            $this->db->set(UPDATED_DT_COLUMN_NAME, 'now()', false);
-            $this->setUpdatedId($set);
-        }
-        if(!$this->isAutoincrement) $bool = false;
+        if(!$this->isAutoIncrement) $bool = false;
+
+        $this->validateWhereCondition($where);
 
         $set = $this->getValidSetData($set);
 
@@ -79,16 +87,23 @@ class Model_Common extends MY_Model
             $this->db->set($field, $field . $count, false);
         }
 
-        return $this->modDataPDO($this->table, [], $where, $bool);
+        $this->validateWhereCondition($where);
+
+        $set = $this->getValidSetData([]);
+
+        return $this->modDataPDO($this->table, $set, $where, $bool);
     }
 
     function delData($where, $bool = false, $isSoftDelete = true, $set = [])
     {
+        $this->validateWhereCondition($where);
+
         if($this->isDelYn) {
             if($isSoftDelete) {
-                $this->db->set(DEL_YN_COLUMN_NAME, 'Y')->set(UPDATED_DT_COLUMN_NAME, 'now()', false);
-                $this->setUpdatedId($set);
-                return parent::modDataPDO($this->table, [], $where, $bool);
+                $set = $this->getValidSetData(array_merge($set, [
+                    DEL_YN_COLUMN_NAME => 'Y'
+                ]));
+                return parent::modDataPDO($this->table, $set, $where, $bool);
             }else{
                 return parent::delDataPDO($this->table, $where, $bool);
             }
@@ -102,9 +117,16 @@ class Model_Common extends MY_Model
         if(empty($where)) throw new Exception("checkDuplicate : where parameter empty");
 
         if(count($this->uniqueKeyList) > 0) {
+            // where() 의 기본 조건(del_yn='N', use_yn='Y')을 끄고 직접 정한다.
+            // 미사용(use_yn='N') 행도 고유값을 차지하므로 use_yn 은 거르지 않고, 삭제 행은 $isIncludeDeleted 일 때만 포함
+            $useDelYnAsBase = $this->useDelYnAsBase;
+            $useUseYnAsBase = $this->useUseYnAsBase;
+            $this->useDelYnAsBase = false;
+            $this->useUseYnAsBase = false;
             $this->where($this->table, $where);
+            $this->useDelYnAsBase = $useDelYnAsBase;
+            $this->useUseYnAsBase = $useUseYnAsBase;
             if($this->isDelYn && $isIncludeDeleted === false) $this->db->where($this->table.".".DEL_YN_COLUMN_NAME, 'N');
-            if($this->isUseYn && $isIncludeDeleted === false) $this->db->where($this->table.".".USE_YN_COLUMN_NAME, 'N');
             foreach ($whereNot as $key=>$val) $this->db->where_not_in($key, [$val]);
             return parent::getCntPDO($this->table);
         }else{
@@ -116,12 +138,15 @@ class Model_Common extends MY_Model
     {
         $columnList = $this->getColumnList();
         if(!in_array($sortField, $columnList)) return false;
-        if(!$this->identifier && !count($this->primaryKeyList)) return false;
+        if(!count($this->primaryKeyList)) return false;
 
         if($sortItem) {
             foreach ($sortItem as $key=>$val) $this->db->where("$key <> $val");
 
-            $list = $this->getList([], $where, [], [], [$sortField => 'ASC']);
+            $list = $this->getList([], [
+                'where' => $where,
+                'orderBy' => [$sortField => 'ASC'],
+            ]);
             $idx = 1;
             $matched = false;
             foreach ($list as $item) {
@@ -143,7 +168,10 @@ class Model_Common extends MY_Model
 
             $this->modData([$sortField => $newIndex], $sortItem);
         }else{
-            $list = $this->getList([], $where, [], [], [$sortField => 'ASC']);
+            $list = $this->getList([], [
+                'where' => $where,
+                'orderBy' => [$sortField => 'ASC'],
+            ]);
             foreach ($list as $i=>$item) {
                 $itemWhere = [];
                 if($this->identifier) {
@@ -174,82 +202,323 @@ class Model_Common extends MY_Model
         return $columnList;
     }
 
-    protected function getValidSetList($set): array
+    /**
+     * 기본 select 목록에서 notIncludeColumns 를 뺀 목록. 응답에 실을 행을 조회할 때 select 로 넘긴다
+     * 예: $this->Model_File->getList($this->Model_File->notIncludeSelects(), $dto)
+     */
+    public function notIncludeSelects(): array
+    {
+        $excluded = array_map(function ($column) {
+            return "$this->table.$column";
+        }, $this->notIncludeColumns);
+
+        return array_values(array_diff($this->getSelectList(), $excluded));
+    }
+
+    protected function getValidSetList($set, $isUpdate = true): array
     {
         return array_map(function($item) {
             if(!is_array($item)) $item = (array)$item;
-            return $this->getValidSetData($item);
+            return $this->getValidSetData($item, false, true);
         }, $set);
     }
 
-    protected function getValidSetData($set): array
+    protected function getValidSetData($set, $isUpdate = true, $isListData = false): array
     {
         $columnList = $this->getColumnList();
+
         $set = array_filter($set, function($key) use ($columnList) {
             return in_array($key, $columnList);
         }, ARRAY_FILTER_USE_KEY);
 
-        if($this->isCreatedId && is_empty($set, CREATED_ID_COLUMN_NAME)) {
-            $set[CREATED_ID_COLUMN_NAME] = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
+        if(!$isUpdate) {
+            $set = $this->setCreatedDt($set, $isListData);
+            $set = $this->setCreatedId($set, $isListData);
+        }else{
+            $set = $this->setUpdatedDt($set, $isListData);
+            $set = $this->setUpdatedId($set, $isListData);
         }
+
         return $set;
+    }
+
+    /**
+     * 요청 파라미터로 조건을 걸 수 있는 컬럼 (기본 select 컬럼 + 식별자·PK)
+     * MY_Builder_API::getAllowedRequestFields() 가 요청 조건 허용 목록을 만들 때 쓴다.
+     */
+    public function getRequestColumnList(): array
+    {
+        // getSelectList()는 '{table}.col' 형태라 접두어를 떼고 컬럼명만 돌려준다
+        $prefix = $this->table.'.';
+        $columns = array_map(function ($column) use ($prefix) {
+            return strpos($column, $prefix) === 0 ? substr($column, strlen($prefix)) : $column;
+        }, $this->getSelectList());
+
+        return array_values(array_unique(array_filter(array_merge(
+            $columns,
+            [$this->identifier],
+            $this->primaryKeyList
+        ))));
     }
 
     public function getColumnList(): array
     {
-        return array_values(array_unique(
+        $list = array_values(array_unique(
             array_filter(
                 array_merge(
-                    [$this->identifier],
-                    $this->primaryKeyList,
                     $this->notNullList,
                     $this->nullList
                 )
             )
         ));
+
+        if($this->isDelYn && !in_array(DEL_YN_COLUMN_NAME, $list)) $list[] = DEL_YN_COLUMN_NAME;
+        if($this->isUseYn && !in_array(USE_YN_COLUMN_NAME, $list)) $list[] = USE_YN_COLUMN_NAME;
+
+        return $list;
     }
 
-    protected function setCreatedId($set)
+    public function getTypedColumnList(): array
     {
-        $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
-        if($this->isCreatedId)
-            $this->db->set(CREATED_ID_COLUMN_NAME, is_empty($set, CREATED_ID_COLUMN_NAME) ? $userId : $set[CREATED_ID_COLUMN_NAME]);
-    }
+        $list = array_values(array_unique(array_filter([
+            ...$this->strList,
+            ...$this->intList,
+            ...$this->fileList,
+        ])));
 
-    protected function setUpdatedId($set)
-    {
-        $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
-        if($this->isCreatedId)
-            $this->db->set(UPDATED_ID_COLUMN_NAME, is_empty($set, UPDATED_ID_COLUMN_NAME) ? $userId : $set[UPDATED_ID_COLUMN_NAME]);
-    }
-
-    public function validateTableColumns(): bool
-    {
-        return count($this->getColumnList()) === count([...$this->strList, ...$this->intList, ...$this->fileList]);
-    }
-
-    public function setFilter($filter)
-    {
-        if(empty($filter)) return null;
-
-        $where = $filter['where'] ?? [];
-        foreach ($where as $key => $val) {
-            $this->db->where("{$this->table}.{$key}", $val);
+        if ($this->isDelYn && !in_array(DEL_YN_COLUMN_NAME, $list, true)) {
+            $list[] = DEL_YN_COLUMN_NAME;
         }
 
-        $like = $filter['like'] ?? [];
-        if(!is_empty($like, 'value')) {
-            if(!is_empty($like, 'field')) {
-                $this->db->like("{$this->table}.{$like['field']}", $like['value'], 'both');
+        if ($this->isUseYn && !in_array(USE_YN_COLUMN_NAME, $list, true)) {
+            $list[] = USE_YN_COLUMN_NAME;
+        }
+
+        return $list;
+    }
+
+    protected function setCreatedDt($set = array(), $isListData = false)
+    {
+        if($this->isCreatedDt) {
+            $value = is_empty($set, CREATED_DT_COLUMN_NAME) ? date('Y-m-d H:i:s') : $set[CREATED_DT_COLUMN_NAME];
+            if($isListData) {
+                $set[CREATED_DT_COLUMN_NAME] = $value;
             }else{
-                if(count($this->strList)) {
-                    foreach ($this->strList as $i=>$field) {
-                        if($i === 0){
-                            $this->db->like("{$this->table}.$field", $like['value'], 'both');
-                        }else{
-                            $this->db->or_like("{$this->table}.$field", $like['value'], 'both');
-                        }
-                    }
+                $this->db->set(CREATED_DT_COLUMN_NAME, $value);
+            }
+        }
+        return $set;
+    }
+
+    protected function setCreatedId($set = array(), $isListData = false)
+    {
+        if($this->isCreatedId) {
+            $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
+            $value = is_empty($set, CREATED_ID_COLUMN_NAME) ? $userId : $set[CREATED_ID_COLUMN_NAME];
+            if($isListData) {
+                $set[CREATED_ID_COLUMN_NAME] = $value;
+            }else{
+                $this->db->set(CREATED_ID_COLUMN_NAME, $value);
+            }
+        }
+        return $set;
+    }
+
+    protected function setUpdatedDt($set = array(), $isListData = false)
+    {
+        if($this->isUpdatedDt) {
+            $value = is_empty($set, UPDATED_DT_COLUMN_NAME) ? date('Y-m-d H:i:s') : $set[UPDATED_DT_COLUMN_NAME];
+            if($isListData) {
+                $set[UPDATED_DT_COLUMN_NAME] = $value;
+            }else{
+                $this->db->set(UPDATED_DT_COLUMN_NAME, $value);
+            }
+        }
+        return $set;
+    }
+
+    protected function setUpdatedId($set = array(), $isListData = false)
+    {
+        if($this->isCreatedId) {
+            $userId = $this->session->userdata(USER_ID_COLUMN_NAME) ?? 1;
+            $value = is_empty($set, UPDATED_ID_COLUMN_NAME) ? $userId : $set[UPDATED_ID_COLUMN_NAME];
+            if($isListData) {
+                $set[UPDATED_ID_COLUMN_NAME] = $value;
+            }else{
+                $this->db->set(UPDATED_ID_COLUMN_NAME, $value);
+            }
+        }
+        return $set;
+    }
+
+    public function determineDiffColumns(): array
+    {
+        $columnList = $this->getColumnList();
+        $typedColumnList = $this->getTypedColumnList();
+
+        return [
+            'missingTypeDefinition' => array_values(array_diff($columnList, $typedColumnList)),
+            'missingColumnDefinition' => array_values(array_diff($typedColumnList, $columnList)),
+        ];
+    }
+
+    protected function validateModelColumns(): bool
+    {
+        $diff = $this->determineDiffColumns();
+
+        return empty($diff['missingTypeDefinition'])
+            && empty($diff['missingColumnDefinition']);
+    }
+
+    protected function validatePrimaryKeyDefinition(): bool
+    {
+        if ($this->isAutoIncrement) {
+            if (count($this->primaryKeyList) !== 1) {
+                return false;
+            }
+
+            if (!$this->identifier) {
+                return false;
+            }
+
+            if (!in_array($this->identifier, $this->primaryKeyList)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function validateNullDefinition(): bool
+    {
+        $duplicated = array_intersect($this->notNullList, $this->nullList);
+
+        return count($duplicated) === 0;
+    }
+
+    public function validateColumnRoleDefinition(): bool
+    {
+        $columnList = $this->getColumnList();
+
+        if ($this->identifier && !in_array($this->identifier, $columnList, true)) {
+            return false;
+        }
+
+        foreach ($this->primaryKeyList as $column) {
+            if (!in_array($column, $columnList, true)) {
+                return false;
+            }
+        }
+
+        foreach ($this->uniqueKeyList as $column) {
+            if (!in_array($column, $columnList, true)) {
+                return false;
+            }
+        }
+
+        if (property_exists($this, 'foreignKeyList')) {
+            foreach ($this->foreignKeyList as $column => $config) {
+                if (!in_array($column, $columnList, true)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function validateModelDefinition()
+    {
+        return $this->validateNullDefinition()
+            && $this->validateModelColumns()
+            && $this->validateColumnRoleDefinition()
+            && $this->validatePrimaryKeyDefinition();
+    }
+
+    public function setSelect($table, $data)
+    {
+
+    }
+
+    public function setCondition($table, $data, $list = true)
+    {
+        foreach ($data as $key => $val) {
+            if($key === 'select') continue;
+            if(!in_array($key, ['where','whereIn','whereNot','like','orLike','limit','orderBy','groupBy','filter','join'])) continue;
+            if(!$list && in_array($key, ['limit','orderBy','groupBy'])) continue;
+
+            if(in_array($key, ['limit'])) {
+                $this->{$key}($val);
+            }else if($key === 'orLike') {
+                // 'orLike' => ['fields' => [컬럼, ...], 'value' => 검색어]  (fields 생략 시 strList 전체)
+                if(is_array($val) && !is_empty($val, 'value')) {
+                    $this->orLike($table, $val['fields'] ?? $this->strList, $val['value']);
+                }
+            }else if($key === 'filter') {
+                $this->setFilter($table, $val);
+            }else{
+                $this->{$key}($table, $val);
+            }
+        }
+        if(!array_key_exists('where', $data)) $this->where($table, []);
+        if($list && !array_key_exists('orderBy', $data)) $this->orderBy($table, []);
+    }
+
+    public function setFilter($table, $filter)
+    {
+        if(empty($filter)) return;
+
+        $this->setFilterWhere($table, $filter['where'] ?? []);
+
+        $this->setFilterWhereIn($table, $filter['whereIn'] ?? []);
+
+        $this->setFilterWhereNot($table, $filter['whereNot'] ?? []);
+
+        $this->setFilterLike($table, $filter['like'] ?? []);
+
+        $this->setFilterDate($table, $filter['date'] ?? []);
+    }
+
+    public function setFilterWhere($table, $data)
+    {
+        $this->where($table, $data);
+    }
+
+    public function setFilterWhereIn($table, $data)
+    {
+        $this->whereIn($table, $data);
+    }
+
+    public function setFilterWhereNot($table, $data)
+    {
+        $this->whereNot($table, $data);
+    }
+
+    public function setFilterLike($table, $data)
+    {
+        foreach ($data as $item) {
+            if(!is_empty($item, 'value')) {
+                if(!is_empty($item, 'field')) {
+                    $this->like($table, [$item['field'] => $item['value']]);
+                }else{
+                    $this->orLike($table, $this->strList, $item['value']);
+                }
+            }
+        }
+    }
+
+    public function setFilterDate($table, $data)
+    {
+        if($this->filteringDateColumn) {
+            $columnName = 'DATE_FORMAT('.$this->filteringDateColumn.',"%Y-%m-%d")';
+            if(array_key_exists('on_date', $data) && !empty($data['on_date'])) {
+                $this->db->where($columnName, $data['on_date']);
+            }else{
+                if(array_key_exists('start_date', $data) && !empty($data['start_date'])) {
+                    $this->db->where($columnName.' >=', $data['start_date']);
+                }
+                if(array_key_exists('end_date', $data) && !empty($data['end_date'])) {
+                    $this->db->where($columnName.' <=', $data['end_date']);
                 }
             }
         }
@@ -279,7 +548,7 @@ class Model_Common extends MY_Model
 
     public function getNotNullColumns($tableName)
     {
-        $tableName = $this->db->dbprefix.$tableName;
+        $tableName = $this->dbprefix.$tableName;
         $query = $this->db->query("
             SELECT COLUMN_NAME
             FROM INFORMATION_SCHEMA.COLUMNS
@@ -317,5 +586,18 @@ SET FOREIGN_KEY_CHECKS = 1;
                 ->where(['user_cd' => 'USR000'])
                 ->from(USER_TABLE_NAME)
                 ->count_all_results() > 0;
+    }
+
+    public function truncate()
+    {
+        $this->db->truncate($this->table);
+    }
+
+    protected function validateWhereCondition($where): void
+    {
+        // 빈 조건으로 수정·삭제하면 테이블 전체가 바뀌므로 막음 (soft delete도 UPDATE라 같은 위험)
+        if(!is_array($where) || !count($where)) show_error(__FUNCTION__ . ': Where condition is empty');
+        if(has_inner_array($where)) show_error(__FUNCTION__ . ': Please check the where condition');
+        return;
     }
 }

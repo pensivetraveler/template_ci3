@@ -42,11 +42,12 @@ class MY_Exceptions extends CI_Exceptions
                 'msg' => $message,
             ], $status_code*10);
         }else{
-            if(config_item('life_cycle') || strlen(get_path()) > 0) {
+            if(defined('BUILDER_FLAGNAME') && (config_item('life_cycle') || strlen(get_path()) > 0)) {
                 $this->config->config['error_occurs'] = true;
                 $this->config->config['error_views_path'] = get_error_views_path();
             }
-            return parent::show_error($heading, $message, $template, $status_code);
+            // 메시지에 요청 값·SQL 이 섞일 수 있어 글자로 출력한다
+            return parent::show_error(html_escape($heading), html_escape($message), $template, $status_code);
         }
     }
 
@@ -60,7 +61,7 @@ class MY_Exceptions extends CI_Exceptions
                 'line' => $exception->getLine(),
             ], INTERNAL_SERVER_ERROR);
         }else{
-            if(config_item('life_cycle')) {
+            if(defined('BUILDER_FLAGNAME') && (config_item('life_cycle') || strlen(get_path()) > 0)) {
                 $this->CI =& get_instance();
                 $this->CI->config->set_item('error_views_path', get_error_views_path());
             }
@@ -79,11 +80,16 @@ class MY_Exceptions extends CI_Exceptions
                 'line' => $line,
             ], INTERNAL_SERVER_ERROR);
         }else{
-            if(config_item('life_cycle')) {
-                $this->CI =& get_instance();
-                $this->CI->config->set_item('error_views_path', get_error_views_path());
+            if(strpos($message, 'Unknown database')) {
+                $this->config->config['error_views_path'] = get_error_views_path();
+                parent::show_error('Database Not Exist', $message, 'error_db');
+            }else{
+                if(defined('BUILDER_FLAGNAME') && (config_item('life_cycle') || strlen(get_path()) > 0)) {
+                    $this->CI =& get_instance();
+                    $this->CI->config->set_item('error_views_path', get_error_views_path());
+                }
+                parent::show_php_error($severity, $message, $filepath, $line);
             }
-            parent::show_php_error($severity, $message, $filepath, $line);
         }
     }
 }

@@ -95,10 +95,6 @@ function plural(str) {
     return result;
 }
 
-function camelize(str) {
-    return str.replace(/_([a-z]?)/g, (m, g) => g.toUpperCase());
-}
-
 /**
  * Camelize
  *
@@ -107,7 +103,19 @@ function camelize(str) {
  * @param	string	str	Input string
  * @return	string
  */
-function uncamelize(str) {
+function camelize(str) {
+    return str.replace(/[-_]+([a-zA-Z])/g, (m, g) => g.toUpperCase());
+}
+
+/**
+ * Snakeize
+ *
+ * Reverse camelized string to snakeized
+ *
+ * @param	string	$str	Input string
+ * @return	string
+ */
+function snakeize(str) {
     return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 }
 
@@ -179,4 +187,55 @@ function capitalize(str) {
  */
 function pascalize(str) {
     return capitalize(camelize(str))
+}
+
+/**
+ * Dashed
+ *
+ * Takes multiple words separated by underscores and dashed them
+ *
+ * @param	string	str	Input string
+ * @return	string
+ */
+function dashed(str) {
+    return str.replace(/_/g, '-');
+}
+
+/**
+ * 리터럴 문자열 안의 특수 문자(HTML 예약어)와 공백을
+ * 대응하는 HTML 엔티티로 변환합니다.
+ * 예: "Tom & Jerry <3" → "Tom&nbsp;&amp;&nbsp;Jerry&nbsp;&lt;3"
+ */
+function literalToEntity(str) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+        ' ': '&nbsp;',
+        '_': '&#95;',   // underscore
+        '-': '&#45;'    // hyphen-minus
+    };
+
+    // 1) map의 키들을 이스케이프해서 정규식용 문자 클래스 문자열 생성
+    const chars = Object.keys(map)
+        .map(c => c.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'))
+        .join('');
+
+    // 2) 글로벌 매칭용 정규식
+    const regex = new RegExp('[' + chars + ']', 'g');
+
+    // 3) 치환
+    return str.replace(regex, char => map[char]);
+}
+/**
+ * HTML 엔티티(이름형 & 숫자형)를 실제 리터럴 문자로 디코딩합니다.
+ * 예: "Tom&nbsp;&amp;&nbsp;Jerry&nbsp;&lt;3" → "Tom & Jerry <3"
+ */
+function entityToLiteral(str) {
+    // DOMParser를 이용한 디코딩 (브라우저 전용)
+    const parser = new DOMParser();
+    const doc    = parser.parseFromString(str, 'text/html');
+    return doc.documentElement.textContent;
 }

@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -26,7 +18,11 @@ return /******/ (function() { // webpackBootstrap
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var cleave_js_dist_cleave__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! cleave.js/dist/cleave */ \"./node_modules/cleave.js/dist/cleave.js\");\n/* harmony import */ var cleave_js_dist_cleave__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(cleave_js_dist_cleave__WEBPACK_IMPORTED_MODULE_0__);\n\n\n//# sourceURL=webpack://Materialize/./libs/cleavejs/cleave.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var cleave_js_dist_cleave__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! cleave.js/dist/cleave */ "./node_modules/cleave.js/dist/cleave.js");
+/* harmony import */ var cleave_js_dist_cleave__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(cleave_js_dist_cleave__WEBPACK_IMPORTED_MODULE_0__);
+}
 
 /***/ }),
 
@@ -36,7 +32,1672 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var clea
   \***********************************************/
 /***/ (function(module) {
 
-eval("(function webpackUniversalModuleDefinition(root, factory) {\n\tif(true)\n\t\tmodule.exports = factory();\n\telse {}\n})(this, function() {\nreturn /******/ (function(modules) { // webpackBootstrap\n/******/ \t// The module cache\n/******/ \tvar installedModules = {};\n\n/******/ \t// The require function\n/******/ \tfunction __nested_webpack_require_527__(moduleId) {\n\n/******/ \t\t// Check if module is in cache\n/******/ \t\tif(installedModules[moduleId])\n/******/ \t\t\treturn installedModules[moduleId].exports;\n\n/******/ \t\t// Create a new module (and put it into the cache)\n/******/ \t\tvar module = installedModules[moduleId] = {\n/******/ \t\t\texports: {},\n/******/ \t\t\tid: moduleId,\n/******/ \t\t\tloaded: false\n/******/ \t\t};\n\n/******/ \t\t// Execute the module function\n/******/ \t\tmodules[moduleId].call(module.exports, module, module.exports, __nested_webpack_require_527__);\n\n/******/ \t\t// Flag the module as loaded\n/******/ \t\tmodule.loaded = true;\n\n/******/ \t\t// Return the exports of the module\n/******/ \t\treturn module.exports;\n/******/ \t}\n\n\n/******/ \t// expose the modules object (__webpack_modules__)\n/******/ \t__nested_webpack_require_527__.m = modules;\n\n/******/ \t// expose the module cache\n/******/ \t__nested_webpack_require_527__.c = installedModules;\n\n/******/ \t// __webpack_public_path__\n/******/ \t__nested_webpack_require_527__.p = \"\";\n\n/******/ \t// Load entry module and return exports\n/******/ \treturn __nested_webpack_require_527__(0);\n/******/ })\n/************************************************************************/\n/******/ ([\n/* 0 */\n/***/ (function(module, exports, __nested_webpack_require_1728__) {\n\n\t/* WEBPACK VAR INJECTION */(function(global) {'use strict';\n\n\t/**\n\t * Construct a new Cleave instance by passing the configuration object\n\t *\n\t * @param {String | HTMLElement} element\n\t * @param {Object} opts\n\t */\n\tvar Cleave = function (element, opts) {\n\t    var owner = this;\n\t    var hasMultipleElements = false;\n\n\t    if (typeof element === 'string') {\n\t        owner.element = document.querySelector(element);\n\t        hasMultipleElements = document.querySelectorAll(element).length > 1;\n\t    } else {\n\t      if (typeof element.length !== 'undefined' && element.length > 0) {\n\t        owner.element = element[0];\n\t        hasMultipleElements = element.length > 1;\n\t      } else {\n\t        owner.element = element;\n\t      }\n\t    }\n\n\t    if (!owner.element) {\n\t        throw new Error('[cleave.js] Please check the element');\n\t    }\n\n\t    if (hasMultipleElements) {\n\t      try {\n\t        // eslint-disable-next-line\n\t        console.warn('[cleave.js] Multiple input fields matched, cleave.js will only take the first one.');\n\t      } catch (e) {\n\t        // Old IE\n\t      }\n\t    }\n\n\t    opts.initValue = owner.element.value;\n\n\t    owner.properties = Cleave.DefaultProperties.assign({}, opts);\n\n\t    owner.init();\n\t};\n\n\tCleave.prototype = {\n\t    init: function () {\n\t        var owner = this, pps = owner.properties;\n\n\t        // no need to use this lib\n\t        if (!pps.numeral && !pps.phone && !pps.creditCard && !pps.time && !pps.date && (pps.blocksLength === 0 && !pps.prefix)) {\n\t            owner.onInput(pps.initValue);\n\n\t            return;\n\t        }\n\n\t        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);\n\n\t        owner.isAndroid = Cleave.Util.isAndroid();\n\t        owner.lastInputValue = '';\n\t        owner.isBackward = '';\n\n\t        owner.onChangeListener = owner.onChange.bind(owner);\n\t        owner.onKeyDownListener = owner.onKeyDown.bind(owner);\n\t        owner.onFocusListener = owner.onFocus.bind(owner);\n\t        owner.onCutListener = owner.onCut.bind(owner);\n\t        owner.onCopyListener = owner.onCopy.bind(owner);\n\n\t        owner.initSwapHiddenInput();\n\n\t        owner.element.addEventListener('input', owner.onChangeListener);\n\t        owner.element.addEventListener('keydown', owner.onKeyDownListener);\n\t        owner.element.addEventListener('focus', owner.onFocusListener);\n\t        owner.element.addEventListener('cut', owner.onCutListener);\n\t        owner.element.addEventListener('copy', owner.onCopyListener);\n\n\n\t        owner.initPhoneFormatter();\n\t        owner.initDateFormatter();\n\t        owner.initTimeFormatter();\n\t        owner.initNumeralFormatter();\n\n\t        // avoid touch input field if value is null\n\t        // otherwise Firefox will add red box-shadow for <input required />\n\t        if (pps.initValue || (pps.prefix && !pps.noImmediatePrefix)) {\n\t            owner.onInput(pps.initValue);\n\t        }\n\t    },\n\n\t    initSwapHiddenInput: function () {\n\t        var owner = this, pps = owner.properties;\n\t        if (!pps.swapHiddenInput) return;\n\n\t        var inputFormatter = owner.element.cloneNode(true);\n\t        owner.element.parentNode.insertBefore(inputFormatter, owner.element);\n\n\t        owner.elementSwapHidden = owner.element;\n\t        owner.elementSwapHidden.type = 'hidden';\n\n\t        owner.element = inputFormatter;\n\t        owner.element.id = '';\n\t    },\n\n\t    initNumeralFormatter: function () {\n\t        var owner = this, pps = owner.properties;\n\n\t        if (!pps.numeral) {\n\t            return;\n\t        }\n\n\t        pps.numeralFormatter = new Cleave.NumeralFormatter(\n\t            pps.numeralDecimalMark,\n\t            pps.numeralIntegerScale,\n\t            pps.numeralDecimalScale,\n\t            pps.numeralThousandsGroupStyle,\n\t            pps.numeralPositiveOnly,\n\t            pps.stripLeadingZeroes,\n\t            pps.prefix,\n\t            pps.signBeforePrefix,\n\t            pps.tailPrefix,\n\t            pps.delimiter\n\t        );\n\t    },\n\n\t    initTimeFormatter: function() {\n\t        var owner = this, pps = owner.properties;\n\n\t        if (!pps.time) {\n\t            return;\n\t        }\n\n\t        pps.timeFormatter = new Cleave.TimeFormatter(pps.timePattern, pps.timeFormat);\n\t        pps.blocks = pps.timeFormatter.getBlocks();\n\t        pps.blocksLength = pps.blocks.length;\n\t        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);\n\t    },\n\n\t    initDateFormatter: function () {\n\t        var owner = this, pps = owner.properties;\n\n\t        if (!pps.date) {\n\t            return;\n\t        }\n\n\t        pps.dateFormatter = new Cleave.DateFormatter(pps.datePattern, pps.dateMin, pps.dateMax);\n\t        pps.blocks = pps.dateFormatter.getBlocks();\n\t        pps.blocksLength = pps.blocks.length;\n\t        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);\n\t    },\n\n\t    initPhoneFormatter: function () {\n\t        var owner = this, pps = owner.properties;\n\n\t        if (!pps.phone) {\n\t            return;\n\t        }\n\n\t        // Cleave.AsYouTypeFormatter should be provided by\n\t        // external google closure lib\n\t        try {\n\t            pps.phoneFormatter = new Cleave.PhoneFormatter(\n\t                new pps.root.Cleave.AsYouTypeFormatter(pps.phoneRegionCode),\n\t                pps.delimiter\n\t            );\n\t        } catch (ex) {\n\t            throw new Error('[cleave.js] Please include phone-type-formatter.{country}.js lib');\n\t        }\n\t    },\n\n\t    onKeyDown: function (event) {\n\t        var owner = this,\n\t            charCode = event.which || event.keyCode;\n\n\t        owner.lastInputValue = owner.element.value;\n\t        owner.isBackward = charCode === 8;\n\t    },\n\n\t    onChange: function (event) {\n\t        var owner = this, pps = owner.properties,\n\t            Util = Cleave.Util;\n\n\t        owner.isBackward = owner.isBackward || event.inputType === 'deleteContentBackward';\n\n\t        var postDelimiter = Util.getPostDelimiter(owner.lastInputValue, pps.delimiter, pps.delimiters);\n\n\t        if (owner.isBackward && postDelimiter) {\n\t            pps.postDelimiterBackspace = postDelimiter;\n\t        } else {\n\t            pps.postDelimiterBackspace = false;\n\t        }\n\n\t        this.onInput(this.element.value);\n\t    },\n\n\t    onFocus: function () {\n\t        var owner = this,\n\t            pps = owner.properties;\n\t        owner.lastInputValue = owner.element.value;\n\n\t        if (pps.prefix && pps.noImmediatePrefix && !owner.element.value) {\n\t            this.onInput(pps.prefix);\n\t        }\n\n\t        Cleave.Util.fixPrefixCursor(owner.element, pps.prefix, pps.delimiter, pps.delimiters);\n\t    },\n\n\t    onCut: function (e) {\n\t        if (!Cleave.Util.checkFullSelection(this.element.value)) return;\n\t        this.copyClipboardData(e);\n\t        this.onInput('');\n\t    },\n\n\t    onCopy: function (e) {\n\t        if (!Cleave.Util.checkFullSelection(this.element.value)) return;\n\t        this.copyClipboardData(e);\n\t    },\n\n\t    copyClipboardData: function (e) {\n\t        var owner = this,\n\t            pps = owner.properties,\n\t            Util = Cleave.Util,\n\t            inputValue = owner.element.value,\n\t            textToCopy = '';\n\n\t        if (!pps.copyDelimiter) {\n\t            textToCopy = Util.stripDelimiters(inputValue, pps.delimiter, pps.delimiters);\n\t        } else {\n\t            textToCopy = inputValue;\n\t        }\n\n\t        try {\n\t            if (e.clipboardData) {\n\t                e.clipboardData.setData('Text', textToCopy);\n\t            } else {\n\t                window.clipboardData.setData('Text', textToCopy);\n\t            }\n\n\t            e.preventDefault();\n\t        } catch (ex) {\n\t            //  empty\n\t        }\n\t    },\n\n\t    onInput: function (value) {\n\t        var owner = this, pps = owner.properties,\n\t            Util = Cleave.Util;\n\n\t        // case 1: delete one more character \"4\"\n\t        // 1234*| -> hit backspace -> 123|\n\t        // case 2: last character is not delimiter which is:\n\t        // 12|34* -> hit backspace -> 1|34*\n\t        // note: no need to apply this for numeral mode\n\t        var postDelimiterAfter = Util.getPostDelimiter(value, pps.delimiter, pps.delimiters);\n\t        if (!pps.numeral && pps.postDelimiterBackspace && !postDelimiterAfter) {\n\t            value = Util.headStr(value, value.length - pps.postDelimiterBackspace.length);\n\t        }\n\n\t        // phone formatter\n\t        if (pps.phone) {\n\t            if (pps.prefix && (!pps.noImmediatePrefix || value.length)) {\n\t                pps.result = pps.prefix + pps.phoneFormatter.format(value).slice(pps.prefix.length);\n\t            } else {\n\t                pps.result = pps.phoneFormatter.format(value);\n\t            }\n\t            owner.updateValueState();\n\n\t            return;\n\t        }\n\n\t        // numeral formatter\n\t        if (pps.numeral) {\n\t            // Do not show prefix when noImmediatePrefix is specified\n\t            // This mostly because we need to show user the native input placeholder\n\t            if (pps.prefix && pps.noImmediatePrefix && value.length === 0) {\n\t                pps.result = '';\n\t            } else {\n\t                pps.result = pps.numeralFormatter.format(value);\n\t            }\n\t            owner.updateValueState();\n\n\t            return;\n\t        }\n\n\t        // date\n\t        if (pps.date) {\n\t            value = pps.dateFormatter.getValidatedDate(value);\n\t        }\n\n\t        // time\n\t        if (pps.time) {\n\t            value = pps.timeFormatter.getValidatedTime(value);\n\t        }\n\n\t        // strip delimiters\n\t        value = Util.stripDelimiters(value, pps.delimiter, pps.delimiters);\n\n\t        // strip prefix\n\t        value = Util.getPrefixStrippedValue(value, pps.prefix, pps.prefixLength, pps.result, pps.delimiter, pps.delimiters, pps.noImmediatePrefix, pps.tailPrefix, pps.signBeforePrefix);\n\n\t        // strip non-numeric characters\n\t        value = pps.numericOnly ? Util.strip(value, /[^\\d]/g) : value;\n\n\t        // convert case\n\t        value = pps.uppercase ? value.toUpperCase() : value;\n\t        value = pps.lowercase ? value.toLowerCase() : value;\n\n\t        // prevent from showing prefix when no immediate option enabled with empty input value\n\t        if (pps.prefix) {\n\t            if (pps.tailPrefix) {\n\t                value = value + pps.prefix;\n\t            } else {\n\t                value = pps.prefix + value;\n\t            }\n\n\n\t            // no blocks specified, no need to do formatting\n\t            if (pps.blocksLength === 0) {\n\t                pps.result = value;\n\t                owner.updateValueState();\n\n\t                return;\n\t            }\n\t        }\n\n\t        // update credit card props\n\t        if (pps.creditCard) {\n\t            owner.updateCreditCardPropsByValue(value);\n\t        }\n\n\t        // strip over length characters\n\t        value = Util.headStr(value, pps.maxLength);\n\n\t        // apply blocks\n\t        pps.result = Util.getFormattedValue(\n\t            value,\n\t            pps.blocks, pps.blocksLength,\n\t            pps.delimiter, pps.delimiters, pps.delimiterLazyShow\n\t        );\n\n\t        owner.updateValueState();\n\t    },\n\n\t    updateCreditCardPropsByValue: function (value) {\n\t        var owner = this, pps = owner.properties,\n\t            Util = Cleave.Util,\n\t            creditCardInfo;\n\n\t        // At least one of the first 4 characters has changed\n\t        if (Util.headStr(pps.result, 4) === Util.headStr(value, 4)) {\n\t            return;\n\t        }\n\n\t        creditCardInfo = Cleave.CreditCardDetector.getInfo(value, pps.creditCardStrictMode);\n\n\t        pps.blocks = creditCardInfo.blocks;\n\t        pps.blocksLength = pps.blocks.length;\n\t        pps.maxLength = Util.getMaxLength(pps.blocks);\n\n\t        // credit card type changed\n\t        if (pps.creditCardType !== creditCardInfo.type) {\n\t            pps.creditCardType = creditCardInfo.type;\n\n\t            pps.onCreditCardTypeChanged.call(owner, pps.creditCardType);\n\t        }\n\t    },\n\n\t    updateValueState: function () {\n\t        var owner = this,\n\t            Util = Cleave.Util,\n\t            pps = owner.properties;\n\n\t        if (!owner.element) {\n\t            return;\n\t        }\n\n\t        var endPos = owner.element.selectionEnd;\n\t        var oldValue = owner.element.value;\n\t        var newValue = pps.result;\n\n\t        endPos = Util.getNextCursorPosition(endPos, oldValue, newValue, pps.delimiter, pps.delimiters);\n\n\t        // fix Android browser type=\"text\" input field\n\t        // cursor not jumping issue\n\t        if (owner.isAndroid) {\n\t            window.setTimeout(function () {\n\t                owner.element.value = newValue;\n\t                Util.setSelection(owner.element, endPos, pps.document, false);\n\t                owner.callOnValueChanged();\n\t            }, 1);\n\n\t            return;\n\t        }\n\n\t        owner.element.value = newValue;\n\t        if (pps.swapHiddenInput) owner.elementSwapHidden.value = owner.getRawValue();\n\n\t        Util.setSelection(owner.element, endPos, pps.document, false);\n\t        owner.callOnValueChanged();\n\t    },\n\n\t    callOnValueChanged: function () {\n\t        var owner = this,\n\t            pps = owner.properties;\n\n\t        pps.onValueChanged.call(owner, {\n\t            target: {\n\t                name: owner.element.name,\n\t                value: pps.result,\n\t                rawValue: owner.getRawValue()\n\t            }\n\t        });\n\t    },\n\n\t    setPhoneRegionCode: function (phoneRegionCode) {\n\t        var owner = this, pps = owner.properties;\n\n\t        pps.phoneRegionCode = phoneRegionCode;\n\t        owner.initPhoneFormatter();\n\t        owner.onChange();\n\t    },\n\n\t    setRawValue: function (value) {\n\t        var owner = this, pps = owner.properties;\n\n\t        value = value !== undefined && value !== null ? value.toString() : '';\n\n\t        if (pps.numeral) {\n\t            value = value.replace('.', pps.numeralDecimalMark);\n\t        }\n\n\t        pps.postDelimiterBackspace = false;\n\n\t        owner.element.value = value;\n\t        owner.onInput(value);\n\t    },\n\n\t    getRawValue: function () {\n\t        var owner = this,\n\t            pps = owner.properties,\n\t            Util = Cleave.Util,\n\t            rawValue = owner.element.value;\n\n\t        if (pps.rawValueTrimPrefix) {\n\t            rawValue = Util.getPrefixStrippedValue(rawValue, pps.prefix, pps.prefixLength, pps.result, pps.delimiter, pps.delimiters, pps.noImmediatePrefix, pps.tailPrefix, pps.signBeforePrefix);\n\t        }\n\n\t        if (pps.numeral) {\n\t            rawValue = pps.numeralFormatter.getRawValue(rawValue);\n\t        } else {\n\t            rawValue = Util.stripDelimiters(rawValue, pps.delimiter, pps.delimiters);\n\t        }\n\n\t        return rawValue;\n\t    },\n\n\t    getISOFormatDate: function () {\n\t        var owner = this,\n\t            pps = owner.properties;\n\n\t        return pps.date ? pps.dateFormatter.getISOFormatDate() : '';\n\t    },\n\n\t    getISOFormatTime: function () {\n\t        var owner = this,\n\t            pps = owner.properties;\n\n\t        return pps.time ? pps.timeFormatter.getISOFormatTime() : '';\n\t    },\n\n\t    getFormattedValue: function () {\n\t        return this.element.value;\n\t    },\n\n\t    destroy: function () {\n\t        var owner = this;\n\n\t        owner.element.removeEventListener('input', owner.onChangeListener);\n\t        owner.element.removeEventListener('keydown', owner.onKeyDownListener);\n\t        owner.element.removeEventListener('focus', owner.onFocusListener);\n\t        owner.element.removeEventListener('cut', owner.onCutListener);\n\t        owner.element.removeEventListener('copy', owner.onCopyListener);\n\t    },\n\n\t    toString: function () {\n\t        return '[Cleave Object]';\n\t    }\n\t};\n\n\tCleave.NumeralFormatter = __nested_webpack_require_1728__(1);\n\tCleave.DateFormatter = __nested_webpack_require_1728__(2);\n\tCleave.TimeFormatter = __nested_webpack_require_1728__(3);\n\tCleave.PhoneFormatter = __nested_webpack_require_1728__(4);\n\tCleave.CreditCardDetector = __nested_webpack_require_1728__(5);\n\tCleave.Util = __nested_webpack_require_1728__(6);\n\tCleave.DefaultProperties = __nested_webpack_require_1728__(7);\n\n\t// for angular directive\n\t((typeof global === 'object' && global) ? global : window)['Cleave'] = Cleave;\n\n\t// CommonJS\n\tmodule.exports = Cleave;\n\n\t/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))\n\n/***/ }),\n/* 1 */\n/***/ (function(module, exports) {\n\n\t'use strict';\n\n\tvar NumeralFormatter = function (numeralDecimalMark,\n\t                                 numeralIntegerScale,\n\t                                 numeralDecimalScale,\n\t                                 numeralThousandsGroupStyle,\n\t                                 numeralPositiveOnly,\n\t                                 stripLeadingZeroes,\n\t                                 prefix,\n\t                                 signBeforePrefix,\n\t                                 tailPrefix,\n\t                                 delimiter) {\n\t    var owner = this;\n\n\t    owner.numeralDecimalMark = numeralDecimalMark || '.';\n\t    owner.numeralIntegerScale = numeralIntegerScale > 0 ? numeralIntegerScale : 0;\n\t    owner.numeralDecimalScale = numeralDecimalScale >= 0 ? numeralDecimalScale : 2;\n\t    owner.numeralThousandsGroupStyle = numeralThousandsGroupStyle || NumeralFormatter.groupStyle.thousand;\n\t    owner.numeralPositiveOnly = !!numeralPositiveOnly;\n\t    owner.stripLeadingZeroes = stripLeadingZeroes !== false;\n\t    owner.prefix = (prefix || prefix === '') ? prefix : '';\n\t    owner.signBeforePrefix = !!signBeforePrefix;\n\t    owner.tailPrefix = !!tailPrefix;\n\t    owner.delimiter = (delimiter || delimiter === '') ? delimiter : ',';\n\t    owner.delimiterRE = delimiter ? new RegExp('\\\\' + delimiter, 'g') : '';\n\t};\n\n\tNumeralFormatter.groupStyle = {\n\t    thousand: 'thousand',\n\t    lakh:     'lakh',\n\t    wan:      'wan',\n\t    none:     'none'    \n\t};\n\n\tNumeralFormatter.prototype = {\n\t    getRawValue: function (value) {\n\t        return value.replace(this.delimiterRE, '').replace(this.numeralDecimalMark, '.');\n\t    },\n\n\t    format: function (value) {\n\t        var owner = this, parts, partSign, partSignAndPrefix, partInteger, partDecimal = '';\n\n\t        // strip alphabet letters\n\t        value = value.replace(/[A-Za-z]/g, '')\n\t            // replace the first decimal mark with reserved placeholder\n\t            .replace(owner.numeralDecimalMark, 'M')\n\n\t            // strip non numeric letters except minus and \"M\"\n\t            // this is to ensure prefix has been stripped\n\t            .replace(/[^\\dM-]/g, '')\n\n\t            // replace the leading minus with reserved placeholder\n\t            .replace(/^\\-/, 'N')\n\n\t            // strip the other minus sign (if present)\n\t            .replace(/\\-/g, '')\n\n\t            // replace the minus sign (if present)\n\t            .replace('N', owner.numeralPositiveOnly ? '' : '-')\n\n\t            // replace decimal mark\n\t            .replace('M', owner.numeralDecimalMark);\n\n\t        // strip any leading zeros\n\t        if (owner.stripLeadingZeroes) {\n\t            value = value.replace(/^(-)?0+(?=\\d)/, '$1');\n\t        }\n\n\t        partSign = value.slice(0, 1) === '-' ? '-' : '';\n\t        if (typeof owner.prefix != 'undefined') {\n\t            if (owner.signBeforePrefix) {\n\t                partSignAndPrefix = partSign + owner.prefix;\n\t            } else {\n\t                partSignAndPrefix = owner.prefix + partSign;\n\t            }\n\t        } else {\n\t            partSignAndPrefix = partSign;\n\t        }\n\t        \n\t        partInteger = value;\n\n\t        if (value.indexOf(owner.numeralDecimalMark) >= 0) {\n\t            parts = value.split(owner.numeralDecimalMark);\n\t            partInteger = parts[0];\n\t            partDecimal = owner.numeralDecimalMark + parts[1].slice(0, owner.numeralDecimalScale);\n\t        }\n\n\t        if(partSign === '-') {\n\t            partInteger = partInteger.slice(1);\n\t        }\n\n\t        if (owner.numeralIntegerScale > 0) {\n\t          partInteger = partInteger.slice(0, owner.numeralIntegerScale);\n\t        }\n\n\t        switch (owner.numeralThousandsGroupStyle) {\n\t        case NumeralFormatter.groupStyle.lakh:\n\t            partInteger = partInteger.replace(/(\\d)(?=(\\d\\d)+\\d$)/g, '$1' + owner.delimiter);\n\n\t            break;\n\n\t        case NumeralFormatter.groupStyle.wan:\n\t            partInteger = partInteger.replace(/(\\d)(?=(\\d{4})+$)/g, '$1' + owner.delimiter);\n\n\t            break;\n\n\t        case NumeralFormatter.groupStyle.thousand:\n\t            partInteger = partInteger.replace(/(\\d)(?=(\\d{3})+$)/g, '$1' + owner.delimiter);\n\n\t            break;\n\t        }\n\n\t        if (owner.tailPrefix) {\n\t            return partSign + partInteger.toString() + (owner.numeralDecimalScale > 0 ? partDecimal.toString() : '') + owner.prefix;\n\t        }\n\n\t        return partSignAndPrefix + partInteger.toString() + (owner.numeralDecimalScale > 0 ? partDecimal.toString() : '');\n\t    }\n\t};\n\n\tmodule.exports = NumeralFormatter;\n\n\n/***/ }),\n/* 2 */\n/***/ (function(module, exports) {\n\n\t'use strict';\n\n\tvar DateFormatter = function (datePattern, dateMin, dateMax) {\n\t    var owner = this;\n\n\t    owner.date = [];\n\t    owner.blocks = [];\n\t    owner.datePattern = datePattern;\n\t    owner.dateMin = dateMin\n\t      .split('-')\n\t      .reverse()\n\t      .map(function(x) {\n\t        return parseInt(x, 10);\n\t      });\n\t    if (owner.dateMin.length === 2) owner.dateMin.unshift(0);\n\n\t    owner.dateMax = dateMax\n\t      .split('-')\n\t      .reverse()\n\t      .map(function(x) {\n\t        return parseInt(x, 10);\n\t      });\n\t    if (owner.dateMax.length === 2) owner.dateMax.unshift(0);\n\t    \n\t    owner.initBlocks();\n\t};\n\n\tDateFormatter.prototype = {\n\t    initBlocks: function () {\n\t        var owner = this;\n\t        owner.datePattern.forEach(function (value) {\n\t            if (value === 'Y') {\n\t                owner.blocks.push(4);\n\t            } else {\n\t                owner.blocks.push(2);\n\t            }\n\t        });\n\t    },\n\n\t    getISOFormatDate: function () {\n\t        var owner = this,\n\t            date = owner.date;\n\n\t        return date[2] ? (\n\t            date[2] + '-' + owner.addLeadingZero(date[1]) + '-' + owner.addLeadingZero(date[0])\n\t        ) : '';\n\t    },\n\n\t    getBlocks: function () {\n\t        return this.blocks;\n\t    },\n\n\t    getValidatedDate: function (value) {\n\t        var owner = this, result = '';\n\n\t        value = value.replace(/[^\\d]/g, '');\n\n\t        owner.blocks.forEach(function (length, index) {\n\t            if (value.length > 0) {\n\t                var sub = value.slice(0, length),\n\t                    sub0 = sub.slice(0, 1),\n\t                    rest = value.slice(length);\n\n\t                switch (owner.datePattern[index]) {\n\t                case 'd':\n\t                    if (sub === '00') {\n\t                        sub = '01';\n\t                    } else if (parseInt(sub0, 10) > 3) {\n\t                        sub = '0' + sub0;\n\t                    } else if (parseInt(sub, 10) > 31) {\n\t                        sub = '31';\n\t                    }\n\n\t                    break;\n\n\t                case 'm':\n\t                    if (sub === '00') {\n\t                        sub = '01';\n\t                    } else if (parseInt(sub0, 10) > 1) {\n\t                        sub = '0' + sub0;\n\t                    } else if (parseInt(sub, 10) > 12) {\n\t                        sub = '12';\n\t                    }\n\n\t                    break;\n\t                }\n\n\t                result += sub;\n\n\t                // update remaining string\n\t                value = rest;\n\t            }\n\t        });\n\n\t        return this.getFixedDateString(result);\n\t    },\n\n\t    getFixedDateString: function (value) {\n\t        var owner = this, datePattern = owner.datePattern, date = [],\n\t            dayIndex = 0, monthIndex = 0, yearIndex = 0,\n\t            dayStartIndex = 0, monthStartIndex = 0, yearStartIndex = 0,\n\t            day, month, year, fullYearDone = false;\n\n\t        // mm-dd || dd-mm\n\t        if (value.length === 4 && datePattern[0].toLowerCase() !== 'y' && datePattern[1].toLowerCase() !== 'y') {\n\t            dayStartIndex = datePattern[0] === 'd' ? 0 : 2;\n\t            monthStartIndex = 2 - dayStartIndex;\n\t            day = parseInt(value.slice(dayStartIndex, dayStartIndex + 2), 10);\n\t            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);\n\n\t            date = this.getFixedDate(day, month, 0);\n\t        }\n\n\t        // yyyy-mm-dd || yyyy-dd-mm || mm-dd-yyyy || dd-mm-yyyy || dd-yyyy-mm || mm-yyyy-dd\n\t        if (value.length === 8) {\n\t            datePattern.forEach(function (type, index) {\n\t                switch (type) {\n\t                case 'd':\n\t                    dayIndex = index;\n\t                    break;\n\t                case 'm':\n\t                    monthIndex = index;\n\t                    break;\n\t                default:\n\t                    yearIndex = index;\n\t                    break;\n\t                }\n\t            });\n\n\t            yearStartIndex = yearIndex * 2;\n\t            dayStartIndex = (dayIndex <= yearIndex) ? dayIndex * 2 : (dayIndex * 2 + 2);\n\t            monthStartIndex = (monthIndex <= yearIndex) ? monthIndex * 2 : (monthIndex * 2 + 2);\n\n\t            day = parseInt(value.slice(dayStartIndex, dayStartIndex + 2), 10);\n\t            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);\n\t            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 4), 10);\n\n\t            fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length === 4;\n\n\t            date = this.getFixedDate(day, month, year);\n\t        }\n\n\t        // mm-yy || yy-mm\n\t        if (value.length === 4 && (datePattern[0] === 'y' || datePattern[1] === 'y')) {\n\t            monthStartIndex = datePattern[0] === 'm' ? 0 : 2;\n\t            yearStartIndex = 2 - monthStartIndex;\n\t            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);\n\t            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 2), 10);\n\n\t            fullYearDone = value.slice(yearStartIndex, yearStartIndex + 2).length === 2;\n\n\t            date = [0, month, year];\n\t        }\n\n\t        // mm-yyyy || yyyy-mm\n\t        if (value.length === 6 && (datePattern[0] === 'Y' || datePattern[1] === 'Y')) {\n\t            monthStartIndex = datePattern[0] === 'm' ? 0 : 4;\n\t            yearStartIndex = 2 - 0.5 * monthStartIndex;\n\t            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);\n\t            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 4), 10);\n\n\t            fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length === 4;\n\n\t            date = [0, month, year];\n\t        }\n\n\t        date = owner.getRangeFixedDate(date);\n\t        owner.date = date;\n\n\t        var result = date.length === 0 ? value : datePattern.reduce(function (previous, current) {\n\t            switch (current) {\n\t            case 'd':\n\t                return previous + (date[0] === 0 ? '' : owner.addLeadingZero(date[0]));\n\t            case 'm':\n\t                return previous + (date[1] === 0 ? '' : owner.addLeadingZero(date[1]));\n\t            case 'y':\n\t                return previous + (fullYearDone ? owner.addLeadingZeroForYear(date[2], false) : '');\n\t            case 'Y':\n\t                return previous + (fullYearDone ? owner.addLeadingZeroForYear(date[2], true) : '');\n\t            }\n\t        }, '');\n\n\t        return result;\n\t    },\n\n\t    getRangeFixedDate: function (date) {\n\t        var owner = this,\n\t            datePattern = owner.datePattern,\n\t            dateMin = owner.dateMin || [],\n\t            dateMax = owner.dateMax || [];\n\n\t        if (!date.length || (dateMin.length < 3 && dateMax.length < 3)) return date;\n\n\t        if (\n\t          datePattern.find(function(x) {\n\t            return x.toLowerCase() === 'y';\n\t          }) &&\n\t          date[2] === 0\n\t        ) return date;\n\n\t        if (dateMax.length && (dateMax[2] < date[2] || (\n\t          dateMax[2] === date[2] && (dateMax[1] < date[1] || (\n\t            dateMax[1] === date[1] && dateMax[0] < date[0]\n\t          ))\n\t        ))) return dateMax;\n\n\t        if (dateMin.length && (dateMin[2] > date[2] || (\n\t          dateMin[2] === date[2] && (dateMin[1] > date[1] || (\n\t            dateMin[1] === date[1] && dateMin[0] > date[0]\n\t          ))\n\t        ))) return dateMin;\n\n\t        return date;\n\t    },\n\n\t    getFixedDate: function (day, month, year) {\n\t        day = Math.min(day, 31);\n\t        month = Math.min(month, 12);\n\t        year = parseInt((year || 0), 10);\n\n\t        if ((month < 7 && month % 2 === 0) || (month > 8 && month % 2 === 1)) {\n\t            day = Math.min(day, month === 2 ? (this.isLeapYear(year) ? 29 : 28) : 30);\n\t        }\n\n\t        return [day, month, year];\n\t    },\n\n\t    isLeapYear: function (year) {\n\t        return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);\n\t    },\n\n\t    addLeadingZero: function (number) {\n\t        return (number < 10 ? '0' : '') + number;\n\t    },\n\n\t    addLeadingZeroForYear: function (number, fullYearMode) {\n\t        if (fullYearMode) {\n\t            return (number < 10 ? '000' : (number < 100 ? '00' : (number < 1000 ? '0' : ''))) + number;\n\t        }\n\n\t        return (number < 10 ? '0' : '') + number;\n\t    }\n\t};\n\n\tmodule.exports = DateFormatter;\n\n\n/***/ }),\n/* 3 */\n/***/ (function(module, exports) {\n\n\t'use strict';\n\n\tvar TimeFormatter = function (timePattern, timeFormat) {\n\t    var owner = this;\n\n\t    owner.time = [];\n\t    owner.blocks = [];\n\t    owner.timePattern = timePattern;\n\t    owner.timeFormat = timeFormat;\n\t    owner.initBlocks();\n\t};\n\n\tTimeFormatter.prototype = {\n\t    initBlocks: function () {\n\t        var owner = this;\n\t        owner.timePattern.forEach(function () {\n\t            owner.blocks.push(2);\n\t        });\n\t    },\n\n\t    getISOFormatTime: function () {\n\t        var owner = this,\n\t            time = owner.time;\n\n\t        return time[2] ? (\n\t            owner.addLeadingZero(time[0]) + ':' + owner.addLeadingZero(time[1]) + ':' + owner.addLeadingZero(time[2])\n\t        ) : '';\n\t    },\n\n\t    getBlocks: function () {\n\t        return this.blocks;\n\t    },\n\n\t    getTimeFormatOptions: function () {\n\t        var owner = this;\n\t        if (String(owner.timeFormat) === '12') {\n\t            return {\n\t                maxHourFirstDigit: 1,\n\t                maxHours: 12,\n\t                maxMinutesFirstDigit: 5,\n\t                maxMinutes: 60\n\t            };\n\t        }\n\n\t        return {\n\t            maxHourFirstDigit: 2,\n\t            maxHours: 23,\n\t            maxMinutesFirstDigit: 5,\n\t            maxMinutes: 60\n\t        };\n\t    },\n\n\t    getValidatedTime: function (value) {\n\t        var owner = this, result = '';\n\n\t        value = value.replace(/[^\\d]/g, '');\n\n\t        var timeFormatOptions = owner.getTimeFormatOptions();\n\n\t        owner.blocks.forEach(function (length, index) {\n\t            if (value.length > 0) {\n\t                var sub = value.slice(0, length),\n\t                    sub0 = sub.slice(0, 1),\n\t                    rest = value.slice(length);\n\n\t                switch (owner.timePattern[index]) {\n\n\t                case 'h':\n\t                    if (parseInt(sub0, 10) > timeFormatOptions.maxHourFirstDigit) {\n\t                        sub = '0' + sub0;\n\t                    } else if (parseInt(sub, 10) > timeFormatOptions.maxHours) {\n\t                        sub = timeFormatOptions.maxHours + '';\n\t                    }\n\n\t                    break;\n\n\t                case 'm':\n\t                case 's':\n\t                    if (parseInt(sub0, 10) > timeFormatOptions.maxMinutesFirstDigit) {\n\t                        sub = '0' + sub0;\n\t                    } else if (parseInt(sub, 10) > timeFormatOptions.maxMinutes) {\n\t                        sub = timeFormatOptions.maxMinutes + '';\n\t                    }\n\t                    break;\n\t                }\n\n\t                result += sub;\n\n\t                // update remaining string\n\t                value = rest;\n\t            }\n\t        });\n\n\t        return this.getFixedTimeString(result);\n\t    },\n\n\t    getFixedTimeString: function (value) {\n\t        var owner = this, timePattern = owner.timePattern, time = [],\n\t            secondIndex = 0, minuteIndex = 0, hourIndex = 0,\n\t            secondStartIndex = 0, minuteStartIndex = 0, hourStartIndex = 0,\n\t            second, minute, hour;\n\n\t        if (value.length === 6) {\n\t            timePattern.forEach(function (type, index) {\n\t                switch (type) {\n\t                case 's':\n\t                    secondIndex = index * 2;\n\t                    break;\n\t                case 'm':\n\t                    minuteIndex = index * 2;\n\t                    break;\n\t                case 'h':\n\t                    hourIndex = index * 2;\n\t                    break;\n\t                }\n\t            });\n\n\t            hourStartIndex = hourIndex;\n\t            minuteStartIndex = minuteIndex;\n\t            secondStartIndex = secondIndex;\n\n\t            second = parseInt(value.slice(secondStartIndex, secondStartIndex + 2), 10);\n\t            minute = parseInt(value.slice(minuteStartIndex, minuteStartIndex + 2), 10);\n\t            hour = parseInt(value.slice(hourStartIndex, hourStartIndex + 2), 10);\n\n\t            time = this.getFixedTime(hour, minute, second);\n\t        }\n\n\t        if (value.length === 4 && owner.timePattern.indexOf('s') < 0) {\n\t            timePattern.forEach(function (type, index) {\n\t                switch (type) {\n\t                case 'm':\n\t                    minuteIndex = index * 2;\n\t                    break;\n\t                case 'h':\n\t                    hourIndex = index * 2;\n\t                    break;\n\t                }\n\t            });\n\n\t            hourStartIndex = hourIndex;\n\t            minuteStartIndex = minuteIndex;\n\n\t            second = 0;\n\t            minute = parseInt(value.slice(minuteStartIndex, minuteStartIndex + 2), 10);\n\t            hour = parseInt(value.slice(hourStartIndex, hourStartIndex + 2), 10);\n\n\t            time = this.getFixedTime(hour, minute, second);\n\t        }\n\n\t        owner.time = time;\n\n\t        return time.length === 0 ? value : timePattern.reduce(function (previous, current) {\n\t            switch (current) {\n\t            case 's':\n\t                return previous + owner.addLeadingZero(time[2]);\n\t            case 'm':\n\t                return previous + owner.addLeadingZero(time[1]);\n\t            case 'h':\n\t                return previous + owner.addLeadingZero(time[0]);\n\t            }\n\t        }, '');\n\t    },\n\n\t    getFixedTime: function (hour, minute, second) {\n\t        second = Math.min(parseInt(second || 0, 10), 60);\n\t        minute = Math.min(minute, 60);\n\t        hour = Math.min(hour, 60);\n\n\t        return [hour, minute, second];\n\t    },\n\n\t    addLeadingZero: function (number) {\n\t        return (number < 10 ? '0' : '') + number;\n\t    }\n\t};\n\n\tmodule.exports = TimeFormatter;\n\n\n/***/ }),\n/* 4 */\n/***/ (function(module, exports) {\n\n\t'use strict';\n\n\tvar PhoneFormatter = function (formatter, delimiter) {\n\t    var owner = this;\n\n\t    owner.delimiter = (delimiter || delimiter === '') ? delimiter : ' ';\n\t    owner.delimiterRE = delimiter ? new RegExp('\\\\' + delimiter, 'g') : '';\n\n\t    owner.formatter = formatter;\n\t};\n\n\tPhoneFormatter.prototype = {\n\t    setFormatter: function (formatter) {\n\t        this.formatter = formatter;\n\t    },\n\n\t    format: function (phoneNumber) {\n\t        var owner = this;\n\n\t        owner.formatter.clear();\n\n\t        // only keep number and +\n\t        phoneNumber = phoneNumber.replace(/[^\\d+]/g, '');\n\n\t        // strip non-leading +\n\t        phoneNumber = phoneNumber.replace(/^\\+/, 'B').replace(/\\+/g, '').replace('B', '+');\n\n\t        // strip delimiter\n\t        phoneNumber = phoneNumber.replace(owner.delimiterRE, '');\n\n\t        var result = '', current, validated = false;\n\n\t        for (var i = 0, iMax = phoneNumber.length; i < iMax; i++) {\n\t            current = owner.formatter.inputDigit(phoneNumber.charAt(i));\n\n\t            // has ()- or space inside\n\t            if (/[\\s()-]/g.test(current)) {\n\t                result = current;\n\n\t                validated = true;\n\t            } else {\n\t                if (!validated) {\n\t                    result = current;\n\t                }\n\t                // else: over length input\n\t                // it turns to invalid number again\n\t            }\n\t        }\n\n\t        // strip ()\n\t        // e.g. US: 7161234567 returns (716) 123-4567\n\t        result = result.replace(/[()]/g, '');\n\t        // replace library delimiter with user customized delimiter\n\t        result = result.replace(/[\\s-]/g, owner.delimiter);\n\n\t        return result;\n\t    }\n\t};\n\n\tmodule.exports = PhoneFormatter;\n\n\n/***/ }),\n/* 5 */\n/***/ (function(module, exports) {\n\n\t'use strict';\n\n\tvar CreditCardDetector = {\n\t    blocks: {\n\t        uatp:          [4, 5, 6],\n\t        amex:          [4, 6, 5],\n\t        diners:        [4, 6, 4],\n\t        discover:      [4, 4, 4, 4],\n\t        mastercard:    [4, 4, 4, 4],\n\t        dankort:       [4, 4, 4, 4],\n\t        instapayment:  [4, 4, 4, 4],\n\t        jcb15:         [4, 6, 5],\n\t        jcb:           [4, 4, 4, 4],\n\t        maestro:       [4, 4, 4, 4],\n\t        visa:          [4, 4, 4, 4],\n\t        mir:           [4, 4, 4, 4],\n\t        unionPay:      [4, 4, 4, 4],\n\t        general:       [4, 4, 4, 4]\n\t    },\n\n\t    re: {\n\t        // starts with 1; 15 digits, not starts with 1800 (jcb card)\n\t        uatp: /^(?!1800)1\\d{0,14}/,\n\n\t        // starts with 34/37; 15 digits\n\t        amex: /^3[47]\\d{0,13}/,\n\n\t        // starts with 6011/65/644-649; 16 digits\n\t        discover: /^(?:6011|65\\d{0,2}|64[4-9]\\d?)\\d{0,12}/,\n\n\t        // starts with 300-305/309 or 36/38/39; 14 digits\n\t        diners: /^3(?:0([0-5]|9)|[689]\\d?)\\d{0,11}/,\n\n\t        // starts with 51-55/2221–2720; 16 digits\n\t        mastercard: /^(5[1-5]\\d{0,2}|22[2-9]\\d{0,1}|2[3-7]\\d{0,2})\\d{0,12}/,\n\n\t        // starts with 5019/4175/4571; 16 digits\n\t        dankort: /^(5019|4175|4571)\\d{0,12}/,\n\n\t        // starts with 637-639; 16 digits\n\t        instapayment: /^63[7-9]\\d{0,13}/,\n\n\t        // starts with 2131/1800; 15 digits\n\t        jcb15: /^(?:2131|1800)\\d{0,11}/,\n\n\t        // starts with 2131/1800/35; 16 digits\n\t        jcb: /^(?:35\\d{0,2})\\d{0,12}/,\n\n\t        // starts with 50/56-58/6304/67; 16 digits\n\t        maestro: /^(?:5[0678]\\d{0,2}|6304|67\\d{0,2})\\d{0,12}/,\n\n\t        // starts with 22; 16 digits\n\t        mir: /^220[0-4]\\d{0,12}/,\n\n\t        // starts with 4; 16 digits\n\t        visa: /^4\\d{0,15}/,\n\n\t        // starts with 62/81; 16 digits\n\t        unionPay: /^(62|81)\\d{0,14}/\n\t    },\n\n\t    getStrictBlocks: function (block) {\n\t      var total = block.reduce(function (prev, current) {\n\t        return prev + current;\n\t      }, 0);\n\n\t      return block.concat(19 - total);\n\t    },\n\n\t    getInfo: function (value, strictMode) {\n\t        var blocks = CreditCardDetector.blocks,\n\t            re = CreditCardDetector.re;\n\n\t        // Some credit card can have up to 19 digits number.\n\t        // Set strictMode to true will remove the 16 max-length restrain,\n\t        // however, I never found any website validate card number like\n\t        // this, hence probably you don't want to enable this option.\n\t        strictMode = !!strictMode;\n\n\t        for (var key in re) {\n\t            if (re[key].test(value)) {\n\t                var matchedBlocks = blocks[key];\n\t                return {\n\t                    type: key,\n\t                    blocks: strictMode ? this.getStrictBlocks(matchedBlocks) : matchedBlocks\n\t                };\n\t            }\n\t        }\n\n\t        return {\n\t            type: 'unknown',\n\t            blocks: strictMode ? this.getStrictBlocks(blocks.general) : blocks.general\n\t        };\n\t    }\n\t};\n\n\tmodule.exports = CreditCardDetector;\n\n\n/***/ }),\n/* 6 */\n/***/ (function(module, exports) {\n\n\t'use strict';\n\n\tvar Util = {\n\t    noop: function () {\n\t    },\n\n\t    strip: function (value, re) {\n\t        return value.replace(re, '');\n\t    },\n\n\t    getPostDelimiter: function (value, delimiter, delimiters) {\n\t        // single delimiter\n\t        if (delimiters.length === 0) {\n\t            return value.slice(-delimiter.length) === delimiter ? delimiter : '';\n\t        }\n\n\t        // multiple delimiters\n\t        var matchedDelimiter = '';\n\t        delimiters.forEach(function (current) {\n\t            if (value.slice(-current.length) === current) {\n\t                matchedDelimiter = current;\n\t            }\n\t        });\n\n\t        return matchedDelimiter;\n\t    },\n\n\t    getDelimiterREByDelimiter: function (delimiter) {\n\t        return new RegExp(delimiter.replace(/([.?*+^$[\\]\\\\(){}|-])/g, '\\\\$1'), 'g');\n\t    },\n\n\t    getNextCursorPosition: function (prevPos, oldValue, newValue, delimiter, delimiters) {\n\t      // If cursor was at the end of value, just place it back.\n\t      // Because new value could contain additional chars.\n\t      if (oldValue.length === prevPos) {\n\t          return newValue.length;\n\t      }\n\n\t      return prevPos + this.getPositionOffset(prevPos, oldValue, newValue, delimiter ,delimiters);\n\t    },\n\n\t    getPositionOffset: function (prevPos, oldValue, newValue, delimiter, delimiters) {\n\t        var oldRawValue, newRawValue, lengthOffset;\n\n\t        oldRawValue = this.stripDelimiters(oldValue.slice(0, prevPos), delimiter, delimiters);\n\t        newRawValue = this.stripDelimiters(newValue.slice(0, prevPos), delimiter, delimiters);\n\t        lengthOffset = oldRawValue.length - newRawValue.length;\n\n\t        return (lengthOffset !== 0) ? (lengthOffset / Math.abs(lengthOffset)) : 0;\n\t    },\n\n\t    stripDelimiters: function (value, delimiter, delimiters) {\n\t        var owner = this;\n\n\t        // single delimiter\n\t        if (delimiters.length === 0) {\n\t            var delimiterRE = delimiter ? owner.getDelimiterREByDelimiter(delimiter) : '';\n\n\t            return value.replace(delimiterRE, '');\n\t        }\n\n\t        // multiple delimiters\n\t        delimiters.forEach(function (current) {\n\t            current.split('').forEach(function (letter) {\n\t                value = value.replace(owner.getDelimiterREByDelimiter(letter), '');\n\t            });\n\t        });\n\n\t        return value;\n\t    },\n\n\t    headStr: function (str, length) {\n\t        return str.slice(0, length);\n\t    },\n\n\t    getMaxLength: function (blocks) {\n\t        return blocks.reduce(function (previous, current) {\n\t            return previous + current;\n\t        }, 0);\n\t    },\n\n\t    // strip prefix\n\t    // Before type  |   After type    |     Return value\n\t    // PEFIX-...    |   PEFIX-...     |     ''\n\t    // PREFIX-123   |   PEFIX-123     |     123\n\t    // PREFIX-123   |   PREFIX-23     |     23\n\t    // PREFIX-123   |   PREFIX-1234   |     1234\n\t    getPrefixStrippedValue: function (value, prefix, prefixLength, prevResult, delimiter, delimiters, noImmediatePrefix, tailPrefix, signBeforePrefix) {\n\t        // No prefix\n\t        if (prefixLength === 0) {\n\t          return value;\n\t        }\n\n\t        // Value is prefix\n\t        if (value === prefix && value !== '') {\n\t          return '';\n\t        }\n\n\t        if (signBeforePrefix && (value.slice(0, 1) == '-')) {\n\t            var prev = (prevResult.slice(0, 1) == '-') ? prevResult.slice(1) : prevResult;\n\t            return '-' + this.getPrefixStrippedValue(value.slice(1), prefix, prefixLength, prev, delimiter, delimiters, noImmediatePrefix, tailPrefix, signBeforePrefix);\n\t        }\n\n\t        // Pre result prefix string does not match pre-defined prefix\n\t        if (prevResult.slice(0, prefixLength) !== prefix && !tailPrefix) {\n\t            // Check if the first time user entered something\n\t            if (noImmediatePrefix && !prevResult && value) return value;\n\t            return '';\n\t        } else if (prevResult.slice(-prefixLength) !== prefix && tailPrefix) {\n\t            // Check if the first time user entered something\n\t            if (noImmediatePrefix && !prevResult && value) return value;\n\t            return '';\n\t        }\n\n\t        var prevValue = this.stripDelimiters(prevResult, delimiter, delimiters);\n\n\t        // New value has issue, someone typed in between prefix letters\n\t        // Revert to pre value\n\t        if (value.slice(0, prefixLength) !== prefix && !tailPrefix) {\n\t            return prevValue.slice(prefixLength);\n\t        } else if (value.slice(-prefixLength) !== prefix && tailPrefix) {\n\t            return prevValue.slice(0, -prefixLength - 1);\n\t        }\n\n\t        // No issue, strip prefix for new value\n\t        return tailPrefix ? value.slice(0, -prefixLength) : value.slice(prefixLength);\n\t    },\n\n\t    getFirstDiffIndex: function (prev, current) {\n\t        var index = 0;\n\n\t        while (prev.charAt(index) === current.charAt(index)) {\n\t            if (prev.charAt(index++) === '') {\n\t                return -1;\n\t            }\n\t        }\n\n\t        return index;\n\t    },\n\n\t    getFormattedValue: function (value, blocks, blocksLength, delimiter, delimiters, delimiterLazyShow) {\n\t        var result = '',\n\t            multipleDelimiters = delimiters.length > 0,\n\t            currentDelimiter = '';\n\n\t        // no options, normal input\n\t        if (blocksLength === 0) {\n\t            return value;\n\t        }\n\n\t        blocks.forEach(function (length, index) {\n\t            if (value.length > 0) {\n\t                var sub = value.slice(0, length),\n\t                    rest = value.slice(length);\n\n\t                if (multipleDelimiters) {\n\t                    currentDelimiter = delimiters[delimiterLazyShow ? (index - 1) : index] || currentDelimiter;\n\t                } else {\n\t                    currentDelimiter = delimiter;\n\t                }\n\n\t                if (delimiterLazyShow) {\n\t                    if (index > 0) {\n\t                        result += currentDelimiter;\n\t                    }\n\n\t                    result += sub;\n\t                } else {\n\t                    result += sub;\n\n\t                    if (sub.length === length && index < blocksLength - 1) {\n\t                        result += currentDelimiter;\n\t                    }\n\t                }\n\n\t                // update remaining string\n\t                value = rest;\n\t            }\n\t        });\n\n\t        return result;\n\t    },\n\n\t    // move cursor to the end\n\t    // the first time user focuses on an input with prefix\n\t    fixPrefixCursor: function (el, prefix, delimiter, delimiters) {\n\t        if (!el) {\n\t            return;\n\t        }\n\n\t        var val = el.value,\n\t            appendix = delimiter || (delimiters[0] || ' ');\n\n\t        if (!el.setSelectionRange || !prefix || (prefix.length + appendix.length) <= val.length) {\n\t            return;\n\t        }\n\n\t        var len = val.length * 2;\n\n\t        // set timeout to avoid blink\n\t        setTimeout(function () {\n\t            el.setSelectionRange(len, len);\n\t        }, 1);\n\t    },\n\n\t    // Check if input field is fully selected\n\t    checkFullSelection: function(value) {\n\t      try {\n\t        var selection = window.getSelection() || document.getSelection() || {};\n\t        return selection.toString().length === value.length;\n\t      } catch (ex) {\n\t        // Ignore\n\t      }\n\n\t      return false;\n\t    },\n\n\t    setSelection: function (element, position, doc) {\n\t        if (element !== this.getActiveElement(doc)) {\n\t            return;\n\t        }\n\n\t        // cursor is already in the end\n\t        if (element && element.value.length <= position) {\n\t          return;\n\t        }\n\n\t        if (element.createTextRange) {\n\t            var range = element.createTextRange();\n\n\t            range.move('character', position);\n\t            range.select();\n\t        } else {\n\t            try {\n\t                element.setSelectionRange(position, position);\n\t            } catch (e) {\n\t                // eslint-disable-next-line\n\t                console.warn('The input element type does not support selection');\n\t            }\n\t        }\n\t    },\n\n\t    getActiveElement: function(parent) {\n\t        var activeElement = parent.activeElement;\n\t        if (activeElement && activeElement.shadowRoot) {\n\t            return this.getActiveElement(activeElement.shadowRoot);\n\t        }\n\t        return activeElement;\n\t    },\n\n\t    isAndroid: function () {\n\t        return navigator && /android/i.test(navigator.userAgent);\n\t    },\n\n\t    // On Android chrome, the keyup and keydown events\n\t    // always return key code 229 as a composition that\n\t    // buffers the user’s keystrokes\n\t    // see https://github.com/nosir/cleave.js/issues/147\n\t    isAndroidBackspaceKeydown: function (lastInputValue, currentInputValue) {\n\t        if (!this.isAndroid() || !lastInputValue || !currentInputValue) {\n\t            return false;\n\t        }\n\n\t        return currentInputValue === lastInputValue.slice(0, -1);\n\t    }\n\t};\n\n\tmodule.exports = Util;\n\n\n/***/ }),\n/* 7 */\n/***/ (function(module, exports) {\n\n\t/* WEBPACK VAR INJECTION */(function(global) {'use strict';\n\n\t/**\n\t * Props Assignment\n\t *\n\t * Separate this, so react module can share the usage\n\t */\n\tvar DefaultProperties = {\n\t    // Maybe change to object-assign\n\t    // for now just keep it as simple\n\t    assign: function (target, opts) {\n\t        target = target || {};\n\t        opts = opts || {};\n\n\t        // credit card\n\t        target.creditCard = !!opts.creditCard;\n\t        target.creditCardStrictMode = !!opts.creditCardStrictMode;\n\t        target.creditCardType = '';\n\t        target.onCreditCardTypeChanged = opts.onCreditCardTypeChanged || (function () {});\n\n\t        // phone\n\t        target.phone = !!opts.phone;\n\t        target.phoneRegionCode = opts.phoneRegionCode || 'AU';\n\t        target.phoneFormatter = {};\n\n\t        // time\n\t        target.time = !!opts.time;\n\t        target.timePattern = opts.timePattern || ['h', 'm', 's'];\n\t        target.timeFormat = opts.timeFormat || '24';\n\t        target.timeFormatter = {};\n\n\t        // date\n\t        target.date = !!opts.date;\n\t        target.datePattern = opts.datePattern || ['d', 'm', 'Y'];\n\t        target.dateMin = opts.dateMin || '';\n\t        target.dateMax = opts.dateMax || '';\n\t        target.dateFormatter = {};\n\n\t        // numeral\n\t        target.numeral = !!opts.numeral;\n\t        target.numeralIntegerScale = opts.numeralIntegerScale > 0 ? opts.numeralIntegerScale : 0;\n\t        target.numeralDecimalScale = opts.numeralDecimalScale >= 0 ? opts.numeralDecimalScale : 2;\n\t        target.numeralDecimalMark = opts.numeralDecimalMark || '.';\n\t        target.numeralThousandsGroupStyle = opts.numeralThousandsGroupStyle || 'thousand';\n\t        target.numeralPositiveOnly = !!opts.numeralPositiveOnly;\n\t        target.stripLeadingZeroes = opts.stripLeadingZeroes !== false;\n\t        target.signBeforePrefix = !!opts.signBeforePrefix;\n\t        target.tailPrefix = !!opts.tailPrefix;\n\n\t        // others\n\t        target.swapHiddenInput = !!opts.swapHiddenInput;\n\t        \n\t        target.numericOnly = target.creditCard || target.date || !!opts.numericOnly;\n\n\t        target.uppercase = !!opts.uppercase;\n\t        target.lowercase = !!opts.lowercase;\n\n\t        target.prefix = (target.creditCard || target.date) ? '' : (opts.prefix || '');\n\t        target.noImmediatePrefix = !!opts.noImmediatePrefix;\n\t        target.prefixLength = target.prefix.length;\n\t        target.rawValueTrimPrefix = !!opts.rawValueTrimPrefix;\n\t        target.copyDelimiter = !!opts.copyDelimiter;\n\n\t        target.initValue = (opts.initValue !== undefined && opts.initValue !== null) ? opts.initValue.toString() : '';\n\n\t        target.delimiter =\n\t            (opts.delimiter || opts.delimiter === '') ? opts.delimiter :\n\t                (opts.date ? '/' :\n\t                    (opts.time ? ':' :\n\t                        (opts.numeral ? ',' :\n\t                            (opts.phone ? ' ' :\n\t                                ' '))));\n\t        target.delimiterLength = target.delimiter.length;\n\t        target.delimiterLazyShow = !!opts.delimiterLazyShow;\n\t        target.delimiters = opts.delimiters || [];\n\n\t        target.blocks = opts.blocks || [];\n\t        target.blocksLength = target.blocks.length;\n\n\t        target.root = (typeof global === 'object' && global) ? global : window;\n\t        target.document = opts.document || target.root.document;\n\n\t        target.maxLength = 0;\n\n\t        target.backspace = false;\n\t        target.result = '';\n\n\t        target.onValueChanged = opts.onValueChanged || (function () {});\n\n\t        return target;\n\t    }\n\t};\n\n\tmodule.exports = DefaultProperties;\n\n\t/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))\n\n/***/ })\n/******/ ])\n});\n;\n\n//# sourceURL=webpack://Materialize/./node_modules/cleave.js/dist/cleave.js?");
+{
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(true)
+		module.exports = factory();
+	else {}
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __nested_webpack_require_527__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __nested_webpack_require_527__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__nested_webpack_require_527__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__nested_webpack_require_527__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__nested_webpack_require_527__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __nested_webpack_require_527__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __nested_webpack_require_1728__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	/**
+	 * Construct a new Cleave instance by passing the configuration object
+	 *
+	 * @param {String | HTMLElement} element
+	 * @param {Object} opts
+	 */
+	var Cleave = function (element, opts) {
+	    var owner = this;
+	    var hasMultipleElements = false;
+
+	    if (typeof element === 'string') {
+	        owner.element = document.querySelector(element);
+	        hasMultipleElements = document.querySelectorAll(element).length > 1;
+	    } else {
+	      if (typeof element.length !== 'undefined' && element.length > 0) {
+	        owner.element = element[0];
+	        hasMultipleElements = element.length > 1;
+	      } else {
+	        owner.element = element;
+	      }
+	    }
+
+	    if (!owner.element) {
+	        throw new Error('[cleave.js] Please check the element');
+	    }
+
+	    if (hasMultipleElements) {
+	      try {
+	        // eslint-disable-next-line
+	        console.warn('[cleave.js] Multiple input fields matched, cleave.js will only take the first one.');
+	      } catch (e) {
+	        // Old IE
+	      }
+	    }
+
+	    opts.initValue = owner.element.value;
+
+	    owner.properties = Cleave.DefaultProperties.assign({}, opts);
+
+	    owner.init();
+	};
+
+	Cleave.prototype = {
+	    init: function () {
+	        var owner = this, pps = owner.properties;
+
+	        // no need to use this lib
+	        if (!pps.numeral && !pps.phone && !pps.creditCard && !pps.time && !pps.date && (pps.blocksLength === 0 && !pps.prefix)) {
+	            owner.onInput(pps.initValue);
+
+	            return;
+	        }
+
+	        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);
+
+	        owner.isAndroid = Cleave.Util.isAndroid();
+	        owner.lastInputValue = '';
+	        owner.isBackward = '';
+
+	        owner.onChangeListener = owner.onChange.bind(owner);
+	        owner.onKeyDownListener = owner.onKeyDown.bind(owner);
+	        owner.onFocusListener = owner.onFocus.bind(owner);
+	        owner.onCutListener = owner.onCut.bind(owner);
+	        owner.onCopyListener = owner.onCopy.bind(owner);
+
+	        owner.initSwapHiddenInput();
+
+	        owner.element.addEventListener('input', owner.onChangeListener);
+	        owner.element.addEventListener('keydown', owner.onKeyDownListener);
+	        owner.element.addEventListener('focus', owner.onFocusListener);
+	        owner.element.addEventListener('cut', owner.onCutListener);
+	        owner.element.addEventListener('copy', owner.onCopyListener);
+
+
+	        owner.initPhoneFormatter();
+	        owner.initDateFormatter();
+	        owner.initTimeFormatter();
+	        owner.initNumeralFormatter();
+
+	        // avoid touch input field if value is null
+	        // otherwise Firefox will add red box-shadow for <input required />
+	        if (pps.initValue || (pps.prefix && !pps.noImmediatePrefix)) {
+	            owner.onInput(pps.initValue);
+	        }
+	    },
+
+	    initSwapHiddenInput: function () {
+	        var owner = this, pps = owner.properties;
+	        if (!pps.swapHiddenInput) return;
+
+	        var inputFormatter = owner.element.cloneNode(true);
+	        owner.element.parentNode.insertBefore(inputFormatter, owner.element);
+
+	        owner.elementSwapHidden = owner.element;
+	        owner.elementSwapHidden.type = 'hidden';
+
+	        owner.element = inputFormatter;
+	        owner.element.id = '';
+	    },
+
+	    initNumeralFormatter: function () {
+	        var owner = this, pps = owner.properties;
+
+	        if (!pps.numeral) {
+	            return;
+	        }
+
+	        pps.numeralFormatter = new Cleave.NumeralFormatter(
+	            pps.numeralDecimalMark,
+	            pps.numeralIntegerScale,
+	            pps.numeralDecimalScale,
+	            pps.numeralThousandsGroupStyle,
+	            pps.numeralPositiveOnly,
+	            pps.stripLeadingZeroes,
+	            pps.prefix,
+	            pps.signBeforePrefix,
+	            pps.tailPrefix,
+	            pps.delimiter
+	        );
+	    },
+
+	    initTimeFormatter: function() {
+	        var owner = this, pps = owner.properties;
+
+	        if (!pps.time) {
+	            return;
+	        }
+
+	        pps.timeFormatter = new Cleave.TimeFormatter(pps.timePattern, pps.timeFormat);
+	        pps.blocks = pps.timeFormatter.getBlocks();
+	        pps.blocksLength = pps.blocks.length;
+	        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);
+	    },
+
+	    initDateFormatter: function () {
+	        var owner = this, pps = owner.properties;
+
+	        if (!pps.date) {
+	            return;
+	        }
+
+	        pps.dateFormatter = new Cleave.DateFormatter(pps.datePattern, pps.dateMin, pps.dateMax);
+	        pps.blocks = pps.dateFormatter.getBlocks();
+	        pps.blocksLength = pps.blocks.length;
+	        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);
+	    },
+
+	    initPhoneFormatter: function () {
+	        var owner = this, pps = owner.properties;
+
+	        if (!pps.phone) {
+	            return;
+	        }
+
+	        // Cleave.AsYouTypeFormatter should be provided by
+	        // external google closure lib
+	        try {
+	            pps.phoneFormatter = new Cleave.PhoneFormatter(
+	                new pps.root.Cleave.AsYouTypeFormatter(pps.phoneRegionCode),
+	                pps.delimiter
+	            );
+	        } catch (ex) {
+	            throw new Error('[cleave.js] Please include phone-type-formatter.{country}.js lib');
+	        }
+	    },
+
+	    onKeyDown: function (event) {
+	        var owner = this,
+	            charCode = event.which || event.keyCode;
+
+	        owner.lastInputValue = owner.element.value;
+	        owner.isBackward = charCode === 8;
+	    },
+
+	    onChange: function (event) {
+	        var owner = this, pps = owner.properties,
+	            Util = Cleave.Util;
+
+	        owner.isBackward = owner.isBackward || event.inputType === 'deleteContentBackward';
+
+	        var postDelimiter = Util.getPostDelimiter(owner.lastInputValue, pps.delimiter, pps.delimiters);
+
+	        if (owner.isBackward && postDelimiter) {
+	            pps.postDelimiterBackspace = postDelimiter;
+	        } else {
+	            pps.postDelimiterBackspace = false;
+	        }
+
+	        this.onInput(this.element.value);
+	    },
+
+	    onFocus: function () {
+	        var owner = this,
+	            pps = owner.properties;
+	        owner.lastInputValue = owner.element.value;
+
+	        if (pps.prefix && pps.noImmediatePrefix && !owner.element.value) {
+	            this.onInput(pps.prefix);
+	        }
+
+	        Cleave.Util.fixPrefixCursor(owner.element, pps.prefix, pps.delimiter, pps.delimiters);
+	    },
+
+	    onCut: function (e) {
+	        if (!Cleave.Util.checkFullSelection(this.element.value)) return;
+	        this.copyClipboardData(e);
+	        this.onInput('');
+	    },
+
+	    onCopy: function (e) {
+	        if (!Cleave.Util.checkFullSelection(this.element.value)) return;
+	        this.copyClipboardData(e);
+	    },
+
+	    copyClipboardData: function (e) {
+	        var owner = this,
+	            pps = owner.properties,
+	            Util = Cleave.Util,
+	            inputValue = owner.element.value,
+	            textToCopy = '';
+
+	        if (!pps.copyDelimiter) {
+	            textToCopy = Util.stripDelimiters(inputValue, pps.delimiter, pps.delimiters);
+	        } else {
+	            textToCopy = inputValue;
+	        }
+
+	        try {
+	            if (e.clipboardData) {
+	                e.clipboardData.setData('Text', textToCopy);
+	            } else {
+	                window.clipboardData.setData('Text', textToCopy);
+	            }
+
+	            e.preventDefault();
+	        } catch (ex) {
+	            //  empty
+	        }
+	    },
+
+	    onInput: function (value) {
+	        var owner = this, pps = owner.properties,
+	            Util = Cleave.Util;
+
+	        // case 1: delete one more character "4"
+	        // 1234*| -> hit backspace -> 123|
+	        // case 2: last character is not delimiter which is:
+	        // 12|34* -> hit backspace -> 1|34*
+	        // note: no need to apply this for numeral mode
+	        var postDelimiterAfter = Util.getPostDelimiter(value, pps.delimiter, pps.delimiters);
+	        if (!pps.numeral && pps.postDelimiterBackspace && !postDelimiterAfter) {
+	            value = Util.headStr(value, value.length - pps.postDelimiterBackspace.length);
+	        }
+
+	        // phone formatter
+	        if (pps.phone) {
+	            if (pps.prefix && (!pps.noImmediatePrefix || value.length)) {
+	                pps.result = pps.prefix + pps.phoneFormatter.format(value).slice(pps.prefix.length);
+	            } else {
+	                pps.result = pps.phoneFormatter.format(value);
+	            }
+	            owner.updateValueState();
+
+	            return;
+	        }
+
+	        // numeral formatter
+	        if (pps.numeral) {
+	            // Do not show prefix when noImmediatePrefix is specified
+	            // This mostly because we need to show user the native input placeholder
+	            if (pps.prefix && pps.noImmediatePrefix && value.length === 0) {
+	                pps.result = '';
+	            } else {
+	                pps.result = pps.numeralFormatter.format(value);
+	            }
+	            owner.updateValueState();
+
+	            return;
+	        }
+
+	        // date
+	        if (pps.date) {
+	            value = pps.dateFormatter.getValidatedDate(value);
+	        }
+
+	        // time
+	        if (pps.time) {
+	            value = pps.timeFormatter.getValidatedTime(value);
+	        }
+
+	        // strip delimiters
+	        value = Util.stripDelimiters(value, pps.delimiter, pps.delimiters);
+
+	        // strip prefix
+	        value = Util.getPrefixStrippedValue(value, pps.prefix, pps.prefixLength, pps.result, pps.delimiter, pps.delimiters, pps.noImmediatePrefix, pps.tailPrefix, pps.signBeforePrefix);
+
+	        // strip non-numeric characters
+	        value = pps.numericOnly ? Util.strip(value, /[^\d]/g) : value;
+
+	        // convert case
+	        value = pps.uppercase ? value.toUpperCase() : value;
+	        value = pps.lowercase ? value.toLowerCase() : value;
+
+	        // prevent from showing prefix when no immediate option enabled with empty input value
+	        if (pps.prefix) {
+	            if (pps.tailPrefix) {
+	                value = value + pps.prefix;
+	            } else {
+	                value = pps.prefix + value;
+	            }
+
+
+	            // no blocks specified, no need to do formatting
+	            if (pps.blocksLength === 0) {
+	                pps.result = value;
+	                owner.updateValueState();
+
+	                return;
+	            }
+	        }
+
+	        // update credit card props
+	        if (pps.creditCard) {
+	            owner.updateCreditCardPropsByValue(value);
+	        }
+
+	        // strip over length characters
+	        value = Util.headStr(value, pps.maxLength);
+
+	        // apply blocks
+	        pps.result = Util.getFormattedValue(
+	            value,
+	            pps.blocks, pps.blocksLength,
+	            pps.delimiter, pps.delimiters, pps.delimiterLazyShow
+	        );
+
+	        owner.updateValueState();
+	    },
+
+	    updateCreditCardPropsByValue: function (value) {
+	        var owner = this, pps = owner.properties,
+	            Util = Cleave.Util,
+	            creditCardInfo;
+
+	        // At least one of the first 4 characters has changed
+	        if (Util.headStr(pps.result, 4) === Util.headStr(value, 4)) {
+	            return;
+	        }
+
+	        creditCardInfo = Cleave.CreditCardDetector.getInfo(value, pps.creditCardStrictMode);
+
+	        pps.blocks = creditCardInfo.blocks;
+	        pps.blocksLength = pps.blocks.length;
+	        pps.maxLength = Util.getMaxLength(pps.blocks);
+
+	        // credit card type changed
+	        if (pps.creditCardType !== creditCardInfo.type) {
+	            pps.creditCardType = creditCardInfo.type;
+
+	            pps.onCreditCardTypeChanged.call(owner, pps.creditCardType);
+	        }
+	    },
+
+	    updateValueState: function () {
+	        var owner = this,
+	            Util = Cleave.Util,
+	            pps = owner.properties;
+
+	        if (!owner.element) {
+	            return;
+	        }
+
+	        var endPos = owner.element.selectionEnd;
+	        var oldValue = owner.element.value;
+	        var newValue = pps.result;
+
+	        endPos = Util.getNextCursorPosition(endPos, oldValue, newValue, pps.delimiter, pps.delimiters);
+
+	        // fix Android browser type="text" input field
+	        // cursor not jumping issue
+	        if (owner.isAndroid) {
+	            window.setTimeout(function () {
+	                owner.element.value = newValue;
+	                Util.setSelection(owner.element, endPos, pps.document, false);
+	                owner.callOnValueChanged();
+	            }, 1);
+
+	            return;
+	        }
+
+	        owner.element.value = newValue;
+	        if (pps.swapHiddenInput) owner.elementSwapHidden.value = owner.getRawValue();
+
+	        Util.setSelection(owner.element, endPos, pps.document, false);
+	        owner.callOnValueChanged();
+	    },
+
+	    callOnValueChanged: function () {
+	        var owner = this,
+	            pps = owner.properties;
+
+	        pps.onValueChanged.call(owner, {
+	            target: {
+	                name: owner.element.name,
+	                value: pps.result,
+	                rawValue: owner.getRawValue()
+	            }
+	        });
+	    },
+
+	    setPhoneRegionCode: function (phoneRegionCode) {
+	        var owner = this, pps = owner.properties;
+
+	        pps.phoneRegionCode = phoneRegionCode;
+	        owner.initPhoneFormatter();
+	        owner.onChange();
+	    },
+
+	    setRawValue: function (value) {
+	        var owner = this, pps = owner.properties;
+
+	        value = value !== undefined && value !== null ? value.toString() : '';
+
+	        if (pps.numeral) {
+	            value = value.replace('.', pps.numeralDecimalMark);
+	        }
+
+	        pps.postDelimiterBackspace = false;
+
+	        owner.element.value = value;
+	        owner.onInput(value);
+	    },
+
+	    getRawValue: function () {
+	        var owner = this,
+	            pps = owner.properties,
+	            Util = Cleave.Util,
+	            rawValue = owner.element.value;
+
+	        if (pps.rawValueTrimPrefix) {
+	            rawValue = Util.getPrefixStrippedValue(rawValue, pps.prefix, pps.prefixLength, pps.result, pps.delimiter, pps.delimiters, pps.noImmediatePrefix, pps.tailPrefix, pps.signBeforePrefix);
+	        }
+
+	        if (pps.numeral) {
+	            rawValue = pps.numeralFormatter.getRawValue(rawValue);
+	        } else {
+	            rawValue = Util.stripDelimiters(rawValue, pps.delimiter, pps.delimiters);
+	        }
+
+	        return rawValue;
+	    },
+
+	    getISOFormatDate: function () {
+	        var owner = this,
+	            pps = owner.properties;
+
+	        return pps.date ? pps.dateFormatter.getISOFormatDate() : '';
+	    },
+
+	    getISOFormatTime: function () {
+	        var owner = this,
+	            pps = owner.properties;
+
+	        return pps.time ? pps.timeFormatter.getISOFormatTime() : '';
+	    },
+
+	    getFormattedValue: function () {
+	        return this.element.value;
+	    },
+
+	    destroy: function () {
+	        var owner = this;
+
+	        owner.element.removeEventListener('input', owner.onChangeListener);
+	        owner.element.removeEventListener('keydown', owner.onKeyDownListener);
+	        owner.element.removeEventListener('focus', owner.onFocusListener);
+	        owner.element.removeEventListener('cut', owner.onCutListener);
+	        owner.element.removeEventListener('copy', owner.onCopyListener);
+	    },
+
+	    toString: function () {
+	        return '[Cleave Object]';
+	    }
+	};
+
+	Cleave.NumeralFormatter = __nested_webpack_require_1728__(1);
+	Cleave.DateFormatter = __nested_webpack_require_1728__(2);
+	Cleave.TimeFormatter = __nested_webpack_require_1728__(3);
+	Cleave.PhoneFormatter = __nested_webpack_require_1728__(4);
+	Cleave.CreditCardDetector = __nested_webpack_require_1728__(5);
+	Cleave.Util = __nested_webpack_require_1728__(6);
+	Cleave.DefaultProperties = __nested_webpack_require_1728__(7);
+
+	// for angular directive
+	((typeof global === 'object' && global) ? global : window)['Cleave'] = Cleave;
+
+	// CommonJS
+	module.exports = Cleave;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	var NumeralFormatter = function (numeralDecimalMark,
+	                                 numeralIntegerScale,
+	                                 numeralDecimalScale,
+	                                 numeralThousandsGroupStyle,
+	                                 numeralPositiveOnly,
+	                                 stripLeadingZeroes,
+	                                 prefix,
+	                                 signBeforePrefix,
+	                                 tailPrefix,
+	                                 delimiter) {
+	    var owner = this;
+
+	    owner.numeralDecimalMark = numeralDecimalMark || '.';
+	    owner.numeralIntegerScale = numeralIntegerScale > 0 ? numeralIntegerScale : 0;
+	    owner.numeralDecimalScale = numeralDecimalScale >= 0 ? numeralDecimalScale : 2;
+	    owner.numeralThousandsGroupStyle = numeralThousandsGroupStyle || NumeralFormatter.groupStyle.thousand;
+	    owner.numeralPositiveOnly = !!numeralPositiveOnly;
+	    owner.stripLeadingZeroes = stripLeadingZeroes !== false;
+	    owner.prefix = (prefix || prefix === '') ? prefix : '';
+	    owner.signBeforePrefix = !!signBeforePrefix;
+	    owner.tailPrefix = !!tailPrefix;
+	    owner.delimiter = (delimiter || delimiter === '') ? delimiter : ',';
+	    owner.delimiterRE = delimiter ? new RegExp('\\' + delimiter, 'g') : '';
+	};
+
+	NumeralFormatter.groupStyle = {
+	    thousand: 'thousand',
+	    lakh:     'lakh',
+	    wan:      'wan',
+	    none:     'none'    
+	};
+
+	NumeralFormatter.prototype = {
+	    getRawValue: function (value) {
+	        return value.replace(this.delimiterRE, '').replace(this.numeralDecimalMark, '.');
+	    },
+
+	    format: function (value) {
+	        var owner = this, parts, partSign, partSignAndPrefix, partInteger, partDecimal = '';
+
+	        // strip alphabet letters
+	        value = value.replace(/[A-Za-z]/g, '')
+	            // replace the first decimal mark with reserved placeholder
+	            .replace(owner.numeralDecimalMark, 'M')
+
+	            // strip non numeric letters except minus and "M"
+	            // this is to ensure prefix has been stripped
+	            .replace(/[^\dM-]/g, '')
+
+	            // replace the leading minus with reserved placeholder
+	            .replace(/^\-/, 'N')
+
+	            // strip the other minus sign (if present)
+	            .replace(/\-/g, '')
+
+	            // replace the minus sign (if present)
+	            .replace('N', owner.numeralPositiveOnly ? '' : '-')
+
+	            // replace decimal mark
+	            .replace('M', owner.numeralDecimalMark);
+
+	        // strip any leading zeros
+	        if (owner.stripLeadingZeroes) {
+	            value = value.replace(/^(-)?0+(?=\d)/, '$1');
+	        }
+
+	        partSign = value.slice(0, 1) === '-' ? '-' : '';
+	        if (typeof owner.prefix != 'undefined') {
+	            if (owner.signBeforePrefix) {
+	                partSignAndPrefix = partSign + owner.prefix;
+	            } else {
+	                partSignAndPrefix = owner.prefix + partSign;
+	            }
+	        } else {
+	            partSignAndPrefix = partSign;
+	        }
+	        
+	        partInteger = value;
+
+	        if (value.indexOf(owner.numeralDecimalMark) >= 0) {
+	            parts = value.split(owner.numeralDecimalMark);
+	            partInteger = parts[0];
+	            partDecimal = owner.numeralDecimalMark + parts[1].slice(0, owner.numeralDecimalScale);
+	        }
+
+	        if(partSign === '-') {
+	            partInteger = partInteger.slice(1);
+	        }
+
+	        if (owner.numeralIntegerScale > 0) {
+	          partInteger = partInteger.slice(0, owner.numeralIntegerScale);
+	        }
+
+	        switch (owner.numeralThousandsGroupStyle) {
+	        case NumeralFormatter.groupStyle.lakh:
+	            partInteger = partInteger.replace(/(\d)(?=(\d\d)+\d$)/g, '$1' + owner.delimiter);
+
+	            break;
+
+	        case NumeralFormatter.groupStyle.wan:
+	            partInteger = partInteger.replace(/(\d)(?=(\d{4})+$)/g, '$1' + owner.delimiter);
+
+	            break;
+
+	        case NumeralFormatter.groupStyle.thousand:
+	            partInteger = partInteger.replace(/(\d)(?=(\d{3})+$)/g, '$1' + owner.delimiter);
+
+	            break;
+	        }
+
+	        if (owner.tailPrefix) {
+	            return partSign + partInteger.toString() + (owner.numeralDecimalScale > 0 ? partDecimal.toString() : '') + owner.prefix;
+	        }
+
+	        return partSignAndPrefix + partInteger.toString() + (owner.numeralDecimalScale > 0 ? partDecimal.toString() : '');
+	    }
+	};
+
+	module.exports = NumeralFormatter;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	var DateFormatter = function (datePattern, dateMin, dateMax) {
+	    var owner = this;
+
+	    owner.date = [];
+	    owner.blocks = [];
+	    owner.datePattern = datePattern;
+	    owner.dateMin = dateMin
+	      .split('-')
+	      .reverse()
+	      .map(function(x) {
+	        return parseInt(x, 10);
+	      });
+	    if (owner.dateMin.length === 2) owner.dateMin.unshift(0);
+
+	    owner.dateMax = dateMax
+	      .split('-')
+	      .reverse()
+	      .map(function(x) {
+	        return parseInt(x, 10);
+	      });
+	    if (owner.dateMax.length === 2) owner.dateMax.unshift(0);
+	    
+	    owner.initBlocks();
+	};
+
+	DateFormatter.prototype = {
+	    initBlocks: function () {
+	        var owner = this;
+	        owner.datePattern.forEach(function (value) {
+	            if (value === 'Y') {
+	                owner.blocks.push(4);
+	            } else {
+	                owner.blocks.push(2);
+	            }
+	        });
+	    },
+
+	    getISOFormatDate: function () {
+	        var owner = this,
+	            date = owner.date;
+
+	        return date[2] ? (
+	            date[2] + '-' + owner.addLeadingZero(date[1]) + '-' + owner.addLeadingZero(date[0])
+	        ) : '';
+	    },
+
+	    getBlocks: function () {
+	        return this.blocks;
+	    },
+
+	    getValidatedDate: function (value) {
+	        var owner = this, result = '';
+
+	        value = value.replace(/[^\d]/g, '');
+
+	        owner.blocks.forEach(function (length, index) {
+	            if (value.length > 0) {
+	                var sub = value.slice(0, length),
+	                    sub0 = sub.slice(0, 1),
+	                    rest = value.slice(length);
+
+	                switch (owner.datePattern[index]) {
+	                case 'd':
+	                    if (sub === '00') {
+	                        sub = '01';
+	                    } else if (parseInt(sub0, 10) > 3) {
+	                        sub = '0' + sub0;
+	                    } else if (parseInt(sub, 10) > 31) {
+	                        sub = '31';
+	                    }
+
+	                    break;
+
+	                case 'm':
+	                    if (sub === '00') {
+	                        sub = '01';
+	                    } else if (parseInt(sub0, 10) > 1) {
+	                        sub = '0' + sub0;
+	                    } else if (parseInt(sub, 10) > 12) {
+	                        sub = '12';
+	                    }
+
+	                    break;
+	                }
+
+	                result += sub;
+
+	                // update remaining string
+	                value = rest;
+	            }
+	        });
+
+	        return this.getFixedDateString(result);
+	    },
+
+	    getFixedDateString: function (value) {
+	        var owner = this, datePattern = owner.datePattern, date = [],
+	            dayIndex = 0, monthIndex = 0, yearIndex = 0,
+	            dayStartIndex = 0, monthStartIndex = 0, yearStartIndex = 0,
+	            day, month, year, fullYearDone = false;
+
+	        // mm-dd || dd-mm
+	        if (value.length === 4 && datePattern[0].toLowerCase() !== 'y' && datePattern[1].toLowerCase() !== 'y') {
+	            dayStartIndex = datePattern[0] === 'd' ? 0 : 2;
+	            monthStartIndex = 2 - dayStartIndex;
+	            day = parseInt(value.slice(dayStartIndex, dayStartIndex + 2), 10);
+	            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
+
+	            date = this.getFixedDate(day, month, 0);
+	        }
+
+	        // yyyy-mm-dd || yyyy-dd-mm || mm-dd-yyyy || dd-mm-yyyy || dd-yyyy-mm || mm-yyyy-dd
+	        if (value.length === 8) {
+	            datePattern.forEach(function (type, index) {
+	                switch (type) {
+	                case 'd':
+	                    dayIndex = index;
+	                    break;
+	                case 'm':
+	                    monthIndex = index;
+	                    break;
+	                default:
+	                    yearIndex = index;
+	                    break;
+	                }
+	            });
+
+	            yearStartIndex = yearIndex * 2;
+	            dayStartIndex = (dayIndex <= yearIndex) ? dayIndex * 2 : (dayIndex * 2 + 2);
+	            monthStartIndex = (monthIndex <= yearIndex) ? monthIndex * 2 : (monthIndex * 2 + 2);
+
+	            day = parseInt(value.slice(dayStartIndex, dayStartIndex + 2), 10);
+	            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
+	            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 4), 10);
+
+	            fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length === 4;
+
+	            date = this.getFixedDate(day, month, year);
+	        }
+
+	        // mm-yy || yy-mm
+	        if (value.length === 4 && (datePattern[0] === 'y' || datePattern[1] === 'y')) {
+	            monthStartIndex = datePattern[0] === 'm' ? 0 : 2;
+	            yearStartIndex = 2 - monthStartIndex;
+	            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
+	            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 2), 10);
+
+	            fullYearDone = value.slice(yearStartIndex, yearStartIndex + 2).length === 2;
+
+	            date = [0, month, year];
+	        }
+
+	        // mm-yyyy || yyyy-mm
+	        if (value.length === 6 && (datePattern[0] === 'Y' || datePattern[1] === 'Y')) {
+	            monthStartIndex = datePattern[0] === 'm' ? 0 : 4;
+	            yearStartIndex = 2 - 0.5 * monthStartIndex;
+	            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
+	            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 4), 10);
+
+	            fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length === 4;
+
+	            date = [0, month, year];
+	        }
+
+	        date = owner.getRangeFixedDate(date);
+	        owner.date = date;
+
+	        var result = date.length === 0 ? value : datePattern.reduce(function (previous, current) {
+	            switch (current) {
+	            case 'd':
+	                return previous + (date[0] === 0 ? '' : owner.addLeadingZero(date[0]));
+	            case 'm':
+	                return previous + (date[1] === 0 ? '' : owner.addLeadingZero(date[1]));
+	            case 'y':
+	                return previous + (fullYearDone ? owner.addLeadingZeroForYear(date[2], false) : '');
+	            case 'Y':
+	                return previous + (fullYearDone ? owner.addLeadingZeroForYear(date[2], true) : '');
+	            }
+	        }, '');
+
+	        return result;
+	    },
+
+	    getRangeFixedDate: function (date) {
+	        var owner = this,
+	            datePattern = owner.datePattern,
+	            dateMin = owner.dateMin || [],
+	            dateMax = owner.dateMax || [];
+
+	        if (!date.length || (dateMin.length < 3 && dateMax.length < 3)) return date;
+
+	        if (
+	          datePattern.find(function(x) {
+	            return x.toLowerCase() === 'y';
+	          }) &&
+	          date[2] === 0
+	        ) return date;
+
+	        if (dateMax.length && (dateMax[2] < date[2] || (
+	          dateMax[2] === date[2] && (dateMax[1] < date[1] || (
+	            dateMax[1] === date[1] && dateMax[0] < date[0]
+	          ))
+	        ))) return dateMax;
+
+	        if (dateMin.length && (dateMin[2] > date[2] || (
+	          dateMin[2] === date[2] && (dateMin[1] > date[1] || (
+	            dateMin[1] === date[1] && dateMin[0] > date[0]
+	          ))
+	        ))) return dateMin;
+
+	        return date;
+	    },
+
+	    getFixedDate: function (day, month, year) {
+	        day = Math.min(day, 31);
+	        month = Math.min(month, 12);
+	        year = parseInt((year || 0), 10);
+
+	        if ((month < 7 && month % 2 === 0) || (month > 8 && month % 2 === 1)) {
+	            day = Math.min(day, month === 2 ? (this.isLeapYear(year) ? 29 : 28) : 30);
+	        }
+
+	        return [day, month, year];
+	    },
+
+	    isLeapYear: function (year) {
+	        return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
+	    },
+
+	    addLeadingZero: function (number) {
+	        return (number < 10 ? '0' : '') + number;
+	    },
+
+	    addLeadingZeroForYear: function (number, fullYearMode) {
+	        if (fullYearMode) {
+	            return (number < 10 ? '000' : (number < 100 ? '00' : (number < 1000 ? '0' : ''))) + number;
+	        }
+
+	        return (number < 10 ? '0' : '') + number;
+	    }
+	};
+
+	module.exports = DateFormatter;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	var TimeFormatter = function (timePattern, timeFormat) {
+	    var owner = this;
+
+	    owner.time = [];
+	    owner.blocks = [];
+	    owner.timePattern = timePattern;
+	    owner.timeFormat = timeFormat;
+	    owner.initBlocks();
+	};
+
+	TimeFormatter.prototype = {
+	    initBlocks: function () {
+	        var owner = this;
+	        owner.timePattern.forEach(function () {
+	            owner.blocks.push(2);
+	        });
+	    },
+
+	    getISOFormatTime: function () {
+	        var owner = this,
+	            time = owner.time;
+
+	        return time[2] ? (
+	            owner.addLeadingZero(time[0]) + ':' + owner.addLeadingZero(time[1]) + ':' + owner.addLeadingZero(time[2])
+	        ) : '';
+	    },
+
+	    getBlocks: function () {
+	        return this.blocks;
+	    },
+
+	    getTimeFormatOptions: function () {
+	        var owner = this;
+	        if (String(owner.timeFormat) === '12') {
+	            return {
+	                maxHourFirstDigit: 1,
+	                maxHours: 12,
+	                maxMinutesFirstDigit: 5,
+	                maxMinutes: 60
+	            };
+	        }
+
+	        return {
+	            maxHourFirstDigit: 2,
+	            maxHours: 23,
+	            maxMinutesFirstDigit: 5,
+	            maxMinutes: 60
+	        };
+	    },
+
+	    getValidatedTime: function (value) {
+	        var owner = this, result = '';
+
+	        value = value.replace(/[^\d]/g, '');
+
+	        var timeFormatOptions = owner.getTimeFormatOptions();
+
+	        owner.blocks.forEach(function (length, index) {
+	            if (value.length > 0) {
+	                var sub = value.slice(0, length),
+	                    sub0 = sub.slice(0, 1),
+	                    rest = value.slice(length);
+
+	                switch (owner.timePattern[index]) {
+
+	                case 'h':
+	                    if (parseInt(sub0, 10) > timeFormatOptions.maxHourFirstDigit) {
+	                        sub = '0' + sub0;
+	                    } else if (parseInt(sub, 10) > timeFormatOptions.maxHours) {
+	                        sub = timeFormatOptions.maxHours + '';
+	                    }
+
+	                    break;
+
+	                case 'm':
+	                case 's':
+	                    if (parseInt(sub0, 10) > timeFormatOptions.maxMinutesFirstDigit) {
+	                        sub = '0' + sub0;
+	                    } else if (parseInt(sub, 10) > timeFormatOptions.maxMinutes) {
+	                        sub = timeFormatOptions.maxMinutes + '';
+	                    }
+	                    break;
+	                }
+
+	                result += sub;
+
+	                // update remaining string
+	                value = rest;
+	            }
+	        });
+
+	        return this.getFixedTimeString(result);
+	    },
+
+	    getFixedTimeString: function (value) {
+	        var owner = this, timePattern = owner.timePattern, time = [],
+	            secondIndex = 0, minuteIndex = 0, hourIndex = 0,
+	            secondStartIndex = 0, minuteStartIndex = 0, hourStartIndex = 0,
+	            second, minute, hour;
+
+	        if (value.length === 6) {
+	            timePattern.forEach(function (type, index) {
+	                switch (type) {
+	                case 's':
+	                    secondIndex = index * 2;
+	                    break;
+	                case 'm':
+	                    minuteIndex = index * 2;
+	                    break;
+	                case 'h':
+	                    hourIndex = index * 2;
+	                    break;
+	                }
+	            });
+
+	            hourStartIndex = hourIndex;
+	            minuteStartIndex = minuteIndex;
+	            secondStartIndex = secondIndex;
+
+	            second = parseInt(value.slice(secondStartIndex, secondStartIndex + 2), 10);
+	            minute = parseInt(value.slice(minuteStartIndex, minuteStartIndex + 2), 10);
+	            hour = parseInt(value.slice(hourStartIndex, hourStartIndex + 2), 10);
+
+	            time = this.getFixedTime(hour, minute, second);
+	        }
+
+	        if (value.length === 4 && owner.timePattern.indexOf('s') < 0) {
+	            timePattern.forEach(function (type, index) {
+	                switch (type) {
+	                case 'm':
+	                    minuteIndex = index * 2;
+	                    break;
+	                case 'h':
+	                    hourIndex = index * 2;
+	                    break;
+	                }
+	            });
+
+	            hourStartIndex = hourIndex;
+	            minuteStartIndex = minuteIndex;
+
+	            second = 0;
+	            minute = parseInt(value.slice(minuteStartIndex, minuteStartIndex + 2), 10);
+	            hour = parseInt(value.slice(hourStartIndex, hourStartIndex + 2), 10);
+
+	            time = this.getFixedTime(hour, minute, second);
+	        }
+
+	        owner.time = time;
+
+	        return time.length === 0 ? value : timePattern.reduce(function (previous, current) {
+	            switch (current) {
+	            case 's':
+	                return previous + owner.addLeadingZero(time[2]);
+	            case 'm':
+	                return previous + owner.addLeadingZero(time[1]);
+	            case 'h':
+	                return previous + owner.addLeadingZero(time[0]);
+	            }
+	        }, '');
+	    },
+
+	    getFixedTime: function (hour, minute, second) {
+	        second = Math.min(parseInt(second || 0, 10), 60);
+	        minute = Math.min(minute, 60);
+	        hour = Math.min(hour, 60);
+
+	        return [hour, minute, second];
+	    },
+
+	    addLeadingZero: function (number) {
+	        return (number < 10 ? '0' : '') + number;
+	    }
+	};
+
+	module.exports = TimeFormatter;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	var PhoneFormatter = function (formatter, delimiter) {
+	    var owner = this;
+
+	    owner.delimiter = (delimiter || delimiter === '') ? delimiter : ' ';
+	    owner.delimiterRE = delimiter ? new RegExp('\\' + delimiter, 'g') : '';
+
+	    owner.formatter = formatter;
+	};
+
+	PhoneFormatter.prototype = {
+	    setFormatter: function (formatter) {
+	        this.formatter = formatter;
+	    },
+
+	    format: function (phoneNumber) {
+	        var owner = this;
+
+	        owner.formatter.clear();
+
+	        // only keep number and +
+	        phoneNumber = phoneNumber.replace(/[^\d+]/g, '');
+
+	        // strip non-leading +
+	        phoneNumber = phoneNumber.replace(/^\+/, 'B').replace(/\+/g, '').replace('B', '+');
+
+	        // strip delimiter
+	        phoneNumber = phoneNumber.replace(owner.delimiterRE, '');
+
+	        var result = '', current, validated = false;
+
+	        for (var i = 0, iMax = phoneNumber.length; i < iMax; i++) {
+	            current = owner.formatter.inputDigit(phoneNumber.charAt(i));
+
+	            // has ()- or space inside
+	            if (/[\s()-]/g.test(current)) {
+	                result = current;
+
+	                validated = true;
+	            } else {
+	                if (!validated) {
+	                    result = current;
+	                }
+	                // else: over length input
+	                // it turns to invalid number again
+	            }
+	        }
+
+	        // strip ()
+	        // e.g. US: 7161234567 returns (716) 123-4567
+	        result = result.replace(/[()]/g, '');
+	        // replace library delimiter with user customized delimiter
+	        result = result.replace(/[\s-]/g, owner.delimiter);
+
+	        return result;
+	    }
+	};
+
+	module.exports = PhoneFormatter;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	var CreditCardDetector = {
+	    blocks: {
+	        uatp:          [4, 5, 6],
+	        amex:          [4, 6, 5],
+	        diners:        [4, 6, 4],
+	        discover:      [4, 4, 4, 4],
+	        mastercard:    [4, 4, 4, 4],
+	        dankort:       [4, 4, 4, 4],
+	        instapayment:  [4, 4, 4, 4],
+	        jcb15:         [4, 6, 5],
+	        jcb:           [4, 4, 4, 4],
+	        maestro:       [4, 4, 4, 4],
+	        visa:          [4, 4, 4, 4],
+	        mir:           [4, 4, 4, 4],
+	        unionPay:      [4, 4, 4, 4],
+	        general:       [4, 4, 4, 4]
+	    },
+
+	    re: {
+	        // starts with 1; 15 digits, not starts with 1800 (jcb card)
+	        uatp: /^(?!1800)1\d{0,14}/,
+
+	        // starts with 34/37; 15 digits
+	        amex: /^3[47]\d{0,13}/,
+
+	        // starts with 6011/65/644-649; 16 digits
+	        discover: /^(?:6011|65\d{0,2}|64[4-9]\d?)\d{0,12}/,
+
+	        // starts with 300-305/309 or 36/38/39; 14 digits
+	        diners: /^3(?:0([0-5]|9)|[689]\d?)\d{0,11}/,
+
+	        // starts with 51-55/2221–2720; 16 digits
+	        mastercard: /^(5[1-5]\d{0,2}|22[2-9]\d{0,1}|2[3-7]\d{0,2})\d{0,12}/,
+
+	        // starts with 5019/4175/4571; 16 digits
+	        dankort: /^(5019|4175|4571)\d{0,12}/,
+
+	        // starts with 637-639; 16 digits
+	        instapayment: /^63[7-9]\d{0,13}/,
+
+	        // starts with 2131/1800; 15 digits
+	        jcb15: /^(?:2131|1800)\d{0,11}/,
+
+	        // starts with 2131/1800/35; 16 digits
+	        jcb: /^(?:35\d{0,2})\d{0,12}/,
+
+	        // starts with 50/56-58/6304/67; 16 digits
+	        maestro: /^(?:5[0678]\d{0,2}|6304|67\d{0,2})\d{0,12}/,
+
+	        // starts with 22; 16 digits
+	        mir: /^220[0-4]\d{0,12}/,
+
+	        // starts with 4; 16 digits
+	        visa: /^4\d{0,15}/,
+
+	        // starts with 62/81; 16 digits
+	        unionPay: /^(62|81)\d{0,14}/
+	    },
+
+	    getStrictBlocks: function (block) {
+	      var total = block.reduce(function (prev, current) {
+	        return prev + current;
+	      }, 0);
+
+	      return block.concat(19 - total);
+	    },
+
+	    getInfo: function (value, strictMode) {
+	        var blocks = CreditCardDetector.blocks,
+	            re = CreditCardDetector.re;
+
+	        // Some credit card can have up to 19 digits number.
+	        // Set strictMode to true will remove the 16 max-length restrain,
+	        // however, I never found any website validate card number like
+	        // this, hence probably you don't want to enable this option.
+	        strictMode = !!strictMode;
+
+	        for (var key in re) {
+	            if (re[key].test(value)) {
+	                var matchedBlocks = blocks[key];
+	                return {
+	                    type: key,
+	                    blocks: strictMode ? this.getStrictBlocks(matchedBlocks) : matchedBlocks
+	                };
+	            }
+	        }
+
+	        return {
+	            type: 'unknown',
+	            blocks: strictMode ? this.getStrictBlocks(blocks.general) : blocks.general
+	        };
+	    }
+	};
+
+	module.exports = CreditCardDetector;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	var Util = {
+	    noop: function () {
+	    },
+
+	    strip: function (value, re) {
+	        return value.replace(re, '');
+	    },
+
+	    getPostDelimiter: function (value, delimiter, delimiters) {
+	        // single delimiter
+	        if (delimiters.length === 0) {
+	            return value.slice(-delimiter.length) === delimiter ? delimiter : '';
+	        }
+
+	        // multiple delimiters
+	        var matchedDelimiter = '';
+	        delimiters.forEach(function (current) {
+	            if (value.slice(-current.length) === current) {
+	                matchedDelimiter = current;
+	            }
+	        });
+
+	        return matchedDelimiter;
+	    },
+
+	    getDelimiterREByDelimiter: function (delimiter) {
+	        return new RegExp(delimiter.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g');
+	    },
+
+	    getNextCursorPosition: function (prevPos, oldValue, newValue, delimiter, delimiters) {
+	      // If cursor was at the end of value, just place it back.
+	      // Because new value could contain additional chars.
+	      if (oldValue.length === prevPos) {
+	          return newValue.length;
+	      }
+
+	      return prevPos + this.getPositionOffset(prevPos, oldValue, newValue, delimiter ,delimiters);
+	    },
+
+	    getPositionOffset: function (prevPos, oldValue, newValue, delimiter, delimiters) {
+	        var oldRawValue, newRawValue, lengthOffset;
+
+	        oldRawValue = this.stripDelimiters(oldValue.slice(0, prevPos), delimiter, delimiters);
+	        newRawValue = this.stripDelimiters(newValue.slice(0, prevPos), delimiter, delimiters);
+	        lengthOffset = oldRawValue.length - newRawValue.length;
+
+	        return (lengthOffset !== 0) ? (lengthOffset / Math.abs(lengthOffset)) : 0;
+	    },
+
+	    stripDelimiters: function (value, delimiter, delimiters) {
+	        var owner = this;
+
+	        // single delimiter
+	        if (delimiters.length === 0) {
+	            var delimiterRE = delimiter ? owner.getDelimiterREByDelimiter(delimiter) : '';
+
+	            return value.replace(delimiterRE, '');
+	        }
+
+	        // multiple delimiters
+	        delimiters.forEach(function (current) {
+	            current.split('').forEach(function (letter) {
+	                value = value.replace(owner.getDelimiterREByDelimiter(letter), '');
+	            });
+	        });
+
+	        return value;
+	    },
+
+	    headStr: function (str, length) {
+	        return str.slice(0, length);
+	    },
+
+	    getMaxLength: function (blocks) {
+	        return blocks.reduce(function (previous, current) {
+	            return previous + current;
+	        }, 0);
+	    },
+
+	    // strip prefix
+	    // Before type  |   After type    |     Return value
+	    // PEFIX-...    |   PEFIX-...     |     ''
+	    // PREFIX-123   |   PEFIX-123     |     123
+	    // PREFIX-123   |   PREFIX-23     |     23
+	    // PREFIX-123   |   PREFIX-1234   |     1234
+	    getPrefixStrippedValue: function (value, prefix, prefixLength, prevResult, delimiter, delimiters, noImmediatePrefix, tailPrefix, signBeforePrefix) {
+	        // No prefix
+	        if (prefixLength === 0) {
+	          return value;
+	        }
+
+	        // Value is prefix
+	        if (value === prefix && value !== '') {
+	          return '';
+	        }
+
+	        if (signBeforePrefix && (value.slice(0, 1) == '-')) {
+	            var prev = (prevResult.slice(0, 1) == '-') ? prevResult.slice(1) : prevResult;
+	            return '-' + this.getPrefixStrippedValue(value.slice(1), prefix, prefixLength, prev, delimiter, delimiters, noImmediatePrefix, tailPrefix, signBeforePrefix);
+	        }
+
+	        // Pre result prefix string does not match pre-defined prefix
+	        if (prevResult.slice(0, prefixLength) !== prefix && !tailPrefix) {
+	            // Check if the first time user entered something
+	            if (noImmediatePrefix && !prevResult && value) return value;
+	            return '';
+	        } else if (prevResult.slice(-prefixLength) !== prefix && tailPrefix) {
+	            // Check if the first time user entered something
+	            if (noImmediatePrefix && !prevResult && value) return value;
+	            return '';
+	        }
+
+	        var prevValue = this.stripDelimiters(prevResult, delimiter, delimiters);
+
+	        // New value has issue, someone typed in between prefix letters
+	        // Revert to pre value
+	        if (value.slice(0, prefixLength) !== prefix && !tailPrefix) {
+	            return prevValue.slice(prefixLength);
+	        } else if (value.slice(-prefixLength) !== prefix && tailPrefix) {
+	            return prevValue.slice(0, -prefixLength - 1);
+	        }
+
+	        // No issue, strip prefix for new value
+	        return tailPrefix ? value.slice(0, -prefixLength) : value.slice(prefixLength);
+	    },
+
+	    getFirstDiffIndex: function (prev, current) {
+	        var index = 0;
+
+	        while (prev.charAt(index) === current.charAt(index)) {
+	            if (prev.charAt(index++) === '') {
+	                return -1;
+	            }
+	        }
+
+	        return index;
+	    },
+
+	    getFormattedValue: function (value, blocks, blocksLength, delimiter, delimiters, delimiterLazyShow) {
+	        var result = '',
+	            multipleDelimiters = delimiters.length > 0,
+	            currentDelimiter = '';
+
+	        // no options, normal input
+	        if (blocksLength === 0) {
+	            return value;
+	        }
+
+	        blocks.forEach(function (length, index) {
+	            if (value.length > 0) {
+	                var sub = value.slice(0, length),
+	                    rest = value.slice(length);
+
+	                if (multipleDelimiters) {
+	                    currentDelimiter = delimiters[delimiterLazyShow ? (index - 1) : index] || currentDelimiter;
+	                } else {
+	                    currentDelimiter = delimiter;
+	                }
+
+	                if (delimiterLazyShow) {
+	                    if (index > 0) {
+	                        result += currentDelimiter;
+	                    }
+
+	                    result += sub;
+	                } else {
+	                    result += sub;
+
+	                    if (sub.length === length && index < blocksLength - 1) {
+	                        result += currentDelimiter;
+	                    }
+	                }
+
+	                // update remaining string
+	                value = rest;
+	            }
+	        });
+
+	        return result;
+	    },
+
+	    // move cursor to the end
+	    // the first time user focuses on an input with prefix
+	    fixPrefixCursor: function (el, prefix, delimiter, delimiters) {
+	        if (!el) {
+	            return;
+	        }
+
+	        var val = el.value,
+	            appendix = delimiter || (delimiters[0] || ' ');
+
+	        if (!el.setSelectionRange || !prefix || (prefix.length + appendix.length) <= val.length) {
+	            return;
+	        }
+
+	        var len = val.length * 2;
+
+	        // set timeout to avoid blink
+	        setTimeout(function () {
+	            el.setSelectionRange(len, len);
+	        }, 1);
+	    },
+
+	    // Check if input field is fully selected
+	    checkFullSelection: function(value) {
+	      try {
+	        var selection = window.getSelection() || document.getSelection() || {};
+	        return selection.toString().length === value.length;
+	      } catch (ex) {
+	        // Ignore
+	      }
+
+	      return false;
+	    },
+
+	    setSelection: function (element, position, doc) {
+	        if (element !== this.getActiveElement(doc)) {
+	            return;
+	        }
+
+	        // cursor is already in the end
+	        if (element && element.value.length <= position) {
+	          return;
+	        }
+
+	        if (element.createTextRange) {
+	            var range = element.createTextRange();
+
+	            range.move('character', position);
+	            range.select();
+	        } else {
+	            try {
+	                element.setSelectionRange(position, position);
+	            } catch (e) {
+	                // eslint-disable-next-line
+	                console.warn('The input element type does not support selection');
+	            }
+	        }
+	    },
+
+	    getActiveElement: function(parent) {
+	        var activeElement = parent.activeElement;
+	        if (activeElement && activeElement.shadowRoot) {
+	            return this.getActiveElement(activeElement.shadowRoot);
+	        }
+	        return activeElement;
+	    },
+
+	    isAndroid: function () {
+	        return navigator && /android/i.test(navigator.userAgent);
+	    },
+
+	    // On Android chrome, the keyup and keydown events
+	    // always return key code 229 as a composition that
+	    // buffers the user’s keystrokes
+	    // see https://github.com/nosir/cleave.js/issues/147
+	    isAndroidBackspaceKeydown: function (lastInputValue, currentInputValue) {
+	        if (!this.isAndroid() || !lastInputValue || !currentInputValue) {
+	            return false;
+	        }
+
+	        return currentInputValue === lastInputValue.slice(0, -1);
+	    }
+	};
+
+	module.exports = Util;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	/**
+	 * Props Assignment
+	 *
+	 * Separate this, so react module can share the usage
+	 */
+	var DefaultProperties = {
+	    // Maybe change to object-assign
+	    // for now just keep it as simple
+	    assign: function (target, opts) {
+	        target = target || {};
+	        opts = opts || {};
+
+	        // credit card
+	        target.creditCard = !!opts.creditCard;
+	        target.creditCardStrictMode = !!opts.creditCardStrictMode;
+	        target.creditCardType = '';
+	        target.onCreditCardTypeChanged = opts.onCreditCardTypeChanged || (function () {});
+
+	        // phone
+	        target.phone = !!opts.phone;
+	        target.phoneRegionCode = opts.phoneRegionCode || 'AU';
+	        target.phoneFormatter = {};
+
+	        // time
+	        target.time = !!opts.time;
+	        target.timePattern = opts.timePattern || ['h', 'm', 's'];
+	        target.timeFormat = opts.timeFormat || '24';
+	        target.timeFormatter = {};
+
+	        // date
+	        target.date = !!opts.date;
+	        target.datePattern = opts.datePattern || ['d', 'm', 'Y'];
+	        target.dateMin = opts.dateMin || '';
+	        target.dateMax = opts.dateMax || '';
+	        target.dateFormatter = {};
+
+	        // numeral
+	        target.numeral = !!opts.numeral;
+	        target.numeralIntegerScale = opts.numeralIntegerScale > 0 ? opts.numeralIntegerScale : 0;
+	        target.numeralDecimalScale = opts.numeralDecimalScale >= 0 ? opts.numeralDecimalScale : 2;
+	        target.numeralDecimalMark = opts.numeralDecimalMark || '.';
+	        target.numeralThousandsGroupStyle = opts.numeralThousandsGroupStyle || 'thousand';
+	        target.numeralPositiveOnly = !!opts.numeralPositiveOnly;
+	        target.stripLeadingZeroes = opts.stripLeadingZeroes !== false;
+	        target.signBeforePrefix = !!opts.signBeforePrefix;
+	        target.tailPrefix = !!opts.tailPrefix;
+
+	        // others
+	        target.swapHiddenInput = !!opts.swapHiddenInput;
+	        
+	        target.numericOnly = target.creditCard || target.date || !!opts.numericOnly;
+
+	        target.uppercase = !!opts.uppercase;
+	        target.lowercase = !!opts.lowercase;
+
+	        target.prefix = (target.creditCard || target.date) ? '' : (opts.prefix || '');
+	        target.noImmediatePrefix = !!opts.noImmediatePrefix;
+	        target.prefixLength = target.prefix.length;
+	        target.rawValueTrimPrefix = !!opts.rawValueTrimPrefix;
+	        target.copyDelimiter = !!opts.copyDelimiter;
+
+	        target.initValue = (opts.initValue !== undefined && opts.initValue !== null) ? opts.initValue.toString() : '';
+
+	        target.delimiter =
+	            (opts.delimiter || opts.delimiter === '') ? opts.delimiter :
+	                (opts.date ? '/' :
+	                    (opts.time ? ':' :
+	                        (opts.numeral ? ',' :
+	                            (opts.phone ? ' ' :
+	                                ' '))));
+	        target.delimiterLength = target.delimiter.length;
+	        target.delimiterLazyShow = !!opts.delimiterLazyShow;
+	        target.delimiters = opts.delimiters || [];
+
+	        target.blocks = opts.blocks || [];
+	        target.blocksLength = target.blocks.length;
+
+	        target.root = (typeof global === 'object' && global) ? global : window;
+	        target.document = opts.document || target.root.document;
+
+	        target.maxLength = 0;
+
+	        target.backspace = false;
+	        target.result = '';
+
+	        target.onValueChanged = opts.onValueChanged || (function () {});
+
+	        return target;
+	    }
+	};
+
+	module.exports = DefaultProperties;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ })
+/******/ ])
+});
+;
+}
 
 /***/ })
 

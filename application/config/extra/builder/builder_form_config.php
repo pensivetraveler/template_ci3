@@ -4,210 +4,1024 @@ $config['buider_form_config_loaded'] = true;
 $config['form_side_prefix'] = 'form_side-';
 $config['form_page_prefix'] = 'form_page-';
 
-$config['form_sample_config'] = [
-	[
-		'field' => 'field',
-		'label' => 'lang:field',
-		'form' => true,
-		'rules' => 'trim|required',
-		'errors' => [
-			'required' => 'Enter the field'
-		],
-		'category' => 'base',
-		'type' => 'text',
-		'subtype' => 'base',
-		'default' => 'sample',
-		'icon' => 'ri-user-line',
-		'form_text' => '영문, 숫자를 포함한 4글자 이상으로 입력해주세요.',
-		'attributes' => [
-			'autocapitalize' => 'none',
-			'autocomplete' => 'off',
-			'placeholder' => 'Enter The User ID',
-		],
-		'form_attributes' => [
-			'editable' => true,
-			'view_mod' => '',
-			'with_btn' => true,
-			'btn_type' => 'dup_check',
-			'btn_params' => '{"key":"id", "title":"아이디"}',
-			'text_type' => 'eng|num',
-		],
-		'option_attributes' => [
-			'option_type' => 'db',
-			'option_data' => [
-				'table' => 'program',
-				'params' => [],
-			],
-			'render' => [
-				'id' => 'program_id',
-				'text' => 'program_name',
-			],
-		],
-		'group_key' => '',
-		'group_attributes' => [
-			'label' => 'lang:user.password',
-			'form_text' => '',
-			'type' => 'new_password',
-		],
-		'list' => true,
-		'list_attributes' => [
-			'format' => 'img',
-			'icon' => 'ri-file-fill',
-			'render' => [
-				'callback' => 'articleListRender',
-				'params' => [
-					'article_cd' => 'ARC004',
-				]
-			]
-		]
-	],
-];
-
 $config['builder_form_base'] = [
-	'field' => '',
-	'label' => '',
-	'form' => true,
-	'rules' => '',
-	'errors' => [],
-	'category' => 'base',
-	'type' => 'text',
-	'subtype' => 'base',
-	'default' => '',
-	'icon' => null,
-	'form_text' => '',
-	'attributes' => [],
-	'form_attributes' => [],
-	'option_attributes' => [],
-	'group' => '',
-	'group_attributes' => [],
-	'list' => false,
-	'list_attributes' => [],
+    'field' => '',
+    'label' => '',
+    'form' => true,
+    'rules' => '',
+    'errors' => [],
+    'category' => 'base',
+    'type' => 'text',
+    'subtype' => 'base',
+    'default' => '',
+    'icon' => null,
+    'form_text' => '',
+    'attributes' => [],
+    'form_attributes' => [],
+    'option_attributes' => [],
+    'group' => 'base',
+    'group_attributes' => [],
+    'list' => false,
+    'list_attributes' => [],
+    // tabs 레이아웃: 탭 이름(tabs_{엔티티}_config 의 키). 비우면 tab_index(탭 정의의 n번째)
+    'tab' => '',
+    'tab_index' => 0,
 ];
 
 $config['builder_form_base_form_attributes'] = [
-	'form_sync' => true,
-	'reset_value' => true,
-	'detect_changed' => true,
-	'with_btn' => false,
-	'with_list' => false,
-	'list_sorter' => false,
-	'list_onclick' => 'download',
-	'list_delete' => false,
+    'form_sync' => true,
+    'reset_value' => true,
+    'detect_changed' => true,
+    'with_btn' => false,
+    'with_list' => false,
+    'list_sorter' => false,
+    'list_onclick' => 'download',
+    'list_delete' => false,
+    'form_validation' => true,
 ];
 
 $config['builder_form_base_option_attributes'] = [
-	'option_type' => 'field',
-	'option_data' => [],
-	'render' => [],
-	'option_stack' => 'vertical',
+    'option_type' => 'field',
+    'option_data' => [],
+    'render' => [],
+    'option_stack' => 'vertical',
 ];
 
 $config['builder_form_base_group_attributes'] = [
-	'label' => '',
-	'form_text' => '',
-	'type' => 'base',
-	'key' => '',
-	'envelope_name' => false,
-	'group_repeater' => false,
-	'repeater_type' => 'base',
-	'repeater_id' => '',
-	'repeater_count' => 1,
-];
-
-$config['builder_form_base_list_attributes'] = [
-	'list' => true,
-	'field' => '',
-	'label' => '',
-	'format' => 'text',
-	'icon' => '',
-	'text' => '',
-	'classes' => [],
-	'onclick' => [],
-	'render' => [],
-	'option_attributes' => [],
+    'label' => '',
+    'form_text' => '',
+    'type' => 'base',
+    'key' => '',
+    'envelope_name' => false,
+    'group_repeater' => false,
+    'repeater_type' => 'base',
+    'repeater_id' => '',
+    'repeater_count' => 1,
 ];
 
 $config['builder_form_filter_base'] = array_replace_recursive($config['builder_form_base'], [
-	'icon' => null,
-	'filter_attributes' => [
-		'type' => 'where',
-	],
+    'icon' => null,
+    'filter_attributes' => [
+        'type' => 'where',
+    ],
 ]);
 
+/***
+ * sample form configs
+ */
+$config['form_sample_config'] = [
+    [
+        'field' => 'field',
+        'label' => 'lang:field',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [
+            'required' => 'Enter the field'
+        ],
+        'category' => 'base',
+        'type' => 'text',
+        'subtype' => 'base',
+        'default' => 'sample',
+        'icon' => 'ri-user-line',
+        'form_text' => '영문, 숫자를 포함한 4글자 이상으로 입력해주세요.',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User ID',
+        ],
+        'form_attributes' => [
+            'writable' => true,
+            'editable' => true,
+            'view_mod' => '',
+            'with_btn' => true,
+            'btn_type' => 'dup_check',
+            'btn_params' => '{"key":"id", "title":"아이디"}',
+            'text_type' => 'eng|num',
+        ],
+        'option_attributes' => [
+            'option_type' => 'db',
+            'option_data' => [
+                'table' => 'program',
+                'params' => [],
+            ],
+            'render' => [
+                'id' => 'program_id',
+                'text' => 'program_name',
+            ],
+        ],
+        'group_key' => '',
+        'group_attributes' => [
+            'label' => 'lang:user.password',
+            'form_text' => '',
+            'type' => 'new_password',
+        ],
+        'list' => true,
+        'list_attributes' => [
+            'format' => 'img',
+            'icon' => 'ri-file-fill',
+            'render' => [
+                'callback' => 'articleListRender',
+                'params' => [
+                    'article_cd' => 'ARC004',
+                ]
+            ]
+        ]
+    ],
+];
+
 $config['form_first_registration_config'] = [
-	[
-		'field' => 'user_id',
-		'label' => 'lang:user.user_id',
-		'form' => true,
-		'type' => 'hidden',
-		'subtype' => 'identifier',
-	],
-	[
-		'field' => 'id',
-		'label' => 'lang:user.id',
-		'form' => true,
-		'rules' => 'trim|required|min_length[4]',
-		'category' => 'base',
-		'type' => 'text',
-		'icon' => 'ri-user-line',
-		'form_text' => 'Please enter at least 4 characters',
-		'attributes' => [
-			'autocapitalize' => 'none',
-			'autocomplete' => 'off',
-			'placeholder' => 'Enter The User ID',
-		],
-	],
-	[
-		'field' => 'password',
-		'label' => 'lang:user.password',
-		'rules' => 'trim|required|min_length[4]|max_length[15]',
-		'form' => true,
-		'errors' => [],
-		'category' => 'base',
-		'type' => 'text',
-		'icon' => 'svg:ri-lock-password-line',
-		'form_text' => 'Please enter 4 to 15 characters, including letters and numbers',
-		'attributes' => [
-			'autocomplete' => 'new-password',
-			'placeholder' => 'Password Dots',
-		],
-		'form_attributes' => [
-			'detect_changed' => true,
-		],
-	],
-	[
-		'field' => 'name',
-		'label' => 'lang:user.name',
-		'rules' => 'trim|required',
-		'form' => true,
-	],
-	[
-		'field' => 'email',
-		'label' => 'lang:user.email',
-		'rules' => 'trim|required',
-		'form' => true,
-		'category' => 'base',
-		'type' => 'text',
-		'icon' => 'ri-font-family',
-		'attributes' => [
-			'placeholder' => 'Enter The User Email',
-		],
-		'list' => true,
-	],
-	[
-		'field' => 'tel',
-		'label' => 'lang:user.tel',
-		'form' => true,
-		'rules' => 'trim|required',
-		'errors' => [],
-		'category' => 'base',
-		'type' => 'tel',
-		'subtype' => 'cleave-hp',
-		'icon' => null,
-		'form_text' => '',
-		'attributes' => [],
-		'default' => '',
-		'list' => true,
-		'list_attributes' => [],
-	],
+    [
+        'field' => 'user_id',
+        'label' => 'lang:user.user_id',
+        'form' => true,
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+        'form' => true,
+        'rules' => 'trim|required|min_length[4]',
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => 'ri-user-line',
+        'form_text' => 'Please enter at least 4 characters',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User ID',
+        ],
+    ],
+    [
+        'field' => 'password',
+        'label' => 'lang:user.password',
+        'rules' => 'trim|required|min_length[4]|max_length[15]',
+        'form' => true,
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => 'svg:ri-lock-password-line',
+        'form_text' => 'Please enter 4 to 15 characters, including letters and numbers',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+        'form_attributes' => [
+            'detect_changed' => true,
+        ],
+    ],
+    [
+        'field' => 'name',
+        'label' => 'lang:user.name',
+        'rules' => 'trim|required',
+        'form' => true,
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+        'rules' => 'trim|required',
+        'form' => true,
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'placeholder' => 'Enter The User Email',
+        ],
+        'list' => true,
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'tel',
+        'subtype' => 'cleave-hp',
+        'icon' => null,
+        'form_text' => '',
+        'attributes' => [],
+        'default' => '',
+        'list' => true,
+        'list_attributes' => [],
+    ],
+];
+
+$config['form_login_config'] = [
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:user.user_cd',
+        'form' => true,
+        'rules' => 'trim',
+        'category' => 'base',
+        'type' => 'hidden',
+        'default' => 'USR001',
+        'list' => false,
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => 'ri-user-line',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User ID',
+        ],
+    ],
+    [
+        'field' => 'password',
+        'label' => 'lang:user.password',
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'password',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+    ],
+    [
+        'field' => 'autologin',
+        'label' => 'lang:auth.autologin',
+        'rules' => '',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'checkbox',
+        'subtype' => 'single',
+        'attributes' => [],
+        'form_attributes' => [],
+    ],
+];
+
+$config['form_find_id_config'] = [
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:user.user_cd',
+        'form' => true,
+        'rules' => 'trim',
+        'category' => 'base',
+        'type' => 'hidden',
+        'default' => 'USR001',
+        'list' => false,
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+        'rules' => 'trim|required',
+        'category' => 'base',
+        'type' => 'email',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User Email',
+        ],
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'tel',
+        'subtype' => 'cleave-hp',
+        'icon' => null,
+        'form_text' => '',
+        'attributes' => [],
+        'default' => '',
+        'list_attributes' => [],
+    ],
+    [
+        'field' => 'name',
+        'label' => 'lang:user.name',
+        'rules' => 'trim|required',
+        'category' => 'base',
+        'type' => 'text',
+        'icon' => 'ri-user-line',
+        'attributes' => [
+            'autocomplete' => 'off',
+        ],
+    ],
+];
+
+$config['form_reset_password_config'] = [
+    [
+        'field' => 'password',
+        'label' => 'lang:user.password',
+        'rules' => 'trim|required|min_length[4]|max_length[15]|strong_password',
+        'category' => 'base',
+        'type' => 'password',
+        'icon' => 'ri-lock-password-line',
+        'form_text' => 'Please enter 4 to 15 characters, including letters and numbers',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+    ],
+    [
+        'field' => 'password_confirm',
+        'label' => 'lang:user.password_confirm',
+        'rules' => 'trim|required|password_matches[password]',
+        'category' => 'base',
+        'type' => 'password',
+        'icon' => 'ri-lock-password-fill',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+    ],
+];
+
+$config['form_find_password_config'] = [
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:user.user_cd',
+        'form' => true,
+        'rules' => 'trim',
+        'category' => 'base',
+        'type' => 'hidden',
+        'default' => 'USR001',
+        'list' => false,
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+        'rules' => 'trim|required',
+        'category' => 'base',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User ID',
+        ],
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+        'rules' => 'trim|required',
+        'category' => 'base',
+        'type' => 'email',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User Email',
+        ],
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'category' => 'base',
+        'type' => 'tel',
+        'subtype' => 'cleave-hp',
+        'icon' => null,
+        'form_text' => '',
+        'attributes' => [],
+        'default' => '',
+        'list_attributes' => [],
+    ],
+];
+
+$config['form_myinfo_config'] = [
+    [
+        'field' => 'user_id',
+        'label' => 'lang:user.user_id',
+        'form' => true,
+        'rules' => 'trim|required_mod[edit]',
+        'errors' => [],
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'user_cd',
+        'label' => 'lang:user.user_cd',
+        'form' => true,
+        'rules' => 'trim',
+        'type' => 'hidden',
+    ],
+    [
+        'field' => 'del_yn',
+        'label' => 'lang:user.del_yn',
+        'form' => true,
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => 'N',
+    ],
+    [
+        'field' => 'withdraw_yn',
+        'label' => 'lang:user.withdraw_yn',
+        'form' => true,
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => 'N',
+    ],
+    [
+        'field' => 'id',
+        'label' => 'lang:user.id',
+        // 내 정보에서는 읽기 전용이라 사용자가 고칠 수 없으므로 검증하지 않는다 (중복은 모델 uniqueKeyList 검사가 막음)
+		'rules' => 'trim',
+        'form' => true,
+        'errors' => [],
+        'type' => 'text',
+        'subtype' => 'readonly',
+        'icon' => 'ri-user-line',
+        'form_text' => 'Please enter at least 4 characters',
+        'attributes' => [
+            'autocapitalize' => 'none',
+            'autocomplete' => 'off',
+            'placeholder' => 'Enter The User ID',
+        ],
+        'form_attributes' => [
+            'editable' => false,
+            'with_btn' => false,
+        ],
+    ],
+    [
+        'field' => 'password',
+        'label' => 'lang:user.password',
+        'rules' => 'trim|required_mod[add]|min_length[4]|max_length[15]',
+        'form' => true,
+        'errors' => [],
+        'category' => 'group',
+        'type' => 'password',
+        'icon' => 'svg:ri-lock-password-line',
+        'form_text' => 'Please enter 4 to 15 characters, including letters and numbers',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+        'form_attributes' => [
+            'detect_changed' => true,
+        ],
+        'group' => 'user_password',
+        'group_attributes' => [
+            'envelope_name' => false,
+            'label' => 'lang:user.password',
+            'form_text' => '',
+            'type' => 'new_password',
+            'key' => 'password',
+        ],
+    ],
+    [
+        'field' => 'password_confirm',
+        'label' => 'lang:user.password_confirm',
+        'rules' => 'trim|required_mod[add]|password_matches[password]',
+        'form' => true,
+        'errors' => [],
+        'category' => 'group',
+        'type' => 'password',
+        'subtype' => 'password_confirm',
+        'icon' => 'svg:ri-lock-password-fill',
+        'form_text' => 'Please Repeat The Password',
+        'attributes' => [
+            'autocomplete' => 'new-password',
+            'placeholder' => 'Password Dots',
+        ],
+        'form_attributes' => [
+            'detect_changed' => true,
+        ],
+        'group' => 'user_password',
+        'group_attributes' => [
+            'key' => 'password_confirm',
+        ],
+    ],
+    [
+        'field' => 'name',
+        'label' => 'lang:user.name',
+        'rules' => 'trim|required',
+        'form' => true,
+    ],
+    [
+        'field' => 'email',
+        'label' => 'lang:user.email',
+        'rules' => 'trim|required|is_unique[user.email.user_id]',
+        'form' => true,
+        'type' => 'text',
+        'subtype' => 'readonly',
+        'icon' => 'ri-font-family',
+        'attributes' => [
+            'placeholder' => 'Enter The User Email',
+        ],
+        'form_attributes' => [
+            'editable' => false,
+            'with_btn' => false,
+        ],
+    ],
+    [
+        'field' => 'tel',
+        'label' => 'lang:user.tel',
+        'form' => true,
+        'rules' => 'trim|required',
+        'errors' => [],
+        'type' => 'tel',
+        'subtype' => 'cleave-hp',
+        'icon' => null,
+        'form_text' => '',
+        'attributes' => [],
+        'default' => '',
+        'list_attributes' => [],
+    ],
+];
+
+$config['form_sys_cfg_config'] = [
+    [
+        'field' => 'cmb_cfg',
+        'label' => 'lang:system.cmb_cfg',
+        'rules' => 'trim|required_mod[edit]|concat[big_cfg,sml_cfg|&#95;]',
+        'subtype' => 'identifier',
+        'attributes' => [
+            'readonly' => 'readonly',
+        ],
+    ],
+    [
+        'field' => 'big_cfg',
+        'label' => 'lang:system.big_cfg',
+        'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'model',
+            'option_data' => [
+                'model' => 'Model_Sys_Cfg',
+                'method' => 'getBigCfgList',
+                'params' => [],
+            ],
+            'render' => [
+                'id' => 'big_cfg',
+                'text' => 'cfg_name',
+                'add' => 'big_cfg'
+            ],
+        ],
+        'form_attributes' => [
+            'editable' => false,
+        ],
+    ],
+    [
+        'field' => 'sml_cfg',
+        'label' => 'lang:system.sml_cfg',
+        'rules' => 'trim|required',
+        'form_attributes' => [
+            'editable' => false,
+        ],
+    ],
+    [
+        'field' => 'cfg_name',
+        'label' => 'lang:system.cfg_name',
+        'rules' => 'trim|required',
+    ],
+    [
+        'field' => 'cfg_val',
+        'label' => 'lang:system.cfg_val',
+        'rules' => 'trim',
+    ],
+    [
+        'field' => 'cfg_desc',
+        'label' => 'lang:system.cfg_desc',
+        'rules' => 'trim',
+    ],
+    [
+        'field' => 'cfg_type',
+        'label' => 'lang:system.cfg_type',
+        'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'field',
+        ],
+        'form_attributes' => [
+            'show_if_field' => 'cfg_options',
+            'show_if_value' => 'dropdown',
+        ],
+    ],
+    [
+        'field' => 'cfg_options',
+        'label' => 'lang:system.cfg_options',
+        'rules' => 'trim',
+        'type' => 'textarea',
+        'subtype' => 'autosize',
+        'form_text' => '드롭다운 선택지를 한 줄에 하나씩 값|표시명 으로 적습니다. 예: Y|사용',
+    ],
+];
+
+$config['form_big_cfg_config'] = [
+    [
+        'field' => 'cmb_cfg',
+        'label' => 'lang:system.cmb_cfg',
+        'rules' => 'trim|required_mod[edit]|concat[big_cfg,sml_cfg|&#95;]',
+        'type' => 'text',
+        'subtype' => 'identifier',
+        'attributes' => [
+            'readonly' => 'readonly',
+        ],
+    ],
+    [
+        'field' => 'sml_cfg',
+        'label' => 'lang:system.sml_cfg',
+        'rules' => 'trim|required|in_list[000]',
+        'type' => 'hidden',
+        'default' => '000',
+    ],
+    [
+        'field' => 'cfg_val',
+        'label' => 'lang:system.cfg_val',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '',
+    ],
+    [
+        'field' => 'cfg_desc',
+        'label' => 'lang:system.cfg_desc',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '',
+    ],
+    [
+        'field' => 'cfg_type',
+        'label' => 'lang:system.cfg_type',
+        'rules' => 'trim|required|in_list[text]',
+        'type' => 'hidden',
+        'default' => 'text',
+    ],
+    [
+        'field' => 'big_cfg',
+        'label' => 'lang:system.big_cfg',
+        'rules' => 'trim|required|max_length[50]|regex_match[/^[A-Z][A-Z0-9_]*$/]',
+        'subtype' => 'identifier',
+        'form_text' => '영문 대문자로 시작하고 영문 대문자·숫자·밑줄(_)만 씁니다. 등록 후에는 바꿀 수 없습니다.',
+        'form_attributes' => [
+            'editable' => false,
+        ],
+    ],
+    [
+        'field' => 'cfg_name',
+        'label' => 'lang:system.cfg_name',
+        'rules' => 'trim|required',
+    ],
+];
+
+$config['form_big_code_config'] = [
+    [
+        'field' => 'cmb_cd',
+        'label' => 'lang:system.cmb_cd',
+        'rules' => 'trim|required_mod[edit]|concat[big_cd,sml_cd]',
+        'type' => 'text',
+        'subtype' => 'identifier',
+        'attributes' => [
+            'readonly' => 'readonly',
+        ],
+    ],
+    [
+        'field' => 'sml_cd',
+        'label' => 'lang:system.sml_cd',
+        'rules' => 'trim|required|in_list[000]',
+        'type' => 'hidden',
+        'default' => '000',
+    ],
+    [
+        'field' => 'cd_val',
+        'label' => 'lang:system.cd_val',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '',
+    ],
+    [
+        'field' => 'cd_desc',
+        'label' => 'lang:system.cd_desc',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '',
+    ],
+    [
+        'field' => 'cd_nick',
+        'label' => 'lang:system.cd_nick',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '',
+    ],
+    [
+        'field' => 'cd_srt',
+        'label' => 'lang:system.cd_srt',
+        'rules' => 'trim|required',
+        'type' => 'hidden',
+        'default' => '0',
+    ],
+    [
+        'field' => 'use_yn',
+        'label' => 'lang:common.use_yn',
+        'rules' => 'trim|required',
+        'type' => 'hidden',
+        'default' => 'N',
+    ],
+    [
+        'field' => 'big_cd',
+        'label' => 'lang:system.big_cd',
+        'rules' => 'trim|required|min_length[3]|max_length[3]|alpha_uppercase',
+        'subtype' => 'identifier',
+        'form_attributes' => [
+            'editable' => false,
+        ],
+    ],
+    [
+        'field' => 'cd_name',
+        'label' => 'lang:system.cd_name',
+        'rules' => 'trim|required',
+    ],
+];
+
+$config['form_sys_code_config'] = [
+    [
+        'field' => 'cmb_cd',
+        'label' => 'lang:system.cmb_cd',
+        'rules' => 'trim|required_mod[edit]|concat[big_cd,sml_cd]',
+        'subtype' => 'identifier',
+        'attributes' => [
+            'readonly' => 'readonly',
+        ],
+    ],
+    [
+        'field' => 'big_cd',
+        'label' => 'lang:system.big_cd',
+        'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'model',
+            'option_data' => [
+                'model' => 'Model_Sys_Code',
+                'method' => 'getBigCodeList',
+                'params' => [],
+            ],
+            'render' => [
+                'id' => 'big_cd',
+                'text' => 'cd_name',
+                'add' => 'big_cd'
+            ],
+        ],
+        'form_attributes' => [
+            'editable' => false,
+        ],
+    ],
+    [
+        'field' => 'sml_cd',
+        'label' => 'lang:system.sml_cd',
+        'rules' => 'trim|required|min_length[3]|max_length[3]|numeric',
+        'form_attributes' => [
+            'editable' => false,
+        ],
+    ],
+    [
+        'field' => 'cd_name',
+        'label' => 'lang:system.cd_name',
+        'rules' => 'trim|required',
+    ],
+    [
+        'field' => 'cd_val',
+        'label' => 'lang:system.cd_val',
+        'rules' => 'trim',
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+    ],
+    [
+        'field' => 'cd_desc',
+        'label' => 'lang:system.cd_desc',
+        'rules' => 'trim',
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+    ],
+    [
+        'field' => 'cd_nick',
+        'label' => 'lang:system.cd_nick',
+        'rules' => 'trim',
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+    ],
+    [
+        'field' => 'cd_srt',
+        'label' => 'lang:system.cd_srt',
+        'rules' => 'trim|required|min[1]',
+        'type' => 'number',
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+    ],
+    [
+        'field' => 'use_yn',
+        'label' => 'lang:common.use_yn',
+        'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'yn',
+        ],
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+    ],
+];
+
+$config['form_menu_list_config'] = [
+    [
+        'field' => 'menu_id',
+        'label' => 'lang:menu.menu_id',
+        'rules' => 'trim|required_mod[edit]',
+        'type' => 'hidden',
+        'subtype' => 'identifier',
+    ],
+    [
+        'field' => 'depth',
+        'label' => 'lang:menu.depth',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '1',
+    ],
+    [
+        'field' => 'srt',
+        'label' => 'lang:menu.srt',
+        'rules' => 'trim',
+        'type' => 'hidden',
+    ],
+    [
+        'field' => 'is_sub_menu',
+        'label' => 'lang:menu.is_sub_menu',
+        'rules' => 'trim',
+        'type' => 'hidden',
+        'default' => '0',
+    ],
+    [
+        'field' => 'code',
+        'label' => 'lang:menu.code',
+        'rules' => 'trim|required',
+        'type' => 'custom',
+        'subtype' => 'unique',
+        'form_attributes' => [
+            'detect_changed' => true,
+            'with_btn' => true,
+            'btn_type' => 'dup_check',
+            'btn_params' => '{"key":"code", "title":"메뉴코드"}',
+            'text_type' => 'eng|num',
+        ],
+    ],
+    [
+        'field' => 'parent_id',
+        'label' => 'lang:menu.parent_id',
+        'rules' => 'trim',
+        'type'  => 'select',
+        'subtype'  => 'select2',
+        'option_attributes' => [
+            'option_type' => 'model',
+            'option_data' => [
+                'model' => 'Model_Menu',
+                'method' => 'getParentList',
+                'params' => [],
+            ],
+            'render' => [
+                'id' => 'menu_id',
+                'text' => 'title',
+            ],
+        ],
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+    ],
+    [
+        'field' => 'title',
+        'label' => 'lang:menu.title',
+        'rules' => 'trim|required',
+    ],
+    [
+        'field' => 'icon',
+        'label' => 'lang:menu.icon',
+        'rules' => 'trim',
+    ],
+    [
+        'field' => 'class',
+        'label' => 'lang:menu.class',
+        'rules' => 'trim',
+        'type'  => 'select',
+        'subtype'  => 'select2',
+        'option_attributes' => [
+            'option_type' => 'method',
+            'option_data' => [
+                'method' => 'getClassList',
+            ],
+        ],
+        'form_attributes' => [
+            'detect_changed' => false,
+            'change_after' => [
+                'callback' => 'onChangeTriggerSelect',
+                'params' => [
+                    'target' => 'method',
+                ]
+            ]
+        ],
+    ],
+    [
+        'field' => 'method',
+        'label' => 'lang:menu.method',
+        'rules' => 'trim',
+        'type'  => 'select',
+        'subtype'  => 'select2',
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+    ],
+    [
+        'field' => 'href',
+        'label' => 'lang:menu.href',
+        'rules' => 'trim',
+        'category' => 'base',
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+        'group' => 'attr',
+        'group_attributes' => [
+            'envelope_name' => true,
+            'label' => 'lang:menu.attr',
+            'form_text' => '',
+            'type' => 'base',
+            'key' => 'href',
+        ],
+    ],
+    [
+        'field' => 'target',
+        'label' => 'lang:menu.target',
+        'rules' => 'trim',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+        'option_attributes' => [
+            'option_type' => 'target',
+        ],
+        'group' => 'attr',
+        'group_attributes' => [
+            'key' => 'target',
+        ],
+    ],
+    [
+        'field' => 'className',
+        'label' => 'lang:menu.className',
+        'rules' => 'trim',
+        'type' => 'custom',
+        'subtype' => 'tag-base',
+        'form_attributes' => [
+            'detect_changed' => false,
+        ],
+        'group' => 'attr',
+        'group_attributes' => [
+            'key' => 'className',
+        ],
+    ],
+    [
+        'field' => 'is_login',
+        'label' => 'lang:menu.is_login',
+        'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'bool',
+        ],
+    ],
+    [
+        'field' => 'is_auth',
+        'label' => 'lang:menu.is_auth',
+        'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'bool',
+        ],
+    ],
+    [
+        'field' => 'is_super',
+        'label' => 'lang:menu.is_super',
+        'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'bool',
+        ],
+    ],
+    [
+        'field' => 'is_use',
+        'label' => 'lang:menu.is_use',
+        'rules' => 'trim|required',
+        'type' => 'select',
+        'subtype' => 'selectpicker',
+        'option_attributes' => [
+            'option_type' => 'bool',
+        ],
+    ],
 ];

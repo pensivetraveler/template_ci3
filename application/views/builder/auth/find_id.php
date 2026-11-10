@@ -10,7 +10,7 @@ extract(trans_formdata_dit_type($formData));
 				<div class="app-brand justify-content-center mt-5">
 					<a href="/" class="app-brand-link gap-2">
 						<span class="app-brand-logo demo">
-							<img src="//placehold.co/400x200?text=Logo" alt="">
+							<img src="https://placehold.co/400x200?text=Logo" alt="">
 						</span>
 					</a>
 				</div>
@@ -22,9 +22,10 @@ extract(trans_formdata_dit_type($formData));
 					echo form_open('', [
 						'id' => 'formAuth',
 						'class' => "needs-validation form-type-page",
-						'onsubmit' => 'return false',
+						'data-no-submit' => 'true',
 					], []);
 					?>
+					<?php if(isset($email)): ?>
 					<div class="col-sm-12 form-validation-unit">
 						<div class="input-group input-group-merge">
 							<div class="form-floating form-floating-outline">
@@ -43,6 +44,26 @@ extract(trans_formdata_dit_type($formData));
 							</div>
 						</div>
 					</div>
+					<?php else: ?>
+					<div class="col-sm-12 form-validation-unit">
+						<div class="input-group input-group-merge">
+							<div class="form-floating form-floating-outline">
+								<?php
+								echo form_input(
+									[
+										'type' => $name['type'],
+										'name' => $name['field'],
+										'id' => $name['id'],
+									],
+									set_admin_form_value($name['field'], $name['default'], null),
+									$name['attributes']
+								);
+								echo form_label(lang($name['label']), $name['id']);
+								?>
+							</div>
+						</div>
+					</div>
+					<?php endif; ?>
 					<div class="col-sm-12 form-validation-unit">
 						<div class="input-group input-group-merge form-password-toggle">
 							<div class="form-floating form-floating-outline">
@@ -74,10 +95,12 @@ extract(trans_formdata_dit_type($formData));
 								<a href="<?=base_url('/admin/auth/login')?>" class="float-start mb-1 mt-2">
 									<span><?=lang('Login')?></span>
 								</a>
+								<?php if(find_password_enabled()): ?>
 								<span class="d-inline-block mb-1 mt-2 text-primary">&nbsp;|&nbsp;</span>
 								<a href="<?=base_url('/admin/auth/findPassword')?>" class="float-end mb-1 mt-2">
 									<span><?=lang('Find Password')?></span>
 								</a>
+								<?php endif; ?>
 							</div>
 						</div>
 					</div>

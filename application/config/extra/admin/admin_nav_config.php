@@ -4,51 +4,107 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $config['admin_nav_config_loaded'] = true;
 
 $config['admin_nav_top'] = [
+
 ];
 
-$config['admin_nav_side'] = [
-    'Dashboard' => [
+$config['admin_nav_menu'] = [
+    // 대시보드: 로그인한 모든 사용자 (권한 검사 없음, 내 정보와 같음)
+    [
         'icon' => 'ri-home-smile-line',
-        'title' => 'Home',
-        'route' => '/admin/dashboard',
-        'method' => 'dashboard',
-        'router' => 'index',
-        'params' => [
-            'layout' => 'side-menu',
-        ],
-        'className' => [],
-        'subMenu' => [],
+        'title' => 'Dashboard',
+        'class' => 'dashboard',
+        'isAuth' => false,
     ],
-    'Company' => [
-        'icon' => 'ri-home-smile-line',
-        'title' => 'Company',
-        'route' => '/admin/company',
-        'router' => 'company',
-        'params' => [
-            'layout' => 'side-menu',
-        ],
-        'className' => [],
-        'subMenu' => [],
+    [
+        'icon' => 'ri-team-line',
+        'title' => 'Administrators Management',
+        'class' => 'administrators',
     ],
-    'Project' => [
-        'icon' => 'ri-home-smile-line',
-        'title' => 'Project',
-        'route' => '/admin/project',
-        'router' => 'project',
-        'params' => [
-            'layout' => 'side-menu',
-        ],
-        'className' => [],
-        'subMenu' => [],
+    [
+        'icon' => 'ri-shapes-line',
+        'title' => 'Categories Management',
+        'class' => 'categories',
     ],
-    'MyInfo' => [
-        'icon' => 'ri-user-line',
+    [
+        'icon' => 'ri-layout-masonry-line',
+        'title' => 'Boards',
+        'subMenu' => [
+            [
+                'title' => 'Boards Management',
+                'class' => 'boards',
+            ],
+            [
+                'title' => 'Articles Management',
+                'class' => 'articles',
+            ],
+        ],
+    ],
+    [
+        'icon' => 'ri-building-line',
+        'title' => 'Companies Management',
+        'class' => 'companies',
+    ],
+    [
+        'icon' => 'ri-code-box-line',
+        'title' => 'Projects Management',
+        'class' => 'projects',
+    ],
+    [
+        'icon' => 'ri-folder-history-line',
+        'title' => 'Logs',
+        'subMenu' => [
+            [
+                'title' => 'Visitors',
+                'class' => 'visitors',
+                'isSuper' => true,
+            ],
+            [
+                'title' => 'UserAccess',
+                'class' => 'logs',
+                'method' => 'userAccess',
+            ],
+            [
+                'title' => 'ErrorLogs',
+                'class' => 'logs',
+                'method' => 'errors',
+                'isSuper' => true,
+            ]
+        ],
+    ],
+    [
+        'icon' => 'ri-function-line',
+        'title' => 'System',
+        'class' => '',
+        'subMenu' => [
+            [
+                'title' => 'SysCfg Management',
+                'class' => 'system',
+                'method' => 'sysCfg',
+                'isSuper' => true,
+            ],
+            [
+                'title' => 'SysCode Management',
+                'class' => 'system',
+                'method' => 'sysCode',
+                'isSuper' => true,
+            ],
+            [
+                'title' => 'MenuList Management',
+                'class' => 'system',
+                'method' => 'menuList',
+                'isSuper' => true,
+            ],
+            [
+                'title' => 'MenuAuth Management',
+                'class' => 'system',
+                'method' => 'menuAuth',
+            ],
+        ],
+    ],
+    [
+        'icon' => 'ri-user-5-line',
         'title' => 'MyInfo',
-        'route' => '/admin/myInfo',
-        'params' => [
-            'layout' => 'side-menu',
-        ],
-        'className' => [],
-        'subMenu' => [],
+        'class' => 'myInfo',
+        'isAuth' => false,
     ],
 ];

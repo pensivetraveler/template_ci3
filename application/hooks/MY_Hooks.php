@@ -2,196 +2,197 @@
 
 class MY_Hooks
 {
-	protected array $config;
+    protected array $config;
 
-	function __construct()
-	{
-		$this->config =& get_config();
-	}
+    function __construct()
+    {
+        $this->config =& get_config();
+    }
 
-	public function getConfig()
-	{
-		print_r('<pre>');
-		print_r($this->config);
-		exit;
-	}
+    public function getConfig()
+    {
+        print_r('<pre>');
+        print_r($this->config);
+        exit;
+    }
 
-	public function loadEnv()
-	{
-		$dotenv = new Symfony\Component\Dotenv\Dotenv();
-		$dotenv->usePutenv();
-		if(getenv('CI_ENV') && file_exists(FCPATH.'.env.'.getenv('CI_ENV')))
-			$dotenv->load(FCPATH.'.env.'.getenv('CI_ENV'));
+    public function loadEnv()
+    {
+        $dotenv = new Symfony\Component\Dotenv\Dotenv();
+        $dotenv->usePutenv();
+        if(ENVIRONMENT && file_exists(FCPATH.'.env.'.ENVIRONMENT))
+            $dotenv->load(FCPATH.'.env.'.ENVIRONMENT);
 
-		define("APP_NAME", getenv('APP_NAME'));
-		define("APP_NAME_KR", getenv('APP_NAME_KR'));
-	}
+        define("APP_NAME", getenv('APP_NAME'));
+        define("APP_NAME_KR", getenv('APP_NAME_KR'));
+        define("APP_GIT", getenv('APP_GIT'));
+        define("COMP_NAME", getenv('COMP_NAME'));
+        define("COMP_NAME_KR", getenv('COMP_NAME_KR'));
+        define("COMP_URL", getenv('COMP_URL'));
+        define("PASSWORD_DECRYPTABLE", filter_var(getenv('PASSWORD_DECRYPTABLE'), FILTER_VALIDATE_BOOLEAN));
+        define("SYSTEM_INSPECTION", filter_var(getenv('SYSTEM_INSPECTION'), FILTER_VALIDATE_BOOLEAN));
 
-	public function systemOfInspection()
-	{
-		if(getenv('SYSTEM_INSPECTION') === 'true') {
-			echo '시스템 점검 중입니다.';
-			exit;
-		}
-	}
+        // encryption key 변경
+        $key = getenv('ENCRYPTION_KEY');
+        if ($key === false || $key === '') {
+            show_error('ENCRYPTION_KEY is not set in .env');
+        }
+        if (strpos($key, 'hex:') === 0) {
+            $key = hex2bin(substr($key, 4));
+        }
+        $this->config['encryption_key'] = $key;
 
-	public function checkPermission()
-	{
-		$CI =& get_instance();
+        // 세션 설정: config.php 는 .env 를 읽기 전에 평가되므로 여기서 덮어쓴다 (세션 라이브러리는 이후에 로드됨)
+        $sessExpiration = getenv('SESS_EXPIRATION');
+        if ($sessExpiration !== false && ctype_digit($sessExpiration) && (int)$sessExpiration > 0) {
+            $this->config['sess_expiration'] = (int)$sessExpiration;
+        }
+        // 저장 폴더는 files 드라이버일 때만 (database 드라이버의 sess_save_path 는 테이블 이름)
+        $sessSavePath = getenv('SESS_SAVE_PATH');
+        if ($sessSavePath !== false && $sessSavePath !== '' && ($this->config['sess_driver'] ?? 'files') === 'files') {
+            $this->config['sess_save_path'] = $sessSavePath;
+        }
+        // 프록시(ALB) 뒤에서 세션 드라이버가 보는 REMOTE_ADDR 은 프록시 노드 주소라 연결마다 달라진다. 맞춰 보면 로그인이 끊긴다
+        if ((string)getenv('PROXY_IPS') !== '') {
+            $this->config['sess_match_ip'] = FALSE;
+        }
+    }
 
-		//Check if lib is loaded or not, and if not loaded, then load it here
-		if(!isset($CI->session)){
-			$CI->load->library('session');
-		}
-		if(!isset($CI->PHPtoJS)){
-			$CI->load->library('PHPtoJS', $CI->config->item('phptojs.namespace')?['namespace' => $CI->config->item('phptojs.namespace')]:[]);
-		}
+    public function systemOfInspection()
+    {
+        if(SYSTEM_INSPECTION) {
+            $allowedIps = json_decode((string)getenv('ALLOWED_IPS'), true) ?: [];
+            // 로드밸런서 뒤에서는 REMOTE_ADDR가 로드밸런서 주소이므로 CI ip_address() (proxy_ips + X-Forwarded-For)
+            $clientIp = get_instance()->input->ip_address();
+            if(!in_array($clientIp, $allowedIps, true)) {
+                builder_misc_view('');
+            }
+        }
+    }
 
-		// autologin
-		if($CI->config->item('autologin_config_loaded')){
-			$aulCookie = $CI->config->item('autologin_cookie_name');
-			$aulTable = $CI->config->item('autologin_table');
-			$aulColumns = $CI->config->item('autologin_columns');
-			$aulLifetime = $CI->config->item('autologin_cookie_lifetime') ?: 86400 * 30;
-			$userTable = $CI->config->item('user_table');
-			$userLimit = $CI->config->item('user_limit_conditions');
+    public function checkPermission()
+    {
+        $CI =& get_instance();
 
-			if (get_cookie($aulCookie) && ! $CI->session->userdata(USER_ID_COLUMN_NAME)) {
-				$autoLogin = $CI->db
-					->order_by($aulColumns['date'], 'desc')
-					->where([$aulColumns['key'] => get_cookie($aulCookie)])->get($aulTable)->result_array();
-				if(count($autoLogin)) {
-					$autoLogin = $autoLogin[0];
+        //Check if lib is loaded or not, and if not loaded, then load it here
+        if(!isset($CI->session)){
+            $CI->load->library('session');
+        }
+        if(!isset($CI->PHPtoJS)){
+            $CI->load->library('PHPtoJS', $CI->config->item('phptojs.namespace')?['namespace' => $CI->config->item('phptojs.namespace')]:[]);
+        }
 
-					if ( ! element(USER_ID_COLUMN_NAME, $autoLogin)) {
-						delete_cookie($aulCookie);
-					}else{
-						$valid = true;
-						if ( ! element($aulColumns['date'], $autoLogin) OR (strtotime(element($aulColumns['date'], $autoLogin)) < ctimestamp() - $aulLifetime)) {
-							$valid = false;
-						} elseif ($CI->input->ip_address() !== element($aulColumns['ip'], $autoLogin)) {
-							$valid = false;
-						} else {
-							$userData = $CI->db
-								->select([USER_ID_COLUMN_NAME, ...array_keys($userLimit)])
-								->where([USER_ID_COLUMN_NAME => element(USER_ID_COLUMN_NAME, $autoLogin)])
-								->get($userTable)->result_array();
+        // 자동 로그인은 MY_Controller::loginWithAutologinCookie (MY_Builder_WEB 생성자에서 호출)로 옮김.
+        // hook 에서는 토큰을 발급할 수 없어 세션에 user_id 만 들어가고, 화면이 로그인 안 됨으로 보고 세션·쿠키를 지웠다.
+    }
 
-							if(count($userData)) {
-								$userData = $userData[0];
-								if(element(USER_ID_COLUMN_NAME, $userData)) {
-									foreach ($userData as $key => $val) {
-										if($key === USER_ID_COLUMN_NAME) continue;
-										if($val === $userLimit[$key]) $valid = false;
-									}
-								}
-							}
-						}
+    public function setPHPVars()
+    {
+        $CI =& get_instance();
+        $token_prefix = $CI->config->item('token_prefix')?$CI->config->item('token_prefix').' ':'';
 
-						if(!$valid) {
-							$CI->db->delete($aulTable, [$aulColumns['id'] => element($aulColumns['id'], $autoLogin)]);
-							delete_cookie($aulCookie);
-						}else{
-							$CI->session->set_userdata(USER_ID_COLUMN_NAME, element(USER_ID_COLUMN_NAME, $autoLogin));
-						}
-					}
-				}
-			}
-		}
-	}
+        $data = [
+            'HOST_URI' => base_url(),
+            'BASE_URI' => base_url().get_path(),
+            'CURRENT_URI' => base_url().get_path().'/'.$CI->router->class,
+            'HOOK_PHPTOJS_VAR_ISLOGIN' => $CI->session->userdata('logged_in'),
+            'HOOK_PHPTOJS_VAR_TOKEN' => $token_prefix.$CI->session->userdata('token'),
+            'HOOK_PHPTOJS_VAR_DIALOG' => $CI->session->flashdata('dialog'),
+        ];
 
-	public function setPHPVars()
-	{
-		$CI =& get_instance();
-		$token_prefix = $CI->config->item('token_prefix')?$CI->config->item('token_prefix').' ':'';
+        if(property_exists($CI, 'jsVars')) $data = array_merge($data, $CI->jsVars);
+        if(property_exists($CI, 'lang')) $data = array_merge($data, [
+            'LOCALE' => $CI->lang->language
+        ]);
 
-		$data = [
-			'BASE_URI' => base_url(),
-			'CURRENT_URI' => base_url().get_path().'/'.$CI->router->class,
-			'HOOK_PHPTOJS_VAR_ISLOGIN' => $CI->session->userdata('logged_in'),
-			'HOOK_PHPTOJS_VAR_TOKEN' => $token_prefix.$CI->session->userdata('token'),
-			'HOOK_PHPTOJS_VAR_DIALOG' => $CI->session->flashdata('dialog'),
-		];
+        if(!array_key_exists('ERRORS', $data)) $data['ERRORS'] = [];
 
-		if(property_exists($CI, 'jsVars')) $data = array_merge($data, $CI->jsVars);
-		if(property_exists($CI, 'lang')) $data = array_merge($data, [
-			'LOCALE' => $CI->lang->language
-		]);
+        $CI->phptojs->put($data);
 
-		if(!array_key_exists('ERRORS', $data)) $data['ERRORS'] = [];
+        $CI->config->set_item('life_cycle', 'post_controller');
+    }
 
-		$CI->phptojs->put($data);
+    public function setFormValidation()
+    {
+        $CI =& get_instance();
 
-		$CI->config->set_item('life_cycle', 'post_controller');
-	}
-	public function setFormValidation()
-	{
-		$CI =& get_instance();
+        foreach ($CI->config->item('regexp') as $name => $regexp)
+            if(!method_exists($CI->form_validation, $name))
+                $CI->form_validation->addMethod($name, $regexp);
+    }
 
-		foreach ($CI->config->item('regexp') as $name => $regexp)
-			if(!method_exists($CI->form_validation, $name))
-				$CI->form_validation->addMethod($name, $regexp);
-	}
+    public function setUploadMaxSize()
+    {
+        $uploadMaxSize = ini_get('upload_max_filesize');
+        $postMaxSize = ini_get('post_max_size');
 
-	public function setUploadMaxSize()
-	{
-		$uploadMaxSize = ini_get('upload_max_filesize');
-		$postMaxSize = ini_get('post_max_size');
+        define('POST_MAX_SIZE', convert_to_bytes($postMaxSize));
+        if(convert_to_bytes($uploadMaxSize) > convert_to_bytes($postMaxSize)) {
+            define('UPLOAD_MAX_FILESIZE', convert_to_bytes($postMaxSize));
+            define('UPLOAD_MAX_FILESIZE_TXT', $postMaxSize);
+        }else{
+            define('UPLOAD_MAX_FILESIZE', convert_to_bytes($uploadMaxSize));
+            define('UPLOAD_MAX_FILESIZE_TXT', $uploadMaxSize);
+        }
+    }
 
-		define('POST_MAX_SIZE', convert_to_bytes($postMaxSize));
-		if(convert_to_bytes($uploadMaxSize) > convert_to_bytes($postMaxSize)) {
-			define('UPLOAD_MAX_FILESIZE', convert_to_bytes($postMaxSize));
-			define('UPLOAD_MAX_FILESIZE_TXT', $postMaxSize);
-		}else{
-			define('UPLOAD_MAX_FILESIZE', convert_to_bytes($uploadMaxSize));
-			define('UPLOAD_MAX_FILESIZE_TXT', $uploadMaxSize);
-		}
-	}
+    public function setHeaderSecure()
+    {
+        // Get CI instance
+        $CI =& get_instance();
 
-	public function setHeaderSecure()
-	{
-		// Get CI instance
-		$CI =& get_instance();
+        // Only allow HTTPS cookies (no JS)
+        $CI->config->set_item('cookie_secure', TRUE);
+        $CI->config->set_item('cookie_httponly', TRUE);
 
-		// Only allow HTTPS cookies (no JS)
-		$CI->config->set_item('cookie_secure', TRUE);
-		$CI->config->set_item('cookie_httponly', TRUE);
+        // Set headers
+        $CI->output->set_header("Strict-Transport-Security: max-age=31536000")
+            ->set_header("X-Content-Type-Options: nosniff")
+            ->set_header("Referrer-Policy: strict-origin")
+            // 같은 사이트만 iframe 허용 (목록 셀 onclick popup 이 같은 사이트 화면을 띄움). 다른 사이트의 iframe(클릭재킹)은 막음
+            ->set_header("X-Frame-Options: SAMEORIGIN")
+            ->set_header("X-XSS-Protection: 1; mode=block");
 
-		// Set headers
-		$CI->output->set_header("Strict-Transport-Security: max-age=31536000")
-			->set_header("X-Content-Type-Options: nosniff")
-			->set_header("Referrer-Policy: strict-origin")
-			->set_header("X-Frame-Options: DENY")
-			->set_header("X-XSS-Protection: 1; mode=block");
-	}
+        // CSP: CSP_ENFORCE 는 차단, CSP_REPORT_ONLY 는 위반을 브라우저 콘솔로 보기만 한다
+        $cspHeader = '';
+        if(filter_var(getenv('CSP_ENFORCE'), FILTER_VALIDATE_BOOLEAN)) {
+            $cspHeader = 'Content-Security-Policy';
+        }elseif(filter_var(getenv('CSP_REPORT_ONLY'), FILTER_VALIDATE_BOOLEAN)) {
+            $cspHeader = 'Content-Security-Policy-Report-Only';
+        }
+        if($cspHeader !== '') {
+            // 화면별 추가: 컨트롤러 메서드에서 $this->cspExtra = ['media-src' => ['blob:']] (이 훅은 post_controller 라 메서드 뒤에 돈다)
+            $CI->output->set_header($cspHeader.': '.csp_policy(csp_nonce(), (array)($CI->cspExtra ?? [])));
+        }
+    }
 
-	public function doYield()
-	{
-		global $OUT;
-		$CI =& get_instance();
-		$output = $CI->output->get_output();
-		$CI->yield = isset($CI->yield) ? $CI->yield : TRUE;
-		$CI->layout = isset($CI->layout) ? $CI->layout : 'default';
-		if ($CI->yield === TRUE) {
-			if (!preg_match('/(.+).php$/', $CI->layout)) {
-				$CI->layout .= '.php';
-			}
-			$requested = APPPATH . 'views/layouts/' . $CI->layout;
-			$layout = $CI->load->file($requested, true);
-			$view = str_replace("{yield}", $output, $layout);
-		} else {
-			$view = $output;
-		}
-		$OUT->_display($view);
-	}
+    public function doYield()
+    {
+        global $OUT;
+        $CI =& get_instance();
+        $output = $CI->output->get_output();
+        $CI->yield = isset($CI->yield) ? $CI->yield : TRUE;
+        $CI->layout = isset($CI->layout) ? $CI->layout : 'default';
+        if ($CI->yield === TRUE) {
+            if (!preg_match('/(.+).php$/', $CI->layout)) {
+                $CI->layout .= '.php';
+            }
+            $requested = APPPATH . 'views/layouts/' . $CI->layout;
+            $layout = $CI->load->file($requested, true);
+            $view = str_replace("{yield}", $output, $layout);
+        } else {
+            $view = $output;
+        }
+        $OUT->_display($view);
+    }
 
-	function compress()
-	{
-		ini_set("pcre.recursion_limit", "16777");
-		$CI =& get_instance();
-		$buffer = $CI->output->get_output();
+    function compress()
+    {
+        ini_set("pcre.recursion_limit", "16777");
+        $CI =& get_instance();
+        $buffer = $CI->output->get_output();
 
-		$re = '%# Collapse whitespace everywhere but in blacklisted elements.
+        $re = '%# Collapse whitespace everywhere but in blacklisted elements.
         (?>             # Match all whitespans other than single space.
           [^\S ]\s*     # Either one [\t\r\n\f\v] and zero or more ws,
         | \s{2,}        # or two or more consecutive-any-whitespace.
@@ -211,15 +212,15 @@ class MY_Hooks
         )  # If we made it here, we are not in a blacklist tag.
         %Six';
 
-		$new_buffer = preg_replace($re, " ", $buffer);
+        $new_buffer = preg_replace($re, " ", $buffer);
 
-		// We are going to check if processing has working
-		if ($new_buffer === null)
-		{
-			$new_buffer = $buffer;
-		}
+        // We are going to check if processing has working
+        if ($new_buffer === null)
+        {
+            $new_buffer = $buffer;
+        }
 
-		$CI->output->set_output($new_buffer);
-		$CI->output->_display();
-	}
+        $CI->output->set_output($new_buffer);
+        $CI->output->_display();
+    }
 }

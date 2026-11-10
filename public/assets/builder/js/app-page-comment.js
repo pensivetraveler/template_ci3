@@ -8,6 +8,13 @@ function resetCommentForm() {
 	document.querySelector('.target-comment-wrap').setAttribute('data-loaded', 'false');
 }
 
+// 댓글 내용·작성자는 사용자가 입력한 글자라 innerHTML 에 넣기 전에 이스케이프한다
+function escapeCommentText(value) {
+	const div = document.createElement('div');
+	div.textContent = value ?? '';
+	return div.innerHTML;
+}
+
 function getCommentBtns(comment, isReply = false) {
 	let btnHTML = '';
 	if(!isReply) btnHTML += `<button class="btn p-1 btn-outline-primary btn-comment btn-comment-reply">${getLocale('Reply', common.LOCALE)}</button>`;
@@ -41,8 +48,8 @@ function setCommentList(comments) {
 					<i class="ri-corner-down-right-line"></i>
 					<div class="d-flex comment-wrap">
 						<div class="comment-info">
-							<div class="w-px-200 me-4 comment-creater">${reply.creater.name} (${reply.creater.id})</div>
-							<div class="flex-fill me-8 comment-content">${reply.content}</div>
+							<div class="w-px-200 me-4 comment-creater">${escapeCommentText(reply.creater.name)} (${escapeCommentText(reply.creater.id)})</div>
+							<div class="flex-fill me-8 comment-content">${escapeCommentText(reply.content)}</div>
 						</div>
 						<div class="d-flex justify-content-end align-items-center comment-btns">
 							<div class="btn-wrap">${replyBtns}</div>
@@ -57,8 +64,8 @@ function setCommentList(comments) {
 			<li class="py-6" data-comment-id="${comment.comment_id}" data-mine-yn="${comment.mine_yn}" data-commen-depth="0" data-is-admin="${comment.is_admin}">
 				<div class="d-flex comment-wrap">
 					<div class="comment-info">
-						<div class="w-px-200 me-4 comment-creater">${comment.creater.name} (${comment.creater.id})</div>
-						<div class="flex-fill me-8 comment-content">${comment.content}</div>
+						<div class="w-px-200 me-4 comment-creater">${escapeCommentText(comment.creater.name)} (${escapeCommentText(comment.creater.id)})</div>
+						<div class="flex-fill me-8 comment-content">${escapeCommentText(comment.content)}</div>
 					</div>
 					<div class="d-flex justify-content-end align-items-center comment-btns">
 						<div class="btn-wrap">${btnHTML}</div>
@@ -75,8 +82,8 @@ function setCommentList(comments) {
 }
 
 function getCommentList() {
-	$.ajax({
-		url : '/api/comments',
+	executeAjax({
+		url : common.API_BASE_URI + 'comments',
 		method : 'get',
 		data : {
 			article_id: document.getElementById('formComment').article_id.value,
@@ -92,6 +99,11 @@ function getCommentList() {
 
 $(function() {
 	const formComment = document.getElementById('formComment');
+
+	// 게시글 번호는 화면 식별자(common.KEY)에서 (폼 hidden 은 서버가 비워서 그린다)
+	if(!formComment.article_id.value) {
+		formComment.article_id.value = isObject(common.KEY) ? (common.KEY.article_id ?? '') : (common.KEY ?? '');
+	}
 
 	// Form validation for Add new record
 	let fv = FormValidation.formValidation(
@@ -180,7 +192,7 @@ $(function() {
 		// Send the form data to back-end
 		// You need to grab the form data and create an Ajax request to send them
 		submitAjax('#formComment', {
-			url: '/api/comments'+(formComment.comment_id.value?'/'+formComment.comment_id.value:''),
+			url: common.API_BASE_URI + 'comments'+(formComment.comment_id.value?'/'+formComment.comment_id.value:''),
 			success: function(response) {
 				showAlert({
 					type: 'success',
@@ -192,15 +204,15 @@ $(function() {
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.warn(jqXHR.responseJSON)
 				if(jqXHR.status === 422) {
-					jqXHR.responseJSON.errors.forEach(error => {
-						if(fv.fields.hasOwnProperty(error.param)) {
+					(jqXHR.responseJSON?.errors ?? []).forEach(error => {
+						if(Object.hasOwn(fv.fields, error.param)) {
 							fv.updateFieldStatus(error.param, 'Invalid', customValidatorsPreset.inflector(error.type));
 						}
 					});
 				}else{
 					showAlert({
 						type: 'warning',
-						text: jqXHR.responseJSON.msg,
+						text: getAjaxErrorMessage(jqXHR),
 						callback: getCommentList,
 					});
 				}
@@ -256,7 +268,7 @@ $(function() {
 				}).then(function (result) {
 					if (result.isConfirmed) {
 						executeAjax({
-							url: '/api/comments/'+formComment.comment_id.value,
+							url: common.API_BASE_URI + 'comments/'+formComment.comment_id.value,
 							method: 'delete',
 							after : {
 								callback: showAlert,

@@ -1,0 +1,413 @@
+function getFormData(form = null) {
+    if(!form) form = document.getElementById('formRecord');
+
+    const formData = new FormData();
+    form.querySelectorAll('input, textarea, select').forEach(function(node) {
+        if(!node.name) return;
+        if(checkInputSubmittable(node, form)){
+            if(node.type === 'file') {
+                let fileCnt = node.files.length;
+                if(fileCnt > 0) {
+                    if(fileCnt === 1) {
+                        formData.append(node.name, node.files[0]);
+                    }else{
+                        if(node.hasAttribute('max') && !isNaN(parseInt(node.getAttribute('max')))) {
+                            fileCnt = Math.min(fileCnt, parseInt(node.getAttribute('max')));
+                        }
+                        for(let i = 0; i < fileCnt; i++) {
+                            formData.append(node.name+'[]', node.files[i]);
+                        }
+                    }
+                }
+            }else {
+                // select2 - multiple 처리
+                // formData.append(node.name, node.value);
+                formData.append(node.name, $(node).val());
+            }
+        }
+    });
+
+    // 다중 체크박스를 모두 해제하면 전송할 값이 없으므로, 변경됐거나 항상 전송 대상이면 빈 값을 보내 해제를 저장
+    const checkboxNames = new Set();
+    form.querySelectorAll('input[type="checkbox"][name$="[]"]').forEach((node) => checkboxNames.add(node.name));
+    checkboxNames.forEach((name) => {
+        const nodes = [...form.querySelectorAll('input[type="checkbox"]')].filter((node) => node.name === name);
+        if(nodes.some((node) => node.checked)) return;
+        if(nodes.some((node) => isAttributeValueTrue(node, 'data-input-changed')
+            || (node.hasAttribute('data-detect-changed') && !isAttributeValueTrue(node, 'data-detect-changed')))) {
+            formData.append(name, '');
+        }
+    });
+
+    if(window['Dropzone'] !== undefined) {
+        for(const inst of Dropzone.instances){
+            let field = inst.element.getAttribute('data-field');
+            if(inst.files.length > 0) {
+                if(inst.files.length === 1) {
+                    formData.append(`${field}`, inst.files[0]);
+                } else {
+                    inst.files.forEach((file, index) => {
+                        formData.append(`${field}[${index}]`, file);
+                    });
+                }
+            }
+        }
+    }
+
+    logFormData(formData);
+
+    return formData;
+}
+
+function checkInputSubmittable(node, form) {
+    if(node.type === 'file') {
+        if(node.files.length > 0) return true;
+    }else{
+        // 체크 해제된 체크박스·라디오는 변경 여부와 관계없이 보내지 않음 (값이 'Y' 등이라 보내면 켜짐으로 저장됨)
+        if((node.type === 'checkbox' || node.type === 'radio') && node.checked !== true) {
+            return false;
+        }
+
+        if(node.hasAttribute('data-detect-changed') && !isAttributeValueTrue(node, 'data-detect-changed')) {
+            return true;
+        }else if(node.type === 'hidden') {
+            return true;
+        }else if(node.hasAttribute('required')) {
+            return true;
+        }else if(isAttributeValueTrue(node, 'data-input-changed')) {
+            return true;
+        }else if(node.hasAttribute('required-mod')) {
+            const requireMod = node.getAttribute('required-mod').split('|');
+            if (requireMod.includes(form['_mode'].value)) return true;
+        }else if(node.type === 'checkbox') {
+            if(node.checked === true) return true;
+        }else if(node.type === 'radio') {
+            if (node.checked === true) return true;
+        }
+    }
+    return false;
+}
+
+function checkDuplicate(button) {
+    try {
+        const fieldName = button.getAttribute('data-rel-field');
+        if(!fieldName) throw new Error(`checkDuplicate : fieldName is not defined !`);
+
+        const form = button.closest('form');
+        if(!Object.hasOwn(form, fieldName)) throw new Error(`checkDuplicate : fieldName is not valid !`);
+
+        const input = form[fieldName];
+        const hidden = form.querySelector(`[name="${input.name}_unique"]`);
+        const value = input.value;
+        const originalValue = input.getAttribute('data-original-value');
+
+        // 같은 값인 경우 중복 체크 하지 않음.
+        if(originalValue && originalValue === value) return;
+
+        // checked val 임시 처리
+        if(form['_event'] !== undefined) form['_event'].value = 'dup_check';
+        fv.revalidateField(input.name).then((status) => {
+            if(status === 'Valid') {
+                executeAjax({
+                    url: common.API_URI + '/checkDuplicate',
+                    data: {
+                        field: fieldName,
+                        value: input.value,
+                    },
+                    success: function(response, textStatus, jqXHR) {
+                        console.log(response)
+                        hidden.value = 1;
+                        button.setAttribute('disabled', 'disabled');
+                        showAlert({
+                            type: 'success',
+                            text: response.msg,
+                        });
+                    },
+                });
+            }else{
+                hidden.value = '';
+            }
+        });
+    } catch (error) {
+        customErrorHandler(error);
+    }
+}
+
+// 다운로드는 화면 주소(CURRENT_URI)의 downloader (수정·상세 페이지 주소 뒤에 붙이면 그 화면의 하위 경로가 됨)
+function downloadFile(fileId) {
+    location.href = `${common.CURRENT_URI}/downloader/${encodeURIComponent(fileId)}`;
+}
+
+function deleteFile(btn, type = '') {
+    const form = btn.closest('form');
+    const identifier = form[common.IDENTIFIER].value;
+
+    const listWrap = btn.closest('ul');
+    const itemWrap = btn.closest('.form-list-item');
+    if(!itemWrap.hasAttribute('data-full-item')) return;
+    const item = JSON.parse(itemWrap.getAttribute('data-full-item').replace(/'/g, '"'));
+
+    executeAjax({
+        url : common.API_URI + '/deleteFile/' + identifier + (type ? '?type='+type : ''),
+        method : 'patch',
+        data : item,
+        success: function(response) {
+            console.log(response)
+            showAlert({
+                type: 'success',
+                title: 'Complete',
+                text: response.msg,
+                callback: reload,
+            });
+            itemWrap.remove();
+            if(!listWrap.children.length) listWrap.classList.add('d-none');
+        },
+    });
+}
+
+function deleteRepeater(repeater, deleteElement) {
+    // 식별자는 리피터가 속한 폼에서 읽는다 (선언되지 않은 identifier 를 써서 ReferenceError 로 요청이 나가지 않았음)
+    const form = $(repeater).closest('form')[0];
+    const identifier = form && form[common.IDENTIFIER] ? form[common.IDENTIFIER].value : '';
+    if(!identifier) {
+        // 아직 저장하지 않은 행(등록 화면)은 화면에서만 지운다
+        $(repeater).slideUp(deleteElement);
+        return;
+    }
+
+    const data = {};
+    $(repeater).find('input, select, textarea').each(function(i , item) {
+        if(item.type === 'file') return;
+        data[item.getAttribute('data-group-field')] = item.value;
+    });
+
+    executeAjax({
+        url : common.API_URI + '/deleteRepeater/' + identifier,
+        method : 'patch',
+        data : data,
+        success: function(response) {
+            console.log(response)
+            showAlert({
+                type: 'success',
+                title: 'Complete',
+                text: response.msg,
+            });
+
+            $(repeater).slideUp(deleteElement)
+        },
+    });
+}
+
+function getData(key = null, params = {}) {
+    if(!key) throw new Error(`key is not defined`);
+
+    let dataParams;
+    if(Object.keys(common.API_PARAMS).length === 0){
+        dataParams = params;
+    }else{
+        dataParams = { ...common.API_PARAMS, ...params };
+    }
+
+    let data = null;
+    executeAjax({
+        async: false,
+        url : getUrlWithIdentifiers(common.API_URI, key, dataParams),
+        dataType: 'json',
+        success: function (response, textStatus, jqXHR) {
+            data = response.data[0];
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR)
+        }
+    });
+    return data;
+}
+
+function deleteData(dataId = null, callback = {}) {
+    if(!dataId) throw new Error(`dataId is not defined`);
+
+    Swal.fire({
+        title: getLocale('Do you really want to delete?', common.LOCALE),
+        text: getLocale('You can\'t undo this action', common.LOCALE),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: getLocale('Delete', common.LOCALE),
+        cancelButtonText: getLocale('Cancel', common.LOCALE),
+        customClass: {
+            confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+            cancelButton: 'btn btn-outline-secondary waves-effect'
+        },
+        buttonsStyling: false
+    }).then(function (result) {
+        if (result.isConfirmed) {
+            if(Object.keys(callback).length === 0) {
+                if(location.origin+location.pathname === common.PAGE_LIST_URI) {
+                    callback.callback = reload;
+                }else{
+                    callback.callback = redirect;
+                    callback.params = common.PAGE_LIST_URI;
+                }
+            }
+
+            executeAjax({
+                url: getUrlWithIdentifiers(common.API_URI, dataId, common.API_PARAMS),
+                method: 'delete',
+                after : {
+                    callback: showAlert,
+                    params: {
+                        type: 'success',
+                        title: 'Complete',
+                        text: 'Delete Completed',
+                        ...callback,
+                    },
+                }
+            });
+        }
+    });
+}
+
+function isMyData(dataId, showError = true) {
+    let result = false;
+    executeAjax({
+        async: false,
+        url: getUrlWithIdentifiers(common.API_URI + '/isMyData', dataId),
+        dataType: 'json',
+        success: function (response, textStatus, jqXHR) {
+            result = true;
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            if(showError) {
+                showAlert({
+                    type: 'warning',
+                    text: getAjaxErrorMessage(jqXHR),
+                });
+            }
+        },
+    });
+    return result;
+}
+
+function logout() {
+    executeAjax({
+        url: common.API_BASE_URI + '/auth/logout',
+        method: 'post',
+        dataType: 'json',
+        success: function (response, textStatus, jqXHR) {
+            redirect(common.NO_LOGIN_REDIRECT);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR)
+            showAlert({
+                type: 'warning',
+                text: getAjaxErrorMessage(jqXHR),
+            });
+        },
+    });
+}
+
+function getIdentifiersData(data, identifiers = [], asString = false) {
+    const obj = {};
+    const isDomObj = data instanceof Node;
+    const isForm = isDomObj&&data.tagName === 'FORM';
+
+    if(isDomObj&&!isForm) {
+        console.warn('data is not be able to parsed', data);
+        return obj;
+    }
+
+    if(identifiers.length) {
+        for(const field of identifiers) {
+            obj[field] = isForm?data[field].value:data[field];
+        }
+    }
+    return asString?JSON.stringify(obj):obj;
+}
+
+function getIdentifiersDataFromForm(form, identifiers = [], asString = false, add = true) {
+    return add?{}:getIdentifiersData(form, identifiers, asString);
+}
+
+function getUrlWithIdentifiers(url, identifierData = {}, addParams = {}) {
+    const params = copyObject(addParams);
+
+    if(isObject(identifierData)){
+        if(Object.keys(identifierData).length) {
+            if(Object.keys(identifierData).length === 1 && !isNaN(Object.values(identifierData)[0])){
+                url += '/' + Object.values(identifierData)[0];
+            }else{
+                Object.assign(params, identifierData);
+            }
+        }
+    }else{
+        url += '/' + identifierData;
+    }
+
+    if(Object.keys(params).length)
+        url += (url.indexOf('?') === -1 ? '?' : '&') + new URLSearchParams(params).toString();
+
+    return url;
+}
+
+function getRedirectActionData(node, identifiers = []) {
+    const obj = {};
+    if(identifiers.length) {
+        if($(node).data('id') === undefined){
+            for(const field of identifiers) obj[field] = $(node).data(field);
+        }else{
+            obj[identifiers[0]] = $(node).data('id');
+        }
+    }
+    return obj;
+}
+
+function getRedirectActionUrl(button, url, identifiers = []) {
+    return getUrlWithIdentifiers(url, getRedirectActionData(button, identifiers));
+}
+
+function prepareExports(kind, filterData = null) {
+    executeAjax({
+        data : {
+            exportType: kind !== 'csv' ? 'xlsx' : kind,
+            filters: filterData
+        },
+        url : getUrlWithIdentifiers(common.API_URI+'/prepareExports', {}, common.API_PARAMS),
+        success: function(response, textStatus, jqXHR) {
+            downloadExports(response.data[0].filename);
+        },
+    });
+}
+
+// API 는 AJAX·인증 헤더가 있어야 하므로(운영) 주소를 바로 열지 않고 요청으로 받아 저장한다
+function downloadExports(filename) {
+    executeAjax({
+        data : {filename: filename},
+        url : common.API_URI+'/downloadExports',
+        dataType : 'binary',
+        xhrFields : {responseType: 'blob'},
+        responseFields : {binary: 'responseBlob'},
+        success: function(blob, textStatus, jqXHR) {
+            const name = /filename="([^"]+)"/.exec(jqXHR.getResponseHeader('Content-Disposition') || '');
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name ? name[1] : 'export';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+        },
+        // 오류 응답(JSON)도 Blob 으로 온다
+        error: function(jqXHR) {
+            Promise.resolve(jqXHR.responseBlob?.text())
+                .then(JSON.parse)
+                .catch(() => undefined)
+                .then(function(json) {
+                    jqXHR.responseJSON = json;
+                    showAlert({
+                        type: 'error',
+                        text: getAjaxErrorMessage(jqXHR),
+                    });
+                });
+        },
+    });
+}

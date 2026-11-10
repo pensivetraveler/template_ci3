@@ -314,7 +314,7 @@ $config['cache_query_string'] = FALSE;
 | https://codeigniter.com/user_guide/libraries/encryption.html
 |
 */
-$config['encryption_key'] = 'PLAYTALKTALK';
+$config['encryption_key'] = '';
 
 /*
 |--------------------------------------------------------------------------
@@ -369,12 +369,12 @@ $config['encryption_key'] = 'PLAYTALKTALK';
 */
 $config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'ci_session';
-$config['sess_expiration'] = 7200;
-$config['sess_save_path'] = 'tbl_session';
+$config['sess_expiration'] = 7200; // .env SESS_EXPIRATION 이 있으면 MY_Hooks::loadEnv 가 덮어씀
+$config['sess_save_path'] = 'tbl_user_session';
 $config['sess_expire_on_close'] = FALSE;
 $config['sess_encrypt_cookie'] = TRUE;
 $config['sess_use_database'] = TRUE;
-$config['sess_table_name']  = 'tbl_session';
+$config['sess_table_name']  = 'tbl_user_session';
 $config['sess_match_ip'] = TRUE;
 $config['sess_match_useragent'] = FALSE;
 $config['sess_time_to_update'] = 300;
@@ -399,7 +399,7 @@ $config['cookie_prefix']	= '';
 $config['cookie_domain']	= '';
 $config['cookie_path']		= '/';
 $config['cookie_secure']    = TRUE;
-$config['cookie_httponly'] 	= FALSE;
+$config['cookie_httponly'] 	= TRUE;
 $config['cookie_lifetime']  = 36500;
 
 /*
@@ -471,7 +471,7 @@ $config['csrf_exclude_uris'] = array();
 | by the output class.  Do not 'echo' any values with compression enabled.
 |
 */
-$config['compress_output'] = TRUE;
+$config['compress_output'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -516,4 +516,4 @@ $config['rewrite_short_tags'] = FALSE;
 | Comma-separated:	'10.0.1.200,192.168.5.0/24'
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
-$config['proxy_ips'] = '';
+$config['proxy_ips'] = getenv('PROXY_IPS') ?: ''; // 예: ALB가 있는 VPC 대역 10.0.0.0/16

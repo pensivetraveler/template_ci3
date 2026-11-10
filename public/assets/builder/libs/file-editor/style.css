@@ -1,0 +1,153 @@
+*:has(>.file-tree-wrap) {
+    background-color: #f8f9fa;
+}
+
+.file-tree-wrap {
+    max-height: 720px;
+    overflow: auto;
+}
+
+.file-tree {
+    padding: 8px;
+    font-size: 14px;
+    border: unset !important;
+}
+
+.file-tree ul {
+    list-style: none;
+    padding-left: 16px;
+    margin-top: 4px;
+}
+
+.file-tree-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 7px 9px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    color: #495057;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.file-tree-item:hover {
+    background-color: rgba(13, 110, 253, .08);
+    color: #0d6efd;
+}
+
+.file-tree-item.active {
+    background-color: rgba(13, 110, 253, .12);
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.file-tree-item.directory {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.file-tree-icon {
+    width: 22px;
+    flex: 0 0 22px;
+    text-align: center;
+}
+
+.file-tree-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-tree-ext {
+    margin-left: auto;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.editor-empty-state {
+    height: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: #f8f9fa;
+}
+
+.editor-wrap {
+    height: 650px;
+}
+
+.monaco-editor-box {
+    height: 650px;
+    border-top: 1px solid #dee2e6;
+}
+
+.image-editor-wrap {
+    padding: 16px;
+    min-height: 650px;
+    background: #f8f9fa;
+}
+
+.image-preview-box {
+    min-height: 500px;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.image-preview-box img {
+    max-width: 100%;
+    max-height: 560px;
+    object-fit: contain;
+    display: block;
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+#currentFileLabel {
+    display: inline-block;
+    max-width: 520px;
+}
+
+.file-tree-toggle {
+    margin-left: auto;
+    font-size: 11px;
+    color: #adb5bd;
+    transition: transform .15s ease;
+}
+
+.file-tree-item.directory.open .file-tree-toggle {
+    transform: rotate(90deg);
+}
+
+.file-tree-children {
+    display: none;
+}
+
+.file-tree-children.open {
+    display: block;
+}
+
+@media (max-width: 991.98px) {
+    .file-tree-wrap {
+        max-height: 320px;
+    }
+
+    .editor-empty-state,
+    .editor-wrap,
+    .monaco-editor-box,
+    .image-editor-wrap {
+        height: 520px;
+        min-height: 520px;
+    }
+}

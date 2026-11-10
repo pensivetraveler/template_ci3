@@ -93,21 +93,24 @@ function get_file_size_unit($filesize)
 // byte 단위의 파일크기를 KB로 변환
 // 크기가 1MB 이상이 되면 소수점을 생략하고
 // 그이하일 경우는 소수점 둘째자리까지 출력한다.
-function get_file_size_to_kb($filesize)
+function get_file_size_to_kb($filesize, $to_string = true)
 {
-	$int_temp = "";
-	$arr_temp = array();
-
-	$int_temp = round($filesize/1024,2);
+	$int_temp = round((float)$filesize/1024,2);
 	$arr_temp = explode(".", $int_temp);
 
 	if(count($arr_temp) > 1) {
-		if (intval($arr_temp[0]) > 999 || intval($arr_temp[1]) == 0) {
-			$rtn = number_format($arr_temp[0]);
-		} else {
-			$rtn = number_format($arr_temp[0].".".$arr_temp[1],2);
-		}
-	}
+        if($to_string) {
+            if (intval($arr_temp[0]) > 999 || intval($arr_temp[1]) == 0) {
+                $rtn = number_format($arr_temp[0]);
+            } else {
+                $rtn = number_format($arr_temp[0].".".$arr_temp[1],2);
+            }
+        }else{
+            $rtn = $int_temp;
+        }
+	}else{
+        $rtn = $arr_temp[0];
+    }
 
 	return $rtn;
 }
@@ -160,18 +163,45 @@ function get_basename($path)
 // link 상 파일 존재하는지 여부 확인하기
 function is_url_exists($url)
 {
-	$ch = curl_init($url);
-	curl_setopt($ch, CURLOPT_NOBODY, true);
-	curl_exec($ch);
-	$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    // 1차: HEAD 요청
+    $ch = curl_init($url);
 
-	if ($code == 200) {
-		$status = true;
-	} else {
-		$status = false;
-	}
-	curl_close($ch);
-	return $status;
+    curl_setopt($ch, CURLOPT_NOBODY, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    curl_exec($ch);
+
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    // 정상 응답
+    if ($code >= 200 && $code < 400) {
+        return true;
+    }
+
+    // HEAD가 막힌 경우 GET으로 재시도
+    if ($code == 405) {
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_NOBODY, false);
+        curl_setopt($ch, CURLOPT_HTTPGET, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        curl_exec($ch);
+
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        return ($code >= 200 && $code < 400);
+    }
+
+    return false;
 }
 
 function get_file_size($filesize, $add_unit_text = false)
@@ -218,4 +248,19 @@ function convert_to_bytes($size)
 	}
 
 	return $size; // 바이트 단위로 변환
+}
+
+function convert_allowed_types_to_accept(string $allowedTypes): string
+{
+    $types = explode('|', $allowedTypes);
+    $accept = [];
+
+    foreach ($types as $type) {
+        $type = strtolower(trim($type));
+        if ($type !== '') {
+            $accept[] = '.' . $type;
+        }
+    }
+
+    return implode(',', array_unique($accept));
 }

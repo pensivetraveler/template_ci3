@@ -1,70 +1,112 @@
 <?php
-function is_admin_active_page($menu, $current_uri = ''): bool
+if ( ! function_exists('is_active_page'))
 {
-    if(isset($menu['subMenu'])){
-        $activated = false;
-        foreach ($menu['subMenu'] as $submenu) {
-            if(is_active_page($submenu['route'], $submenu['params'], $current_uri)) $activated = true;
+    function is_active_page($menu, $current_uri = ''): bool
+    {
+        if($menu['isSubMenu']){
+            $activated = false;
+            foreach ($menu['subMenu'] as $submenu) {
+                if(is_current_uri($submenu['attr']['href'], $submenu['params'], $current_uri)) $activated = true;
+            }
+            return $activated;
+        }else{
+            return is_current_uri($menu['attr']['href'], $menu['params'], $current_uri);
         }
-        return $activated;
-    }else{
-        return is_active_page($menu['route'], $menu['params'], $current_uri);
     }
 }
 
-function get_admin_breadcrumbs($title_list): string
+if ( ! function_exists('get_breadcrumbs'))
 {
-    $CI =& get_instance();
+    function get_breadcrumbs($title_list): string
+    {
+        $CI =& get_instance();
 
-    $html = '';
-    foreach ($title_list as $title) {
-        $title = $CI->lang->line('nav.'.$title);
-        $html .= "<li class='breadcrumb-item'><a href='javascript:void(0);'>{$title}</a></li>";
+        $html = '';
+        foreach ($title_list as $i=>$title) {
+            $active = $i === count($title_list)-1 ? 'active' : '';
+            $html .= "<li class='breadcrumb-item {$active}'>";
+            $title = html_escape($CI->lang->line('nav.'.$title));
+            if($i !== count($title_list)-1) {
+                $html .= "<a href='#' class='pe-2'>{$title}</a><i class='breadcrumb-icon icon-base ri ri-arrow-right-s-line align-middle'></i>";
+            }else{
+                $html .= $title;
+            }
+            $html .= "</li>";
+        }
+        return $html;
     }
-    return $html;
 }
 
-function get_icon($icon_class_name, $svg = false, $size = 18, $classname = ''): string
+if ( ! function_exists('get_icon'))
 {
-	if(!$icon_class_name) return '';
-	if($classname) {
-		if(is_array($classname)) {
-			$classname = implode('.', $classname);
-		}else{
-			$classname = str_replace(' ', '.', $classname);
-		}
-		if($classname && substr($classname, 0, 1) === '.') $classname = substr($classname, 1);
-	}
-	if(!$size) $size = 18;
-	return $svg?file_get_contents(BUILDER_ASSET_SVG_PATH.'icons/'.$icon_class_name.'.svg'):convert_selector_to_html("i.$icon_class_name.$classname.ri-{$size}px");
+    function get_icon($icon_class_name, $svg = false, $size = 18, $classname = ''): string
+    {
+        if(!$icon_class_name) return '';
+        if($classname) {
+            if(is_array($classname)) {
+                $classname = implode('.', $classname);
+            }else{
+                $classname = str_replace(' ', '.', $classname);
+            }
+            if($classname && substr($classname, 0, 1) === '.') $classname = substr($classname, 1);
+        }
+        if(!$size) $size = 18;
+        return $svg?file_get_contents(BUILDER_ASSET_SVG_PATH.'icons/'.$icon_class_name.'.svg'):convert_selector_to_html("i.$icon_class_name.$classname.ri-{$size}px");
+    }
 }
 
-function get_icon_by_type($type, $svg = false, $size = 18): string
+if ( ! function_exists('get_icon_by_type'))
 {
-	$classname = get_icon_classname_by_type($type);
-	return get_icon($classname, $svg, $size);
+    function get_icon_by_type($type, $svg = false, $size = 18): string
+    {
+        $classname = get_icon_classname_by_type($type);
+        return get_icon($classname, $svg, $size);
+    }
 }
 
-function get_icon_classname_by_type($type): string
+if ( ! function_exists('get_icon_classname_by_type'))
 {
-	switch (strtolower($type)) {
-		case "file" :
-			return 'ri-attachment-line';
-		case "zipcode" :
-			return 'ri-building-line';
-		case "text" :
-			return 'ri-text';
-		case "tel" :
-			return 'ri-phone-fill';
-		case "textarea" :
-			return 'ri-chat-4-line';
-		case "date" :
-			return 'ri-calendar-line';
-		case "time" :
-			return 'ri-time-line';
-		case "pdf" :
-			return 'ri-file-pdf-2-fill';
-		default :
-			return '';
-	}
+    function get_icon_classname_by_type($type): string
+    {
+        switch (strtolower($type)) {
+            case "file" :
+                return 'ri-attachment-line';
+            case "zipcode" :
+                return 'ri-building-line';
+            case "color" :
+                return 'ri-palette-line';
+            case "text" :
+                return 'ri-text';
+            case "tel" :
+                return 'ri-phone-fill';
+            case "textarea" :
+                return 'ri-chat-4-line';
+            case "date" :
+                return 'ri-calendar-line';
+            case "time" :
+                return 'ri-time-line';
+            case "pdf" :
+                return 'ri-file-pdf-2-fill';
+            default :
+                return '';
+        }
+    }
+}
+
+if ( ! function_exists('show_alert'))
+{
+    function show_alert($type = 'error', $text = 'error occurred', $parent = false): string
+    {
+        $func = $parent?'window.parent.showAlert':'showAlert';
+        $nonce = csp_nonce_attr();
+        echo "
+        <script{$nonce}>
+            $func({
+                type: '$type',
+                text: '$text',
+            });
+        </script>
+        ";
+        exit;
+    }
 }

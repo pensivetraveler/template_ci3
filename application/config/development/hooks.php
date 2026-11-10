@@ -51,7 +51,7 @@ $hook['pre_system'][] = array(
  * System Of Inspection
  * 서버 점검 시, 모든 라우트에 대한 접근 제한을 해아할 경우
  */
-$hook['pre_controller'][] = array(
+$hook['post_controller_constructor'][] = array(
 	'class'    => 'MY_Hooks',
 	'function' => 'systemOfInspection',
 	'filename' => 'MY_Hooks.php',
@@ -137,7 +137,7 @@ $hook['post_controller'][] = array(
  * Compress output only in production mode.
  * https://github.com/bkader/ci-starter-kit/
  */
-if (ENVIRONMENT == 'production')
+if (IS_PRODUCTION)
 {
 	$hook['display_override'][] = array(
 		'class'    => 'MY_Hooks',

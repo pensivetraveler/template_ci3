@@ -33,7 +33,7 @@ class MY_Loader extends CI_Loader
 
 		if($valid && !file_exists(VIEWPATH.$view.'.php')) {
 			$valid = false;
-			trigger_error("viewApp : View file '$view' does not exist.", E_USER_ERROR);
+			show_error("viewApp : View file '$view' does not exist.", E_USER_ERROR);
 		}
 
 		// 부모 클래스의 view() 메소드를 호출하여 실제 뷰를 로드

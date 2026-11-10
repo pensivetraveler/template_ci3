@@ -4,6 +4,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 define("BUILDER_ASSET_URI", 'public/assets/' . basename(__DIR__) . '/');
 
 const BUILDER_FLAGNAME = 'builder';
+
+// filter 폼 기본 colspan (플랫폼 공통: reformat_filter_data, MY_Builder_WEB::setFilterColumns)
+const FILTER_BASE_COLSPAN = 3;
 const BUILDER_ASSET_PATH = FCPATH . BUILDER_ASSET_URI;
 
 const BUILDER_ASSET_AUDIO_URI = BUILDER_ASSET_URI . 'audio/';
@@ -17,6 +20,9 @@ const BUILDER_ASSET_IMG_PATH = FCPATH . BUILDER_ASSET_IMG_URI;
 
 const BUILDER_ASSET_JS_URI = BUILDER_ASSET_URI . 'js/';
 const BUILDER_ASSET_JS_PATH = FCPATH . BUILDER_ASSET_JS_URI;
+
+const BUILDER_ASSET_LIBS_URI = BUILDER_ASSET_URI . 'libs/';
+const BUILDER_ASSET_LIBS_PATH = FCPATH . BUILDER_ASSET_JS_URI;
 
 const BUILDER_ASSET_JSON_URI = BUILDER_ASSET_URI . 'json/';
 const BUILDER_ASSET_JSON_PATH = FCPATH . BUILDER_ASSET_JSON_URI;

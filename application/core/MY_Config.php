@@ -6,23 +6,30 @@ class MY_Config extends CI_Config
     public function __construct()
     {
         parent::__construct();
-    }
+	}
 
     public function get($item, $default = null, $triggerError = true)
     {
-        $CI =& get_instance();
+		$CI =& get_instance();
 
-        if(is_null($this->item($item))) $CI->logger("MY_Config-get : $item does not exist.", E_USER_ERROR, $triggerError);
-
-        if($this->item($item) === null) {
-            return $default;
-        }else{
-            if(empty($this->item($item))) {
-                return $default === null ? $this->item($item) : $default;
-            }else{
-                return $this->item($item);
+        $result = null;
+        if(is_array($item)) {
+            if(!is_list_type($item)) show_error(__METHOD__.' : Please Check Config Item');
+            foreach ($item as $value) {
+                if(!is_null($this->item($value))) {
+                    $result = $this->item($value);
+                    break;
+                }
             }
+        }else{
+            $result = $this->item($item);
         }
+
+        if(is_null($result) && $triggerError) {
+            $CI->logging("MY_Config-get : $item does not exist.", E_USER_ERROR, $triggerError);
+        }
+
+        return $result ?? $default;
     }
 
     // . 으로 구성된 Config 처리

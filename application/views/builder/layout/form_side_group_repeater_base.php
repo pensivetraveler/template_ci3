@@ -18,12 +18,15 @@
 				<div class="col-sm-12">
 					<?php
 						foreach ($item['data'] as $fieldName=>$fieldData) :
+							// 행마다 group[i][field] (envelope 아니면 field[i]) name/id
+							$fieldData['name'] = get_group_field_name($fieldData['group_attributes'], $fieldData['group'], $fieldData['field'], $i);
+							$fieldData['id'] = get_group_field_id($fieldData['group_attributes'], $fieldData['group'], $fieldData['field'], $i);
 							if($fieldData['type'] === 'hidden') :
 								echo form_input(
 									[
 										'type' => 'hidden',
-										'name' => get_group_field_name($fieldData['attr'], $fieldData['group'], $fieldData['field']),
-										'id' => get_group_field_id($fieldData['attr'], $fieldData['group'], $fieldData['field']),
+										'name' => $fieldData['name'],
+										'id' => $fieldData['id'],
 									],
 									'',
 									$fieldData['attributes'],
@@ -39,7 +42,7 @@
 										case 'password' :
 											echo form_password(
 												[
-													'name' => $fieldData['field'],
+													'name' => $fieldData['name'],
 													'id' => $fieldData['id'],
 												],
 												set_admin_form_value($fieldData['field'], $fieldData['default'], null),
@@ -52,7 +55,7 @@
 											break;
 										case 'select' :
 											echo form_dropdown(
-												$fieldData['field'],
+												$fieldData['name'],
 												$fieldData['options'] ?? [],
 												set_admin_form_value($fieldData['field'], $fieldData['default'], null),
 												array_merge([
@@ -64,7 +67,7 @@
 										case 'textarea' :
 											echo form_textarea(
 												[
-													'name' => $fieldData['field'],
+													'name' => $fieldData['name'],
 													'id' => $fieldData['id'],
 													'rows' => $fieldData['attributes']['rows']
 												],
@@ -74,7 +77,7 @@
 											break;
 										case 'file' :
 											echo form_upload([
-												'name' => $fieldData['field'],
+												'name' => $fieldData['name'],
 												'id' => $fieldData['id'],
 											], $fieldData['attributes']);
 											break;
@@ -82,7 +85,7 @@
 											echo form_input(
 												[
 													'type' => $fieldData['type'],
-													'name' => $fieldData['field'],
+													'name' => $fieldData['name'],
 													'id' => $fieldData['id'],
 												],
 												set_admin_form_value($fieldData['field'], $fieldData['default'], null),

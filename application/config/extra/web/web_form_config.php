@@ -32,7 +32,7 @@ $config['form_find_id_config'] = [
 	[
 		'field' => 'email',
 		'label' => 'lang:user.email',
-		'rules' => 'trim|required|is_unique[user.email.user_id]',
+		'rules' => 'trim|required',
 		'category' => 'base',
 		'type' => 'email',
 		'icon' => 'ri-font-family',
@@ -57,6 +57,45 @@ $config['form_find_id_config'] = [
 		'default' => '',
 		'list' => true,
 		'list_attributes' => [],
+	],
+	[
+		'field' => 'name',
+		'label' => 'lang:user.name',
+		'rules' => 'trim|required',
+		'category' => 'base',
+		'type' => 'text',
+		'icon' => 'ri-user-line',
+		'attributes' => [
+			'autocomplete' => 'off',
+		],
+	],
+];
+
+$config['form_reset_password_config'] = [
+	[
+		'field' => 'password',
+		'label' => 'lang:user.password',
+		'rules' => 'trim|required|min_length[4]|max_length[15]|strong_password',
+		'category' => 'base',
+		'type' => 'password',
+		'icon' => 'ri-lock-password-line',
+		'form_text' => 'Please enter 4 to 15 characters, including letters and numbers',
+		'attributes' => [
+			'autocomplete' => 'new-password',
+			'placeholder' => 'Password Dots',
+		],
+	],
+	[
+		'field' => 'password_confirm',
+		'label' => 'lang:user.password_confirm',
+		'rules' => 'trim|required|password_matches[password]',
+		'category' => 'base',
+		'type' => 'password',
+		'icon' => 'ri-lock-password-fill',
+		'attributes' => [
+			'autocomplete' => 'new-password',
+			'placeholder' => 'Password Dots',
+		],
 	],
 ];
 
@@ -120,15 +159,6 @@ $config['form_password_check_config'] = [
 
 $config['form_signup_config'] = [
 	[
-		'field' => 'user_cd',
-		'label' => 'lang:user.user_cd',
-		'form' => true,
-		'rules' => 'trim',
-		'type' => 'hidden',
-		'default' => 'USR002',
-		'list' => false,
-	],
-	[
 		'field' => 'id',
 		'label' => 'lang:user.id',
 		'rules' => 'trim|required|min_length[4]|is_unique[user.id.user_id]',
@@ -156,7 +186,7 @@ $config['form_signup_config'] = [
 	[
 		'field' => 'password',
 		'label' => 'lang:user.password',
-		'rules' => 'trim|required_mod[add]|min_length[4]|max_length[15]|strong_password',
+		'rules' => 'trim|required|min_length[4]|max_length[15]|strong_password',
 		'form' => true,
 		'errors' => [],
 		'category' => 'group',
@@ -183,7 +213,7 @@ $config['form_signup_config'] = [
 	[
 		'field' => 'password_confirm',
 		'label' => 'lang:user.password_confirm',
-		'rules' => 'trim|required_mod[add]|password_matches[password]',
+		'rules' => 'trim|required|password_matches[password]',
 		'form' => true,
 		'errors' => [],
 		'category' => 'group',
@@ -243,88 +273,6 @@ $config['form_signup_config'] = [
 		'icon' => null,
 		'form_text' => '',
 		'attributes' => [],
-		'default' => '',
-		'list' => true,
-		'list_attributes' => [],
-	],
-	[
-		'field' => 'code',
-		'label' => 'lang:student.code',
-		'form' => true,
-		'rules' => 'trim|required|exact_length[8]|integer|is_unique[student.code.student_id]',
-		'errors' => [],
-		'category' => 'custom',
-		'type' => 'text',
-		'subtype' => 'unique',
-		'icon' => 'ri-number-2',
-		'form_text' => 'Enter The Student Code',
-		'attributes' => [],
-		'form_attributes' => [
-			'with_btn' => true,
-			'btn_type' => 'dup_check',
-			'btn_params' => '{"key":"code", "title":"학번"}',
-			'text_type' => 'num',
-		],
-		'default' => '',
-		'list' => true,
-		'list_attributes' => [],
-	],
-	[
-		'field' => 'grade',
-		'label' => 'lang:student.grade',
-		'form' => true,
-		'rules' => 'trim|required',
-		'errors' => [],
-		'type' => 'select',
-		'subtype' => 'selectpicker',
-		'attributes' => [
-			'placeholder' => 'Select The Grade',
-		],
-		'option_attributes' => [
-			'option_type' => 'field',
-		],
-		'default' => '',
-		'list' => true,
-		'list_attributes' => [],
-	],
-	[
-		'field' => 'disabilities_yn',
-		'label' => 'lang:student.disabilities_yn',
-		'form' => true,
-		'rules' => 'trim',
-		'errors' => [],
-        'type' => 'checkbox',
-        'subtype' => 'single',
-        'option_attributes' => [
-            'option_type' => 'static',
-            'option_data' => [
-                'Y' => 'lang:student.disabilities_yn',
-            ],
-        ],
-        'form_attributes' => [
-            'detect_changed' => true,
-        ],
-		'default' => '',
-		'list' => true,
-		'list_attributes' => [],
-	],
-	[
-		'field' => 'aac_yn',
-		'label' => 'lang:student.aac_yn',
-		'form' => true,
-		'rules' => 'trim',
-		'errors' => [],
-        'type' => 'checkbox',
-        'subtype' => 'single',
-        'option_attributes' => [
-            'option_type' => 'static',
-            'option_data' => [
-                'Y' => 'lang:student.aac_yn',
-            ],
-        ],
-        'form_attributes' => [
-            'detect_changed' => true,
-        ],
 		'default' => '',
 		'list' => true,
 		'list_attributes' => [],
@@ -570,7 +518,8 @@ $config['form_myinfo_config'] = [
 	[
 		'field' => 'id',
 		'label' => 'lang:user.id',
-		'rules' => 'trim|required|min_length[4]|is_unique[user.id.user_id]',
+		// 내 정보에서는 읽기 전용이라 사용자가 고칠 수 없으므로 검증하지 않는다 (중복은 모델 uniqueKeyList 검사가 막음)
+		'rules' => 'trim',
 		'form' => true,
 		'errors' => [],
 		'type' => 'text',

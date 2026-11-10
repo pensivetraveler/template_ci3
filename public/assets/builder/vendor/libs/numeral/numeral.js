@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -26,7 +18,21 @@ return /******/ (function() { // webpackBootstrap
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   numeral: function() { return /* reexport default from dynamic */ numeral__WEBPACK_IMPORTED_MODULE_0___default.a; }\n/* harmony export */ });\n/* harmony import */ var numeral__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! numeral */ \"./node_modules/numeral/numeral.js\");\n/* harmony import */ var numeral__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(numeral__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var numeral_locales__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! numeral/locales */ \"./node_modules/numeral/locales.js\");\n/* harmony import */ var numeral_locales__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(numeral_locales__WEBPACK_IMPORTED_MODULE_1__);\n\n\ntry {\n  window.numeral = (numeral__WEBPACK_IMPORTED_MODULE_0___default());\n} catch (e) {}\n\n\n//# sourceURL=webpack://Materialize/./libs/numeral/numeral.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   numeral: function() { return /* reexport default from dynamic */ numeral__WEBPACK_IMPORTED_MODULE_0___default.a; }
+/* harmony export */ });
+/* harmony import */ var numeral__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! numeral */ "./node_modules/numeral/numeral.js");
+/* harmony import */ var numeral__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(numeral__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var numeral_locales__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! numeral/locales */ "./node_modules/numeral/locales.js");
+/* harmony import */ var numeral_locales__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(numeral_locales__WEBPACK_IMPORTED_MODULE_1__);
+
+
+try {
+  window.numeral = (numeral__WEBPACK_IMPORTED_MODULE_0___default());
+} catch (e) {}
+}
 
 /***/ }),
 
@@ -36,7 +42,853 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \*****************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! @preserve\n * numeral.js\n * locales : 2.0.6\n * license : MIT\n * http://adamwdraper.github.com/Numeral-js/\n */\n\n(function (global, factory) {\n    if (true) {\n        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! numeral */ \"./node_modules/numeral/numeral.js\")], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),\n\t\t__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?\n\t\t(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),\n\t\t__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));\n    } else {}\n}(this, function (numeral) {\n    \n(function() {\n        numeral.register('locale', 'bg', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: { // I found these here http://www.unicode.org/cldr/charts/28/verify/numbers/bg.html\n            thousand: 'хил',\n            million: 'млн',\n            billion: 'млрд',\n            trillion: 'трлн'\n        },\n        ordinal: function (number) {\n            // google translate suggests:\n            // 1st=1-ви; 2nd=2-ри; 7th=7-ми;\n            // 8th=8-ми and many others end with -ти\n            // for example 3rd=3-ти\n            // However since I've seen suggestions that in\n            // Bulgarian the ordinal can be taken in\n            // different forms (masculine, feminine, neuter)\n            // I've opted to wimp out on commiting that to code\n            return '';\n        },\n        currency: {\n            symbol: 'лв'\n        }\n    });\n})();\n\n\n(function() {\n    \n    numeral.register('locale', 'chs', {\n        delimiters: {\n            thousands: ',',\n            decimal: '.'\n        },\n        abbreviations: {\n            thousand: '千',\n            million: '百万',\n            billion: '十亿',\n            trillion: '兆'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: '¥'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'cs', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'tis.',\n            million: 'mil.',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function () {\n            return '.';\n        },\n        currency: {\n            symbol: 'Kč'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'da-dk', {\n        delimiters: {\n            thousands: '.',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'mio',\n            billion: 'mia',\n            trillion: 'b'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: 'DKK'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'de-ch', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: 'CHF'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'de', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'en-au', {\n        delimiters: {\n            thousands: ',',\n            decimal: '.'\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            var b = number % 10;\n            return (~~ (number % 100 / 10) === 1) ? 'th' :\n                (b === 1) ? 'st' :\n                (b === 2) ? 'nd' :\n                (b === 3) ? 'rd' : 'th';\n        },\n        currency: {\n            symbol: '$'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'en-gb', {\n        delimiters: {\n            thousands: ',',\n            decimal: '.'\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            var b = number % 10;\n            return (~~ (number % 100 / 10) === 1) ? 'th' :\n                (b === 1) ? 'st' :\n                (b === 2) ? 'nd' :\n                (b === 3) ? 'rd' : 'th';\n        },\n        currency: {\n            symbol: '£'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'en-za', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            var b = number % 10;\n            return (~~ (number % 100 / 10) === 1) ? 'th' :\n                (b === 1) ? 'st' :\n                    (b === 2) ? 'nd' :\n                        (b === 3) ? 'rd' : 'th';\n        },\n        currency: {\n            symbol: 'R'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'es-es', {\n        delimiters: {\n            thousands: '.',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'mm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            var b = number % 10;\n            return (b === 1 || b === 3) ? 'er' :\n                (b === 2) ? 'do' :\n                    (b === 7 || b === 0) ? 'mo' :\n                        (b === 8) ? 'vo' :\n                            (b === 9) ? 'no' : 'to';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'es', {\n        delimiters: {\n            thousands: '.',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'mm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            var b = number % 10;\n            return (b === 1 || b === 3) ? 'er' :\n                (b === 2) ? 'do' :\n                (b === 7 || b === 0) ? 'mo' :\n\t\t(b === 8) ? 'vo' :\n\t\t(b === 9) ? 'no' : 'to';\n        },\n        currency: {\n            symbol: '$'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'et', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: ' tuh',\n            million: ' mln',\n            billion: ' mld',\n            trillion: ' trl'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'fi', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'M',\n            billion: 'G',\n            trillion: 'T'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'fr-ca', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'M',\n            billion: 'G',\n            trillion: 'T'\n        },\n        ordinal : function (number) {\n            return number === 1 ? 'er' : 'e';\n        },\n        currency: {\n            symbol: '$'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'fr-ch', {\n        delimiters: {\n            thousands: '\\'',\n            decimal: '.'\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal : function (number) {\n            return number === 1 ? 'er' : 'e';\n        },\n        currency: {\n            symbol: 'CHF'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'fr', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal : function (number) {\n            return number === 1 ? 'er' : 'e';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'hu', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'E',  // ezer\n            million: 'M',   // millió\n            billion: 'Mrd', // milliárd\n            trillion: 'T'   // trillió\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: ' Ft'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'it', {\n        delimiters: {\n            thousands: '.',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'mila',\n            million: 'mil',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            return 'º';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'ja', {\n        delimiters: {\n            thousands: ',',\n            decimal: '.'\n        },\n        abbreviations: {\n            thousand: '千',\n            million: '百万',\n            billion: '十億',\n            trillion: '兆'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: '¥'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'lv', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: ' tūkst.',\n            million: ' milj.',\n            billion: ' mljrd.',\n            trillion: ' trilj.'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'nl-be', {\n        delimiters: {\n            thousands: ' ',\n            decimal  : ','\n        },\n        abbreviations: {\n            thousand : 'k',\n            million  : ' mln',\n            billion  : ' mld',\n            trillion : ' bln'\n        },\n        ordinal : function (number) {\n            var remainder = number % 100;\n\n            return (number !== 0 && remainder <= 1 || remainder === 8 || remainder >= 20) ? 'ste' : 'de';\n        },\n        currency: {\n            symbol: '€ '\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'nl-nl', {\n        delimiters: {\n            thousands: '.',\n            decimal  : ','\n        },\n        abbreviations: {\n            thousand : 'k',\n            million  : 'mln',\n            billion  : 'mrd',\n            trillion : 'bln'\n        },\n        ordinal : function (number) {\n            var remainder = number % 100;\n            return (number !== 0 && remainder <= 1 || remainder === 8 || remainder >= 20) ? 'ste' : 'de';\n        },\n        currency: {\n            symbol: '€ '\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'no', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: 'kr'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'pl', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'tys.',\n            million: 'mln',\n            billion: 'mld',\n            trillion: 'bln'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: 'PLN'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'pt-br', {\n        delimiters: {\n            thousands: '.',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'mil',\n            million: 'milhões',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function (number) {\n            return 'º';\n        },\n        currency: {\n            symbol: 'R$'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'pt-pt', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal : function (number) {\n            return 'º';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'ru-ua', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'тыс.',\n            million: 'млн',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function () {\n            // not ideal, but since in Russian it can taken on\n            // different forms (masculine, feminine, neuter)\n            // this is all we can do\n            return '.';\n        },\n        currency: {\n            symbol: '\\u20B4'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'ru', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'тыс.',\n            million: 'млн.',\n            billion: 'млрд.',\n            trillion: 'трлн.'\n        },\n        ordinal: function () {\n            // not ideal, but since in Russian it can taken on\n            // different forms (masculine, feminine, neuter)\n            // this is all we can do\n            return '.';\n        },\n        currency: {\n            symbol: 'руб.'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'sk', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'tis.',\n            million: 'mil.',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function () {\n            return '.';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'sl', {\n        delimiters: {\n            thousands: '.',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'mio',\n            billion: 'mrd',\n            trillion: 'trilijon'\n        },\n        ordinal: function () {\n            return '.';\n        },\n        currency: {\n            symbol: '€'\n        }\n    });\n})();\n\n\n(function() {\n    \n\n    numeral.register('locale', 'th', {\n        delimiters: {\n            thousands: ',',\n            decimal: '.'\n        },\n        abbreviations: {\n            thousand: 'พัน',\n            million: 'ล้าน',\n            billion: 'พันล้าน',\n            trillion: 'ล้านล้าน'\n        },\n        ordinal: function (number) {\n            return '.';\n        },\n        currency: {\n            symbol: '฿'\n        }\n    });\n})();\n\n\n(function() {\n        var suffixes = {\n            1: '\\'inci',\n            5: '\\'inci',\n            8: '\\'inci',\n            70: '\\'inci',\n            80: '\\'inci',\n\n            2: '\\'nci',\n            7: '\\'nci',\n            20: '\\'nci',\n            50: '\\'nci',\n\n            3: '\\'üncü',\n            4: '\\'üncü',\n            100: '\\'üncü',\n\n            6: '\\'ncı',\n\n            9: '\\'uncu',\n            10: '\\'uncu',\n            30: '\\'uncu',\n\n            60: '\\'ıncı',\n            90: '\\'ıncı'\n        };\n\n    numeral.register('locale', 'tr', {\n        delimiters: {\n            thousands: '.',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'bin',\n            million: 'milyon',\n            billion: 'milyar',\n            trillion: 'trilyon'\n        },\n        ordinal: function (number) {\n            if (number === 0) {  // special case for zero\n                return '\\'ıncı';\n            }\n\n            var a = number % 10,\n                b = number % 100 - a,\n                c = number >= 100 ? 100 : null;\n\n          return suffixes[a] || suffixes[b] || suffixes[c];\n        },\n        currency: {\n            symbol: '\\u20BA'\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('locale', 'uk-ua', {\n        delimiters: {\n            thousands: ' ',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: 'тис.',\n            million: 'млн',\n            billion: 'млрд',\n            trillion: 'блн'\n        },\n        ordinal: function () {\n            // not ideal, but since in Ukrainian it can taken on\n            // different forms (masculine, feminine, neuter)\n            // this is all we can do\n            return '';\n        },\n        currency: {\n            symbol: '\\u20B4'\n        }\n    });\n})();\n\n\n(function() {\n    \n    numeral.register('locale', 'vi', {\n        delimiters: {\n            thousands: '.',\n            decimal: ','\n        },\n        abbreviations: {\n            thousand: ' nghìn',\n            million: ' triệu',\n            billion: ' tỷ',\n            trillion: ' nghìn tỷ'\n        },\n        ordinal: function () {\n            return '.';\n        },\n        currency: {\n            symbol: '₫'\n        }\n    });\n})();\n\n\n}));\n\n\n//# sourceURL=webpack://Materialize/./node_modules/numeral/locales.js?");
+{
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! @preserve
+ * numeral.js
+ * locales : 2.0.6
+ * license : MIT
+ * http://adamwdraper.github.com/Numeral-js/
+ */
+
+(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! numeral */ "./node_modules/numeral/numeral.js")], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+		__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+		(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else {}
+}(this, function (numeral) {
+    
+(function() {
+        numeral.register('locale', 'bg', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: { // I found these here http://www.unicode.org/cldr/charts/28/verify/numbers/bg.html
+            thousand: 'хил',
+            million: 'млн',
+            billion: 'млрд',
+            trillion: 'трлн'
+        },
+        ordinal: function (number) {
+            // google translate suggests:
+            // 1st=1-ви; 2nd=2-ри; 7th=7-ми;
+            // 8th=8-ми and many others end with -ти
+            // for example 3rd=3-ти
+            // However since I've seen suggestions that in
+            // Bulgarian the ordinal can be taken in
+            // different forms (masculine, feminine, neuter)
+            // I've opted to wimp out on commiting that to code
+            return '';
+        },
+        currency: {
+            symbol: 'лв'
+        }
+    });
+})();
+
+
+(function() {
+    
+    numeral.register('locale', 'chs', {
+        delimiters: {
+            thousands: ',',
+            decimal: '.'
+        },
+        abbreviations: {
+            thousand: '千',
+            million: '百万',
+            billion: '十亿',
+            trillion: '兆'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: '¥'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'cs', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'tis.',
+            million: 'mil.',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function () {
+            return '.';
+        },
+        currency: {
+            symbol: 'Kč'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'da-dk', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'mio',
+            billion: 'mia',
+            trillion: 'b'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: 'DKK'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'de-ch', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: 'CHF'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'de', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'en-au', {
+        delimiters: {
+            thousands: ',',
+            decimal: '.'
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            var b = number % 10;
+            return (~~ (number % 100 / 10) === 1) ? 'th' :
+                (b === 1) ? 'st' :
+                (b === 2) ? 'nd' :
+                (b === 3) ? 'rd' : 'th';
+        },
+        currency: {
+            symbol: '$'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'en-gb', {
+        delimiters: {
+            thousands: ',',
+            decimal: '.'
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            var b = number % 10;
+            return (~~ (number % 100 / 10) === 1) ? 'th' :
+                (b === 1) ? 'st' :
+                (b === 2) ? 'nd' :
+                (b === 3) ? 'rd' : 'th';
+        },
+        currency: {
+            symbol: '£'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'en-za', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            var b = number % 10;
+            return (~~ (number % 100 / 10) === 1) ? 'th' :
+                (b === 1) ? 'st' :
+                    (b === 2) ? 'nd' :
+                        (b === 3) ? 'rd' : 'th';
+        },
+        currency: {
+            symbol: 'R'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'es-es', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'mm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            var b = number % 10;
+            return (b === 1 || b === 3) ? 'er' :
+                (b === 2) ? 'do' :
+                    (b === 7 || b === 0) ? 'mo' :
+                        (b === 8) ? 'vo' :
+                            (b === 9) ? 'no' : 'to';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'es', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'mm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            var b = number % 10;
+            return (b === 1 || b === 3) ? 'er' :
+                (b === 2) ? 'do' :
+                (b === 7 || b === 0) ? 'mo' :
+		(b === 8) ? 'vo' :
+		(b === 9) ? 'no' : 'to';
+        },
+        currency: {
+            symbol: '$'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'et', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: ' tuh',
+            million: ' mln',
+            billion: ' mld',
+            trillion: ' trl'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'fi', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'M',
+            billion: 'G',
+            trillion: 'T'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'fr-ca', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'M',
+            billion: 'G',
+            trillion: 'T'
+        },
+        ordinal : function (number) {
+            return number === 1 ? 'er' : 'e';
+        },
+        currency: {
+            symbol: '$'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'fr-ch', {
+        delimiters: {
+            thousands: '\'',
+            decimal: '.'
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal : function (number) {
+            return number === 1 ? 'er' : 'e';
+        },
+        currency: {
+            symbol: 'CHF'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'fr', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal : function (number) {
+            return number === 1 ? 'er' : 'e';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'hu', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'E',  // ezer
+            million: 'M',   // millió
+            billion: 'Mrd', // milliárd
+            trillion: 'T'   // trillió
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: ' Ft'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'it', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'mila',
+            million: 'mil',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            return 'º';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'ja', {
+        delimiters: {
+            thousands: ',',
+            decimal: '.'
+        },
+        abbreviations: {
+            thousand: '千',
+            million: '百万',
+            billion: '十億',
+            trillion: '兆'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: '¥'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'lv', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: ' tūkst.',
+            million: ' milj.',
+            billion: ' mljrd.',
+            trillion: ' trilj.'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'nl-be', {
+        delimiters: {
+            thousands: ' ',
+            decimal  : ','
+        },
+        abbreviations: {
+            thousand : 'k',
+            million  : ' mln',
+            billion  : ' mld',
+            trillion : ' bln'
+        },
+        ordinal : function (number) {
+            var remainder = number % 100;
+
+            return (number !== 0 && remainder <= 1 || remainder === 8 || remainder >= 20) ? 'ste' : 'de';
+        },
+        currency: {
+            symbol: '€ '
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'nl-nl', {
+        delimiters: {
+            thousands: '.',
+            decimal  : ','
+        },
+        abbreviations: {
+            thousand : 'k',
+            million  : 'mln',
+            billion  : 'mrd',
+            trillion : 'bln'
+        },
+        ordinal : function (number) {
+            var remainder = number % 100;
+            return (number !== 0 && remainder <= 1 || remainder === 8 || remainder >= 20) ? 'ste' : 'de';
+        },
+        currency: {
+            symbol: '€ '
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'no', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: 'kr'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'pl', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'tys.',
+            million: 'mln',
+            billion: 'mld',
+            trillion: 'bln'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: 'PLN'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'pt-br', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'mil',
+            million: 'milhões',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            return 'º';
+        },
+        currency: {
+            symbol: 'R$'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'pt-pt', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal : function (number) {
+            return 'º';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'ru-ua', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'тыс.',
+            million: 'млн',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function () {
+            // not ideal, but since in Russian it can taken on
+            // different forms (masculine, feminine, neuter)
+            // this is all we can do
+            return '.';
+        },
+        currency: {
+            symbol: '\u20B4'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'ru', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'тыс.',
+            million: 'млн.',
+            billion: 'млрд.',
+            trillion: 'трлн.'
+        },
+        ordinal: function () {
+            // not ideal, but since in Russian it can taken on
+            // different forms (masculine, feminine, neuter)
+            // this is all we can do
+            return '.';
+        },
+        currency: {
+            symbol: 'руб.'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'sk', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'tis.',
+            million: 'mil.',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function () {
+            return '.';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'sl', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'mio',
+            billion: 'mrd',
+            trillion: 'trilijon'
+        },
+        ordinal: function () {
+            return '.';
+        },
+        currency: {
+            symbol: '€'
+        }
+    });
+})();
+
+
+(function() {
+    
+
+    numeral.register('locale', 'th', {
+        delimiters: {
+            thousands: ',',
+            decimal: '.'
+        },
+        abbreviations: {
+            thousand: 'พัน',
+            million: 'ล้าน',
+            billion: 'พันล้าน',
+            trillion: 'ล้านล้าน'
+        },
+        ordinal: function (number) {
+            return '.';
+        },
+        currency: {
+            symbol: '฿'
+        }
+    });
+})();
+
+
+(function() {
+        var suffixes = {
+            1: '\'inci',
+            5: '\'inci',
+            8: '\'inci',
+            70: '\'inci',
+            80: '\'inci',
+
+            2: '\'nci',
+            7: '\'nci',
+            20: '\'nci',
+            50: '\'nci',
+
+            3: '\'üncü',
+            4: '\'üncü',
+            100: '\'üncü',
+
+            6: '\'ncı',
+
+            9: '\'uncu',
+            10: '\'uncu',
+            30: '\'uncu',
+
+            60: '\'ıncı',
+            90: '\'ıncı'
+        };
+
+    numeral.register('locale', 'tr', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'bin',
+            million: 'milyon',
+            billion: 'milyar',
+            trillion: 'trilyon'
+        },
+        ordinal: function (number) {
+            if (number === 0) {  // special case for zero
+                return '\'ıncı';
+            }
+
+            var a = number % 10,
+                b = number % 100 - a,
+                c = number >= 100 ? 100 : null;
+
+          return suffixes[a] || suffixes[b] || suffixes[c];
+        },
+        currency: {
+            symbol: '\u20BA'
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('locale', 'uk-ua', {
+        delimiters: {
+            thousands: ' ',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'тис.',
+            million: 'млн',
+            billion: 'млрд',
+            trillion: 'блн'
+        },
+        ordinal: function () {
+            // not ideal, but since in Ukrainian it can taken on
+            // different forms (masculine, feminine, neuter)
+            // this is all we can do
+            return '';
+        },
+        currency: {
+            symbol: '\u20B4'
+        }
+    });
+})();
+
+
+(function() {
+    
+    numeral.register('locale', 'vi', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: ' nghìn',
+            million: ' triệu',
+            billion: ' tỷ',
+            trillion: ' nghìn tỷ'
+        },
+        ordinal: function () {
+            return '.';
+        },
+        currency: {
+            symbol: '₫'
+        }
+    });
+})();
+
+
+}));
+}
 
 /***/ }),
 
@@ -46,7 +898,1021 @@ eval("var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPAC
   \*****************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! @preserve\n * numeral.js\n * version : 2.0.6\n * author : Adam Draper\n * license : MIT\n * http://adamwdraper.github.com/Numeral-js/\n */\n\n(function (global, factory) {\n    if (true) {\n        !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),\n\t\t__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?\n\t\t(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :\n\t\t__WEBPACK_AMD_DEFINE_FACTORY__),\n\t\t__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));\n    } else {}\n}(this, function () {\n    /************************************\n        Variables\n    ************************************/\n\n    var numeral,\n        _,\n        VERSION = '2.0.6',\n        formats = {},\n        locales = {},\n        defaults = {\n            currentLocale: 'en',\n            zeroFormat: null,\n            nullFormat: null,\n            defaultFormat: '0,0',\n            scalePercentBy100: true\n        },\n        options = {\n            currentLocale: defaults.currentLocale,\n            zeroFormat: defaults.zeroFormat,\n            nullFormat: defaults.nullFormat,\n            defaultFormat: defaults.defaultFormat,\n            scalePercentBy100: defaults.scalePercentBy100\n        };\n\n\n    /************************************\n        Constructors\n    ************************************/\n\n    // Numeral prototype object\n    function Numeral(input, number) {\n        this._input = input;\n\n        this._value = number;\n    }\n\n    numeral = function(input) {\n        var value,\n            kind,\n            unformatFunction,\n            regexp;\n\n        if (numeral.isNumeral(input)) {\n            value = input.value();\n        } else if (input === 0 || typeof input === 'undefined') {\n            value = 0;\n        } else if (input === null || _.isNaN(input)) {\n            value = null;\n        } else if (typeof input === 'string') {\n            if (options.zeroFormat && input === options.zeroFormat) {\n                value = 0;\n            } else if (options.nullFormat && input === options.nullFormat || !input.replace(/[^0-9]+/g, '').length) {\n                value = null;\n            } else {\n                for (kind in formats) {\n                    regexp = typeof formats[kind].regexps.unformat === 'function' ? formats[kind].regexps.unformat() : formats[kind].regexps.unformat;\n\n                    if (regexp && input.match(regexp)) {\n                        unformatFunction = formats[kind].unformat;\n\n                        break;\n                    }\n                }\n\n                unformatFunction = unformatFunction || numeral._.stringToNumber;\n\n                value = unformatFunction(input);\n            }\n        } else {\n            value = Number(input)|| null;\n        }\n\n        return new Numeral(input, value);\n    };\n\n    // version number\n    numeral.version = VERSION;\n\n    // compare numeral object\n    numeral.isNumeral = function(obj) {\n        return obj instanceof Numeral;\n    };\n\n    // helper functions\n    numeral._ = _ = {\n        // formats numbers separators, decimals places, signs, abbreviations\n        numberToFormat: function(value, format, roundingFunction) {\n            var locale = locales[numeral.options.currentLocale],\n                negP = false,\n                optDec = false,\n                leadingCount = 0,\n                abbr = '',\n                trillion = 1000000000000,\n                billion = 1000000000,\n                million = 1000000,\n                thousand = 1000,\n                decimal = '',\n                neg = false,\n                abbrForce, // force abbreviation\n                abs,\n                min,\n                max,\n                power,\n                int,\n                precision,\n                signed,\n                thousands,\n                output;\n\n            // make sure we never format a null value\n            value = value || 0;\n\n            abs = Math.abs(value);\n\n            // see if we should use parentheses for negative number or if we should prefix with a sign\n            // if both are present we default to parentheses\n            if (numeral._.includes(format, '(')) {\n                negP = true;\n                format = format.replace(/[\\(|\\)]/g, '');\n            } else if (numeral._.includes(format, '+') || numeral._.includes(format, '-')) {\n                signed = numeral._.includes(format, '+') ? format.indexOf('+') : value < 0 ? format.indexOf('-') : -1;\n                format = format.replace(/[\\+|\\-]/g, '');\n            }\n\n            // see if abbreviation is wanted\n            if (numeral._.includes(format, 'a')) {\n                abbrForce = format.match(/a(k|m|b|t)?/);\n\n                abbrForce = abbrForce ? abbrForce[1] : false;\n\n                // check for space before abbreviation\n                if (numeral._.includes(format, ' a')) {\n                    abbr = ' ';\n                }\n\n                format = format.replace(new RegExp(abbr + 'a[kmbt]?'), '');\n\n                if (abs >= trillion && !abbrForce || abbrForce === 't') {\n                    // trillion\n                    abbr += locale.abbreviations.trillion;\n                    value = value / trillion;\n                } else if (abs < trillion && abs >= billion && !abbrForce || abbrForce === 'b') {\n                    // billion\n                    abbr += locale.abbreviations.billion;\n                    value = value / billion;\n                } else if (abs < billion && abs >= million && !abbrForce || abbrForce === 'm') {\n                    // million\n                    abbr += locale.abbreviations.million;\n                    value = value / million;\n                } else if (abs < million && abs >= thousand && !abbrForce || abbrForce === 'k') {\n                    // thousand\n                    abbr += locale.abbreviations.thousand;\n                    value = value / thousand;\n                }\n            }\n\n            // check for optional decimals\n            if (numeral._.includes(format, '[.]')) {\n                optDec = true;\n                format = format.replace('[.]', '.');\n            }\n\n            // break number and format\n            int = value.toString().split('.')[0];\n            precision = format.split('.')[1];\n            thousands = format.indexOf(',');\n            leadingCount = (format.split('.')[0].split(',')[0].match(/0/g) || []).length;\n\n            if (precision) {\n                if (numeral._.includes(precision, '[')) {\n                    precision = precision.replace(']', '');\n                    precision = precision.split('[');\n                    decimal = numeral._.toFixed(value, (precision[0].length + precision[1].length), roundingFunction, precision[1].length);\n                } else {\n                    decimal = numeral._.toFixed(value, precision.length, roundingFunction);\n                }\n\n                int = decimal.split('.')[0];\n\n                if (numeral._.includes(decimal, '.')) {\n                    decimal = locale.delimiters.decimal + decimal.split('.')[1];\n                } else {\n                    decimal = '';\n                }\n\n                if (optDec && Number(decimal.slice(1)) === 0) {\n                    decimal = '';\n                }\n            } else {\n                int = numeral._.toFixed(value, 0, roundingFunction);\n            }\n\n            // check abbreviation again after rounding\n            if (abbr && !abbrForce && Number(int) >= 1000 && abbr !== locale.abbreviations.trillion) {\n                int = String(Number(int) / 1000);\n\n                switch (abbr) {\n                    case locale.abbreviations.thousand:\n                        abbr = locale.abbreviations.million;\n                        break;\n                    case locale.abbreviations.million:\n                        abbr = locale.abbreviations.billion;\n                        break;\n                    case locale.abbreviations.billion:\n                        abbr = locale.abbreviations.trillion;\n                        break;\n                }\n            }\n\n\n            // format number\n            if (numeral._.includes(int, '-')) {\n                int = int.slice(1);\n                neg = true;\n            }\n\n            if (int.length < leadingCount) {\n                for (var i = leadingCount - int.length; i > 0; i--) {\n                    int = '0' + int;\n                }\n            }\n\n            if (thousands > -1) {\n                int = int.toString().replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, '$1' + locale.delimiters.thousands);\n            }\n\n            if (format.indexOf('.') === 0) {\n                int = '';\n            }\n\n            output = int + decimal + (abbr ? abbr : '');\n\n            if (negP) {\n                output = (negP && neg ? '(' : '') + output + (negP && neg ? ')' : '');\n            } else {\n                if (signed >= 0) {\n                    output = signed === 0 ? (neg ? '-' : '+') + output : output + (neg ? '-' : '+');\n                } else if (neg) {\n                    output = '-' + output;\n                }\n            }\n\n            return output;\n        },\n        // unformats numbers separators, decimals places, signs, abbreviations\n        stringToNumber: function(string) {\n            var locale = locales[options.currentLocale],\n                stringOriginal = string,\n                abbreviations = {\n                    thousand: 3,\n                    million: 6,\n                    billion: 9,\n                    trillion: 12\n                },\n                abbreviation,\n                value,\n                i,\n                regexp;\n\n            if (options.zeroFormat && string === options.zeroFormat) {\n                value = 0;\n            } else if (options.nullFormat && string === options.nullFormat || !string.replace(/[^0-9]+/g, '').length) {\n                value = null;\n            } else {\n                value = 1;\n\n                if (locale.delimiters.decimal !== '.') {\n                    string = string.replace(/\\./g, '').replace(locale.delimiters.decimal, '.');\n                }\n\n                for (abbreviation in abbreviations) {\n                    regexp = new RegExp('[^a-zA-Z]' + locale.abbreviations[abbreviation] + '(?:\\\\)|(\\\\' + locale.currency.symbol + ')?(?:\\\\))?)?$');\n\n                    if (stringOriginal.match(regexp)) {\n                        value *= Math.pow(10, abbreviations[abbreviation]);\n                        break;\n                    }\n                }\n\n                // check for negative number\n                value *= (string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2 ? 1 : -1;\n\n                // remove non numbers\n                string = string.replace(/[^0-9\\.]+/g, '');\n\n                value *= Number(string);\n            }\n\n            return value;\n        },\n        isNaN: function(value) {\n            return typeof value === 'number' && isNaN(value);\n        },\n        includes: function(string, search) {\n            return string.indexOf(search) !== -1;\n        },\n        insert: function(string, subString, start) {\n            return string.slice(0, start) + subString + string.slice(start);\n        },\n        reduce: function(array, callback /*, initialValue*/) {\n            if (this === null) {\n                throw new TypeError('Array.prototype.reduce called on null or undefined');\n            }\n\n            if (typeof callback !== 'function') {\n                throw new TypeError(callback + ' is not a function');\n            }\n\n            var t = Object(array),\n                len = t.length >>> 0,\n                k = 0,\n                value;\n\n            if (arguments.length === 3) {\n                value = arguments[2];\n            } else {\n                while (k < len && !(k in t)) {\n                    k++;\n                }\n\n                if (k >= len) {\n                    throw new TypeError('Reduce of empty array with no initial value');\n                }\n\n                value = t[k++];\n            }\n            for (; k < len; k++) {\n                if (k in t) {\n                    value = callback(value, t[k], k, t);\n                }\n            }\n            return value;\n        },\n        /**\n         * Computes the multiplier necessary to make x >= 1,\n         * effectively eliminating miscalculations caused by\n         * finite precision.\n         */\n        multiplier: function (x) {\n            var parts = x.toString().split('.');\n\n            return parts.length < 2 ? 1 : Math.pow(10, parts[1].length);\n        },\n        /**\n         * Given a variable number of arguments, returns the maximum\n         * multiplier that must be used to normalize an operation involving\n         * all of them.\n         */\n        correctionFactor: function () {\n            var args = Array.prototype.slice.call(arguments);\n\n            return args.reduce(function(accum, next) {\n                var mn = _.multiplier(next);\n                return accum > mn ? accum : mn;\n            }, 1);\n        },\n        /**\n         * Implementation of toFixed() that treats floats more like decimals\n         *\n         * Fixes binary rounding issues (eg. (0.615).toFixed(2) === '0.61') that present\n         * problems for accounting- and finance-related software.\n         */\n        toFixed: function(value, maxDecimals, roundingFunction, optionals) {\n            var splitValue = value.toString().split('.'),\n                minDecimals = maxDecimals - (optionals || 0),\n                boundedPrecision,\n                optionalsRegExp,\n                power,\n                output;\n\n            // Use the smallest precision value possible to avoid errors from floating point representation\n            if (splitValue.length === 2) {\n              boundedPrecision = Math.min(Math.max(splitValue[1].length, minDecimals), maxDecimals);\n            } else {\n              boundedPrecision = minDecimals;\n            }\n\n            power = Math.pow(10, boundedPrecision);\n\n            // Multiply up by precision, round accurately, then divide and use native toFixed():\n            output = (roundingFunction(value + 'e+' + boundedPrecision) / power).toFixed(boundedPrecision);\n\n            if (optionals > maxDecimals - boundedPrecision) {\n                optionalsRegExp = new RegExp('\\\\.?0{1,' + (optionals - (maxDecimals - boundedPrecision)) + '}$');\n                output = output.replace(optionalsRegExp, '');\n            }\n\n            return output;\n        }\n    };\n\n    // avaliable options\n    numeral.options = options;\n\n    // avaliable formats\n    numeral.formats = formats;\n\n    // avaliable formats\n    numeral.locales = locales;\n\n    // This function sets the current locale.  If\n    // no arguments are passed in, it will simply return the current global\n    // locale key.\n    numeral.locale = function(key) {\n        if (key) {\n            options.currentLocale = key.toLowerCase();\n        }\n\n        return options.currentLocale;\n    };\n\n    // This function provides access to the loaded locale data.  If\n    // no arguments are passed in, it will simply return the current\n    // global locale object.\n    numeral.localeData = function(key) {\n        if (!key) {\n            return locales[options.currentLocale];\n        }\n\n        key = key.toLowerCase();\n\n        if (!locales[key]) {\n            throw new Error('Unknown locale : ' + key);\n        }\n\n        return locales[key];\n    };\n\n    numeral.reset = function() {\n        for (var property in defaults) {\n            options[property] = defaults[property];\n        }\n    };\n\n    numeral.zeroFormat = function(format) {\n        options.zeroFormat = typeof(format) === 'string' ? format : null;\n    };\n\n    numeral.nullFormat = function (format) {\n        options.nullFormat = typeof(format) === 'string' ? format : null;\n    };\n\n    numeral.defaultFormat = function(format) {\n        options.defaultFormat = typeof(format) === 'string' ? format : '0.0';\n    };\n\n    numeral.register = function(type, name, format) {\n        name = name.toLowerCase();\n\n        if (this[type + 's'][name]) {\n            throw new TypeError(name + ' ' + type + ' already registered.');\n        }\n\n        this[type + 's'][name] = format;\n\n        return format;\n    };\n\n\n    numeral.validate = function(val, culture) {\n        var _decimalSep,\n            _thousandSep,\n            _currSymbol,\n            _valArray,\n            _abbrObj,\n            _thousandRegEx,\n            localeData,\n            temp;\n\n        //coerce val to string\n        if (typeof val !== 'string') {\n            val += '';\n\n            if (console.warn) {\n                console.warn('Numeral.js: Value is not string. It has been co-erced to: ', val);\n            }\n        }\n\n        //trim whitespaces from either sides\n        val = val.trim();\n\n        //if val is just digits return true\n        if (!!val.match(/^\\d+$/)) {\n            return true;\n        }\n\n        //if val is empty return false\n        if (val === '') {\n            return false;\n        }\n\n        //get the decimal and thousands separator from numeral.localeData\n        try {\n            //check if the culture is understood by numeral. if not, default it to current locale\n            localeData = numeral.localeData(culture);\n        } catch (e) {\n            localeData = numeral.localeData(numeral.locale());\n        }\n\n        //setup the delimiters and currency symbol based on culture/locale\n        _currSymbol = localeData.currency.symbol;\n        _abbrObj = localeData.abbreviations;\n        _decimalSep = localeData.delimiters.decimal;\n        if (localeData.delimiters.thousands === '.') {\n            _thousandSep = '\\\\.';\n        } else {\n            _thousandSep = localeData.delimiters.thousands;\n        }\n\n        // validating currency symbol\n        temp = val.match(/^[^\\d]+/);\n        if (temp !== null) {\n            val = val.substr(1);\n            if (temp[0] !== _currSymbol) {\n                return false;\n            }\n        }\n\n        //validating abbreviation symbol\n        temp = val.match(/[^\\d]+$/);\n        if (temp !== null) {\n            val = val.slice(0, -1);\n            if (temp[0] !== _abbrObj.thousand && temp[0] !== _abbrObj.million && temp[0] !== _abbrObj.billion && temp[0] !== _abbrObj.trillion) {\n                return false;\n            }\n        }\n\n        _thousandRegEx = new RegExp(_thousandSep + '{2}');\n\n        if (!val.match(/[^\\d.,]/g)) {\n            _valArray = val.split(_decimalSep);\n            if (_valArray.length > 2) {\n                return false;\n            } else {\n                if (_valArray.length < 2) {\n                    return ( !! _valArray[0].match(/^\\d+.*\\d$/) && !_valArray[0].match(_thousandRegEx));\n                } else {\n                    if (_valArray[0].length === 1) {\n                        return ( !! _valArray[0].match(/^\\d+$/) && !_valArray[0].match(_thousandRegEx) && !! _valArray[1].match(/^\\d+$/));\n                    } else {\n                        return ( !! _valArray[0].match(/^\\d+.*\\d$/) && !_valArray[0].match(_thousandRegEx) && !! _valArray[1].match(/^\\d+$/));\n                    }\n                }\n            }\n        }\n\n        return false;\n    };\n\n\n    /************************************\n        Numeral Prototype\n    ************************************/\n\n    numeral.fn = Numeral.prototype = {\n        clone: function() {\n            return numeral(this);\n        },\n        format: function(inputString, roundingFunction) {\n            var value = this._value,\n                format = inputString || options.defaultFormat,\n                kind,\n                output,\n                formatFunction;\n\n            // make sure we have a roundingFunction\n            roundingFunction = roundingFunction || Math.round;\n\n            // format based on value\n            if (value === 0 && options.zeroFormat !== null) {\n                output = options.zeroFormat;\n            } else if (value === null && options.nullFormat !== null) {\n                output = options.nullFormat;\n            } else {\n                for (kind in formats) {\n                    if (format.match(formats[kind].regexps.format)) {\n                        formatFunction = formats[kind].format;\n\n                        break;\n                    }\n                }\n\n                formatFunction = formatFunction || numeral._.numberToFormat;\n\n                output = formatFunction(value, format, roundingFunction);\n            }\n\n            return output;\n        },\n        value: function() {\n            return this._value;\n        },\n        input: function() {\n            return this._input;\n        },\n        set: function(value) {\n            this._value = Number(value);\n\n            return this;\n        },\n        add: function(value) {\n            var corrFactor = _.correctionFactor.call(null, this._value, value);\n\n            function cback(accum, curr, currI, O) {\n                return accum + Math.round(corrFactor * curr);\n            }\n\n            this._value = _.reduce([this._value, value], cback, 0) / corrFactor;\n\n            return this;\n        },\n        subtract: function(value) {\n            var corrFactor = _.correctionFactor.call(null, this._value, value);\n\n            function cback(accum, curr, currI, O) {\n                return accum - Math.round(corrFactor * curr);\n            }\n\n            this._value = _.reduce([value], cback, Math.round(this._value * corrFactor)) / corrFactor;\n\n            return this;\n        },\n        multiply: function(value) {\n            function cback(accum, curr, currI, O) {\n                var corrFactor = _.correctionFactor(accum, curr);\n                return Math.round(accum * corrFactor) * Math.round(curr * corrFactor) / Math.round(corrFactor * corrFactor);\n            }\n\n            this._value = _.reduce([this._value, value], cback, 1);\n\n            return this;\n        },\n        divide: function(value) {\n            function cback(accum, curr, currI, O) {\n                var corrFactor = _.correctionFactor(accum, curr);\n                return Math.round(accum * corrFactor) / Math.round(curr * corrFactor);\n            }\n\n            this._value = _.reduce([this._value, value], cback);\n\n            return this;\n        },\n        difference: function(value) {\n            return Math.abs(numeral(this._value).subtract(value).value());\n        }\n    };\n\n    /************************************\n        Default Locale && Format\n    ************************************/\n\n    numeral.register('locale', 'en', {\n        delimiters: {\n            thousands: ',',\n            decimal: '.'\n        },\n        abbreviations: {\n            thousand: 'k',\n            million: 'm',\n            billion: 'b',\n            trillion: 't'\n        },\n        ordinal: function(number) {\n            var b = number % 10;\n            return (~~(number % 100 / 10) === 1) ? 'th' :\n                (b === 1) ? 'st' :\n                (b === 2) ? 'nd' :\n                (b === 3) ? 'rd' : 'th';\n        },\n        currency: {\n            symbol: '$'\n        }\n    });\n\n    \n\n(function() {\n        numeral.register('format', 'bps', {\n            regexps: {\n                format: /(BPS)/,\n                unformat: /(BPS)/\n            },\n            format: function(value, format, roundingFunction) {\n                var space = numeral._.includes(format, ' BPS') ? ' ' : '',\n                    output;\n\n                value = value * 10000;\n\n                // check for space before BPS\n                format = format.replace(/\\s?BPS/, '');\n\n                output = numeral._.numberToFormat(value, format, roundingFunction);\n\n                if (numeral._.includes(output, ')')) {\n                    output = output.split('');\n\n                    output.splice(-1, 0, space + 'BPS');\n\n                    output = output.join('');\n                } else {\n                    output = output + space + 'BPS';\n                }\n\n                return output;\n            },\n            unformat: function(string) {\n                return +(numeral._.stringToNumber(string) * 0.0001).toFixed(15);\n            }\n        });\n})();\n\n\n(function() {\n        var decimal = {\n            base: 1000,\n            suffixes: ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']\n        },\n        binary = {\n            base: 1024,\n            suffixes: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']\n        };\n\n    var allSuffixes =  decimal.suffixes.concat(binary.suffixes.filter(function (item) {\n            return decimal.suffixes.indexOf(item) < 0;\n        }));\n        var unformatRegex = allSuffixes.join('|');\n        // Allow support for BPS (http://www.investopedia.com/terms/b/basispoint.asp)\n        unformatRegex = '(' + unformatRegex.replace('B', 'B(?!PS)') + ')';\n\n    numeral.register('format', 'bytes', {\n        regexps: {\n            format: /([0\\s]i?b)/,\n            unformat: new RegExp(unformatRegex)\n        },\n        format: function(value, format, roundingFunction) {\n            var output,\n                bytes = numeral._.includes(format, 'ib') ? binary : decimal,\n                suffix = numeral._.includes(format, ' b') || numeral._.includes(format, ' ib') ? ' ' : '',\n                power,\n                min,\n                max;\n\n            // check for space before\n            format = format.replace(/\\s?i?b/, '');\n\n            for (power = 0; power <= bytes.suffixes.length; power++) {\n                min = Math.pow(bytes.base, power);\n                max = Math.pow(bytes.base, power + 1);\n\n                if (value === null || value === 0 || value >= min && value < max) {\n                    suffix += bytes.suffixes[power];\n\n                    if (min > 0) {\n                        value = value / min;\n                    }\n\n                    break;\n                }\n            }\n\n            output = numeral._.numberToFormat(value, format, roundingFunction);\n\n            return output + suffix;\n        },\n        unformat: function(string) {\n            var value = numeral._.stringToNumber(string),\n                power,\n                bytesMultiplier;\n\n            if (value) {\n                for (power = decimal.suffixes.length - 1; power >= 0; power--) {\n                    if (numeral._.includes(string, decimal.suffixes[power])) {\n                        bytesMultiplier = Math.pow(decimal.base, power);\n\n                        break;\n                    }\n\n                    if (numeral._.includes(string, binary.suffixes[power])) {\n                        bytesMultiplier = Math.pow(binary.base, power);\n\n                        break;\n                    }\n                }\n\n                value *= (bytesMultiplier || 1);\n            }\n\n            return value;\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('format', 'currency', {\n        regexps: {\n            format: /(\\$)/\n        },\n        format: function(value, format, roundingFunction) {\n            var locale = numeral.locales[numeral.options.currentLocale],\n                symbols = {\n                    before: format.match(/^([\\+|\\-|\\(|\\s|\\$]*)/)[0],\n                    after: format.match(/([\\+|\\-|\\)|\\s|\\$]*)$/)[0]\n                },\n                output,\n                symbol,\n                i;\n\n            // strip format of spaces and $\n            format = format.replace(/\\s?\\$\\s?/, '');\n\n            // format the number\n            output = numeral._.numberToFormat(value, format, roundingFunction);\n\n            // update the before and after based on value\n            if (value >= 0) {\n                symbols.before = symbols.before.replace(/[\\-\\(]/, '');\n                symbols.after = symbols.after.replace(/[\\-\\)]/, '');\n            } else if (value < 0 && (!numeral._.includes(symbols.before, '-') && !numeral._.includes(symbols.before, '('))) {\n                symbols.before = '-' + symbols.before;\n            }\n\n            // loop through each before symbol\n            for (i = 0; i < symbols.before.length; i++) {\n                symbol = symbols.before[i];\n\n                switch (symbol) {\n                    case '$':\n                        output = numeral._.insert(output, locale.currency.symbol, i);\n                        break;\n                    case ' ':\n                        output = numeral._.insert(output, ' ', i + locale.currency.symbol.length - 1);\n                        break;\n                }\n            }\n\n            // loop through each after symbol\n            for (i = symbols.after.length - 1; i >= 0; i--) {\n                symbol = symbols.after[i];\n\n                switch (symbol) {\n                    case '$':\n                        output = i === symbols.after.length - 1 ? output + locale.currency.symbol : numeral._.insert(output, locale.currency.symbol, -(symbols.after.length - (1 + i)));\n                        break;\n                    case ' ':\n                        output = i === symbols.after.length - 1 ? output + ' ' : numeral._.insert(output, ' ', -(symbols.after.length - (1 + i) + locale.currency.symbol.length - 1));\n                        break;\n                }\n            }\n\n\n            return output;\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('format', 'exponential', {\n        regexps: {\n            format: /(e\\+|e-)/,\n            unformat: /(e\\+|e-)/\n        },\n        format: function(value, format, roundingFunction) {\n            var output,\n                exponential = typeof value === 'number' && !numeral._.isNaN(value) ? value.toExponential() : '0e+0',\n                parts = exponential.split('e');\n\n            format = format.replace(/e[\\+|\\-]{1}0/, '');\n\n            output = numeral._.numberToFormat(Number(parts[0]), format, roundingFunction);\n\n            return output + 'e' + parts[1];\n        },\n        unformat: function(string) {\n            var parts = numeral._.includes(string, 'e+') ? string.split('e+') : string.split('e-'),\n                value = Number(parts[0]),\n                power = Number(parts[1]);\n\n            power = numeral._.includes(string, 'e-') ? power *= -1 : power;\n\n            function cback(accum, curr, currI, O) {\n                var corrFactor = numeral._.correctionFactor(accum, curr),\n                    num = (accum * corrFactor) * (curr * corrFactor) / (corrFactor * corrFactor);\n                return num;\n            }\n\n            return numeral._.reduce([value, Math.pow(10, power)], cback, 1);\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('format', 'ordinal', {\n        regexps: {\n            format: /(o)/\n        },\n        format: function(value, format, roundingFunction) {\n            var locale = numeral.locales[numeral.options.currentLocale],\n                output,\n                ordinal = numeral._.includes(format, ' o') ? ' ' : '';\n\n            // check for space before\n            format = format.replace(/\\s?o/, '');\n\n            ordinal += locale.ordinal(value);\n\n            output = numeral._.numberToFormat(value, format, roundingFunction);\n\n            return output + ordinal;\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('format', 'percentage', {\n        regexps: {\n            format: /(%)/,\n            unformat: /(%)/\n        },\n        format: function(value, format, roundingFunction) {\n            var space = numeral._.includes(format, ' %') ? ' ' : '',\n                output;\n\n            if (numeral.options.scalePercentBy100) {\n                value = value * 100;\n            }\n\n            // check for space before %\n            format = format.replace(/\\s?\\%/, '');\n\n            output = numeral._.numberToFormat(value, format, roundingFunction);\n\n            if (numeral._.includes(output, ')')) {\n                output = output.split('');\n\n                output.splice(-1, 0, space + '%');\n\n                output = output.join('');\n            } else {\n                output = output + space + '%';\n            }\n\n            return output;\n        },\n        unformat: function(string) {\n            var number = numeral._.stringToNumber(string);\n            if (numeral.options.scalePercentBy100) {\n                return number * 0.01;\n            }\n            return number;\n        }\n    });\n})();\n\n\n(function() {\n        numeral.register('format', 'time', {\n        regexps: {\n            format: /(:)/,\n            unformat: /(:)/\n        },\n        format: function(value, format, roundingFunction) {\n            var hours = Math.floor(value / 60 / 60),\n                minutes = Math.floor((value - (hours * 60 * 60)) / 60),\n                seconds = Math.round(value - (hours * 60 * 60) - (minutes * 60));\n\n            return hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);\n        },\n        unformat: function(string) {\n            var timeArray = string.split(':'),\n                seconds = 0;\n\n            // turn hours and minutes into seconds and add them all up\n            if (timeArray.length === 3) {\n                // hours\n                seconds = seconds + (Number(timeArray[0]) * 60 * 60);\n                // minutes\n                seconds = seconds + (Number(timeArray[1]) * 60);\n                // seconds\n                seconds = seconds + Number(timeArray[2]);\n            } else if (timeArray.length === 2) {\n                // minutes\n                seconds = seconds + (Number(timeArray[0]) * 60);\n                // seconds\n                seconds = seconds + Number(timeArray[1]);\n            }\n            return Number(seconds);\n        }\n    });\n})();\n\nreturn numeral;\n}));\n\n\n//# sourceURL=webpack://Materialize/./node_modules/numeral/numeral.js?");
+{
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! @preserve
+ * numeral.js
+ * version : 2.0.6
+ * author : Adam Draper
+ * license : MIT
+ * http://adamwdraper.github.com/Numeral-js/
+ */
+
+(function (global, factory) {
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+		__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+		(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+		__WEBPACK_AMD_DEFINE_FACTORY__),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    } else {}
+}(this, function () {
+    /************************************
+        Variables
+    ************************************/
+
+    var numeral,
+        _,
+        VERSION = '2.0.6',
+        formats = {},
+        locales = {},
+        defaults = {
+            currentLocale: 'en',
+            zeroFormat: null,
+            nullFormat: null,
+            defaultFormat: '0,0',
+            scalePercentBy100: true
+        },
+        options = {
+            currentLocale: defaults.currentLocale,
+            zeroFormat: defaults.zeroFormat,
+            nullFormat: defaults.nullFormat,
+            defaultFormat: defaults.defaultFormat,
+            scalePercentBy100: defaults.scalePercentBy100
+        };
+
+
+    /************************************
+        Constructors
+    ************************************/
+
+    // Numeral prototype object
+    function Numeral(input, number) {
+        this._input = input;
+
+        this._value = number;
+    }
+
+    numeral = function(input) {
+        var value,
+            kind,
+            unformatFunction,
+            regexp;
+
+        if (numeral.isNumeral(input)) {
+            value = input.value();
+        } else if (input === 0 || typeof input === 'undefined') {
+            value = 0;
+        } else if (input === null || _.isNaN(input)) {
+            value = null;
+        } else if (typeof input === 'string') {
+            if (options.zeroFormat && input === options.zeroFormat) {
+                value = 0;
+            } else if (options.nullFormat && input === options.nullFormat || !input.replace(/[^0-9]+/g, '').length) {
+                value = null;
+            } else {
+                for (kind in formats) {
+                    regexp = typeof formats[kind].regexps.unformat === 'function' ? formats[kind].regexps.unformat() : formats[kind].regexps.unformat;
+
+                    if (regexp && input.match(regexp)) {
+                        unformatFunction = formats[kind].unformat;
+
+                        break;
+                    }
+                }
+
+                unformatFunction = unformatFunction || numeral._.stringToNumber;
+
+                value = unformatFunction(input);
+            }
+        } else {
+            value = Number(input)|| null;
+        }
+
+        return new Numeral(input, value);
+    };
+
+    // version number
+    numeral.version = VERSION;
+
+    // compare numeral object
+    numeral.isNumeral = function(obj) {
+        return obj instanceof Numeral;
+    };
+
+    // helper functions
+    numeral._ = _ = {
+        // formats numbers separators, decimals places, signs, abbreviations
+        numberToFormat: function(value, format, roundingFunction) {
+            var locale = locales[numeral.options.currentLocale],
+                negP = false,
+                optDec = false,
+                leadingCount = 0,
+                abbr = '',
+                trillion = 1000000000000,
+                billion = 1000000000,
+                million = 1000000,
+                thousand = 1000,
+                decimal = '',
+                neg = false,
+                abbrForce, // force abbreviation
+                abs,
+                min,
+                max,
+                power,
+                int,
+                precision,
+                signed,
+                thousands,
+                output;
+
+            // make sure we never format a null value
+            value = value || 0;
+
+            abs = Math.abs(value);
+
+            // see if we should use parentheses for negative number or if we should prefix with a sign
+            // if both are present we default to parentheses
+            if (numeral._.includes(format, '(')) {
+                negP = true;
+                format = format.replace(/[\(|\)]/g, '');
+            } else if (numeral._.includes(format, '+') || numeral._.includes(format, '-')) {
+                signed = numeral._.includes(format, '+') ? format.indexOf('+') : value < 0 ? format.indexOf('-') : -1;
+                format = format.replace(/[\+|\-]/g, '');
+            }
+
+            // see if abbreviation is wanted
+            if (numeral._.includes(format, 'a')) {
+                abbrForce = format.match(/a(k|m|b|t)?/);
+
+                abbrForce = abbrForce ? abbrForce[1] : false;
+
+                // check for space before abbreviation
+                if (numeral._.includes(format, ' a')) {
+                    abbr = ' ';
+                }
+
+                format = format.replace(new RegExp(abbr + 'a[kmbt]?'), '');
+
+                if (abs >= trillion && !abbrForce || abbrForce === 't') {
+                    // trillion
+                    abbr += locale.abbreviations.trillion;
+                    value = value / trillion;
+                } else if (abs < trillion && abs >= billion && !abbrForce || abbrForce === 'b') {
+                    // billion
+                    abbr += locale.abbreviations.billion;
+                    value = value / billion;
+                } else if (abs < billion && abs >= million && !abbrForce || abbrForce === 'm') {
+                    // million
+                    abbr += locale.abbreviations.million;
+                    value = value / million;
+                } else if (abs < million && abs >= thousand && !abbrForce || abbrForce === 'k') {
+                    // thousand
+                    abbr += locale.abbreviations.thousand;
+                    value = value / thousand;
+                }
+            }
+
+            // check for optional decimals
+            if (numeral._.includes(format, '[.]')) {
+                optDec = true;
+                format = format.replace('[.]', '.');
+            }
+
+            // break number and format
+            int = value.toString().split('.')[0];
+            precision = format.split('.')[1];
+            thousands = format.indexOf(',');
+            leadingCount = (format.split('.')[0].split(',')[0].match(/0/g) || []).length;
+
+            if (precision) {
+                if (numeral._.includes(precision, '[')) {
+                    precision = precision.replace(']', '');
+                    precision = precision.split('[');
+                    decimal = numeral._.toFixed(value, (precision[0].length + precision[1].length), roundingFunction, precision[1].length);
+                } else {
+                    decimal = numeral._.toFixed(value, precision.length, roundingFunction);
+                }
+
+                int = decimal.split('.')[0];
+
+                if (numeral._.includes(decimal, '.')) {
+                    decimal = locale.delimiters.decimal + decimal.split('.')[1];
+                } else {
+                    decimal = '';
+                }
+
+                if (optDec && Number(decimal.slice(1)) === 0) {
+                    decimal = '';
+                }
+            } else {
+                int = numeral._.toFixed(value, 0, roundingFunction);
+            }
+
+            // check abbreviation again after rounding
+            if (abbr && !abbrForce && Number(int) >= 1000 && abbr !== locale.abbreviations.trillion) {
+                int = String(Number(int) / 1000);
+
+                switch (abbr) {
+                    case locale.abbreviations.thousand:
+                        abbr = locale.abbreviations.million;
+                        break;
+                    case locale.abbreviations.million:
+                        abbr = locale.abbreviations.billion;
+                        break;
+                    case locale.abbreviations.billion:
+                        abbr = locale.abbreviations.trillion;
+                        break;
+                }
+            }
+
+
+            // format number
+            if (numeral._.includes(int, '-')) {
+                int = int.slice(1);
+                neg = true;
+            }
+
+            if (int.length < leadingCount) {
+                for (var i = leadingCount - int.length; i > 0; i--) {
+                    int = '0' + int;
+                }
+            }
+
+            if (thousands > -1) {
+                int = int.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + locale.delimiters.thousands);
+            }
+
+            if (format.indexOf('.') === 0) {
+                int = '';
+            }
+
+            output = int + decimal + (abbr ? abbr : '');
+
+            if (negP) {
+                output = (negP && neg ? '(' : '') + output + (negP && neg ? ')' : '');
+            } else {
+                if (signed >= 0) {
+                    output = signed === 0 ? (neg ? '-' : '+') + output : output + (neg ? '-' : '+');
+                } else if (neg) {
+                    output = '-' + output;
+                }
+            }
+
+            return output;
+        },
+        // unformats numbers separators, decimals places, signs, abbreviations
+        stringToNumber: function(string) {
+            var locale = locales[options.currentLocale],
+                stringOriginal = string,
+                abbreviations = {
+                    thousand: 3,
+                    million: 6,
+                    billion: 9,
+                    trillion: 12
+                },
+                abbreviation,
+                value,
+                i,
+                regexp;
+
+            if (options.zeroFormat && string === options.zeroFormat) {
+                value = 0;
+            } else if (options.nullFormat && string === options.nullFormat || !string.replace(/[^0-9]+/g, '').length) {
+                value = null;
+            } else {
+                value = 1;
+
+                if (locale.delimiters.decimal !== '.') {
+                    string = string.replace(/\./g, '').replace(locale.delimiters.decimal, '.');
+                }
+
+                for (abbreviation in abbreviations) {
+                    regexp = new RegExp('[^a-zA-Z]' + locale.abbreviations[abbreviation] + '(?:\\)|(\\' + locale.currency.symbol + ')?(?:\\))?)?$');
+
+                    if (stringOriginal.match(regexp)) {
+                        value *= Math.pow(10, abbreviations[abbreviation]);
+                        break;
+                    }
+                }
+
+                // check for negative number
+                value *= (string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2 ? 1 : -1;
+
+                // remove non numbers
+                string = string.replace(/[^0-9\.]+/g, '');
+
+                value *= Number(string);
+            }
+
+            return value;
+        },
+        isNaN: function(value) {
+            return typeof value === 'number' && isNaN(value);
+        },
+        includes: function(string, search) {
+            return string.indexOf(search) !== -1;
+        },
+        insert: function(string, subString, start) {
+            return string.slice(0, start) + subString + string.slice(start);
+        },
+        reduce: function(array, callback /*, initialValue*/) {
+            if (this === null) {
+                throw new TypeError('Array.prototype.reduce called on null or undefined');
+            }
+
+            if (typeof callback !== 'function') {
+                throw new TypeError(callback + ' is not a function');
+            }
+
+            var t = Object(array),
+                len = t.length >>> 0,
+                k = 0,
+                value;
+
+            if (arguments.length === 3) {
+                value = arguments[2];
+            } else {
+                while (k < len && !(k in t)) {
+                    k++;
+                }
+
+                if (k >= len) {
+                    throw new TypeError('Reduce of empty array with no initial value');
+                }
+
+                value = t[k++];
+            }
+            for (; k < len; k++) {
+                if (k in t) {
+                    value = callback(value, t[k], k, t);
+                }
+            }
+            return value;
+        },
+        /**
+         * Computes the multiplier necessary to make x >= 1,
+         * effectively eliminating miscalculations caused by
+         * finite precision.
+         */
+        multiplier: function (x) {
+            var parts = x.toString().split('.');
+
+            return parts.length < 2 ? 1 : Math.pow(10, parts[1].length);
+        },
+        /**
+         * Given a variable number of arguments, returns the maximum
+         * multiplier that must be used to normalize an operation involving
+         * all of them.
+         */
+        correctionFactor: function () {
+            var args = Array.prototype.slice.call(arguments);
+
+            return args.reduce(function(accum, next) {
+                var mn = _.multiplier(next);
+                return accum > mn ? accum : mn;
+            }, 1);
+        },
+        /**
+         * Implementation of toFixed() that treats floats more like decimals
+         *
+         * Fixes binary rounding issues (eg. (0.615).toFixed(2) === '0.61') that present
+         * problems for accounting- and finance-related software.
+         */
+        toFixed: function(value, maxDecimals, roundingFunction, optionals) {
+            var splitValue = value.toString().split('.'),
+                minDecimals = maxDecimals - (optionals || 0),
+                boundedPrecision,
+                optionalsRegExp,
+                power,
+                output;
+
+            // Use the smallest precision value possible to avoid errors from floating point representation
+            if (splitValue.length === 2) {
+              boundedPrecision = Math.min(Math.max(splitValue[1].length, minDecimals), maxDecimals);
+            } else {
+              boundedPrecision = minDecimals;
+            }
+
+            power = Math.pow(10, boundedPrecision);
+
+            // Multiply up by precision, round accurately, then divide and use native toFixed():
+            output = (roundingFunction(value + 'e+' + boundedPrecision) / power).toFixed(boundedPrecision);
+
+            if (optionals > maxDecimals - boundedPrecision) {
+                optionalsRegExp = new RegExp('\\.?0{1,' + (optionals - (maxDecimals - boundedPrecision)) + '}$');
+                output = output.replace(optionalsRegExp, '');
+            }
+
+            return output;
+        }
+    };
+
+    // avaliable options
+    numeral.options = options;
+
+    // avaliable formats
+    numeral.formats = formats;
+
+    // avaliable formats
+    numeral.locales = locales;
+
+    // This function sets the current locale.  If
+    // no arguments are passed in, it will simply return the current global
+    // locale key.
+    numeral.locale = function(key) {
+        if (key) {
+            options.currentLocale = key.toLowerCase();
+        }
+
+        return options.currentLocale;
+    };
+
+    // This function provides access to the loaded locale data.  If
+    // no arguments are passed in, it will simply return the current
+    // global locale object.
+    numeral.localeData = function(key) {
+        if (!key) {
+            return locales[options.currentLocale];
+        }
+
+        key = key.toLowerCase();
+
+        if (!locales[key]) {
+            throw new Error('Unknown locale : ' + key);
+        }
+
+        return locales[key];
+    };
+
+    numeral.reset = function() {
+        for (var property in defaults) {
+            options[property] = defaults[property];
+        }
+    };
+
+    numeral.zeroFormat = function(format) {
+        options.zeroFormat = typeof(format) === 'string' ? format : null;
+    };
+
+    numeral.nullFormat = function (format) {
+        options.nullFormat = typeof(format) === 'string' ? format : null;
+    };
+
+    numeral.defaultFormat = function(format) {
+        options.defaultFormat = typeof(format) === 'string' ? format : '0.0';
+    };
+
+    numeral.register = function(type, name, format) {
+        name = name.toLowerCase();
+
+        if (this[type + 's'][name]) {
+            throw new TypeError(name + ' ' + type + ' already registered.');
+        }
+
+        this[type + 's'][name] = format;
+
+        return format;
+    };
+
+
+    numeral.validate = function(val, culture) {
+        var _decimalSep,
+            _thousandSep,
+            _currSymbol,
+            _valArray,
+            _abbrObj,
+            _thousandRegEx,
+            localeData,
+            temp;
+
+        //coerce val to string
+        if (typeof val !== 'string') {
+            val += '';
+
+            if (console.warn) {
+                console.warn('Numeral.js: Value is not string. It has been co-erced to: ', val);
+            }
+        }
+
+        //trim whitespaces from either sides
+        val = val.trim();
+
+        //if val is just digits return true
+        if (!!val.match(/^\d+$/)) {
+            return true;
+        }
+
+        //if val is empty return false
+        if (val === '') {
+            return false;
+        }
+
+        //get the decimal and thousands separator from numeral.localeData
+        try {
+            //check if the culture is understood by numeral. if not, default it to current locale
+            localeData = numeral.localeData(culture);
+        } catch (e) {
+            localeData = numeral.localeData(numeral.locale());
+        }
+
+        //setup the delimiters and currency symbol based on culture/locale
+        _currSymbol = localeData.currency.symbol;
+        _abbrObj = localeData.abbreviations;
+        _decimalSep = localeData.delimiters.decimal;
+        if (localeData.delimiters.thousands === '.') {
+            _thousandSep = '\\.';
+        } else {
+            _thousandSep = localeData.delimiters.thousands;
+        }
+
+        // validating currency symbol
+        temp = val.match(/^[^\d]+/);
+        if (temp !== null) {
+            val = val.substr(1);
+            if (temp[0] !== _currSymbol) {
+                return false;
+            }
+        }
+
+        //validating abbreviation symbol
+        temp = val.match(/[^\d]+$/);
+        if (temp !== null) {
+            val = val.slice(0, -1);
+            if (temp[0] !== _abbrObj.thousand && temp[0] !== _abbrObj.million && temp[0] !== _abbrObj.billion && temp[0] !== _abbrObj.trillion) {
+                return false;
+            }
+        }
+
+        _thousandRegEx = new RegExp(_thousandSep + '{2}');
+
+        if (!val.match(/[^\d.,]/g)) {
+            _valArray = val.split(_decimalSep);
+            if (_valArray.length > 2) {
+                return false;
+            } else {
+                if (_valArray.length < 2) {
+                    return ( !! _valArray[0].match(/^\d+.*\d$/) && !_valArray[0].match(_thousandRegEx));
+                } else {
+                    if (_valArray[0].length === 1) {
+                        return ( !! _valArray[0].match(/^\d+$/) && !_valArray[0].match(_thousandRegEx) && !! _valArray[1].match(/^\d+$/));
+                    } else {
+                        return ( !! _valArray[0].match(/^\d+.*\d$/) && !_valArray[0].match(_thousandRegEx) && !! _valArray[1].match(/^\d+$/));
+                    }
+                }
+            }
+        }
+
+        return false;
+    };
+
+
+    /************************************
+        Numeral Prototype
+    ************************************/
+
+    numeral.fn = Numeral.prototype = {
+        clone: function() {
+            return numeral(this);
+        },
+        format: function(inputString, roundingFunction) {
+            var value = this._value,
+                format = inputString || options.defaultFormat,
+                kind,
+                output,
+                formatFunction;
+
+            // make sure we have a roundingFunction
+            roundingFunction = roundingFunction || Math.round;
+
+            // format based on value
+            if (value === 0 && options.zeroFormat !== null) {
+                output = options.zeroFormat;
+            } else if (value === null && options.nullFormat !== null) {
+                output = options.nullFormat;
+            } else {
+                for (kind in formats) {
+                    if (format.match(formats[kind].regexps.format)) {
+                        formatFunction = formats[kind].format;
+
+                        break;
+                    }
+                }
+
+                formatFunction = formatFunction || numeral._.numberToFormat;
+
+                output = formatFunction(value, format, roundingFunction);
+            }
+
+            return output;
+        },
+        value: function() {
+            return this._value;
+        },
+        input: function() {
+            return this._input;
+        },
+        set: function(value) {
+            this._value = Number(value);
+
+            return this;
+        },
+        add: function(value) {
+            var corrFactor = _.correctionFactor.call(null, this._value, value);
+
+            function cback(accum, curr, currI, O) {
+                return accum + Math.round(corrFactor * curr);
+            }
+
+            this._value = _.reduce([this._value, value], cback, 0) / corrFactor;
+
+            return this;
+        },
+        subtract: function(value) {
+            var corrFactor = _.correctionFactor.call(null, this._value, value);
+
+            function cback(accum, curr, currI, O) {
+                return accum - Math.round(corrFactor * curr);
+            }
+
+            this._value = _.reduce([value], cback, Math.round(this._value * corrFactor)) / corrFactor;
+
+            return this;
+        },
+        multiply: function(value) {
+            function cback(accum, curr, currI, O) {
+                var corrFactor = _.correctionFactor(accum, curr);
+                return Math.round(accum * corrFactor) * Math.round(curr * corrFactor) / Math.round(corrFactor * corrFactor);
+            }
+
+            this._value = _.reduce([this._value, value], cback, 1);
+
+            return this;
+        },
+        divide: function(value) {
+            function cback(accum, curr, currI, O) {
+                var corrFactor = _.correctionFactor(accum, curr);
+                return Math.round(accum * corrFactor) / Math.round(curr * corrFactor);
+            }
+
+            this._value = _.reduce([this._value, value], cback);
+
+            return this;
+        },
+        difference: function(value) {
+            return Math.abs(numeral(this._value).subtract(value).value());
+        }
+    };
+
+    /************************************
+        Default Locale && Format
+    ************************************/
+
+    numeral.register('locale', 'en', {
+        delimiters: {
+            thousands: ',',
+            decimal: '.'
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function(number) {
+            var b = number % 10;
+            return (~~(number % 100 / 10) === 1) ? 'th' :
+                (b === 1) ? 'st' :
+                (b === 2) ? 'nd' :
+                (b === 3) ? 'rd' : 'th';
+        },
+        currency: {
+            symbol: '$'
+        }
+    });
+
+    
+
+(function() {
+        numeral.register('format', 'bps', {
+            regexps: {
+                format: /(BPS)/,
+                unformat: /(BPS)/
+            },
+            format: function(value, format, roundingFunction) {
+                var space = numeral._.includes(format, ' BPS') ? ' ' : '',
+                    output;
+
+                value = value * 10000;
+
+                // check for space before BPS
+                format = format.replace(/\s?BPS/, '');
+
+                output = numeral._.numberToFormat(value, format, roundingFunction);
+
+                if (numeral._.includes(output, ')')) {
+                    output = output.split('');
+
+                    output.splice(-1, 0, space + 'BPS');
+
+                    output = output.join('');
+                } else {
+                    output = output + space + 'BPS';
+                }
+
+                return output;
+            },
+            unformat: function(string) {
+                return +(numeral._.stringToNumber(string) * 0.0001).toFixed(15);
+            }
+        });
+})();
+
+
+(function() {
+        var decimal = {
+            base: 1000,
+            suffixes: ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+        },
+        binary = {
+            base: 1024,
+            suffixes: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+        };
+
+    var allSuffixes =  decimal.suffixes.concat(binary.suffixes.filter(function (item) {
+            return decimal.suffixes.indexOf(item) < 0;
+        }));
+        var unformatRegex = allSuffixes.join('|');
+        // Allow support for BPS (http://www.investopedia.com/terms/b/basispoint.asp)
+        unformatRegex = '(' + unformatRegex.replace('B', 'B(?!PS)') + ')';
+
+    numeral.register('format', 'bytes', {
+        regexps: {
+            format: /([0\s]i?b)/,
+            unformat: new RegExp(unformatRegex)
+        },
+        format: function(value, format, roundingFunction) {
+            var output,
+                bytes = numeral._.includes(format, 'ib') ? binary : decimal,
+                suffix = numeral._.includes(format, ' b') || numeral._.includes(format, ' ib') ? ' ' : '',
+                power,
+                min,
+                max;
+
+            // check for space before
+            format = format.replace(/\s?i?b/, '');
+
+            for (power = 0; power <= bytes.suffixes.length; power++) {
+                min = Math.pow(bytes.base, power);
+                max = Math.pow(bytes.base, power + 1);
+
+                if (value === null || value === 0 || value >= min && value < max) {
+                    suffix += bytes.suffixes[power];
+
+                    if (min > 0) {
+                        value = value / min;
+                    }
+
+                    break;
+                }
+            }
+
+            output = numeral._.numberToFormat(value, format, roundingFunction);
+
+            return output + suffix;
+        },
+        unformat: function(string) {
+            var value = numeral._.stringToNumber(string),
+                power,
+                bytesMultiplier;
+
+            if (value) {
+                for (power = decimal.suffixes.length - 1; power >= 0; power--) {
+                    if (numeral._.includes(string, decimal.suffixes[power])) {
+                        bytesMultiplier = Math.pow(decimal.base, power);
+
+                        break;
+                    }
+
+                    if (numeral._.includes(string, binary.suffixes[power])) {
+                        bytesMultiplier = Math.pow(binary.base, power);
+
+                        break;
+                    }
+                }
+
+                value *= (bytesMultiplier || 1);
+            }
+
+            return value;
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('format', 'currency', {
+        regexps: {
+            format: /(\$)/
+        },
+        format: function(value, format, roundingFunction) {
+            var locale = numeral.locales[numeral.options.currentLocale],
+                symbols = {
+                    before: format.match(/^([\+|\-|\(|\s|\$]*)/)[0],
+                    after: format.match(/([\+|\-|\)|\s|\$]*)$/)[0]
+                },
+                output,
+                symbol,
+                i;
+
+            // strip format of spaces and $
+            format = format.replace(/\s?\$\s?/, '');
+
+            // format the number
+            output = numeral._.numberToFormat(value, format, roundingFunction);
+
+            // update the before and after based on value
+            if (value >= 0) {
+                symbols.before = symbols.before.replace(/[\-\(]/, '');
+                symbols.after = symbols.after.replace(/[\-\)]/, '');
+            } else if (value < 0 && (!numeral._.includes(symbols.before, '-') && !numeral._.includes(symbols.before, '('))) {
+                symbols.before = '-' + symbols.before;
+            }
+
+            // loop through each before symbol
+            for (i = 0; i < symbols.before.length; i++) {
+                symbol = symbols.before[i];
+
+                switch (symbol) {
+                    case '$':
+                        output = numeral._.insert(output, locale.currency.symbol, i);
+                        break;
+                    case ' ':
+                        output = numeral._.insert(output, ' ', i + locale.currency.symbol.length - 1);
+                        break;
+                }
+            }
+
+            // loop through each after symbol
+            for (i = symbols.after.length - 1; i >= 0; i--) {
+                symbol = symbols.after[i];
+
+                switch (symbol) {
+                    case '$':
+                        output = i === symbols.after.length - 1 ? output + locale.currency.symbol : numeral._.insert(output, locale.currency.symbol, -(symbols.after.length - (1 + i)));
+                        break;
+                    case ' ':
+                        output = i === symbols.after.length - 1 ? output + ' ' : numeral._.insert(output, ' ', -(symbols.after.length - (1 + i) + locale.currency.symbol.length - 1));
+                        break;
+                }
+            }
+
+
+            return output;
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('format', 'exponential', {
+        regexps: {
+            format: /(e\+|e-)/,
+            unformat: /(e\+|e-)/
+        },
+        format: function(value, format, roundingFunction) {
+            var output,
+                exponential = typeof value === 'number' && !numeral._.isNaN(value) ? value.toExponential() : '0e+0',
+                parts = exponential.split('e');
+
+            format = format.replace(/e[\+|\-]{1}0/, '');
+
+            output = numeral._.numberToFormat(Number(parts[0]), format, roundingFunction);
+
+            return output + 'e' + parts[1];
+        },
+        unformat: function(string) {
+            var parts = numeral._.includes(string, 'e+') ? string.split('e+') : string.split('e-'),
+                value = Number(parts[0]),
+                power = Number(parts[1]);
+
+            power = numeral._.includes(string, 'e-') ? power *= -1 : power;
+
+            function cback(accum, curr, currI, O) {
+                var corrFactor = numeral._.correctionFactor(accum, curr),
+                    num = (accum * corrFactor) * (curr * corrFactor) / (corrFactor * corrFactor);
+                return num;
+            }
+
+            return numeral._.reduce([value, Math.pow(10, power)], cback, 1);
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('format', 'ordinal', {
+        regexps: {
+            format: /(o)/
+        },
+        format: function(value, format, roundingFunction) {
+            var locale = numeral.locales[numeral.options.currentLocale],
+                output,
+                ordinal = numeral._.includes(format, ' o') ? ' ' : '';
+
+            // check for space before
+            format = format.replace(/\s?o/, '');
+
+            ordinal += locale.ordinal(value);
+
+            output = numeral._.numberToFormat(value, format, roundingFunction);
+
+            return output + ordinal;
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('format', 'percentage', {
+        regexps: {
+            format: /(%)/,
+            unformat: /(%)/
+        },
+        format: function(value, format, roundingFunction) {
+            var space = numeral._.includes(format, ' %') ? ' ' : '',
+                output;
+
+            if (numeral.options.scalePercentBy100) {
+                value = value * 100;
+            }
+
+            // check for space before %
+            format = format.replace(/\s?\%/, '');
+
+            output = numeral._.numberToFormat(value, format, roundingFunction);
+
+            if (numeral._.includes(output, ')')) {
+                output = output.split('');
+
+                output.splice(-1, 0, space + '%');
+
+                output = output.join('');
+            } else {
+                output = output + space + '%';
+            }
+
+            return output;
+        },
+        unformat: function(string) {
+            var number = numeral._.stringToNumber(string);
+            if (numeral.options.scalePercentBy100) {
+                return number * 0.01;
+            }
+            return number;
+        }
+    });
+})();
+
+
+(function() {
+        numeral.register('format', 'time', {
+        regexps: {
+            format: /(:)/,
+            unformat: /(:)/
+        },
+        format: function(value, format, roundingFunction) {
+            var hours = Math.floor(value / 60 / 60),
+                minutes = Math.floor((value - (hours * 60 * 60)) / 60),
+                seconds = Math.round(value - (hours * 60 * 60) - (minutes * 60));
+
+            return hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
+        },
+        unformat: function(string) {
+            var timeArray = string.split(':'),
+                seconds = 0;
+
+            // turn hours and minutes into seconds and add them all up
+            if (timeArray.length === 3) {
+                // hours
+                seconds = seconds + (Number(timeArray[0]) * 60 * 60);
+                // minutes
+                seconds = seconds + (Number(timeArray[1]) * 60);
+                // seconds
+                seconds = seconds + Number(timeArray[2]);
+            } else if (timeArray.length === 2) {
+                // minutes
+                seconds = seconds + (Number(timeArray[0]) * 60);
+                // seconds
+                seconds = seconds + Number(timeArray[1]);
+            }
+            return Number(seconds);
+        }
+    });
+})();
+
+return numeral;
+}));
+}
 
 /***/ })
 

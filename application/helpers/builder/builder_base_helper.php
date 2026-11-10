@@ -1,71 +1,138 @@
 <?php
 if ( ! function_exists('builder_view'))
 {
-	function builder_view($path, $vars = array(), $return = false)
-	{
-		$CI = &get_instance();
-		if(!file_exists(VIEWPATH.$path.'.php')) {
-			$path = preg_replace('/^[^\/]+/', BUILDER_FLAGNAME, $path);
-		}
-		$CI->load->view($path, $vars, $return);
-	}
+    function builder_view($path, $vars = array(), $return = false)
+    {
+        $CI = &get_instance();
+        if(!file_exists(VIEWPATH.$path.'.php')) {
+            $path = preg_replace('/^[^\/]+/', BUILDER_FLAGNAME, $path);
+        }
+        $CI->load->view($path, $vars, $return);
+    }
 }
 
 function get_builder_html_attributes($flag): string
 {
-	$classList = [];
-	$template = '';
-	switch ($flag) {
-		case 'admin' :
-			$classList = ['light-style','layout-navbar-fixed','layout-menu-fixed','layout-compact'];
-			$template = 'vertical-menu-template-starter';
-			break;
-		case 'web' :
-			$classList = ['light-style','layout-navbar-fixed','layout-wide'];
-			$template = 'front-pages';
-			break;
-	}
+    $classList = [];
+    $template = '';
+    switch ($flag) {
+        case 'admin' :
+            $classList = ['light-style','layout-navbar-fixed','layout-menu-fixed','layout-compact'];
+            $template = 'vertical-menu-template-starter';
+            break;
+        case 'web' :
+            $classList = ['light-style','layout-navbar-fixed','layout-wide'];
+            $template = 'front-pages';
+            break;
+    }
 
-	$attrs = [
-		'lang' => get_language_code(config_item('language')),
-		'class' => implode(' ', $classList),
-		'dir' => 'ltr',
-		'data-theme' => 'theme-default',
-		'data-assets-path' => '/'.BUILDER_ASSET_URI,
-		'data-template' => $template,
-		'data-style' => 'light',
-	];
+    $attrs = [
+        'lang' => get_language_code(config_item('language')),
+        'class' => implode(' ', $classList),
+        'dir' => 'ltr',
+        'data-theme' => 'theme-default',
+        'data-assets-path' => '/'.BUILDER_ASSET_URI,
+        'data-template' => $template,
+        'data-style' => 'light',
+    ];
 
-	return implode(' ', array_map(
-		function ($key, $value) {
-			return $key . '="' . $value . '"';
-		},
-		array_keys($attrs),
-		$attrs
-	));
+    return implode(' ', array_map(
+        function ($key, $value) {
+            return $key . '="' . $value . '"';
+        },
+        array_keys($attrs),
+        $attrs
+    ));
 }
 
 function get_builder_body_attributes($production = false): string
 {
-	$append = [
+    $append = [
 //		'oncontextmenu' => 'return true',
 //		'onselectstart' => 'return true',
 //		'ondragstart' => 'return true',
 //		'onkeydown' => 'return true',
-	];
+    ];
 
-	$CI =& get_instance();
-	$attrs = array_merge([
-		'data-class' => $CI->router->class,
-		'data-method' => $CI->router->method,
-		'data-onload' => 'false',
-	], $production ? $append : []);
+    $CI =& get_instance();
+    $attrs = array_merge([
+        'data-class' => $CI->router->class,
+        'data-method' => $CI->router->method,
+        'data-onload' => 'false',
+    ], $production ? $append : []);
 
-	return implode(' ', array_map(
-		function ($key, $value) {
-			return $key . '="' . $value . '"';
-		},
-		array_keys($attrs),
-		$attrs
-	));
+    return implode(' ', array_map(
+        function ($key, $value) {
+            return $key . '="' . $value . '"';
+        },
+        array_keys($attrs),
+        $attrs
+    ));
+}
+
+function get_menu_list_tree($data): string
+{
+    $html = '';
+    foreach($data as $i=>$item):
+        $html .= get_menu_item_tree($item, 1, $i+1);
+    endforeach;
+    return $html;
+}
+
+function get_menu_item_tree($item, $depth, $srt = 1)
+{
+    $html = '<div class="menu-item" data-depth="'.$depth.'" data-srt="'.$srt.'">';
+    $html .= '<div class="menu-header">';
+    $html .= '<span class="menu-title">';
+    if($item['icon'])
+        $html .= '<i class="icon-base me-2 '.$item['icon'].'"></i>';
+    $html .= $item['title'].'</span>';
+    $html .= '</div>'; // menu-header
+    $html .= '<div class="menu-container submenu-container">';
+    if(!empty($item['subMenu']) && is_array($item['subMenu'])) {
+        foreach($item['subMenu'] as $j=>$subItem) {
+            $html .= get_menu_item_tree($subItem, $depth+1, $j+1);
+        }
+    }
+    $html .= '</div>'; // submenu-container
+    $html .= '</div>'; // menu-item
+    return $html;
+}
+
+function get_menu_href($href = '', $params = [])
+{
+    $url = '#';
+    if($href) {
+        $parsed = parse_url($href);
+        if(!array_key_exists('host', $parsed)) {
+            $url = base_url(
+                $href.'?'.http_build_query($params)
+            );
+        }else{
+            $url = $href;
+            if(count($params)) $url .= '?'.http_build_query($params);
+        }
+    }
+    return $url;
+}
+
+function builder_misc_view($type)
+{
+    $CI =& get_instance();
+    echo '시스템 점검 중입니다.';
+//    $CI->load->view('builder/misc/under_maintenance');
+    exit;
+}
+
+if ( ! function_exists('builder_config_name'))
+{
+    /**
+     * 컨트롤러 클래스명·메서드명을 빌더 설정 키에 쓰는 이름으로 바꾼다 (WEB·API 공통 규칙).
+     * 예: partnerAuth → partner_auth, SysCfg → sys_cfg
+     * 설정 키는 "{종류}_{이 이름}_config" (form_partner_auth_config 등)로 짓는다.
+     */
+    function builder_config_name(string $name): string
+    {
+        return snakeize(lcfirst($name));
+    }
 }

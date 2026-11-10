@@ -1,6 +1,6 @@
 <div class="row g-6 mb-6">
 	<nav aria-label="breadcrumb">
-		<ol class="breadcrumb"><?=get_admin_breadcrumbs($titleList)?></ol>
+		<ol class="breadcrumb breadcrumb-custom-icon"><?=get_breadcrumbs($titleList)?></ol>
 	</nav>
 </div>
 <div class="row g-6 mb-6">
@@ -40,7 +40,7 @@
 						</p>
 						<p class="text-start mt-4">
 							<a href="<?=$sampleFile?>" class="btn btn-info p-2" download=""><i class="ri-download-line ri-14px me-2"></i><span class="small">샘플 파일 다운로드</span></a>
-							<a href="javascript:resetExcelFile()" class="btn btn-secondary p-2" download=""><i class="ri-refresh-line ri-14px me-2"></i><span class="small">샘플 파일 리셋</span></a>
+							<a href="#" data-action="reset-excel-file" class="btn btn-secondary p-2" download=""><i class="ri-refresh-line ri-14px me-2"></i><span class="small">샘플 파일 리셋</span></a>
 						</p>
 					</div>
 				</div>
@@ -93,7 +93,7 @@
 					<tr>
 						<th>#</th>
 						<?php foreach ($excelHeaders as $item): ?>
-						<th data-field="<?=$item['field']?>" data-required="<?=$item['required']?>"><span><?=$item['label']?></span></th>
+						<th data-field="<?=html_escape($item['field'])?>" data-required="<?=$item['required']?'1':''?>"><span><?=html_escape($item['label'])?></span></th>
 						<?php endforeach; ?>
 						<th>삭제</th>
 					</tr>
@@ -108,6 +108,7 @@
 		</div>
 	</div>
 </div>
-<script>
-	const excelHeaders = JSON.parse('<?=json_encode($excelHeaders, JSON_UNESCAPED_UNICODE)?>');
+<script<?=csp_nonce_attr()?>>
+	// JSON 을 문자열로 감싸지 않고 바로 출력 (라벨의 따옴표·역슬래시가 스크립트를 깨뜨리지 않게, 태그 문자는 JSON_HEX_TAG 로 처리)
+	const excelHeaders = <?=json_encode($excelHeaders, JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP)?>;
 </script>

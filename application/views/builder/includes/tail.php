@@ -9,26 +9,29 @@
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/cleavejs/cleave-phone.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/cleavejs/cleave-phone.kr.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/flatpickr/flatpickr.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/vendor/libs/flatpickr-month-select/index.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/bootstrap-select/bootstrap-select.js');?>"></script>
-		<script src="<?php echo base_url('public/assets/builder/vendor/libs/select2/select2.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/moment/moment.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/libs/sweetalert2/sweetalert2.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/vendor/libs/sortablejs/sortable.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/vendor/js/menu.js');?>"></script>
 
 		<?php if(!isset($status_code) || !in_array($status_code, [404, 500])): ?>
 		<!-- Main JS -->
-		<script src="<?php echo base_url('public/assets/builder/js/front-main.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/js/main.js');?>"></script>
 
 		<!-- Page JS -->
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-ajax.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-form.js');?>"></script>
-		<script src="<?php echo base_url('public/assets/builder/js/app-page-event.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/js/app-page-form-event.js');?>"></script>
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-validators.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/js/app-page-event.js');?>"></script>
+		<script src="<?php echo base_url('public/assets/builder/js/app-page-common.js');?>"></script>
 		<?php if(isset($addJS['tail'])) add_javascript($addJS['tail']); ?>
 		<script src="<?php echo base_url('public/assets/builder/js/app-page-onload.js');?>"></script>
 
 		<?php if($this->config->config['life_cycle'] === 'post_controller'): ?>
-		<script>
+		<script<?=csp_nonce_attr()?>>
 			$(function() {
 				if(
 					<?=$this->config->item('phptojs.namespace')?>.HOOK_PHPTOJS_VAR_DIALOG !== null

@@ -1,4 +1,5 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 $config['builder_view_config_loaded'] = true;
 
@@ -53,7 +54,7 @@ $config['builder_view_config'] = [
     ],
 ];
 
-$config['builder_view_field_config'] = [
+$config['builder_view_base'] = [
     'field' => '',
     'label' => '',
     'category' => 'base',
@@ -64,16 +65,8 @@ $config['builder_view_field_config'] = [
     'colspan' => 6,
 ];
 
-$config['builder_view_hidden_config'] = array_replace_recursive($config['builder_view_field_config'], [
+$config['builder_view_hidden_config'] = array_replace_recursive($config['builder_view_base'], [
     'category' => 'base',
     'type' => 'hidden',
     'subtype' => 'base',
 ]);
-
-$config['builder_view_actions_config'] = [
-    'list' => true,
-    'edit' => true,
-    'delete' => true,
-];
-
-$config['builder_view_buttons_config'] = [];

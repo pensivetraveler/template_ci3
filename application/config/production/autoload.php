@@ -58,7 +58,7 @@ $autoload['packages'] = array();
 |
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
-$autoload['libraries'] = array('email', 'session', 'encryption', 'database', 'user_agent', 'upload', 'josa', 'form_validation');
+$autoload['libraries'] = array('email', 'session', 'database', 'user_agent', 'upload', 'josa', 'form_validation');
 
 /*
 | -------------------------------------------------------------------
@@ -79,7 +79,7 @@ $autoload['libraries'] = array('email', 'session', 'encryption', 'database', 'us
 |	$autoload['drivers'] = array('cache' => 'cch');
 |
 */
-$autoload['drivers'] = array();
+$autoload['drivers'] = array('cache');
 
 /*
 | -------------------------------------------------------------------
@@ -89,7 +89,8 @@ $autoload['drivers'] = array();
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = array('string', 'array', 'url', 'file', 'function', 'cookie', 'inflector', 'directory', 'path', 'download', 'language', 'model', 'format', 'date', 'common');
+$autoload['helper'] = array('string', 'array', 'url', 'file', 'function', 'cookie', 'inflector',
+    'directory', 'path', 'download', 'language', 'model', 'format', 'date', 'common', 'env', 'log', 'encryption');
 
 /*
 | -------------------------------------------------------------------
@@ -119,7 +120,7 @@ foreach (glob(APPPATH . 'config/extra/*_config.php') as $file) {
 | "codeigniter_lang.php" would be referenced as array('codeigniter');
 |
 */
-$autoload['language'] = array();
+$autoload['language'] = array('common');
 
 /*
 | -------------------------------------------------------------------
@@ -134,4 +135,5 @@ $autoload['language'] = array();
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-$autoload['model'] = array('Model_User', 'Model_File', 'Model_User_Token', 'Model_User_Autologin', 'Model_Sys_Cfg', 'Model_Sys_Code');
+$autoload['model'] = array('Model_Common', 'Model_User', 'Model_File', 'Model_User_Token', 'Model_User_Autologin',
+    'Model_Sys_Cfg', 'Model_Sys_Code', 'Model_Menu', 'Model_Menu_Auth');

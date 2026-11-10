@@ -1,4 +1,12 @@
 /**
+ * 값을 HTML 글자로 이스케이프한다 (HTML 문자열·속성에 사용자 값을 넣을 때)
+ */
+function escapeHtml(value) {
+    const entities = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'};
+    return String(value ?? '').replace(/[&<>"']/g, (char) => entities[char]);
+}
+
+/**
  * GetLocale
  *
  * Fetches a language variable
@@ -8,52 +16,52 @@
  * @returns {*[]}
  */
 function getLocale(key, locale = []) {
-	try {
-		if(locale.length === 0 && common.LOCALE === undefined) throw new ReferenceError('getLocale : LOCALE is not defined.');
-		if(locale.length === 0) locale = common.LOCALE;
-		if(key === undefined) throw new ReferenceError('getLocale : key is not defined.');
+    try {
+        if(locale.length === 0 && common.LOCALE === undefined) throw new ReferenceError('getLocale : LOCALE is not defined.');
+        if(locale.length === 0) locale = common.LOCALE;
+        if(key === undefined) throw new ReferenceError('getLocale : key is not defined.');
 
-		let exist = false;
-		let result = locale;
+        let exist = false;
+        let result = locale;
 
-		if(key.indexOf('.') === -1 || key.substring(key.length-1,key.length) === '.'){
-			result = locale.hasOwnProperty(key) ? result[key] : undefined;
-		}else{
-			const keys = key.split('.');
+        if(key.indexOf('.') === -1 || key.substring(key.length-1,key.length) === '.'){
+            result = Object.hasOwn(locale, key) ? result[key] : undefined;
+        }else{
+            const keys = key.split('.');
 
-			for(const item of keys) {
-				if(result[item] !== undefined) {
-					result = result[item];
-				}else{
-					result = undefined;
-					break;
-				}
-			}
+            for(const item of keys) {
+                if(result[item] !== undefined) {
+                    result = result[item];
+                }else{
+                    result = undefined;
+                    break;
+                }
+            }
 
-			if(result === undefined) {
-				result = locale;
-				keys[0] = 'common';
-				for(const item of keys) {
-					if(result[item] !== undefined) {
-						result = result[item];
-					}else{
-						result = undefined;
-						break;
-					}
-				}
-			}
-		}
+            if(result === undefined) {
+                result = locale;
+                keys[0] = 'common';
+                for(const item of keys) {
+                    if(result[item] !== undefined) {
+                        result = result[item];
+                    }else{
+                        result = undefined;
+                        break;
+                    }
+                }
+            }
+        }
 
-		if(result === undefined) throw new RangeError(`getLocale : Can't find locale. ${key}`);
-		return result;
-	} catch (error) {
-		if (error instanceof RangeError) {
-			console.warn(error.message);
-			return key;
-		}else{
-			customErrorHandler(error);
-		}
-	}
+        if(result === undefined) throw new RangeError(`getLocale : Can't find locale. ${key}`);
+        return result;
+    } catch (error) {
+        if (error instanceof RangeError) {
+            console.warn(error.message);
+            return key;
+        }else{
+            customErrorHandler(error);
+        }
+    }
 }
 
 /**
@@ -61,346 +69,842 @@ function getLocale(key, locale = []) {
  * @param wrap
  */
 function foldDaumPostcode(wrap) {
-	// iframe을 넣은 element를 안보이게 한다.
-	wrap.classList.remove('on');
-	wrap.style.removeProperty('height');
-	wrap.querySelector('div').remove();
+    // iframe을 넣은 element를 안보이게 한다.
+    wrap.classList.remove('on');
+    wrap.style.removeProperty('height');
+    wrap.querySelector('div').remove();
 }
 
 function findAddress(wrap) {
-	const group_name = wrap.getAttribute('data-group-name');
-	// 현재 scroll 위치를 저장해놓는다.
-	new daum.Postcode({
-		oncomplete: function(data) {
-			const frm = wrap.closest('form');
-			console.log(`[data-group-name="${group_name}"][data-group-field="zipcode"]`);
-			frm.querySelector(`[data-group-name="${group_name}"][data-group-key="zipcode"]`).value = data.zonecode;
-			frm.querySelector(`[data-group-name="${group_name}"][data-group-key="addr1"]`).value = data.address;
-			frm.querySelector(`[data-group-name="${group_name}"][data-group-key="addr2"]`).focus()
+    const group_name = wrap.getAttribute('data-group-name');
+    // 현재 scroll 위치를 저장해놓는다.
+    new daum.Postcode({
+        oncomplete: function(data) {
+            const frm = wrap.closest('form');
+            console.log(`[data-group-name="${group_name}"][data-group-field="zipcode"]`);
+            frm.querySelector(`[data-group-name="${group_name}"][data-group-key="zipcode"]`).value = data.zonecode;
+            frm.querySelector(`[data-group-name="${group_name}"][data-group-key="addr1"]`).value = data.address;
+            frm.querySelector(`[data-group-name="${group_name}"][data-group-key="addr2"]`).focus()
 
-			// iframe을 넣은 element를 안보이게 한다.
-			// (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
-			wrap.classList.remove('on');
-		},
-		// 우편번호 찾기 화면 크기가 조정되었을때 실행할 코드를 작성하는 부분. iframe을 넣은 element의 높이값을 조정한다.
-		onresize : function(size) {
-			wrap.style.height = size.height+'px';
-		},
-		width : '100%',
-		height : '100%'
-	}).embed(wrap);
+            // iframe을 넣은 element를 안보이게 한다.
+            // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+            wrap.classList.remove('on');
+        },
+        // 우편번호 찾기 화면 크기가 조정되었을때 실행할 코드를 작성하는 부분. iframe을 넣은 element의 높이값을 조정한다.
+        onresize : function(size) {
+            wrap.style.height = size.height+'px';
+        },
+        width : '100%',
+        height : '100%'
+    }).embed(wrap);
 
-	// iframe을 넣은 element를 보이게 한다.
-	wrap.classList.add('on');
+    // iframe을 넣은 element를 보이게 한다.
+    wrap.classList.add('on');
 }
 
 function callUserFunc(callback = undefined, params = undefined) {
-	try {
-		if(callback === undefined || typeof callback === undefined)
-			throw new Error(`callUserFunc : callback is not defined !`);
+    try {
+        if(callback === undefined)
+            throw new Error(`callUserFunc : callback is not defined !`);
 
-		if(typeof callback === 'string' && callback.trim().length === 0)
-			throw new Error(`callUserFunc : callback is not valid !`);
+        if(typeof callback === 'string' && callback.trim().length === 0)
+            throw new Error(`callUserFunc : callback is not valid !`);
 
-		const isString = typeof callback === 'string';
+        const isString = typeof callback === 'string';
 
-		if(params !== undefined) {
-			if(isObject(params) || isArray(params)) {
-				if(isObject(params)) isString?window[callback](params):callback(params);
-				if(isArray(params)) isString?window[callback](...params):callback(...params);
-			}else{
-				isString?window[callback](params):callback(params);
-			}
-		}else{
-			isString?window[callback]():callback();
-		}
-	} catch (error) {
-		customErrorHandler(error);
-	}
+        if(params !== undefined) {
+            if(isObject(params) || isArray(params)) {
+                if(isObject(params)) isString?window[callback](params):callback(params);
+                if(isArray(params)) isString?window[callback](...params):callback(...params);
+            }else{
+                isString?window[callback](params):callback(params);
+            }
+        }else{
+            isString?window[callback]():callback();
+        }
+    } catch (error) {
+        customErrorHandler(error);
+    }
 }
 
 function showAlert(obj = {}) {
-	try {
-		var title, text;
-		if(obj.type === undefined) obj.type = 'success';
-		if(!['success', 'warning', 'error'].includes(obj.type)) throw new Error(`showAlert : Type is not allowed. ${obj.type}`);
-		if(obj.title !== undefined) title = getLocale(obj.title, common.LOCALE);
-		if(obj.text !== undefined || obj.html !== undefined) text = getLocale(obj.text, common.LOCALE);
-
-		switch (obj.type) {
-			case 'success' :
-				if(title === undefined) title = 'Success!';
-				if(text === undefined) text = getLocale('You clicked the button!', common.LOCALE);
-				break;
-			case 'warning' :
-				if(title === undefined) title = 'Warning!';
-				if(text === undefined) text = getLocale('Are you sure you want to do this?', common.LOCALE);
-				break;
-			case 'error' :
-				if(title === undefined) title = 'Error!';
-				if(text === undefined) text = getLocale('An Error Occurred', common.LOCALE);
-				break;
-		}
-
-		obj.title = title;
-		if(obj.html === undefined) obj.text = text;
-
-		showSwalAlert(obj);
-	} catch (error) {
-		customErrorHandler(error);
-	}
+    try {
+        showSwalAlert(obj);
+    } catch (error) {
+        customErrorHandler(error);
+    }
 }
 
 function swalKeydownHandler(event) {
-	// Prevent bubbling of Enter or Escape key
-	if (event.key === 'Enter' || event.key === 'Escape') {
-		event.stopPropagation();
-		event.preventDefault();
-		// Confirm the swal
-		if(['Enter', 'Escape'].includes(event.key)) Swal.clickConfirm();
-	}
+    // Prevent bubbling of Enter or Escape key
+    if (event.key === 'Enter' || event.key === 'Escape') {
+        event.stopPropagation();
+        event.preventDefault();
+        // Confirm the swal
+        if(['Enter', 'Escape'].includes(event.key)) Swal.clickConfirm();
+    }
 }
 
-function showSwalAlert(obj) {
-	Swal.fire({
-		title: obj.title,
-		html: nl2br(obj.text??obj.html??null),
-		icon: obj.type,
-		customClass: {
-			confirmButton: 'btn btn-primary waves-effect waves-light'
-		},
-		buttonsStyling: false,
-		willOpen: () => {
-			// console.log('1 willOpen')
-			document.addEventListener('keydown', swalKeydownHandler);
-		},
-		preConfirm: () => {
-			// console.log('2 preConfirm')
-			console.log('Confirm button clicked or Enter key pressed');
-		},
-		didOpen: () => {
-			// console.log('3 didOpen')
-		},
-		willClose: () => {
-			// console.log('4 willClose')
-			document.removeEventListener('keydown', swalKeydownHandler);
-		},
-	}).then(function (result) {
-		if(obj.callback !== undefined) {
-			if(obj.hasOwnProperty('params') && obj.params !== null){
-				callUserFunc(obj.callback, obj.params);
-			}else{
-				obj.callback();
-			}
-		}else{
-			// if(obj.type === 'error') location.reload();
-		}
-	});
+function getSwalOption(obj) {
+    let title, text;
+    if(obj.type === undefined) obj.type = 'success';
+    if(!['success', 'warning', 'error', 'delete', 'confirm'].includes(obj.type)) throw new Error(`showAlert : Type is not allowed. ${obj.type}`);
+    if(obj.title !== undefined) title = getLocale(obj.title, common.LOCALE);
+    if(obj.text !== undefined || obj.html !== undefined) text = getLocale(obj.text, common.LOCALE);
+
+    switch (obj.type) {
+        case 'delete' :
+            if(title === undefined) title = getLocale('Do you really want to delete?', common.LOCALE);
+            if(text === undefined) text = getLocale('You can\'t undo this action', common.LOCALE);
+            obj = Object.assign(obj, {
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: getLocale('Delete', common.LOCALE),
+                cancelButtonText: getLocale('Cancel', common.LOCALE),
+                customClass: {
+                    confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+                    cancelButton: 'btn btn-outline-secondary waves-effect'
+                },
+                buttonsStyling: false
+            });
+            break;
+        case 'confirm' :
+            obj.type = 'warning';
+            if(title === undefined) title = 'Warning!';
+            if(text === undefined) text = getLocale('Are you sure you want to do this?', common.LOCALE);
+            obj = Object.assign(obj, {
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: getLocale('Yes', common.LOCALE),
+                cancelButtonText: getLocale('No', common.LOCALE),
+                customClass: {
+                    confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+                    cancelButton: 'btn btn-outline-secondary waves-effect'
+                },
+                buttonsStyling: false
+            });
+            break;
+        case 'success' :
+            if(title === undefined) title = 'Success!';
+            if(text === undefined) text = getLocale('You clicked the button!', common.LOCALE);
+            break;
+        case 'warning' :
+            if(title === undefined) title = 'Warning!';
+            if(text === undefined) text = getLocale('Are you sure you want to do this?', common.LOCALE);
+            break;
+        case 'error' :
+            if(title === undefined) title = 'Error!';
+            if(text === undefined) text = getLocale('An Error Occurred', common.LOCALE);
+            break;
+    }
+
+    obj.title = title;
+    if(obj.html === undefined) obj.text = text;
+
+    let html = null;
+    if(obj.text || obj.html) html = nl2br(obj.text??obj.html);
+
+    return Object.assign({
+        title: obj.title,
+        html: html,
+        icon: obj.icon??obj.type,
+        customClass: {
+            confirmButton: 'btn btn-primary waves-effect waves-light'
+        },
+        buttonsStyling: false,
+        willOpen: () => {
+            // console.log('1 willOpen')
+            document.addEventListener('keydown', swalKeydownHandler);
+        },
+        preConfirm: () => {
+            // console.log('2 preConfirm')
+            console.log('Confirm button clicked or Enter key pressed');
+        },
+        didOpen: () => {
+            // console.log('3 didOpen')
+        },
+        willClose: () => {
+            // console.log('4 willClose')
+            document.removeEventListener('keydown', swalKeydownHandler);
+        },
+    }, obj);}
+
+function showSwalAlert(obj = {}) {
+    const option = getSwalOption(obj);
+    Swal.fire(option).then(function (result) {
+        if(result.isConfirmed) {
+            if(option.callback !== undefined) {
+                if(Object.hasOwn(option, 'params') && option.params !== null){
+                    option.params.result = result;
+                    callUserFunc(option.callback, option.params);
+                }else{
+                    option.callback(result);
+                }
+            }else{
+                // if(obj.type === 'error') location.reload();
+            }
+        }
+    });
 }
 
 function reformatFormData(form, data, regexp = {}, side = false) {
-	if(data === undefined) {
-		data = [];
-		for(const input of form.querySelectorAll('input')) {
-			if(['hidden','button'].includes(input.type)) continue;
-			data.push({
-				field: input.name,
-				rules: 'required',
-				errors: [],
-			});
-		}
-	}
+    if(data === undefined) {
+        data = [];
+        for(const input of form.querySelectorAll('input')) {
+            if(input.dataset.validate === 'false') continue;
+            if(['hidden','button'].includes(input.type)) continue;
+            data.push({
+                field: input.name,
+                rules: 'required',
+                errors: [],
+            });
+        }
+    }
 
-	return data.reduce((acc, curr, i) => {
-		if(curr.type === 'hidden') return acc;
+    return data.reduce((acc, curr, i) => {
+        if(curr.type === 'hidden') return acc;
 
-		let selector;
-		if(form.querySelector(`[name="${curr.field}"]`)) {
-			selector = `[name="${curr.field}"]`;
-		}else if(form.querySelector(`[name="${curr.field}[]"]`)) {
-			selector = `[name="${curr.field}[]"]`;
-		}else if(curr.group) {
-			const groupName = curr.group;
-			const inputName = curr.field;
-			if(curr.group_attributes.envelope_name) {
-				selector = `[name^="${groupName}"][name$="[${inputName}]"]`;
-			}else{
-				selector = `[name^="${inputName}"]`;
-			}
-			selector = isValidSelector(selector) ? selector : null;
-		}else if(isValidSelector(`#${curr.id}`) && form.querySelector(`#${curr.id}`)) {
-			selector = `#${curr.id}`;
-		}
-		if(!selector) return acc;
+        if (curr.form_attributes?.form_validation === false) {
+            return acc;
+        }
 
-		const item = {
-			selector : selector,
-			validators : {},
-		};
+        let selector;
+        if(form.querySelector(`[name="${curr.field}"]`)) {
+            selector = `[name="${curr.field}"]`;
+        }else if(form.querySelector(`[name="${curr.field}[]"]`)) {
+            selector = `[name="${curr.field}[]"]`;
+        }else if(curr.group) {
+            const groupName = curr.group;
+            const inputName = curr.field;
+            if(curr.group_attributes.envelope_name) {
+                selector = `[name^="${groupName}"][name$="[${inputName}]"]`;
+            }else{
+                selector = `[name^="${inputName}"]`;
+            }
+            selector = isValidSelector(selector) ? selector : null;
+        }else if(isValidSelector(`#${curr.id}`) && form.querySelector(`#${curr.id}`)) {
+            selector = `#${curr.id}`;
+        }
+        if(!selector) return acc;
 
-		for(const key of Object.keys(curr.errors)){
-			switch(key) {
-				case 'required':
-					item.validators.notEmpty = {
-						message: curr.errors[key]
-					};
-					break;
-			}
-		}
+        const item = {
+            selector : selector,
+            validators : {},
+        };
 
-		if(curr.type === 'date') {
-			item.validators.date = {
-				format: 'YYYY-MM-DD',
-			};
-		}
+        for(const key of Object.keys(curr.errors)){
+            switch(key) {
+                case 'required':
+                    item.validators.notEmpty = {
+                        message: curr.errors[key]
+                    };
+                    break;
+            }
+        }
 
-		if(curr.type === 'file') {
-			console.log(curr.attributes.accept)
-			item.validators.file = {
-				extension: curr.attributes.extension??null,
-				maxFiles : curr.attributes.max??null,
-				type : curr.attributes.accept??null,
-				message : '유효한 파일을 업로드해주세요.',
-			};
-		}
+        if(curr.type === 'date') {
+            item.validators.date = {
+                format: 'YYYY-MM-DD',
+            };
+        }
 
-		curr.rules.split(/\|(?![^\[]*\])/).forEach(raw => {
-			if(!raw.length) return;
-			if(['required', 'trim'].includes(raw)) return;
-			const rule = raw.match(/^[a-zA-Z_]+/)?.[0];
+        if(curr.type === 'file') {
+            // accept 는 서버가 allowed_types 로 만든 확장자 목록(.jpg,.png)일 수 있다. FormValidation 의 type 은 MIME 만 받으므로 나눠 넘긴다
+            const accept = (curr.attributes.accept ?? '').split(',').map(a => a.trim()).filter(a => a.length);
+            item.validators.file = {
+                extension: curr.attributes.extension ?? (accept.filter(a => a.startsWith('.')).map(a => a.slice(1)).join(',') || null),
+                maxFiles : curr.attributes.max??null,
+                type : accept.filter(a => a.includes('/')).join(',') || null,
+                message : '유효한 파일을 업로드해주세요.',
+            };
+        }
 
-			if (!rule || ![...Object.keys(customValidatorsPreset.rules), ...Object.keys(regexp)].includes(rule)) {
-				console.warn(`reformatFormData : Rule '${rule || raw}' of '${curr.field}' doesn't have any matched validator.`);
-				// item.validators['baseValidator'] = {
-				// 	message: `The field id not valid (${camelize(rule)})`,
-				// }
-				return;
-			}else{
-				if (customValidatorsPreset.inflector(rule)) {
-					const validatorName = customValidatorsPreset.inflector(rule)
-					const { regex, options: getOptions, message: getMessage } = customValidatorsPreset.rules[rule];
+        curr.rules.split(/\|(?![^[]*\])/).forEach(raw => {
+            if(!raw.length) return;
+            if(['required', 'trim'].includes(raw)) return;
+            const rule = raw.match(/^[a-zA-Z_]+/)?.[0];
 
-					let message;
-					if(getMessage === undefined) {
-						message = curr.errors?.[rule] && curr.errors[rule];
-					}else{
-						message = getMessage;
-					}
+            if (!rule || ![...Object.keys(customValidatorsPreset.rules), ...Object.keys(regexp)].includes(rule)) {
+                console.warn(`reformatFormData : Rule '${rule || raw}' of '${curr.field}' doesn't have any matched validator.`);
+                // item.validators['baseValidator'] = {
+                // 	message: `The field id not valid (${camelize(rule)})`,
+                // }
+                return;
+            }else{
+                if (customValidatorsPreset.inflector(rule)) {
+                    const validatorName = customValidatorsPreset.inflector(rule)
+                    const { regex, options: getOptions, message: getMessage } = customValidatorsPreset.rules[rule];
 
-					if (!regex) {
-						console.warn(`${rule} regex is not set.`);
-						item.validators[validatorName] = {
-							...(message && { message: message })
-						};
-					}else{
-						if(customValidatorsPreset.extractor(regex, raw)){
-							item.validators[validatorName] = {
-								...item.validators[validatorName],
-								...getOptions(form, item, customValidatorsPreset.extractor(regex, raw)),
-								...(message && { message: message })
-							};
-						}
-					}
-				}else{
-					if(Object.keys(regexp).includes(rule)) {
-						item.validators['regexp'] = {
-							regexp: new RegExp(regexp[rule].exp, regexp[rule].flags)
-						};
-						if(curr.errors.hasOwnProperty(rule)) item.validators['regexp'].message = curr.errors[rule];
-					}else{
-						console.warn(`reformatFormData : ${rule} validator is not set.`);
-					}
-				}
-			}
-		});
+                    let message;
+                    if(getMessage === undefined) {
+                        message = curr.errors?.[rule] && curr.errors[rule];
+                    }else{
+                        message = getMessage;
+                    }
 
-		acc[curr.field] = item;
-		return acc; // 항상 acc를 반환
-	}, {});
+                    if (!regex) {
+                        console.warn(`${rule} regex is not set.`);
+                        item.validators[validatorName] = {
+                            ...(message && { message: message })
+                        };
+                    }else{
+                        if(customValidatorsPreset.extractor(regex, raw)){
+                            item.validators[validatorName] = {
+                                ...item.validators[validatorName],
+                                ...getOptions(form, item, customValidatorsPreset.extractor(regex, raw)),
+                                ...(message && { message: message })
+                            };
+                        }
+                    }
+                }else{
+                    if(Object.keys(regexp).includes(rule)) {
+                        const regexpOption = {
+                            regexp: new RegExp(regexp[rule].exp, regexp[rule].flags)
+                        };
+                        if(Object.hasOwn(curr.errors, rule)) regexpOption.message = curr.errors[rule];
+                        // FV 는 validator 키당 하나라 두 번째 regexp 규칙부터는 regexpMulti 로 모아 검증
+                        if(!item.validators['regexp'] || !(typeof FormValidation !== 'undefined' && FormValidation.validators?.regexpMulti)) {
+                            item.validators['regexp'] = regexpOption;
+                        }else{
+                            if(!item.validators['regexpMulti']) item.validators['regexpMulti'] = { list: [] };
+                            item.validators['regexpMulti'].list.push(regexpOption);
+                        }
+                    }else{
+                        console.warn(`reformatFormData : ${rule} validator is not set.`);
+                    }
+                }
+            }
+        });
+
+        if (Object.keys(item.validators).length === 0) return acc;
+
+        // submitAjax 422 응답의 서버 메시지 표시용 (customValidatorsPreset.validators.server)
+        if(typeof FormValidation !== 'undefined' && FormValidation.validators?.server) {
+            item.validators.server = { enabled: false, message: '' };
+        }
+
+        acc[curr.field] = item;
+        return acc;
+    }, {});
+}
+
+/**
+ * 탭 폼(form_tabs)에서 첫 오류 칸이 다른 탭에 있으면 그 탭을 연다
+ */
+function showInvalidFieldTab(form) {
+    const invalid = form?.querySelector('.is-invalid');
+    const pane = invalid?.closest('.tab-pane');
+    if(!pane || pane.classList.contains('active') || !pane.id) return;
+    const button = form.querySelector(`[data-bs-toggle="tab"][data-bs-target="#${pane.id}"]`);
+    if(button) bootstrap.Tab.getOrCreateInstance(button).show();
+}
+
+/**
+ * 서버 검증 에러 param(group[field], group[0][field], field[0])을 FV 필드 키로 변환
+ */
+function getFvFieldKey(fv, param) {
+    if(!fv || !fv.fields) return null;
+    param = String(param);
+    if(fv.fields[param]) return param;
+
+    const last = param.match(/\[([^[\]]+)\]$/);
+    if(last && isNaN(last[1]) && fv.fields[last[1]]) return last[1];
+
+    const base = param.split('[')[0];
+    if(fv.fields[base]) return base;
+
+    return null;
 }
 
 function setFlatpickr(node) {
-	const option = {
-		// See https://flatpickr.js.org/formatting/
-		dateFormat: 'Y-m-d',
-		positionElement: document.querySelector(`#${node.id}`),
-		onReady: function(selectedDates, dateStr, instance) {
-			// Center the popup relative to the input
-			instance.calendarContainer.classList.add('flatpickr-side-position');
-		},
-		// After selecting a date, we need to revalid”ate the field
-		onChange: function (data, value, full) {
-			$(full.input).trigger('change'); // 'change' 이벤트 강제로 발생
-		},
-	};
+    if (!node) return;
 
-	if(node.classList.contains('flatpickr-date')) {
-		Object.assign(option, {
-			enableTime: false,
-			dateFormat: 'Y-m-d',
-		})
-	}else if(node.classList.contains('flatpickr-time')) {
-		Object.assign(option, {
-			enableTime: true,
-			noCalendar: true,
-			// See https://flatpickr.js.org/formatting/
-			dateFormat: 'h:i K',
-			// time_24hr: false,
-		})
-	}
+    // 이미 초기화된 경우 중복 초기화 방지
+    if (node._flatpickr) {
+        node._flatpickr.destroy();
+    }
 
-	node.flatpickr(option);
+    const repositionCalendar = function (instance) {
+        const calendar = instance.calendarContainer;
+        const input = instance.input;
+        const parent = calendar.parentElement;
+
+        if (!calendar || !input || !parent) return;
+
+        const inputRect = input.getBoundingClientRect();
+        const parentRect = parent.getBoundingClientRect();
+
+        calendar.style.position = 'absolute';
+        calendar.style.top = `${inputRect.bottom - parentRect.top + 4}px`;
+        calendar.style.left = `${inputRect.left - parentRect.left}px`;
+        calendar.style.right = 'auto';
+    };
+
+    // See https://flatpickr.js.org/formatting/
+    const option = {
+        dateFormat: 'Y-m-d',
+        positionElement: node,
+        position: 'below left',
+        onReady: function(selectedDates, dateStr, instance) {
+            // Center the popup relative to the input
+            instance.calendarContainer.classList.add('flatpickr-side-position');
+        },
+        onOpen: function (selectedDates, dateStr, instance) {
+            repositionCalendar(instance);
+        },
+        onMonthChange: function (selectedDates, dateStr, instance) {
+            repositionCalendar(instance);
+        },
+        onYearChange: function (selectedDates, dateStr, instance) {
+            repositionCalendar(instance);
+        },
+        onChange: function (data, value, full) {
+            $(full.input).trigger('change'); // 'change' 이벤트 강제로 발생
+        },
+    };
+
+    if(node.classList.contains('flatpickr-date')) {
+        Object.assign(option, {
+            enableTime: false,
+            dateFormat: 'Y-m-d',
+        })
+    }else if(node.classList.contains('flatpickr-time')) {
+        Object.assign(option, {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: 'h:i K',
+            // time_24hr: false,
+
+            onReady: function (selectedDates, dateStr, instance) {
+                const timeContainer = instance.timeContainer;
+
+                if (timeContainer && instance.amPM) {
+                    timeContainer.insertBefore(instance.amPM, timeContainer.firstChild);
+                }
+
+                instance.calendarContainer.classList.add('flatpickr-side-position');
+            },
+
+            onOpen: function (selectedDates, dateStr, instance) {
+                repositionCalendar(instance);
+            },
+        })
+    }else if (node.classList.contains('flatpickr-year-month')) {
+        Object.assign(option, {
+            locale: 'ko',
+            plugins: [
+                new monthSelectPlugin({
+                    shorthand: true,
+                    dateFormat: 'Y.m',
+                    altFormat: 'Y년 m월',
+                })
+            ],
+        });
+    }
+
+    node.flatpickr(option);
 }
 
 function setCleave(node) {
-	if(node.classList.contains('cleave-hp')) {
-		new Cleave(node, {
-			phone: true,
-			delimiter: '-',
-			phoneRegionCode: 'KR'
-		});
-	}else if(node.classList.contains('cleave-fulldate')) {
-		new Cleave(node, {
-			date: true,
-			delimiter: '-',
-			datePattern: ['Y', 'm', 'd']
-		});
-	}else if(node.classList.contains('cleave-year')) {
-		new Cleave(node, {
-			date: true,
-			datePattern: ['Y']
-		});
-	}else if(node.classList.contains('cleave-month')) {
-		new Cleave(node, {
-			date: true,
-			datePattern: ['m']
-		});
-	}else if(node.classList.contains('cleave-date')) {
-		new Cleave(node, {
-			date: true,
-			datePattern: ['d']
-		});
-	}else if(node.classList.contains('cleave-time')) {
-		new Cleave(node, {
-			time: true,
-			timePattern: ['h', 'm']
-		});
-	}else if(node.classList.contains('cleave-hour')) {
-		new Cleave(node, {
-			time: true,
-			timePattern: ['h']
-		});
-	}else if(node.classList.contains('cleave-minute')) {
-		new Cleave(node, {
-			time: true,
-			timePattern: ['m']
-		});
-	}else if(node.classList.contains('form-input_text-cleave-version')) {
-		new Cleave(node, {
-			delimiter: '.',
-			blocks: [1, 1, 1],
-			uppercase: false,
-			numericOnly: true
-		});
-	}
+    if(node.classList.contains('cleave-hp')) {
+        new Cleave(node, {
+            phone: true,
+            delimiter: '-',
+            phoneRegionCode: 'KR'
+        });
+    }else if(node.classList.contains('cleave-fulldate')) {
+        new Cleave(node, {
+            date: true,
+            delimiter: '-',
+            datePattern: ['Y', 'm', 'd']
+        });
+    }else if(node.classList.contains('cleave-year')) {
+        new Cleave(node, {
+            date: true,
+            datePattern: ['Y']
+        });
+    }else if(node.classList.contains('cleave-month')) {
+        new Cleave(node, {
+            date: true,
+            datePattern: ['m']
+        });
+    }else if(node.classList.contains('cleave-date')) {
+        new Cleave(node, {
+            date: true,
+            datePattern: ['d']
+        });
+    }else if(node.classList.contains('cleave-time')) {
+        new Cleave(node, {
+            time: true,
+            timePattern: ['h', 'm']
+        });
+    }else if(node.classList.contains('cleave-hour')) {
+        new Cleave(node, {
+            time: true,
+            timePattern: ['h']
+        });
+    }else if(node.classList.contains('cleave-minute')) {
+        new Cleave(node, {
+            time: true,
+            timePattern: ['m']
+        });
+    }else if(node.classList.contains('form-input_text-cleave-version')) {
+        new Cleave(node, {
+            delimiter: '.',
+            blocks: [1, 1, 1],
+            uppercase: false,
+            numericOnly: true
+        });
+    }else if(node.classList.contains('cleave-bizno')) {
+        new Cleave(node, {
+            delimiter: '-',
+            blocks: [3, 2, 5],
+            uppercase: false,
+            numericOnly: true
+        });
+    }
+}
+
+function replaceValidationMessage(message, obj = {}) {
+    for(const key of Object.keys(obj || {})) {
+        message = message.replaceAll(`{${key}}`, obj[key]);
+    }
+    return window.Josa.s(message);
+}
+
+function setDropzone(node, addOptions = {}, previewTemplate = '') {
+    console.log(node)
+    if(window['Dropzone'] === undefined) {
+        console.warn('Dropzone lib is not loaded');
+    }else {
+        if(node === undefined){
+            console.warn('Check the Dropzone target');
+        }else{
+            // Dropzone 자동 탐색 방지
+            window['Dropzone'].autoDiscover = false;
+
+            if(previewTemplate === '') {
+                previewTemplate = `<div class="dz-preview dz-file-preview">
+<div class="dz-details">
+  <div class="dz-thumbnail">
+    <img data-dz-thumbnail>
+    <span class="dz-nopreview">No preview</span>
+    <div class="dz-success-mark"></div>
+    <div class="dz-error-mark"></div>
+    <div class="dz-error-message"><span data-dz-errormessage></span></div>
+    <div class="progress">
+      <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+    </div>
+  </div>
+  <div class="dz-filename" data-dz-name></div>
+  <div class="dz-size" data-dz-size></div>
+</div>
+</div>`;
+            }
+
+            let baseOptions = Object.assign([...node.attributes]
+                    .filter(attr => attr.name.startsWith('dz-') && attr.value !== '')
+                    .reduce((acc, attr) => {
+                        const name = camelize(attr.name.replace('dz-',''));
+                        // 'true'·'false' 는 문자열이면 항상 참이라 불리언으로
+                        if(attr.value === 'true' || attr.value === 'false') acc[name] = attr.value === 'true';
+                        else acc[name] = isNaN(attr.value)?attr.value:parseInt(attr.value);
+                        return acc;
+                    }, {}),
+                addOptions
+            );
+            console.log(baseOptions)
+
+            new Dropzone(node,
+                Object.assign({
+                    url: node.closest('form').action,
+                    // 파일은 폼 저장 때 getFormData() 가 함께 보낸다 (자동 업로드하면 페이지 주소로 따로 POST 됨)
+                    autoProcessQueue: false,
+                    thumbnailWidth: null,
+                    thumbnailHeight: null,
+                    previewTemplate: previewTemplate,
+                    parallelUploads: 1,
+                    addRemoveLinks: true,
+                    dictDefaultMessage: getLocale('Drop files here or click to upload', common.LOCALE),
+                    dictRemoveFile: getLocale('Delete', common.LOCALE),
+                    init: function () {
+                        this.on("success", function (file, response) {
+                            console.log("업로드 성공:", response);
+                        });
+                        this.on("error", function (file, errorMessage) {
+                            console.log("업로드 실패:", errorMessage);
+                        });
+                        this.on('addedfile', function (file) {
+                            // 한 개만 받는 드롭존(maxFiles 1)은 새 파일로 바꾼다: 고른 파일·기존 파일 미리보기를 모두 뺀다
+                            if(this.options.maxFiles === 1) {
+                                this.files.filter((item) => item !== file).forEach((item) => this.removeFile(item));
+                                if(this.existingFile) {
+                                    this.existingFile.previewElement?.remove();
+                                    this.existingFile = null;
+                                }
+                            }
+
+                            const previewContainer = this.element.querySelector('.dropzone-file-container');
+                            if(previewContainer && file.previewElement) previewContainer.appendChild(file.previewElement); // 이미지 미리보기만 추가
+                        });
+                        this.on("sending", function (file, errorMessage) {
+                            console.log("업로드");
+                        });
+                    },
+                }, baseOptions)
+            );
+        }
+    }
+}
+
+/**
+ * 수정 화면: 저장된 파일을 드롭존에 미리보기로 보여 주고, 미리보기에서 지우면 서버 파일도 지운다
+ * (deleteFile/{행 id}?type={field}, 본문 file_id)
+ */
+function setDropzoneExistingFile(inst, item, fieldName) {
+    const mockFile = {
+        name: item.orig_name ?? item.file_name,
+        size: Math.round(parseFloat(item.file_size ?? 0) * 1024),
+        accepted: true,
+        file_id: item.file_id,
+    };
+    inst.displayExistingFile(mockFile, item.file_link);
+    inst.existingFile = mockFile;
+
+    const removeLink = mockFile.previewElement?.querySelector('[data-dz-remove]');
+    if(!removeLink) return;
+    removeLink.addEventListener('click', function (e) {
+        // Dropzone 기본 삭제(미리보기만 뺌) 대신 서버에서 지운 뒤 뺀다
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        executeAjax({
+            url : getUrlWithIdentifiers(common.API_URI + '/deleteFile', common.KEY, {type: fieldName}),
+            method : 'patch',
+            data : {
+                file_id : mockFile.file_id,
+            },
+            success: function(response) {
+                mockFile.previewElement?.remove();
+                inst.existingFile = null;
+                showAlert({
+                    type: 'success',
+                    title: 'Complete',
+                    text: response.msg,
+                });
+            },
+        });
+    }, {capture: true});
+}
+
+function setColorisValue(selector, color) {
+    const input = document.querySelector(selector);
+
+    if (!input) {
+        return;
+    }
+
+    input.value = color;
+
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function initSelectpicker(scope) {
+    const $scope = scope ? $(scope) : $(document);
+
+    const $selects = $scope.is('select.selectpicker')
+        ? $scope
+        : $scope.find('select.selectpicker');
+
+    $selects.each(function () {
+        const $select = $(this);
+
+        if(this.dataset.changeAfter){
+            const changeAfter = JSON.parse(this.dataset.changeAfter.replace(/'/g, '"'));
+
+            if(window[changeAfter.callback]) {
+                $select
+                    .off('changed.bs.select.formSelectpicker')
+                    .on('changed.bs.select.formSelectpicker', () => {
+                        window[changeAfter.callback](this, changeAfter.params??{})
+                    });
+            }
+        }
+
+        if ($select.data('selectpicker')) return;
+
+        $select.selectpicker();
+    });
+
+    $scope.find('.form-floating:has(select.selectpicker)').addClass('form-floating-bootstrap-select');
+}
+
+function syncSelectpickerDisabled(node) {
+    if (!node) return;
+
+    /*
+     * selectpicker UI의 disabled 상태만 동기화한다.
+     * option dataset은 다시 구성하지 않는다.
+     */
+    const $node = $(node);
+    const instance = $node.data('selectpicker');
+
+    if (!instance) return;
+
+    instance.checkDisabled();
+}
+
+function rebuildSelectpicker(node) {
+    if (!node) return;
+
+    const $node = $(node);
+    const instance = $node.data('selectpicker');
+
+    /*
+     * 기존 selectpicker 인스턴스와 내부 option 데이터를 제거한다.
+     */
+    if (instance) {
+        $node.selectpicker('destroy');
+    }
+
+    /*
+     * destroy()가 selectpicker 클래스를 제거하므로 복원한다.
+     */
+    $node.addClass('selectpicker');
+
+    /*
+     * changeAfter 이벤트를 다시 연결하고 selectpicker를 초기화한다.
+     */
+    initSelectpicker(node);
+}
+
+function bindSelectValue(node, value, mode = 'change') {
+    if (!node) return;
+
+    const $node = $(node);
+    const normalizedValue = Array.isArray(value)
+        ? value.map(v => String(v))
+        : value == null
+            ? ''
+            : String(value);
+
+    node.dataset.originalValue = Array.isArray(normalizedValue)
+        ? normalizedValue.join(',')
+        : normalizedValue;
+
+    // selectpicker
+    if ($node.hasClass('selectpicker')) {
+        if ($node.data('selectpicker')) {
+            /*
+             * 원본 select, selectpicker 내부 상태,
+             * 표시 UI를 함께 동기화한다.
+             *
+             * changed.bs.select도 플러그인 내부에서 발생한다.
+             */
+            $node.selectpicker('val', normalizedValue);
+            return;
+        }
+
+        /*
+         * 아직 selectpicker가 초기화되지 않았다면
+         * 원본 select에만 값을 적용한다.
+         */
+        $node.val(normalizedValue);
+
+        if (mode === 'change') {
+            $node.trigger('change');
+        }
+
+        return;
+    }
+
+    $node.val(normalizedValue);
+
+    // select2
+    if ($node.hasClass('select2') || $node.hasClass('select2-repeater')) {
+        switch (mode) {
+            case 'none' :
+                return;
+            case 'handler' :
+                $node.trigger('change.formSelect2');
+                return;
+            case 'change':
+            default:
+                $node.trigger('change');
+        }
+        return;
+    }
+
+    // normal select
+    if(mode === 'change') $node.trigger('change');
+}
+
+function bindSelectpickerKeyEvents() {
+    $(document)
+        .off('keydown.selectpickerMenu')
+        .on('keydown.selectpickerMenu', '.bootstrap-select .dropdown-menu', function (e) {
+            if (e.key !== 'Enter') return;
+
+            const $wrap = $(this).closest('.bootstrap-select');
+            const $select = $wrap.find('select');
+            const $toggle = $wrap.find('> button.dropdown-toggle');
+
+            if ($select.prop('multiple')) return;
+
+            setTimeout(function () {
+                if ($toggle.hasClass('show') || $toggle.hasClass('open')) {
+                    $toggle.trigger('click');
+                }
+            }, 0);
+        });
+
+    $(document)
+        .off('keydown.selectpickerToggle')
+        .on('keydown.selectpickerToggle', '.bootstrap-select > button.dropdown-toggle', function (e) {
+            if (e.key !== 'ArrowDown') return;
+
+            e.preventDefault();
+
+            const $toggle = $(this);
+            const $wrap = $toggle.closest('.bootstrap-select');
+            const $select = $wrap.find('select');
+
+            $select.selectpicker('toggle');
+
+            if (!$toggle.hasClass('show') && !$toggle.hasClass('open')) {
+                $toggle.trigger('click');
+            }
+        });
+}
+
+function focusSelect2(node) {
+    $(node).on('select2:open', function (e) {
+        $(e.target.closest('.form-floating')).addClass('select2-focus');
+    });
+    $(node).on('select2:close', function (e) {
+        $(e.target.closest('.form-floating')).removeClass('select2-focus');
+    });
+    node.closest('.form-floating').hasClass('form-floating')
+    && node.closest('.form-floating').addClass('form-floating-select2');
+}
+
+function onChangeTrigger(node, params)
+{
+    const form = node.closest('form');
+    const $target = $(form).find(`[data-form-field="${params.target}"]`);
+    $target.val(null).trigger('change');
+}
+
+function onChangeTriggerSelect(node, params)
+{
+    const form = node.closest('form');
+    const targetId = form.querySelector(`[data-form-field="${params.target}"]`).id;
+
+    params.target = `#${targetId}`;
+
+    setDynamicSelectOptions(`#${node.id}`, params);
+}
+
+function onChangeTriggerAPIParams(node, params) {
+    common.API_PARAMS[params.target] = node.value;
 }

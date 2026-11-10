@@ -5,20 +5,33 @@ $(function() {
 	const formRecord = document.querySelector(formSelector);
 	if(formRecord === null) throw new Error(`formRecord is not exist`);
 
+    onLoadedLayout(formRecord);
 	preparePlugins(formRecord);
-	resetFrmInputs(formRecord, common.FORM_DATA);
+	// 서버가 빈 폼을 내려주므로 초기화하지 않는다. 스크립트가 뜨기 전에 사용자가 체크한 자동 로그인·
+	// 브라우저 자동완성 값을 resetFrmInputs 가 지우던 문제 (bizsoft #빌더-31 확인)
 	readyFrmInputs(formRecord, 'add', common.FORM_DATA);
-	refreshPlugins();
+	refreshPlugins(formRecord);
 
 	for(const rule of Object.keys(customValidatorsPreset.validators))
 		FormValidation.validators[rule] = customValidatorsPreset.validators[rule];
+
+	const dropzoneList = common.FORM_DATA.filter((item) => item.subtype.indexOf('dropzone') !== -1);
 
 	// Form validation for Add new record
 	fv = FormValidation.formValidation(
 		formRecord,
 		{
-			fields: reformatFormData(formRecord, common.FORM_DATA, common.FORM_REGEXP, true),
+			fields: reformatFormData(formRecord, common.FORM_DATA, common.FORM_REGEXP, false),
 			plugins: {
+				message: new FormValidation.plugins.Message({
+					container: function (field, element) {
+						// Dropzone 필드 메시지를 특정 컨테이너에 표시
+						if (dropzoneList.find((item) => item.field === field)) {
+							return document.querySelector(`#${field}-dropzone-wrapper`);
+						}
+						return element.closest('.form-validation-unit');
+					},
+				}),
 				trigger: new FormValidation.plugins.Trigger(),
 				bootstrap5: new FormValidation.plugins.Bootstrap5({
 					// Use this for enabling/changing valid/invalid class
@@ -38,6 +51,10 @@ $(function() {
 			},
 			init: instance => {
 				instance.on('plugins.message.placed', function (e) {
+					// 중복된 fv-plugins-message-container 제거
+					const containers = e.element.closest('.form-validation-unit').querySelectorAll('.fv-plugins-message-container');
+					if (containers.length > 1) containers[1].remove();
+
 					//* Move the error message out of the `input-group` element
 					if (e.element.parentElement.classList.contains('input-group')) {
 						// `e.field`: The field name
@@ -75,7 +92,7 @@ $(function() {
 				event.element.value = editors[`${textareaId}`].root.innerHTML;
 			}
 		}
-		console.log('value : ', event.element.value);
+		console.log('value : ', event.element.type === 'password' ? '********' : event.element.value);
 	}).on('core.validator.validated', function(event) {
 		// 특정 요소에 대한 유효성 검사 시작 후
 		console.log('%c Validator for the field ' + event.field + ' is validated.', 'color: skyblue');
@@ -95,33 +112,48 @@ $(function() {
 		// Send the form data to back-end
 		// You need to grab the form data and create an Ajax request to send them
 		submitAjax(formSelector, {
-			success: function(response) {
-				if(response.data.aul_key) setCookie('autologin', response.data.autologin, 30);
-				if(response.data.result !== undefined) {
-					let key = Object.keys(response.data.result)[0];
-					let val = response.data.result[key];
+            success: function(response) {
+                console.log(response)
+				if(response.data !== undefined && response.data.length > 0) {
+					const data = response.data[0];
+					if(data.notice !== undefined) {
+						showAlert({
+							type: 'success',
+							html: escapeHtml(data.notice),
+							callback: redirect,
+							params: data.redirect_to??common.REDIRECT_URI??null,
+						})
+					}else if(data.result !== undefined) {
+						let key = Object.keys(data.result)[0];
+						let val = data.result[key];
+						showAlert({
+							type: 'success',
+							html: `데이터가 조회되었습니다.<br><p class="text-danger mt-2 mb-0">(${getLocale('user.'+key, common.LOCALE)} : ${escapeHtml(val)})</p>`,
+							callback: redirect,
+							params: data.redirect_to??common.REDIRECT_URI??null,
+						})
+					}else{
+						redirect(data.redirect_to??common.REDIRECT_URI??null)
+					}
+				}else{
 					showAlert({
 						type: 'success',
-						html: `데이터가 조회되었습니다.<br><p class="text-danger mt-2 mb-0">(${getLocale('user.'+key, common.LOCALE)} : ${val})</p>`,
-						callback: redirect,
-						params: response.data.redirect_to??common.REDIRECT_URI??null,
+						html: response.msg,
 					})
-				}else{
-					redirect(response.data.redirect_to??common.REDIRECT_URI??null)
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.warn(jqXHR.responseJSON)
 				if(jqXHR.status === 422) {
-					jqXHR.responseJSON.errors.forEach(error => {
-						if(fv.fields.hasOwnProperty(error.param)) {
+					(jqXHR.responseJSON?.errors ?? []).forEach(error => {
+						if(Object.hasOwn(fv.fields, error.param)) {
 							fv.updateFieldStatus(error.param, 'Invalid', customValidatorsPreset.inflector(error.type));
 						}
 					});
 				}else{
 					showAlert({
 						type: 'warning',
-						text: jqXHR.responseJSON.msg,
+						text: getAjaxErrorMessage(jqXHR),
 					});
 				}
 			}

@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -26,7 +18,18 @@ return /******/ (function() { // webpackBootstrap
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   Sortable: function() { return /* reexport default from dynamic */ sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0___default.a; }\n/* harmony export */ });\n/* harmony import */ var sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sortablejs/Sortable */ \"./node_modules/sortablejs/Sortable.js\");\n/* harmony import */ var sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0__);\n\ntry {\n  window.Sortable = (sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0___default());\n} catch (e) {}\n\n\n//# sourceURL=webpack://Materialize/./libs/sortablejs/sortable.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Sortable: function() { return /* reexport default from dynamic */ sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0___default.a; }
+/* harmony export */ });
+/* harmony import */ var sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sortablejs/Sortable */ "./node_modules/sortablejs/Sortable.js");
+/* harmony import */ var sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0__);
+
+try {
+  window.Sortable = (sortablejs_Sortable__WEBPACK_IMPORTED_MODULE_0___default());
+} catch (e) {}
+}
 
 /***/ }),
 
@@ -36,7 +39,3369 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \*********************************************/
 /***/ (function(module) {
 
-eval("/**!\n * Sortable 1.15.2\n * @author\tRubaXa   <trash@rubaxa.org>\n * @author\towenm    <owen23355@gmail.com>\n * @license MIT\n */\n(function (global, factory) {\n   true ? module.exports = factory() :\n  0;\n}(this, (function () { 'use strict';\n\n  function ownKeys(object, enumerableOnly) {\n    var keys = Object.keys(object);\n    if (Object.getOwnPropertySymbols) {\n      var symbols = Object.getOwnPropertySymbols(object);\n      if (enumerableOnly) {\n        symbols = symbols.filter(function (sym) {\n          return Object.getOwnPropertyDescriptor(object, sym).enumerable;\n        });\n      }\n      keys.push.apply(keys, symbols);\n    }\n    return keys;\n  }\n  function _objectSpread2(target) {\n    for (var i = 1; i < arguments.length; i++) {\n      var source = arguments[i] != null ? arguments[i] : {};\n      if (i % 2) {\n        ownKeys(Object(source), true).forEach(function (key) {\n          _defineProperty(target, key, source[key]);\n        });\n      } else if (Object.getOwnPropertyDescriptors) {\n        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));\n      } else {\n        ownKeys(Object(source)).forEach(function (key) {\n          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));\n        });\n      }\n    }\n    return target;\n  }\n  function _typeof(obj) {\n    \"@babel/helpers - typeof\";\n\n    if (typeof Symbol === \"function\" && typeof Symbol.iterator === \"symbol\") {\n      _typeof = function (obj) {\n        return typeof obj;\n      };\n    } else {\n      _typeof = function (obj) {\n        return obj && typeof Symbol === \"function\" && obj.constructor === Symbol && obj !== Symbol.prototype ? \"symbol\" : typeof obj;\n      };\n    }\n    return _typeof(obj);\n  }\n  function _defineProperty(obj, key, value) {\n    if (key in obj) {\n      Object.defineProperty(obj, key, {\n        value: value,\n        enumerable: true,\n        configurable: true,\n        writable: true\n      });\n    } else {\n      obj[key] = value;\n    }\n    return obj;\n  }\n  function _extends() {\n    _extends = Object.assign || function (target) {\n      for (var i = 1; i < arguments.length; i++) {\n        var source = arguments[i];\n        for (var key in source) {\n          if (Object.prototype.hasOwnProperty.call(source, key)) {\n            target[key] = source[key];\n          }\n        }\n      }\n      return target;\n    };\n    return _extends.apply(this, arguments);\n  }\n  function _objectWithoutPropertiesLoose(source, excluded) {\n    if (source == null) return {};\n    var target = {};\n    var sourceKeys = Object.keys(source);\n    var key, i;\n    for (i = 0; i < sourceKeys.length; i++) {\n      key = sourceKeys[i];\n      if (excluded.indexOf(key) >= 0) continue;\n      target[key] = source[key];\n    }\n    return target;\n  }\n  function _objectWithoutProperties(source, excluded) {\n    if (source == null) return {};\n    var target = _objectWithoutPropertiesLoose(source, excluded);\n    var key, i;\n    if (Object.getOwnPropertySymbols) {\n      var sourceSymbolKeys = Object.getOwnPropertySymbols(source);\n      for (i = 0; i < sourceSymbolKeys.length; i++) {\n        key = sourceSymbolKeys[i];\n        if (excluded.indexOf(key) >= 0) continue;\n        if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;\n        target[key] = source[key];\n      }\n    }\n    return target;\n  }\n  function _toConsumableArray(arr) {\n    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();\n  }\n  function _arrayWithoutHoles(arr) {\n    if (Array.isArray(arr)) return _arrayLikeToArray(arr);\n  }\n  function _iterableToArray(iter) {\n    if (typeof Symbol !== \"undefined\" && iter[Symbol.iterator] != null || iter[\"@@iterator\"] != null) return Array.from(iter);\n  }\n  function _unsupportedIterableToArray(o, minLen) {\n    if (!o) return;\n    if (typeof o === \"string\") return _arrayLikeToArray(o, minLen);\n    var n = Object.prototype.toString.call(o).slice(8, -1);\n    if (n === \"Object\" && o.constructor) n = o.constructor.name;\n    if (n === \"Map\" || n === \"Set\") return Array.from(o);\n    if (n === \"Arguments\" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);\n  }\n  function _arrayLikeToArray(arr, len) {\n    if (len == null || len > arr.length) len = arr.length;\n    for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];\n    return arr2;\n  }\n  function _nonIterableSpread() {\n    throw new TypeError(\"Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\");\n  }\n\n  var version = \"1.15.2\";\n\n  function userAgent(pattern) {\n    if (typeof window !== 'undefined' && window.navigator) {\n      return !! /*@__PURE__*/navigator.userAgent.match(pattern);\n    }\n  }\n  var IE11OrLess = userAgent(/(?:Trident.*rv[ :]?11\\.|msie|iemobile|Windows Phone)/i);\n  var Edge = userAgent(/Edge/i);\n  var FireFox = userAgent(/firefox/i);\n  var Safari = userAgent(/safari/i) && !userAgent(/chrome/i) && !userAgent(/android/i);\n  var IOS = userAgent(/iP(ad|od|hone)/i);\n  var ChromeForAndroid = userAgent(/chrome/i) && userAgent(/android/i);\n\n  var captureMode = {\n    capture: false,\n    passive: false\n  };\n  function on(el, event, fn) {\n    el.addEventListener(event, fn, !IE11OrLess && captureMode);\n  }\n  function off(el, event, fn) {\n    el.removeEventListener(event, fn, !IE11OrLess && captureMode);\n  }\n  function matches( /**HTMLElement*/el, /**String*/selector) {\n    if (!selector) return;\n    selector[0] === '>' && (selector = selector.substring(1));\n    if (el) {\n      try {\n        if (el.matches) {\n          return el.matches(selector);\n        } else if (el.msMatchesSelector) {\n          return el.msMatchesSelector(selector);\n        } else if (el.webkitMatchesSelector) {\n          return el.webkitMatchesSelector(selector);\n        }\n      } catch (_) {\n        return false;\n      }\n    }\n    return false;\n  }\n  function getParentOrHost(el) {\n    return el.host && el !== document && el.host.nodeType ? el.host : el.parentNode;\n  }\n  function closest( /**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, includeCTX) {\n    if (el) {\n      ctx = ctx || document;\n      do {\n        if (selector != null && (selector[0] === '>' ? el.parentNode === ctx && matches(el, selector) : matches(el, selector)) || includeCTX && el === ctx) {\n          return el;\n        }\n        if (el === ctx) break;\n        /* jshint boss:true */\n      } while (el = getParentOrHost(el));\n    }\n    return null;\n  }\n  var R_SPACE = /\\s+/g;\n  function toggleClass(el, name, state) {\n    if (el && name) {\n      if (el.classList) {\n        el.classList[state ? 'add' : 'remove'](name);\n      } else {\n        var className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ');\n        el.className = (className + (state ? ' ' + name : '')).replace(R_SPACE, ' ');\n      }\n    }\n  }\n  function css(el, prop, val) {\n    var style = el && el.style;\n    if (style) {\n      if (val === void 0) {\n        if (document.defaultView && document.defaultView.getComputedStyle) {\n          val = document.defaultView.getComputedStyle(el, '');\n        } else if (el.currentStyle) {\n          val = el.currentStyle;\n        }\n        return prop === void 0 ? val : val[prop];\n      } else {\n        if (!(prop in style) && prop.indexOf('webkit') === -1) {\n          prop = '-webkit-' + prop;\n        }\n        style[prop] = val + (typeof val === 'string' ? '' : 'px');\n      }\n    }\n  }\n  function matrix(el, selfOnly) {\n    var appliedTransforms = '';\n    if (typeof el === 'string') {\n      appliedTransforms = el;\n    } else {\n      do {\n        var transform = css(el, 'transform');\n        if (transform && transform !== 'none') {\n          appliedTransforms = transform + ' ' + appliedTransforms;\n        }\n        /* jshint boss:true */\n      } while (!selfOnly && (el = el.parentNode));\n    }\n    var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix || window.MSCSSMatrix;\n    /*jshint -W056 */\n    return matrixFn && new matrixFn(appliedTransforms);\n  }\n  function find(ctx, tagName, iterator) {\n    if (ctx) {\n      var list = ctx.getElementsByTagName(tagName),\n        i = 0,\n        n = list.length;\n      if (iterator) {\n        for (; i < n; i++) {\n          iterator(list[i], i);\n        }\n      }\n      return list;\n    }\n    return [];\n  }\n  function getWindowScrollingElement() {\n    var scrollingElement = document.scrollingElement;\n    if (scrollingElement) {\n      return scrollingElement;\n    } else {\n      return document.documentElement;\n    }\n  }\n\n  /**\r\n   * Returns the \"bounding client rect\" of given element\r\n   * @param  {HTMLElement} el                       The element whose boundingClientRect is wanted\r\n   * @param  {[Boolean]} relativeToContainingBlock  Whether the rect should be relative to the containing block of (including) the container\r\n   * @param  {[Boolean]} relativeToNonStaticParent  Whether the rect should be relative to the relative parent of (including) the contaienr\r\n   * @param  {[Boolean]} undoScale                  Whether the container's scale() should be undone\r\n   * @param  {[HTMLElement]} container              The parent the element will be placed in\r\n   * @return {Object}                               The boundingClientRect of el, with specified adjustments\r\n   */\n  function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoScale, container) {\n    if (!el.getBoundingClientRect && el !== window) return;\n    var elRect, top, left, bottom, right, height, width;\n    if (el !== window && el.parentNode && el !== getWindowScrollingElement()) {\n      elRect = el.getBoundingClientRect();\n      top = elRect.top;\n      left = elRect.left;\n      bottom = elRect.bottom;\n      right = elRect.right;\n      height = elRect.height;\n      width = elRect.width;\n    } else {\n      top = 0;\n      left = 0;\n      bottom = window.innerHeight;\n      right = window.innerWidth;\n      height = window.innerHeight;\n      width = window.innerWidth;\n    }\n    if ((relativeToContainingBlock || relativeToNonStaticParent) && el !== window) {\n      // Adjust for translate()\n      container = container || el.parentNode;\n\n      // solves #1123 (see: https://stackoverflow.com/a/37953806/6088312)\n      // Not needed on <= IE11\n      if (!IE11OrLess) {\n        do {\n          if (container && container.getBoundingClientRect && (css(container, 'transform') !== 'none' || relativeToNonStaticParent && css(container, 'position') !== 'static')) {\n            var containerRect = container.getBoundingClientRect();\n\n            // Set relative to edges of padding box of container\n            top -= containerRect.top + parseInt(css(container, 'border-top-width'));\n            left -= containerRect.left + parseInt(css(container, 'border-left-width'));\n            bottom = top + elRect.height;\n            right = left + elRect.width;\n            break;\n          }\n          /* jshint boss:true */\n        } while (container = container.parentNode);\n      }\n    }\n    if (undoScale && el !== window) {\n      // Adjust for scale()\n      var elMatrix = matrix(container || el),\n        scaleX = elMatrix && elMatrix.a,\n        scaleY = elMatrix && elMatrix.d;\n      if (elMatrix) {\n        top /= scaleY;\n        left /= scaleX;\n        width /= scaleX;\n        height /= scaleY;\n        bottom = top + height;\n        right = left + width;\n      }\n    }\n    return {\n      top: top,\n      left: left,\n      bottom: bottom,\n      right: right,\n      width: width,\n      height: height\n    };\n  }\n\n  /**\r\n   * Checks if a side of an element is scrolled past a side of its parents\r\n   * @param  {HTMLElement}  el           The element who's side being scrolled out of view is in question\r\n   * @param  {String}       elSide       Side of the element in question ('top', 'left', 'right', 'bottom')\r\n   * @param  {String}       parentSide   Side of the parent in question ('top', 'left', 'right', 'bottom')\r\n   * @return {HTMLElement}               The parent scroll element that the el's side is scrolled past, or null if there is no such element\r\n   */\n  function isScrolledPast(el, elSide, parentSide) {\n    var parent = getParentAutoScrollElement(el, true),\n      elSideVal = getRect(el)[elSide];\n\n    /* jshint boss:true */\n    while (parent) {\n      var parentSideVal = getRect(parent)[parentSide],\n        visible = void 0;\n      if (parentSide === 'top' || parentSide === 'left') {\n        visible = elSideVal >= parentSideVal;\n      } else {\n        visible = elSideVal <= parentSideVal;\n      }\n      if (!visible) return parent;\n      if (parent === getWindowScrollingElement()) break;\n      parent = getParentAutoScrollElement(parent, false);\n    }\n    return false;\n  }\n\n  /**\r\n   * Gets nth child of el, ignoring hidden children, sortable's elements (does not ignore clone if it's visible)\r\n   * and non-draggable elements\r\n   * @param  {HTMLElement} el       The parent element\r\n   * @param  {Number} childNum      The index of the child\r\n   * @param  {Object} options       Parent Sortable's options\r\n   * @return {HTMLElement}          The child at index childNum, or null if not found\r\n   */\n  function getChild(el, childNum, options, includeDragEl) {\n    var currentChild = 0,\n      i = 0,\n      children = el.children;\n    while (i < children.length) {\n      if (children[i].style.display !== 'none' && children[i] !== Sortable.ghost && (includeDragEl || children[i] !== Sortable.dragged) && closest(children[i], options.draggable, el, false)) {\n        if (currentChild === childNum) {\n          return children[i];\n        }\n        currentChild++;\n      }\n      i++;\n    }\n    return null;\n  }\n\n  /**\r\n   * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)\r\n   * @param  {HTMLElement} el       Parent element\r\n   * @param  {selector} selector    Any other elements that should be ignored\r\n   * @return {HTMLElement}          The last child, ignoring ghostEl\r\n   */\n  function lastChild(el, selector) {\n    var last = el.lastElementChild;\n    while (last && (last === Sortable.ghost || css(last, 'display') === 'none' || selector && !matches(last, selector))) {\n      last = last.previousElementSibling;\n    }\n    return last || null;\n  }\n\n  /**\r\n   * Returns the index of an element within its parent for a selected set of\r\n   * elements\r\n   * @param  {HTMLElement} el\r\n   * @param  {selector} selector\r\n   * @return {number}\r\n   */\n  function index(el, selector) {\n    var index = 0;\n    if (!el || !el.parentNode) {\n      return -1;\n    }\n\n    /* jshint boss:true */\n    while (el = el.previousElementSibling) {\n      if (el.nodeName.toUpperCase() !== 'TEMPLATE' && el !== Sortable.clone && (!selector || matches(el, selector))) {\n        index++;\n      }\n    }\n    return index;\n  }\n\n  /**\r\n   * Returns the scroll offset of the given element, added with all the scroll offsets of parent elements.\r\n   * The value is returned in real pixels.\r\n   * @param  {HTMLElement} el\r\n   * @return {Array}             Offsets in the format of [left, top]\r\n   */\n  function getRelativeScrollOffset(el) {\n    var offsetLeft = 0,\n      offsetTop = 0,\n      winScroller = getWindowScrollingElement();\n    if (el) {\n      do {\n        var elMatrix = matrix(el),\n          scaleX = elMatrix.a,\n          scaleY = elMatrix.d;\n        offsetLeft += el.scrollLeft * scaleX;\n        offsetTop += el.scrollTop * scaleY;\n      } while (el !== winScroller && (el = el.parentNode));\n    }\n    return [offsetLeft, offsetTop];\n  }\n\n  /**\r\n   * Returns the index of the object within the given array\r\n   * @param  {Array} arr   Array that may or may not hold the object\r\n   * @param  {Object} obj  An object that has a key-value pair unique to and identical to a key-value pair in the object you want to find\r\n   * @return {Number}      The index of the object in the array, or -1\r\n   */\n  function indexOfObject(arr, obj) {\n    for (var i in arr) {\n      if (!arr.hasOwnProperty(i)) continue;\n      for (var key in obj) {\n        if (obj.hasOwnProperty(key) && obj[key] === arr[i][key]) return Number(i);\n      }\n    }\n    return -1;\n  }\n  function getParentAutoScrollElement(el, includeSelf) {\n    // skip to window\n    if (!el || !el.getBoundingClientRect) return getWindowScrollingElement();\n    var elem = el;\n    var gotSelf = false;\n    do {\n      // we don't need to get elem css if it isn't even overflowing in the first place (performance)\n      if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {\n        var elemCSS = css(elem);\n        if (elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') || elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')) {\n          if (!elem.getBoundingClientRect || elem === document.body) return getWindowScrollingElement();\n          if (gotSelf || includeSelf) return elem;\n          gotSelf = true;\n        }\n      }\n      /* jshint boss:true */\n    } while (elem = elem.parentNode);\n    return getWindowScrollingElement();\n  }\n  function extend(dst, src) {\n    if (dst && src) {\n      for (var key in src) {\n        if (src.hasOwnProperty(key)) {\n          dst[key] = src[key];\n        }\n      }\n    }\n    return dst;\n  }\n  function isRectEqual(rect1, rect2) {\n    return Math.round(rect1.top) === Math.round(rect2.top) && Math.round(rect1.left) === Math.round(rect2.left) && Math.round(rect1.height) === Math.round(rect2.height) && Math.round(rect1.width) === Math.round(rect2.width);\n  }\n  var _throttleTimeout;\n  function throttle(callback, ms) {\n    return function () {\n      if (!_throttleTimeout) {\n        var args = arguments,\n          _this = this;\n        if (args.length === 1) {\n          callback.call(_this, args[0]);\n        } else {\n          callback.apply(_this, args);\n        }\n        _throttleTimeout = setTimeout(function () {\n          _throttleTimeout = void 0;\n        }, ms);\n      }\n    };\n  }\n  function cancelThrottle() {\n    clearTimeout(_throttleTimeout);\n    _throttleTimeout = void 0;\n  }\n  function scrollBy(el, x, y) {\n    el.scrollLeft += x;\n    el.scrollTop += y;\n  }\n  function clone(el) {\n    var Polymer = window.Polymer;\n    var $ = window.jQuery || window.Zepto;\n    if (Polymer && Polymer.dom) {\n      return Polymer.dom(el).cloneNode(true);\n    } else if ($) {\n      return $(el).clone(true)[0];\n    } else {\n      return el.cloneNode(true);\n    }\n  }\n  function setRect(el, rect) {\n    css(el, 'position', 'absolute');\n    css(el, 'top', rect.top);\n    css(el, 'left', rect.left);\n    css(el, 'width', rect.width);\n    css(el, 'height', rect.height);\n  }\n  function unsetRect(el) {\n    css(el, 'position', '');\n    css(el, 'top', '');\n    css(el, 'left', '');\n    css(el, 'width', '');\n    css(el, 'height', '');\n  }\n  function getChildContainingRectFromElement(container, options, ghostEl) {\n    var rect = {};\n    Array.from(container.children).forEach(function (child) {\n      var _rect$left, _rect$top, _rect$right, _rect$bottom;\n      if (!closest(child, options.draggable, container, false) || child.animated || child === ghostEl) return;\n      var childRect = getRect(child);\n      rect.left = Math.min((_rect$left = rect.left) !== null && _rect$left !== void 0 ? _rect$left : Infinity, childRect.left);\n      rect.top = Math.min((_rect$top = rect.top) !== null && _rect$top !== void 0 ? _rect$top : Infinity, childRect.top);\n      rect.right = Math.max((_rect$right = rect.right) !== null && _rect$right !== void 0 ? _rect$right : -Infinity, childRect.right);\n      rect.bottom = Math.max((_rect$bottom = rect.bottom) !== null && _rect$bottom !== void 0 ? _rect$bottom : -Infinity, childRect.bottom);\n    });\n    rect.width = rect.right - rect.left;\n    rect.height = rect.bottom - rect.top;\n    rect.x = rect.left;\n    rect.y = rect.top;\n    return rect;\n  }\n  var expando = 'Sortable' + new Date().getTime();\n\n  function AnimationStateManager() {\n    var animationStates = [],\n      animationCallbackId;\n    return {\n      captureAnimationState: function captureAnimationState() {\n        animationStates = [];\n        if (!this.options.animation) return;\n        var children = [].slice.call(this.el.children);\n        children.forEach(function (child) {\n          if (css(child, 'display') === 'none' || child === Sortable.ghost) return;\n          animationStates.push({\n            target: child,\n            rect: getRect(child)\n          });\n          var fromRect = _objectSpread2({}, animationStates[animationStates.length - 1].rect);\n\n          // If animating: compensate for current animation\n          if (child.thisAnimationDuration) {\n            var childMatrix = matrix(child, true);\n            if (childMatrix) {\n              fromRect.top -= childMatrix.f;\n              fromRect.left -= childMatrix.e;\n            }\n          }\n          child.fromRect = fromRect;\n        });\n      },\n      addAnimationState: function addAnimationState(state) {\n        animationStates.push(state);\n      },\n      removeAnimationState: function removeAnimationState(target) {\n        animationStates.splice(indexOfObject(animationStates, {\n          target: target\n        }), 1);\n      },\n      animateAll: function animateAll(callback) {\n        var _this = this;\n        if (!this.options.animation) {\n          clearTimeout(animationCallbackId);\n          if (typeof callback === 'function') callback();\n          return;\n        }\n        var animating = false,\n          animationTime = 0;\n        animationStates.forEach(function (state) {\n          var time = 0,\n            target = state.target,\n            fromRect = target.fromRect,\n            toRect = getRect(target),\n            prevFromRect = target.prevFromRect,\n            prevToRect = target.prevToRect,\n            animatingRect = state.rect,\n            targetMatrix = matrix(target, true);\n          if (targetMatrix) {\n            // Compensate for current animation\n            toRect.top -= targetMatrix.f;\n            toRect.left -= targetMatrix.e;\n          }\n          target.toRect = toRect;\n          if (target.thisAnimationDuration) {\n            // Could also check if animatingRect is between fromRect and toRect\n            if (isRectEqual(prevFromRect, toRect) && !isRectEqual(fromRect, toRect) &&\n            // Make sure animatingRect is on line between toRect & fromRect\n            (animatingRect.top - toRect.top) / (animatingRect.left - toRect.left) === (fromRect.top - toRect.top) / (fromRect.left - toRect.left)) {\n              // If returning to same place as started from animation and on same axis\n              time = calculateRealTime(animatingRect, prevFromRect, prevToRect, _this.options);\n            }\n          }\n\n          // if fromRect != toRect: animate\n          if (!isRectEqual(toRect, fromRect)) {\n            target.prevFromRect = fromRect;\n            target.prevToRect = toRect;\n            if (!time) {\n              time = _this.options.animation;\n            }\n            _this.animate(target, animatingRect, toRect, time);\n          }\n          if (time) {\n            animating = true;\n            animationTime = Math.max(animationTime, time);\n            clearTimeout(target.animationResetTimer);\n            target.animationResetTimer = setTimeout(function () {\n              target.animationTime = 0;\n              target.prevFromRect = null;\n              target.fromRect = null;\n              target.prevToRect = null;\n              target.thisAnimationDuration = null;\n            }, time);\n            target.thisAnimationDuration = time;\n          }\n        });\n        clearTimeout(animationCallbackId);\n        if (!animating) {\n          if (typeof callback === 'function') callback();\n        } else {\n          animationCallbackId = setTimeout(function () {\n            if (typeof callback === 'function') callback();\n          }, animationTime);\n        }\n        animationStates = [];\n      },\n      animate: function animate(target, currentRect, toRect, duration) {\n        if (duration) {\n          css(target, 'transition', '');\n          css(target, 'transform', '');\n          var elMatrix = matrix(this.el),\n            scaleX = elMatrix && elMatrix.a,\n            scaleY = elMatrix && elMatrix.d,\n            translateX = (currentRect.left - toRect.left) / (scaleX || 1),\n            translateY = (currentRect.top - toRect.top) / (scaleY || 1);\n          target.animatingX = !!translateX;\n          target.animatingY = !!translateY;\n          css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0)');\n          this.forRepaintDummy = repaint(target); // repaint\n\n          css(target, 'transition', 'transform ' + duration + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));\n          css(target, 'transform', 'translate3d(0,0,0)');\n          typeof target.animated === 'number' && clearTimeout(target.animated);\n          target.animated = setTimeout(function () {\n            css(target, 'transition', '');\n            css(target, 'transform', '');\n            target.animated = false;\n            target.animatingX = false;\n            target.animatingY = false;\n          }, duration);\n        }\n      }\n    };\n  }\n  function repaint(target) {\n    return target.offsetWidth;\n  }\n  function calculateRealTime(animatingRect, fromRect, toRect, options) {\n    return Math.sqrt(Math.pow(fromRect.top - animatingRect.top, 2) + Math.pow(fromRect.left - animatingRect.left, 2)) / Math.sqrt(Math.pow(fromRect.top - toRect.top, 2) + Math.pow(fromRect.left - toRect.left, 2)) * options.animation;\n  }\n\n  var plugins = [];\n  var defaults = {\n    initializeByDefault: true\n  };\n  var PluginManager = {\n    mount: function mount(plugin) {\n      // Set default static properties\n      for (var option in defaults) {\n        if (defaults.hasOwnProperty(option) && !(option in plugin)) {\n          plugin[option] = defaults[option];\n        }\n      }\n      plugins.forEach(function (p) {\n        if (p.pluginName === plugin.pluginName) {\n          throw \"Sortable: Cannot mount plugin \".concat(plugin.pluginName, \" more than once\");\n        }\n      });\n      plugins.push(plugin);\n    },\n    pluginEvent: function pluginEvent(eventName, sortable, evt) {\n      var _this = this;\n      this.eventCanceled = false;\n      evt.cancel = function () {\n        _this.eventCanceled = true;\n      };\n      var eventNameGlobal = eventName + 'Global';\n      plugins.forEach(function (plugin) {\n        if (!sortable[plugin.pluginName]) return;\n        // Fire global events if it exists in this sortable\n        if (sortable[plugin.pluginName][eventNameGlobal]) {\n          sortable[plugin.pluginName][eventNameGlobal](_objectSpread2({\n            sortable: sortable\n          }, evt));\n        }\n\n        // Only fire plugin event if plugin is enabled in this sortable,\n        // and plugin has event defined\n        if (sortable.options[plugin.pluginName] && sortable[plugin.pluginName][eventName]) {\n          sortable[plugin.pluginName][eventName](_objectSpread2({\n            sortable: sortable\n          }, evt));\n        }\n      });\n    },\n    initializePlugins: function initializePlugins(sortable, el, defaults, options) {\n      plugins.forEach(function (plugin) {\n        var pluginName = plugin.pluginName;\n        if (!sortable.options[pluginName] && !plugin.initializeByDefault) return;\n        var initialized = new plugin(sortable, el, sortable.options);\n        initialized.sortable = sortable;\n        initialized.options = sortable.options;\n        sortable[pluginName] = initialized;\n\n        // Add default options from plugin\n        _extends(defaults, initialized.defaults);\n      });\n      for (var option in sortable.options) {\n        if (!sortable.options.hasOwnProperty(option)) continue;\n        var modified = this.modifyOption(sortable, option, sortable.options[option]);\n        if (typeof modified !== 'undefined') {\n          sortable.options[option] = modified;\n        }\n      }\n    },\n    getEventProperties: function getEventProperties(name, sortable) {\n      var eventProperties = {};\n      plugins.forEach(function (plugin) {\n        if (typeof plugin.eventProperties !== 'function') return;\n        _extends(eventProperties, plugin.eventProperties.call(sortable[plugin.pluginName], name));\n      });\n      return eventProperties;\n    },\n    modifyOption: function modifyOption(sortable, name, value) {\n      var modifiedValue;\n      plugins.forEach(function (plugin) {\n        // Plugin must exist on the Sortable\n        if (!sortable[plugin.pluginName]) return;\n\n        // If static option listener exists for this option, call in the context of the Sortable's instance of this plugin\n        if (plugin.optionListeners && typeof plugin.optionListeners[name] === 'function') {\n          modifiedValue = plugin.optionListeners[name].call(sortable[plugin.pluginName], value);\n        }\n      });\n      return modifiedValue;\n    }\n  };\n\n  function dispatchEvent(_ref) {\n    var sortable = _ref.sortable,\n      rootEl = _ref.rootEl,\n      name = _ref.name,\n      targetEl = _ref.targetEl,\n      cloneEl = _ref.cloneEl,\n      toEl = _ref.toEl,\n      fromEl = _ref.fromEl,\n      oldIndex = _ref.oldIndex,\n      newIndex = _ref.newIndex,\n      oldDraggableIndex = _ref.oldDraggableIndex,\n      newDraggableIndex = _ref.newDraggableIndex,\n      originalEvent = _ref.originalEvent,\n      putSortable = _ref.putSortable,\n      extraEventProperties = _ref.extraEventProperties;\n    sortable = sortable || rootEl && rootEl[expando];\n    if (!sortable) return;\n    var evt,\n      options = sortable.options,\n      onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);\n    // Support for new CustomEvent feature\n    if (window.CustomEvent && !IE11OrLess && !Edge) {\n      evt = new CustomEvent(name, {\n        bubbles: true,\n        cancelable: true\n      });\n    } else {\n      evt = document.createEvent('Event');\n      evt.initEvent(name, true, true);\n    }\n    evt.to = toEl || rootEl;\n    evt.from = fromEl || rootEl;\n    evt.item = targetEl || rootEl;\n    evt.clone = cloneEl;\n    evt.oldIndex = oldIndex;\n    evt.newIndex = newIndex;\n    evt.oldDraggableIndex = oldDraggableIndex;\n    evt.newDraggableIndex = newDraggableIndex;\n    evt.originalEvent = originalEvent;\n    evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;\n    var allEventProperties = _objectSpread2(_objectSpread2({}, extraEventProperties), PluginManager.getEventProperties(name, sortable));\n    for (var option in allEventProperties) {\n      evt[option] = allEventProperties[option];\n    }\n    if (rootEl) {\n      rootEl.dispatchEvent(evt);\n    }\n    if (options[onName]) {\n      options[onName].call(sortable, evt);\n    }\n  }\n\n  var _excluded = [\"evt\"];\n  var pluginEvent = function pluginEvent(eventName, sortable) {\n    var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},\n      originalEvent = _ref.evt,\n      data = _objectWithoutProperties(_ref, _excluded);\n    PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, _objectSpread2({\n      dragEl: dragEl,\n      parentEl: parentEl,\n      ghostEl: ghostEl,\n      rootEl: rootEl,\n      nextEl: nextEl,\n      lastDownEl: lastDownEl,\n      cloneEl: cloneEl,\n      cloneHidden: cloneHidden,\n      dragStarted: moved,\n      putSortable: putSortable,\n      activeSortable: Sortable.active,\n      originalEvent: originalEvent,\n      oldIndex: oldIndex,\n      oldDraggableIndex: oldDraggableIndex,\n      newIndex: newIndex,\n      newDraggableIndex: newDraggableIndex,\n      hideGhostForTarget: _hideGhostForTarget,\n      unhideGhostForTarget: _unhideGhostForTarget,\n      cloneNowHidden: function cloneNowHidden() {\n        cloneHidden = true;\n      },\n      cloneNowShown: function cloneNowShown() {\n        cloneHidden = false;\n      },\n      dispatchSortableEvent: function dispatchSortableEvent(name) {\n        _dispatchEvent({\n          sortable: sortable,\n          name: name,\n          originalEvent: originalEvent\n        });\n      }\n    }, data));\n  };\n  function _dispatchEvent(info) {\n    dispatchEvent(_objectSpread2({\n      putSortable: putSortable,\n      cloneEl: cloneEl,\n      targetEl: dragEl,\n      rootEl: rootEl,\n      oldIndex: oldIndex,\n      oldDraggableIndex: oldDraggableIndex,\n      newIndex: newIndex,\n      newDraggableIndex: newDraggableIndex\n    }, info));\n  }\n  var dragEl,\n    parentEl,\n    ghostEl,\n    rootEl,\n    nextEl,\n    lastDownEl,\n    cloneEl,\n    cloneHidden,\n    oldIndex,\n    newIndex,\n    oldDraggableIndex,\n    newDraggableIndex,\n    activeGroup,\n    putSortable,\n    awaitingDragStarted = false,\n    ignoreNextClick = false,\n    sortables = [],\n    tapEvt,\n    touchEvt,\n    lastDx,\n    lastDy,\n    tapDistanceLeft,\n    tapDistanceTop,\n    moved,\n    lastTarget,\n    lastDirection,\n    pastFirstInvertThresh = false,\n    isCircumstantialInvert = false,\n    targetMoveDistance,\n    // For positioning ghost absolutely\n    ghostRelativeParent,\n    ghostRelativeParentInitialScroll = [],\n    // (left, top)\n\n    _silent = false,\n    savedInputChecked = [];\n\n  /** @const */\n  var documentExists = typeof document !== 'undefined',\n    PositionGhostAbsolutely = IOS,\n    CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',\n    // This will not pass for IE9, because IE9 DnD only works on anchors\n    supportDraggable = documentExists && !ChromeForAndroid && !IOS && 'draggable' in document.createElement('div'),\n    supportCssPointerEvents = function () {\n      if (!documentExists) return;\n      // false when <= IE11\n      if (IE11OrLess) {\n        return false;\n      }\n      var el = document.createElement('x');\n      el.style.cssText = 'pointer-events:auto';\n      return el.style.pointerEvents === 'auto';\n    }(),\n    _detectDirection = function _detectDirection(el, options) {\n      var elCSS = css(el),\n        elWidth = parseInt(elCSS.width) - parseInt(elCSS.paddingLeft) - parseInt(elCSS.paddingRight) - parseInt(elCSS.borderLeftWidth) - parseInt(elCSS.borderRightWidth),\n        child1 = getChild(el, 0, options),\n        child2 = getChild(el, 1, options),\n        firstChildCSS = child1 && css(child1),\n        secondChildCSS = child2 && css(child2),\n        firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + getRect(child1).width,\n        secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + getRect(child2).width;\n      if (elCSS.display === 'flex') {\n        return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse' ? 'vertical' : 'horizontal';\n      }\n      if (elCSS.display === 'grid') {\n        return elCSS.gridTemplateColumns.split(' ').length <= 1 ? 'vertical' : 'horizontal';\n      }\n      if (child1 && firstChildCSS[\"float\"] && firstChildCSS[\"float\"] !== 'none') {\n        var touchingSideChild2 = firstChildCSS[\"float\"] === 'left' ? 'left' : 'right';\n        return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ? 'vertical' : 'horizontal';\n      }\n      return child1 && (firstChildCSS.display === 'block' || firstChildCSS.display === 'flex' || firstChildCSS.display === 'table' || firstChildCSS.display === 'grid' || firstChildWidth >= elWidth && elCSS[CSSFloatProperty] === 'none' || child2 && elCSS[CSSFloatProperty] === 'none' && firstChildWidth + secondChildWidth > elWidth) ? 'vertical' : 'horizontal';\n    },\n    _dragElInRowColumn = function _dragElInRowColumn(dragRect, targetRect, vertical) {\n      var dragElS1Opp = vertical ? dragRect.left : dragRect.top,\n        dragElS2Opp = vertical ? dragRect.right : dragRect.bottom,\n        dragElOppLength = vertical ? dragRect.width : dragRect.height,\n        targetS1Opp = vertical ? targetRect.left : targetRect.top,\n        targetS2Opp = vertical ? targetRect.right : targetRect.bottom,\n        targetOppLength = vertical ? targetRect.width : targetRect.height;\n      return dragElS1Opp === targetS1Opp || dragElS2Opp === targetS2Opp || dragElS1Opp + dragElOppLength / 2 === targetS1Opp + targetOppLength / 2;\n    },\n    /**\r\n     * Detects first nearest empty sortable to X and Y position using emptyInsertThreshold.\r\n     * @param  {Number} x      X position\r\n     * @param  {Number} y      Y position\r\n     * @return {HTMLElement}   Element of the first found nearest Sortable\r\n     */\n    _detectNearestEmptySortable = function _detectNearestEmptySortable(x, y) {\n      var ret;\n      sortables.some(function (sortable) {\n        var threshold = sortable[expando].options.emptyInsertThreshold;\n        if (!threshold || lastChild(sortable)) return;\n        var rect = getRect(sortable),\n          insideHorizontally = x >= rect.left - threshold && x <= rect.right + threshold,\n          insideVertically = y >= rect.top - threshold && y <= rect.bottom + threshold;\n        if (insideHorizontally && insideVertically) {\n          return ret = sortable;\n        }\n      });\n      return ret;\n    },\n    _prepareGroup = function _prepareGroup(options) {\n      function toFn(value, pull) {\n        return function (to, from, dragEl, evt) {\n          var sameGroup = to.options.group.name && from.options.group.name && to.options.group.name === from.options.group.name;\n          if (value == null && (pull || sameGroup)) {\n            // Default pull value\n            // Default pull and put value if same group\n            return true;\n          } else if (value == null || value === false) {\n            return false;\n          } else if (pull && value === 'clone') {\n            return value;\n          } else if (typeof value === 'function') {\n            return toFn(value(to, from, dragEl, evt), pull)(to, from, dragEl, evt);\n          } else {\n            var otherGroup = (pull ? to : from).options.group.name;\n            return value === true || typeof value === 'string' && value === otherGroup || value.join && value.indexOf(otherGroup) > -1;\n          }\n        };\n      }\n      var group = {};\n      var originalGroup = options.group;\n      if (!originalGroup || _typeof(originalGroup) != 'object') {\n        originalGroup = {\n          name: originalGroup\n        };\n      }\n      group.name = originalGroup.name;\n      group.checkPull = toFn(originalGroup.pull, true);\n      group.checkPut = toFn(originalGroup.put);\n      group.revertClone = originalGroup.revertClone;\n      options.group = group;\n    },\n    _hideGhostForTarget = function _hideGhostForTarget() {\n      if (!supportCssPointerEvents && ghostEl) {\n        css(ghostEl, 'display', 'none');\n      }\n    },\n    _unhideGhostForTarget = function _unhideGhostForTarget() {\n      if (!supportCssPointerEvents && ghostEl) {\n        css(ghostEl, 'display', '');\n      }\n    };\n\n  // #1184 fix - Prevent click event on fallback if dragged but item not changed position\n  if (documentExists && !ChromeForAndroid) {\n    document.addEventListener('click', function (evt) {\n      if (ignoreNextClick) {\n        evt.preventDefault();\n        evt.stopPropagation && evt.stopPropagation();\n        evt.stopImmediatePropagation && evt.stopImmediatePropagation();\n        ignoreNextClick = false;\n        return false;\n      }\n    }, true);\n  }\n  var nearestEmptyInsertDetectEvent = function nearestEmptyInsertDetectEvent(evt) {\n    if (dragEl) {\n      evt = evt.touches ? evt.touches[0] : evt;\n      var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);\n      if (nearest) {\n        // Create imitation event\n        var event = {};\n        for (var i in evt) {\n          if (evt.hasOwnProperty(i)) {\n            event[i] = evt[i];\n          }\n        }\n        event.target = event.rootEl = nearest;\n        event.preventDefault = void 0;\n        event.stopPropagation = void 0;\n        nearest[expando]._onDragOver(event);\n      }\n    }\n  };\n  var _checkOutsideTargetEl = function _checkOutsideTargetEl(evt) {\n    if (dragEl) {\n      dragEl.parentNode[expando]._isOutsideThisEl(evt.target);\n    }\n  };\n\n  /**\r\n   * @class  Sortable\r\n   * @param  {HTMLElement}  el\r\n   * @param  {Object}       [options]\r\n   */\n  function Sortable(el, options) {\n    if (!(el && el.nodeType && el.nodeType === 1)) {\n      throw \"Sortable: `el` must be an HTMLElement, not \".concat({}.toString.call(el));\n    }\n    this.el = el; // root element\n    this.options = options = _extends({}, options);\n\n    // Export instance\n    el[expando] = this;\n    var defaults = {\n      group: null,\n      sort: true,\n      disabled: false,\n      store: null,\n      handle: null,\n      draggable: /^[uo]l$/i.test(el.nodeName) ? '>li' : '>*',\n      swapThreshold: 1,\n      // percentage; 0 <= x <= 1\n      invertSwap: false,\n      // invert always\n      invertedSwapThreshold: null,\n      // will be set to same as swapThreshold if default\n      removeCloneOnHide: true,\n      direction: function direction() {\n        return _detectDirection(el, this.options);\n      },\n      ghostClass: 'sortable-ghost',\n      chosenClass: 'sortable-chosen',\n      dragClass: 'sortable-drag',\n      ignore: 'a, img',\n      filter: null,\n      preventOnFilter: true,\n      animation: 0,\n      easing: null,\n      setData: function setData(dataTransfer, dragEl) {\n        dataTransfer.setData('Text', dragEl.textContent);\n      },\n      dropBubble: false,\n      dragoverBubble: false,\n      dataIdAttr: 'data-id',\n      delay: 0,\n      delayOnTouchOnly: false,\n      touchStartThreshold: (Number.parseInt ? Number : window).parseInt(window.devicePixelRatio, 10) || 1,\n      forceFallback: false,\n      fallbackClass: 'sortable-fallback',\n      fallbackOnBody: false,\n      fallbackTolerance: 0,\n      fallbackOffset: {\n        x: 0,\n        y: 0\n      },\n      supportPointer: Sortable.supportPointer !== false && 'PointerEvent' in window && !Safari,\n      emptyInsertThreshold: 5\n    };\n    PluginManager.initializePlugins(this, el, defaults);\n\n    // Set default options\n    for (var name in defaults) {\n      !(name in options) && (options[name] = defaults[name]);\n    }\n    _prepareGroup(options);\n\n    // Bind all private methods\n    for (var fn in this) {\n      if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {\n        this[fn] = this[fn].bind(this);\n      }\n    }\n\n    // Setup drag mode\n    this.nativeDraggable = options.forceFallback ? false : supportDraggable;\n    if (this.nativeDraggable) {\n      // Touch start threshold cannot be greater than the native dragstart threshold\n      this.options.touchStartThreshold = 1;\n    }\n\n    // Bind events\n    if (options.supportPointer) {\n      on(el, 'pointerdown', this._onTapStart);\n    } else {\n      on(el, 'mousedown', this._onTapStart);\n      on(el, 'touchstart', this._onTapStart);\n    }\n    if (this.nativeDraggable) {\n      on(el, 'dragover', this);\n      on(el, 'dragenter', this);\n    }\n    sortables.push(this.el);\n\n    // Restore sorting\n    options.store && options.store.get && this.sort(options.store.get(this) || []);\n\n    // Add animation state manager\n    _extends(this, AnimationStateManager());\n  }\n  Sortable.prototype = /** @lends Sortable.prototype */{\n    constructor: Sortable,\n    _isOutsideThisEl: function _isOutsideThisEl(target) {\n      if (!this.el.contains(target) && target !== this.el) {\n        lastTarget = null;\n      }\n    },\n    _getDirection: function _getDirection(evt, target) {\n      return typeof this.options.direction === 'function' ? this.options.direction.call(this, evt, target, dragEl) : this.options.direction;\n    },\n    _onTapStart: function _onTapStart( /** Event|TouchEvent */evt) {\n      if (!evt.cancelable) return;\n      var _this = this,\n        el = this.el,\n        options = this.options,\n        preventOnFilter = options.preventOnFilter,\n        type = evt.type,\n        touch = evt.touches && evt.touches[0] || evt.pointerType && evt.pointerType === 'touch' && evt,\n        target = (touch || evt).target,\n        originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0] || evt.composedPath && evt.composedPath()[0]) || target,\n        filter = options.filter;\n      _saveInputCheckedState(el);\n\n      // Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.\n      if (dragEl) {\n        return;\n      }\n      if (/mousedown|pointerdown/.test(type) && evt.button !== 0 || options.disabled) {\n        return; // only left button and enabled\n      }\n\n      // cancel dnd if original target is content editable\n      if (originalTarget.isContentEditable) {\n        return;\n      }\n\n      // Safari ignores further event handling after mousedown\n      if (!this.nativeDraggable && Safari && target && target.tagName.toUpperCase() === 'SELECT') {\n        return;\n      }\n      target = closest(target, options.draggable, el, false);\n      if (target && target.animated) {\n        return;\n      }\n      if (lastDownEl === target) {\n        // Ignoring duplicate `down`\n        return;\n      }\n\n      // Get the index of the dragged element within its parent\n      oldIndex = index(target);\n      oldDraggableIndex = index(target, options.draggable);\n\n      // Check filter\n      if (typeof filter === 'function') {\n        if (filter.call(this, evt, target, this)) {\n          _dispatchEvent({\n            sortable: _this,\n            rootEl: originalTarget,\n            name: 'filter',\n            targetEl: target,\n            toEl: el,\n            fromEl: el\n          });\n          pluginEvent('filter', _this, {\n            evt: evt\n          });\n          preventOnFilter && evt.cancelable && evt.preventDefault();\n          return; // cancel dnd\n        }\n      } else if (filter) {\n        filter = filter.split(',').some(function (criteria) {\n          criteria = closest(originalTarget, criteria.trim(), el, false);\n          if (criteria) {\n            _dispatchEvent({\n              sortable: _this,\n              rootEl: criteria,\n              name: 'filter',\n              targetEl: target,\n              fromEl: el,\n              toEl: el\n            });\n            pluginEvent('filter', _this, {\n              evt: evt\n            });\n            return true;\n          }\n        });\n        if (filter) {\n          preventOnFilter && evt.cancelable && evt.preventDefault();\n          return; // cancel dnd\n        }\n      }\n      if (options.handle && !closest(originalTarget, options.handle, el, false)) {\n        return;\n      }\n\n      // Prepare `dragstart`\n      this._prepareDragStart(evt, touch, target);\n    },\n    _prepareDragStart: function _prepareDragStart( /** Event */evt, /** Touch */touch, /** HTMLElement */target) {\n      var _this = this,\n        el = _this.el,\n        options = _this.options,\n        ownerDocument = el.ownerDocument,\n        dragStartFn;\n      if (target && !dragEl && target.parentNode === el) {\n        var dragRect = getRect(target);\n        rootEl = el;\n        dragEl = target;\n        parentEl = dragEl.parentNode;\n        nextEl = dragEl.nextSibling;\n        lastDownEl = target;\n        activeGroup = options.group;\n        Sortable.dragged = dragEl;\n        tapEvt = {\n          target: dragEl,\n          clientX: (touch || evt).clientX,\n          clientY: (touch || evt).clientY\n        };\n        tapDistanceLeft = tapEvt.clientX - dragRect.left;\n        tapDistanceTop = tapEvt.clientY - dragRect.top;\n        this._lastX = (touch || evt).clientX;\n        this._lastY = (touch || evt).clientY;\n        dragEl.style['will-change'] = 'all';\n        dragStartFn = function dragStartFn() {\n          pluginEvent('delayEnded', _this, {\n            evt: evt\n          });\n          if (Sortable.eventCanceled) {\n            _this._onDrop();\n            return;\n          }\n          // Delayed drag has been triggered\n          // we can re-enable the events: touchmove/mousemove\n          _this._disableDelayedDragEvents();\n          if (!FireFox && _this.nativeDraggable) {\n            dragEl.draggable = true;\n          }\n\n          // Bind the events: dragstart/dragend\n          _this._triggerDragStart(evt, touch);\n\n          // Drag start event\n          _dispatchEvent({\n            sortable: _this,\n            name: 'choose',\n            originalEvent: evt\n          });\n\n          // Chosen item\n          toggleClass(dragEl, options.chosenClass, true);\n        };\n\n        // Disable \"draggable\"\n        options.ignore.split(',').forEach(function (criteria) {\n          find(dragEl, criteria.trim(), _disableDraggable);\n        });\n        on(ownerDocument, 'dragover', nearestEmptyInsertDetectEvent);\n        on(ownerDocument, 'mousemove', nearestEmptyInsertDetectEvent);\n        on(ownerDocument, 'touchmove', nearestEmptyInsertDetectEvent);\n        on(ownerDocument, 'mouseup', _this._onDrop);\n        on(ownerDocument, 'touchend', _this._onDrop);\n        on(ownerDocument, 'touchcancel', _this._onDrop);\n\n        // Make dragEl draggable (must be before delay for FireFox)\n        if (FireFox && this.nativeDraggable) {\n          this.options.touchStartThreshold = 4;\n          dragEl.draggable = true;\n        }\n        pluginEvent('delayStart', this, {\n          evt: evt\n        });\n\n        // Delay is impossible for native DnD in Edge or IE\n        if (options.delay && (!options.delayOnTouchOnly || touch) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {\n          if (Sortable.eventCanceled) {\n            this._onDrop();\n            return;\n          }\n          // If the user moves the pointer or let go the click or touch\n          // before the delay has been reached:\n          // disable the delayed drag\n          on(ownerDocument, 'mouseup', _this._disableDelayedDrag);\n          on(ownerDocument, 'touchend', _this._disableDelayedDrag);\n          on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);\n          on(ownerDocument, 'mousemove', _this._delayedDragTouchMoveHandler);\n          on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);\n          options.supportPointer && on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);\n          _this._dragStartTimer = setTimeout(dragStartFn, options.delay);\n        } else {\n          dragStartFn();\n        }\n      }\n    },\n    _delayedDragTouchMoveHandler: function _delayedDragTouchMoveHandler( /** TouchEvent|PointerEvent **/e) {\n      var touch = e.touches ? e.touches[0] : e;\n      if (Math.max(Math.abs(touch.clientX - this._lastX), Math.abs(touch.clientY - this._lastY)) >= Math.floor(this.options.touchStartThreshold / (this.nativeDraggable && window.devicePixelRatio || 1))) {\n        this._disableDelayedDrag();\n      }\n    },\n    _disableDelayedDrag: function _disableDelayedDrag() {\n      dragEl && _disableDraggable(dragEl);\n      clearTimeout(this._dragStartTimer);\n      this._disableDelayedDragEvents();\n    },\n    _disableDelayedDragEvents: function _disableDelayedDragEvents() {\n      var ownerDocument = this.el.ownerDocument;\n      off(ownerDocument, 'mouseup', this._disableDelayedDrag);\n      off(ownerDocument, 'touchend', this._disableDelayedDrag);\n      off(ownerDocument, 'touchcancel', this._disableDelayedDrag);\n      off(ownerDocument, 'mousemove', this._delayedDragTouchMoveHandler);\n      off(ownerDocument, 'touchmove', this._delayedDragTouchMoveHandler);\n      off(ownerDocument, 'pointermove', this._delayedDragTouchMoveHandler);\n    },\n    _triggerDragStart: function _triggerDragStart( /** Event */evt, /** Touch */touch) {\n      touch = touch || evt.pointerType == 'touch' && evt;\n      if (!this.nativeDraggable || touch) {\n        if (this.options.supportPointer) {\n          on(document, 'pointermove', this._onTouchMove);\n        } else if (touch) {\n          on(document, 'touchmove', this._onTouchMove);\n        } else {\n          on(document, 'mousemove', this._onTouchMove);\n        }\n      } else {\n        on(dragEl, 'dragend', this);\n        on(rootEl, 'dragstart', this._onDragStart);\n      }\n      try {\n        if (document.selection) {\n          // Timeout neccessary for IE9\n          _nextTick(function () {\n            document.selection.empty();\n          });\n        } else {\n          window.getSelection().removeAllRanges();\n        }\n      } catch (err) {}\n    },\n    _dragStarted: function _dragStarted(fallback, evt) {\n      awaitingDragStarted = false;\n      if (rootEl && dragEl) {\n        pluginEvent('dragStarted', this, {\n          evt: evt\n        });\n        if (this.nativeDraggable) {\n          on(document, 'dragover', _checkOutsideTargetEl);\n        }\n        var options = this.options;\n\n        // Apply effect\n        !fallback && toggleClass(dragEl, options.dragClass, false);\n        toggleClass(dragEl, options.ghostClass, true);\n        Sortable.active = this;\n        fallback && this._appendGhost();\n\n        // Drag start event\n        _dispatchEvent({\n          sortable: this,\n          name: 'start',\n          originalEvent: evt\n        });\n      } else {\n        this._nulling();\n      }\n    },\n    _emulateDragOver: function _emulateDragOver() {\n      if (touchEvt) {\n        this._lastX = touchEvt.clientX;\n        this._lastY = touchEvt.clientY;\n        _hideGhostForTarget();\n        var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);\n        var parent = target;\n        while (target && target.shadowRoot) {\n          target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);\n          if (target === parent) break;\n          parent = target;\n        }\n        dragEl.parentNode[expando]._isOutsideThisEl(target);\n        if (parent) {\n          do {\n            if (parent[expando]) {\n              var inserted = void 0;\n              inserted = parent[expando]._onDragOver({\n                clientX: touchEvt.clientX,\n                clientY: touchEvt.clientY,\n                target: target,\n                rootEl: parent\n              });\n              if (inserted && !this.options.dragoverBubble) {\n                break;\n              }\n            }\n            target = parent; // store last element\n          }\n          /* jshint boss:true */ while (parent = parent.parentNode);\n        }\n        _unhideGhostForTarget();\n      }\n    },\n    _onTouchMove: function _onTouchMove( /**TouchEvent*/evt) {\n      if (tapEvt) {\n        var options = this.options,\n          fallbackTolerance = options.fallbackTolerance,\n          fallbackOffset = options.fallbackOffset,\n          touch = evt.touches ? evt.touches[0] : evt,\n          ghostMatrix = ghostEl && matrix(ghostEl, true),\n          scaleX = ghostEl && ghostMatrix && ghostMatrix.a,\n          scaleY = ghostEl && ghostMatrix && ghostMatrix.d,\n          relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && getRelativeScrollOffset(ghostRelativeParent),\n          dx = (touch.clientX - tapEvt.clientX + fallbackOffset.x) / (scaleX || 1) + (relativeScrollOffset ? relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0] : 0) / (scaleX || 1),\n          dy = (touch.clientY - tapEvt.clientY + fallbackOffset.y) / (scaleY || 1) + (relativeScrollOffset ? relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1] : 0) / (scaleY || 1);\n\n        // only set the status to dragging, when we are actually dragging\n        if (!Sortable.active && !awaitingDragStarted) {\n          if (fallbackTolerance && Math.max(Math.abs(touch.clientX - this._lastX), Math.abs(touch.clientY - this._lastY)) < fallbackTolerance) {\n            return;\n          }\n          this._onDragStart(evt, true);\n        }\n        if (ghostEl) {\n          if (ghostMatrix) {\n            ghostMatrix.e += dx - (lastDx || 0);\n            ghostMatrix.f += dy - (lastDy || 0);\n          } else {\n            ghostMatrix = {\n              a: 1,\n              b: 0,\n              c: 0,\n              d: 1,\n              e: dx,\n              f: dy\n            };\n          }\n          var cssMatrix = \"matrix(\".concat(ghostMatrix.a, \",\").concat(ghostMatrix.b, \",\").concat(ghostMatrix.c, \",\").concat(ghostMatrix.d, \",\").concat(ghostMatrix.e, \",\").concat(ghostMatrix.f, \")\");\n          css(ghostEl, 'webkitTransform', cssMatrix);\n          css(ghostEl, 'mozTransform', cssMatrix);\n          css(ghostEl, 'msTransform', cssMatrix);\n          css(ghostEl, 'transform', cssMatrix);\n          lastDx = dx;\n          lastDy = dy;\n          touchEvt = touch;\n        }\n        evt.cancelable && evt.preventDefault();\n      }\n    },\n    _appendGhost: function _appendGhost() {\n      // Bug if using scale(): https://stackoverflow.com/questions/2637058\n      // Not being adjusted for\n      if (!ghostEl) {\n        var container = this.options.fallbackOnBody ? document.body : rootEl,\n          rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container),\n          options = this.options;\n\n        // Position absolutely\n        if (PositionGhostAbsolutely) {\n          // Get relatively positioned parent\n          ghostRelativeParent = container;\n          while (css(ghostRelativeParent, 'position') === 'static' && css(ghostRelativeParent, 'transform') === 'none' && ghostRelativeParent !== document) {\n            ghostRelativeParent = ghostRelativeParent.parentNode;\n          }\n          if (ghostRelativeParent !== document.body && ghostRelativeParent !== document.documentElement) {\n            if (ghostRelativeParent === document) ghostRelativeParent = getWindowScrollingElement();\n            rect.top += ghostRelativeParent.scrollTop;\n            rect.left += ghostRelativeParent.scrollLeft;\n          } else {\n            ghostRelativeParent = getWindowScrollingElement();\n          }\n          ghostRelativeParentInitialScroll = getRelativeScrollOffset(ghostRelativeParent);\n        }\n        ghostEl = dragEl.cloneNode(true);\n        toggleClass(ghostEl, options.ghostClass, false);\n        toggleClass(ghostEl, options.fallbackClass, true);\n        toggleClass(ghostEl, options.dragClass, true);\n        css(ghostEl, 'transition', '');\n        css(ghostEl, 'transform', '');\n        css(ghostEl, 'box-sizing', 'border-box');\n        css(ghostEl, 'margin', 0);\n        css(ghostEl, 'top', rect.top);\n        css(ghostEl, 'left', rect.left);\n        css(ghostEl, 'width', rect.width);\n        css(ghostEl, 'height', rect.height);\n        css(ghostEl, 'opacity', '0.8');\n        css(ghostEl, 'position', PositionGhostAbsolutely ? 'absolute' : 'fixed');\n        css(ghostEl, 'zIndex', '100000');\n        css(ghostEl, 'pointerEvents', 'none');\n        Sortable.ghost = ghostEl;\n        container.appendChild(ghostEl);\n\n        // Set transform-origin\n        css(ghostEl, 'transform-origin', tapDistanceLeft / parseInt(ghostEl.style.width) * 100 + '% ' + tapDistanceTop / parseInt(ghostEl.style.height) * 100 + '%');\n      }\n    },\n    _onDragStart: function _onDragStart( /**Event*/evt, /**boolean*/fallback) {\n      var _this = this;\n      var dataTransfer = evt.dataTransfer;\n      var options = _this.options;\n      pluginEvent('dragStart', this, {\n        evt: evt\n      });\n      if (Sortable.eventCanceled) {\n        this._onDrop();\n        return;\n      }\n      pluginEvent('setupClone', this);\n      if (!Sortable.eventCanceled) {\n        cloneEl = clone(dragEl);\n        cloneEl.removeAttribute(\"id\");\n        cloneEl.draggable = false;\n        cloneEl.style['will-change'] = '';\n        this._hideClone();\n        toggleClass(cloneEl, this.options.chosenClass, false);\n        Sortable.clone = cloneEl;\n      }\n\n      // #1143: IFrame support workaround\n      _this.cloneId = _nextTick(function () {\n        pluginEvent('clone', _this);\n        if (Sortable.eventCanceled) return;\n        if (!_this.options.removeCloneOnHide) {\n          rootEl.insertBefore(cloneEl, dragEl);\n        }\n        _this._hideClone();\n        _dispatchEvent({\n          sortable: _this,\n          name: 'clone'\n        });\n      });\n      !fallback && toggleClass(dragEl, options.dragClass, true);\n\n      // Set proper drop events\n      if (fallback) {\n        ignoreNextClick = true;\n        _this._loopId = setInterval(_this._emulateDragOver, 50);\n      } else {\n        // Undo what was set in _prepareDragStart before drag started\n        off(document, 'mouseup', _this._onDrop);\n        off(document, 'touchend', _this._onDrop);\n        off(document, 'touchcancel', _this._onDrop);\n        if (dataTransfer) {\n          dataTransfer.effectAllowed = 'move';\n          options.setData && options.setData.call(_this, dataTransfer, dragEl);\n        }\n        on(document, 'drop', _this);\n\n        // #1276 fix:\n        css(dragEl, 'transform', 'translateZ(0)');\n      }\n      awaitingDragStarted = true;\n      _this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback, evt));\n      on(document, 'selectstart', _this);\n      moved = true;\n      if (Safari) {\n        css(document.body, 'user-select', 'none');\n      }\n    },\n    // Returns true - if no further action is needed (either inserted or another condition)\n    _onDragOver: function _onDragOver( /**Event*/evt) {\n      var el = this.el,\n        target = evt.target,\n        dragRect,\n        targetRect,\n        revert,\n        options = this.options,\n        group = options.group,\n        activeSortable = Sortable.active,\n        isOwner = activeGroup === group,\n        canSort = options.sort,\n        fromSortable = putSortable || activeSortable,\n        vertical,\n        _this = this,\n        completedFired = false;\n      if (_silent) return;\n      function dragOverEvent(name, extra) {\n        pluginEvent(name, _this, _objectSpread2({\n          evt: evt,\n          isOwner: isOwner,\n          axis: vertical ? 'vertical' : 'horizontal',\n          revert: revert,\n          dragRect: dragRect,\n          targetRect: targetRect,\n          canSort: canSort,\n          fromSortable: fromSortable,\n          target: target,\n          completed: completed,\n          onMove: function onMove(target, after) {\n            return _onMove(rootEl, el, dragEl, dragRect, target, getRect(target), evt, after);\n          },\n          changed: changed\n        }, extra));\n      }\n\n      // Capture animation state\n      function capture() {\n        dragOverEvent('dragOverAnimationCapture');\n        _this.captureAnimationState();\n        if (_this !== fromSortable) {\n          fromSortable.captureAnimationState();\n        }\n      }\n\n      // Return invocation when dragEl is inserted (or completed)\n      function completed(insertion) {\n        dragOverEvent('dragOverCompleted', {\n          insertion: insertion\n        });\n        if (insertion) {\n          // Clones must be hidden before folding animation to capture dragRectAbsolute properly\n          if (isOwner) {\n            activeSortable._hideClone();\n          } else {\n            activeSortable._showClone(_this);\n          }\n          if (_this !== fromSortable) {\n            // Set ghost class to new sortable's ghost class\n            toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);\n            toggleClass(dragEl, options.ghostClass, true);\n          }\n          if (putSortable !== _this && _this !== Sortable.active) {\n            putSortable = _this;\n          } else if (_this === Sortable.active && putSortable) {\n            putSortable = null;\n          }\n\n          // Animation\n          if (fromSortable === _this) {\n            _this._ignoreWhileAnimating = target;\n          }\n          _this.animateAll(function () {\n            dragOverEvent('dragOverAnimationComplete');\n            _this._ignoreWhileAnimating = null;\n          });\n          if (_this !== fromSortable) {\n            fromSortable.animateAll();\n            fromSortable._ignoreWhileAnimating = null;\n          }\n        }\n\n        // Null lastTarget if it is not inside a previously swapped element\n        if (target === dragEl && !dragEl.animated || target === el && !target.animated) {\n          lastTarget = null;\n        }\n\n        // no bubbling and not fallback\n        if (!options.dragoverBubble && !evt.rootEl && target !== document) {\n          dragEl.parentNode[expando]._isOutsideThisEl(evt.target);\n\n          // Do not detect for empty insert if already inserted\n          !insertion && nearestEmptyInsertDetectEvent(evt);\n        }\n        !options.dragoverBubble && evt.stopPropagation && evt.stopPropagation();\n        return completedFired = true;\n      }\n\n      // Call when dragEl has been inserted\n      function changed() {\n        newIndex = index(dragEl);\n        newDraggableIndex = index(dragEl, options.draggable);\n        _dispatchEvent({\n          sortable: _this,\n          name: 'change',\n          toEl: el,\n          newIndex: newIndex,\n          newDraggableIndex: newDraggableIndex,\n          originalEvent: evt\n        });\n      }\n      if (evt.preventDefault !== void 0) {\n        evt.cancelable && evt.preventDefault();\n      }\n      target = closest(target, options.draggable, el, true);\n      dragOverEvent('dragOver');\n      if (Sortable.eventCanceled) return completedFired;\n      if (dragEl.contains(evt.target) || target.animated && target.animatingX && target.animatingY || _this._ignoreWhileAnimating === target) {\n        return completed(false);\n      }\n      ignoreNextClick = false;\n      if (activeSortable && !options.disabled && (isOwner ? canSort || (revert = parentEl !== rootEl) // Reverting item into the original list\n      : putSortable === this || (this.lastPutMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) && group.checkPut(this, activeSortable, dragEl, evt))) {\n        vertical = this._getDirection(evt, target) === 'vertical';\n        dragRect = getRect(dragEl);\n        dragOverEvent('dragOverValid');\n        if (Sortable.eventCanceled) return completedFired;\n        if (revert) {\n          parentEl = rootEl; // actualization\n          capture();\n          this._hideClone();\n          dragOverEvent('revert');\n          if (!Sortable.eventCanceled) {\n            if (nextEl) {\n              rootEl.insertBefore(dragEl, nextEl);\n            } else {\n              rootEl.appendChild(dragEl);\n            }\n          }\n          return completed(true);\n        }\n        var elLastChild = lastChild(el, options.draggable);\n        if (!elLastChild || _ghostIsLast(evt, vertical, this) && !elLastChild.animated) {\n          // Insert to end of list\n\n          // If already at end of list: Do not insert\n          if (elLastChild === dragEl) {\n            return completed(false);\n          }\n\n          // if there is a last element, it is the target\n          if (elLastChild && el === evt.target) {\n            target = elLastChild;\n          }\n          if (target) {\n            targetRect = getRect(target);\n          }\n          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {\n            capture();\n            if (elLastChild && elLastChild.nextSibling) {\n              // the last draggable element is not the last node\n              el.insertBefore(dragEl, elLastChild.nextSibling);\n            } else {\n              el.appendChild(dragEl);\n            }\n            parentEl = el; // actualization\n\n            changed();\n            return completed(true);\n          }\n        } else if (elLastChild && _ghostIsFirst(evt, vertical, this)) {\n          // Insert to start of list\n          var firstChild = getChild(el, 0, options, true);\n          if (firstChild === dragEl) {\n            return completed(false);\n          }\n          target = firstChild;\n          targetRect = getRect(target);\n          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, false) !== false) {\n            capture();\n            el.insertBefore(dragEl, firstChild);\n            parentEl = el; // actualization\n\n            changed();\n            return completed(true);\n          }\n        } else if (target.parentNode === el) {\n          targetRect = getRect(target);\n          var direction = 0,\n            targetBeforeFirstSwap,\n            differentLevel = dragEl.parentNode !== el,\n            differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical),\n            side1 = vertical ? 'top' : 'left',\n            scrolledPastTop = isScrolledPast(target, 'top', 'top') || isScrolledPast(dragEl, 'top', 'top'),\n            scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;\n          if (lastTarget !== target) {\n            targetBeforeFirstSwap = targetRect[side1];\n            pastFirstInvertThresh = false;\n            isCircumstantialInvert = !differentRowCol && options.invertSwap || differentLevel;\n          }\n          direction = _getSwapDirection(evt, target, targetRect, vertical, differentRowCol ? 1 : options.swapThreshold, options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold, isCircumstantialInvert, lastTarget === target);\n          var sibling;\n          if (direction !== 0) {\n            // Check if target is beside dragEl in respective direction (ignoring hidden elements)\n            var dragIndex = index(dragEl);\n            do {\n              dragIndex -= direction;\n              sibling = parentEl.children[dragIndex];\n            } while (sibling && (css(sibling, 'display') === 'none' || sibling === ghostEl));\n          }\n          // If dragEl is already beside target: Do not insert\n          if (direction === 0 || sibling === target) {\n            return completed(false);\n          }\n          lastTarget = target;\n          lastDirection = direction;\n          var nextSibling = target.nextElementSibling,\n            after = false;\n          after = direction === 1;\n          var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);\n          if (moveVector !== false) {\n            if (moveVector === 1 || moveVector === -1) {\n              after = moveVector === 1;\n            }\n            _silent = true;\n            setTimeout(_unsilent, 30);\n            capture();\n            if (after && !nextSibling) {\n              el.appendChild(dragEl);\n            } else {\n              target.parentNode.insertBefore(dragEl, after ? nextSibling : target);\n            }\n\n            // Undo chrome's scroll adjustment (has no effect on other browsers)\n            if (scrolledPastTop) {\n              scrollBy(scrolledPastTop, 0, scrollBefore - scrolledPastTop.scrollTop);\n            }\n            parentEl = dragEl.parentNode; // actualization\n\n            // must be done before animation\n            if (targetBeforeFirstSwap !== undefined && !isCircumstantialInvert) {\n              targetMoveDistance = Math.abs(targetBeforeFirstSwap - getRect(target)[side1]);\n            }\n            changed();\n            return completed(true);\n          }\n        }\n        if (el.contains(dragEl)) {\n          return completed(false);\n        }\n      }\n      return false;\n    },\n    _ignoreWhileAnimating: null,\n    _offMoveEvents: function _offMoveEvents() {\n      off(document, 'mousemove', this._onTouchMove);\n      off(document, 'touchmove', this._onTouchMove);\n      off(document, 'pointermove', this._onTouchMove);\n      off(document, 'dragover', nearestEmptyInsertDetectEvent);\n      off(document, 'mousemove', nearestEmptyInsertDetectEvent);\n      off(document, 'touchmove', nearestEmptyInsertDetectEvent);\n    },\n    _offUpEvents: function _offUpEvents() {\n      var ownerDocument = this.el.ownerDocument;\n      off(ownerDocument, 'mouseup', this._onDrop);\n      off(ownerDocument, 'touchend', this._onDrop);\n      off(ownerDocument, 'pointerup', this._onDrop);\n      off(ownerDocument, 'touchcancel', this._onDrop);\n      off(document, 'selectstart', this);\n    },\n    _onDrop: function _onDrop( /**Event*/evt) {\n      var el = this.el,\n        options = this.options;\n\n      // Get the index of the dragged element within its parent\n      newIndex = index(dragEl);\n      newDraggableIndex = index(dragEl, options.draggable);\n      pluginEvent('drop', this, {\n        evt: evt\n      });\n      parentEl = dragEl && dragEl.parentNode;\n\n      // Get again after plugin event\n      newIndex = index(dragEl);\n      newDraggableIndex = index(dragEl, options.draggable);\n      if (Sortable.eventCanceled) {\n        this._nulling();\n        return;\n      }\n      awaitingDragStarted = false;\n      isCircumstantialInvert = false;\n      pastFirstInvertThresh = false;\n      clearInterval(this._loopId);\n      clearTimeout(this._dragStartTimer);\n      _cancelNextTick(this.cloneId);\n      _cancelNextTick(this._dragStartId);\n\n      // Unbind events\n      if (this.nativeDraggable) {\n        off(document, 'drop', this);\n        off(el, 'dragstart', this._onDragStart);\n      }\n      this._offMoveEvents();\n      this._offUpEvents();\n      if (Safari) {\n        css(document.body, 'user-select', '');\n      }\n      css(dragEl, 'transform', '');\n      if (evt) {\n        if (moved) {\n          evt.cancelable && evt.preventDefault();\n          !options.dropBubble && evt.stopPropagation();\n        }\n        ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);\n        if (rootEl === parentEl || putSortable && putSortable.lastPutMode !== 'clone') {\n          // Remove clone(s)\n          cloneEl && cloneEl.parentNode && cloneEl.parentNode.removeChild(cloneEl);\n        }\n        if (dragEl) {\n          if (this.nativeDraggable) {\n            off(dragEl, 'dragend', this);\n          }\n          _disableDraggable(dragEl);\n          dragEl.style['will-change'] = '';\n\n          // Remove classes\n          // ghostClass is added in dragStarted\n          if (moved && !awaitingDragStarted) {\n            toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : this.options.ghostClass, false);\n          }\n          toggleClass(dragEl, this.options.chosenClass, false);\n\n          // Drag stop event\n          _dispatchEvent({\n            sortable: this,\n            name: 'unchoose',\n            toEl: parentEl,\n            newIndex: null,\n            newDraggableIndex: null,\n            originalEvent: evt\n          });\n          if (rootEl !== parentEl) {\n            if (newIndex >= 0) {\n              // Add event\n              _dispatchEvent({\n                rootEl: parentEl,\n                name: 'add',\n                toEl: parentEl,\n                fromEl: rootEl,\n                originalEvent: evt\n              });\n\n              // Remove event\n              _dispatchEvent({\n                sortable: this,\n                name: 'remove',\n                toEl: parentEl,\n                originalEvent: evt\n              });\n\n              // drag from one list and drop into another\n              _dispatchEvent({\n                rootEl: parentEl,\n                name: 'sort',\n                toEl: parentEl,\n                fromEl: rootEl,\n                originalEvent: evt\n              });\n              _dispatchEvent({\n                sortable: this,\n                name: 'sort',\n                toEl: parentEl,\n                originalEvent: evt\n              });\n            }\n            putSortable && putSortable.save();\n          } else {\n            if (newIndex !== oldIndex) {\n              if (newIndex >= 0) {\n                // drag & drop within the same list\n                _dispatchEvent({\n                  sortable: this,\n                  name: 'update',\n                  toEl: parentEl,\n                  originalEvent: evt\n                });\n                _dispatchEvent({\n                  sortable: this,\n                  name: 'sort',\n                  toEl: parentEl,\n                  originalEvent: evt\n                });\n              }\n            }\n          }\n          if (Sortable.active) {\n            /* jshint eqnull:true */\n            if (newIndex == null || newIndex === -1) {\n              newIndex = oldIndex;\n              newDraggableIndex = oldDraggableIndex;\n            }\n            _dispatchEvent({\n              sortable: this,\n              name: 'end',\n              toEl: parentEl,\n              originalEvent: evt\n            });\n\n            // Save sorting\n            this.save();\n          }\n        }\n      }\n      this._nulling();\n    },\n    _nulling: function _nulling() {\n      pluginEvent('nulling', this);\n      rootEl = dragEl = parentEl = ghostEl = nextEl = cloneEl = lastDownEl = cloneHidden = tapEvt = touchEvt = moved = newIndex = newDraggableIndex = oldIndex = oldDraggableIndex = lastTarget = lastDirection = putSortable = activeGroup = Sortable.dragged = Sortable.ghost = Sortable.clone = Sortable.active = null;\n      savedInputChecked.forEach(function (el) {\n        el.checked = true;\n      });\n      savedInputChecked.length = lastDx = lastDy = 0;\n    },\n    handleEvent: function handleEvent( /**Event*/evt) {\n      switch (evt.type) {\n        case 'drop':\n        case 'dragend':\n          this._onDrop(evt);\n          break;\n        case 'dragenter':\n        case 'dragover':\n          if (dragEl) {\n            this._onDragOver(evt);\n            _globalDragOver(evt);\n          }\n          break;\n        case 'selectstart':\n          evt.preventDefault();\n          break;\n      }\n    },\n    /**\r\n     * Serializes the item into an array of string.\r\n     * @returns {String[]}\r\n     */\n    toArray: function toArray() {\n      var order = [],\n        el,\n        children = this.el.children,\n        i = 0,\n        n = children.length,\n        options = this.options;\n      for (; i < n; i++) {\n        el = children[i];\n        if (closest(el, options.draggable, this.el, false)) {\n          order.push(el.getAttribute(options.dataIdAttr) || _generateId(el));\n        }\n      }\n      return order;\n    },\n    /**\r\n     * Sorts the elements according to the array.\r\n     * @param  {String[]}  order  order of the items\r\n     */\n    sort: function sort(order, useAnimation) {\n      var items = {},\n        rootEl = this.el;\n      this.toArray().forEach(function (id, i) {\n        var el = rootEl.children[i];\n        if (closest(el, this.options.draggable, rootEl, false)) {\n          items[id] = el;\n        }\n      }, this);\n      useAnimation && this.captureAnimationState();\n      order.forEach(function (id) {\n        if (items[id]) {\n          rootEl.removeChild(items[id]);\n          rootEl.appendChild(items[id]);\n        }\n      });\n      useAnimation && this.animateAll();\n    },\n    /**\r\n     * Save the current sorting\r\n     */\n    save: function save() {\n      var store = this.options.store;\n      store && store.set && store.set(this);\n    },\n    /**\r\n     * For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.\r\n     * @param   {HTMLElement}  el\r\n     * @param   {String}       [selector]  default: `options.draggable`\r\n     * @returns {HTMLElement|null}\r\n     */\n    closest: function closest$1(el, selector) {\n      return closest(el, selector || this.options.draggable, this.el, false);\n    },\n    /**\r\n     * Set/get option\r\n     * @param   {string} name\r\n     * @param   {*}      [value]\r\n     * @returns {*}\r\n     */\n    option: function option(name, value) {\n      var options = this.options;\n      if (value === void 0) {\n        return options[name];\n      } else {\n        var modifiedValue = PluginManager.modifyOption(this, name, value);\n        if (typeof modifiedValue !== 'undefined') {\n          options[name] = modifiedValue;\n        } else {\n          options[name] = value;\n        }\n        if (name === 'group') {\n          _prepareGroup(options);\n        }\n      }\n    },\n    /**\r\n     * Destroy\r\n     */\n    destroy: function destroy() {\n      pluginEvent('destroy', this);\n      var el = this.el;\n      el[expando] = null;\n      off(el, 'mousedown', this._onTapStart);\n      off(el, 'touchstart', this._onTapStart);\n      off(el, 'pointerdown', this._onTapStart);\n      if (this.nativeDraggable) {\n        off(el, 'dragover', this);\n        off(el, 'dragenter', this);\n      }\n      // Remove draggable attributes\n      Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {\n        el.removeAttribute('draggable');\n      });\n      this._onDrop();\n      this._disableDelayedDragEvents();\n      sortables.splice(sortables.indexOf(this.el), 1);\n      this.el = el = null;\n    },\n    _hideClone: function _hideClone() {\n      if (!cloneHidden) {\n        pluginEvent('hideClone', this);\n        if (Sortable.eventCanceled) return;\n        css(cloneEl, 'display', 'none');\n        if (this.options.removeCloneOnHide && cloneEl.parentNode) {\n          cloneEl.parentNode.removeChild(cloneEl);\n        }\n        cloneHidden = true;\n      }\n    },\n    _showClone: function _showClone(putSortable) {\n      if (putSortable.lastPutMode !== 'clone') {\n        this._hideClone();\n        return;\n      }\n      if (cloneHidden) {\n        pluginEvent('showClone', this);\n        if (Sortable.eventCanceled) return;\n\n        // show clone at dragEl or original position\n        if (dragEl.parentNode == rootEl && !this.options.group.revertClone) {\n          rootEl.insertBefore(cloneEl, dragEl);\n        } else if (nextEl) {\n          rootEl.insertBefore(cloneEl, nextEl);\n        } else {\n          rootEl.appendChild(cloneEl);\n        }\n        if (this.options.group.revertClone) {\n          this.animate(dragEl, cloneEl);\n        }\n        css(cloneEl, 'display', '');\n        cloneHidden = false;\n      }\n    }\n  };\n  function _globalDragOver( /**Event*/evt) {\n    if (evt.dataTransfer) {\n      evt.dataTransfer.dropEffect = 'move';\n    }\n    evt.cancelable && evt.preventDefault();\n  }\n  function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvent, willInsertAfter) {\n    var evt,\n      sortable = fromEl[expando],\n      onMoveFn = sortable.options.onMove,\n      retVal;\n    // Support for new CustomEvent feature\n    if (window.CustomEvent && !IE11OrLess && !Edge) {\n      evt = new CustomEvent('move', {\n        bubbles: true,\n        cancelable: true\n      });\n    } else {\n      evt = document.createEvent('Event');\n      evt.initEvent('move', true, true);\n    }\n    evt.to = toEl;\n    evt.from = fromEl;\n    evt.dragged = dragEl;\n    evt.draggedRect = dragRect;\n    evt.related = targetEl || toEl;\n    evt.relatedRect = targetRect || getRect(toEl);\n    evt.willInsertAfter = willInsertAfter;\n    evt.originalEvent = originalEvent;\n    fromEl.dispatchEvent(evt);\n    if (onMoveFn) {\n      retVal = onMoveFn.call(sortable, evt, originalEvent);\n    }\n    return retVal;\n  }\n  function _disableDraggable(el) {\n    el.draggable = false;\n  }\n  function _unsilent() {\n    _silent = false;\n  }\n  function _ghostIsFirst(evt, vertical, sortable) {\n    var firstElRect = getRect(getChild(sortable.el, 0, sortable.options, true));\n    var childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);\n    var spacer = 10;\n    return vertical ? evt.clientX < childContainingRect.left - spacer || evt.clientY < firstElRect.top && evt.clientX < firstElRect.right : evt.clientY < childContainingRect.top - spacer || evt.clientY < firstElRect.bottom && evt.clientX < firstElRect.left;\n  }\n  function _ghostIsLast(evt, vertical, sortable) {\n    var lastElRect = getRect(lastChild(sortable.el, sortable.options.draggable));\n    var childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);\n    var spacer = 10;\n    return vertical ? evt.clientX > childContainingRect.right + spacer || evt.clientY > lastElRect.bottom && evt.clientX > lastElRect.left : evt.clientY > childContainingRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top;\n  }\n  function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {\n    var mouseOnAxis = vertical ? evt.clientY : evt.clientX,\n      targetLength = vertical ? targetRect.height : targetRect.width,\n      targetS1 = vertical ? targetRect.top : targetRect.left,\n      targetS2 = vertical ? targetRect.bottom : targetRect.right,\n      invert = false;\n    if (!invertSwap) {\n      // Never invert or create dragEl shadow when target movemenet causes mouse to move past the end of regular swapThreshold\n      if (isLastTarget && targetMoveDistance < targetLength * swapThreshold) {\n        // multiplied only by swapThreshold because mouse will already be inside target by (1 - threshold) * targetLength / 2\n        // check if past first invert threshold on side opposite of lastDirection\n        if (!pastFirstInvertThresh && (lastDirection === 1 ? mouseOnAxis > targetS1 + targetLength * invertedSwapThreshold / 2 : mouseOnAxis < targetS2 - targetLength * invertedSwapThreshold / 2)) {\n          // past first invert threshold, do not restrict inverted threshold to dragEl shadow\n          pastFirstInvertThresh = true;\n        }\n        if (!pastFirstInvertThresh) {\n          // dragEl shadow (target move distance shadow)\n          if (lastDirection === 1 ? mouseOnAxis < targetS1 + targetMoveDistance // over dragEl shadow\n          : mouseOnAxis > targetS2 - targetMoveDistance) {\n            return -lastDirection;\n          }\n        } else {\n          invert = true;\n        }\n      } else {\n        // Regular\n        if (mouseOnAxis > targetS1 + targetLength * (1 - swapThreshold) / 2 && mouseOnAxis < targetS2 - targetLength * (1 - swapThreshold) / 2) {\n          return _getInsertDirection(target);\n        }\n      }\n    }\n    invert = invert || invertSwap;\n    if (invert) {\n      // Invert of regular\n      if (mouseOnAxis < targetS1 + targetLength * invertedSwapThreshold / 2 || mouseOnAxis > targetS2 - targetLength * invertedSwapThreshold / 2) {\n        return mouseOnAxis > targetS1 + targetLength / 2 ? 1 : -1;\n      }\n    }\n    return 0;\n  }\n\n  /**\r\n   * Gets the direction dragEl must be swapped relative to target in order to make it\r\n   * seem that dragEl has been \"inserted\" into that element's position\r\n   * @param  {HTMLElement} target       The target whose position dragEl is being inserted at\r\n   * @return {Number}                   Direction dragEl must be swapped\r\n   */\n  function _getInsertDirection(target) {\n    if (index(dragEl) < index(target)) {\n      return 1;\n    } else {\n      return -1;\n    }\n  }\n\n  /**\r\n   * Generate id\r\n   * @param   {HTMLElement} el\r\n   * @returns {String}\r\n   * @private\r\n   */\n  function _generateId(el) {\n    var str = el.tagName + el.className + el.src + el.href + el.textContent,\n      i = str.length,\n      sum = 0;\n    while (i--) {\n      sum += str.charCodeAt(i);\n    }\n    return sum.toString(36);\n  }\n  function _saveInputCheckedState(root) {\n    savedInputChecked.length = 0;\n    var inputs = root.getElementsByTagName('input');\n    var idx = inputs.length;\n    while (idx--) {\n      var el = inputs[idx];\n      el.checked && savedInputChecked.push(el);\n    }\n  }\n  function _nextTick(fn) {\n    return setTimeout(fn, 0);\n  }\n  function _cancelNextTick(id) {\n    return clearTimeout(id);\n  }\n\n  // Fixed #973:\n  if (documentExists) {\n    on(document, 'touchmove', function (evt) {\n      if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {\n        evt.preventDefault();\n      }\n    });\n  }\n\n  // Export utils\n  Sortable.utils = {\n    on: on,\n    off: off,\n    css: css,\n    find: find,\n    is: function is(el, selector) {\n      return !!closest(el, selector, el, false);\n    },\n    extend: extend,\n    throttle: throttle,\n    closest: closest,\n    toggleClass: toggleClass,\n    clone: clone,\n    index: index,\n    nextTick: _nextTick,\n    cancelNextTick: _cancelNextTick,\n    detectDirection: _detectDirection,\n    getChild: getChild\n  };\n\n  /**\r\n   * Get the Sortable instance of an element\r\n   * @param  {HTMLElement} element The element\r\n   * @return {Sortable|undefined}         The instance of Sortable\r\n   */\n  Sortable.get = function (element) {\n    return element[expando];\n  };\n\n  /**\r\n   * Mount a plugin to Sortable\r\n   * @param  {...SortablePlugin|SortablePlugin[]} plugins       Plugins being mounted\r\n   */\n  Sortable.mount = function () {\n    for (var _len = arguments.length, plugins = new Array(_len), _key = 0; _key < _len; _key++) {\n      plugins[_key] = arguments[_key];\n    }\n    if (plugins[0].constructor === Array) plugins = plugins[0];\n    plugins.forEach(function (plugin) {\n      if (!plugin.prototype || !plugin.prototype.constructor) {\n        throw \"Sortable: Mounted plugin must be a constructor function, not \".concat({}.toString.call(plugin));\n      }\n      if (plugin.utils) Sortable.utils = _objectSpread2(_objectSpread2({}, Sortable.utils), plugin.utils);\n      PluginManager.mount(plugin);\n    });\n  };\n\n  /**\r\n   * Create sortable instance\r\n   * @param {HTMLElement}  el\r\n   * @param {Object}      [options]\r\n   */\n  Sortable.create = function (el, options) {\n    return new Sortable(el, options);\n  };\n\n  // Export\n  Sortable.version = version;\n\n  var autoScrolls = [],\n    scrollEl,\n    scrollRootEl,\n    scrolling = false,\n    lastAutoScrollX,\n    lastAutoScrollY,\n    touchEvt$1,\n    pointerElemChangedInterval;\n  function AutoScrollPlugin() {\n    function AutoScroll() {\n      this.defaults = {\n        scroll: true,\n        forceAutoScrollFallback: false,\n        scrollSensitivity: 30,\n        scrollSpeed: 10,\n        bubbleScroll: true\n      };\n\n      // Bind all private methods\n      for (var fn in this) {\n        if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {\n          this[fn] = this[fn].bind(this);\n        }\n      }\n    }\n    AutoScroll.prototype = {\n      dragStarted: function dragStarted(_ref) {\n        var originalEvent = _ref.originalEvent;\n        if (this.sortable.nativeDraggable) {\n          on(document, 'dragover', this._handleAutoScroll);\n        } else {\n          if (this.options.supportPointer) {\n            on(document, 'pointermove', this._handleFallbackAutoScroll);\n          } else if (originalEvent.touches) {\n            on(document, 'touchmove', this._handleFallbackAutoScroll);\n          } else {\n            on(document, 'mousemove', this._handleFallbackAutoScroll);\n          }\n        }\n      },\n      dragOverCompleted: function dragOverCompleted(_ref2) {\n        var originalEvent = _ref2.originalEvent;\n        // For when bubbling is canceled and using fallback (fallback 'touchmove' always reached)\n        if (!this.options.dragOverBubble && !originalEvent.rootEl) {\n          this._handleAutoScroll(originalEvent);\n        }\n      },\n      drop: function drop() {\n        if (this.sortable.nativeDraggable) {\n          off(document, 'dragover', this._handleAutoScroll);\n        } else {\n          off(document, 'pointermove', this._handleFallbackAutoScroll);\n          off(document, 'touchmove', this._handleFallbackAutoScroll);\n          off(document, 'mousemove', this._handleFallbackAutoScroll);\n        }\n        clearPointerElemChangedInterval();\n        clearAutoScrolls();\n        cancelThrottle();\n      },\n      nulling: function nulling() {\n        touchEvt$1 = scrollRootEl = scrollEl = scrolling = pointerElemChangedInterval = lastAutoScrollX = lastAutoScrollY = null;\n        autoScrolls.length = 0;\n      },\n      _handleFallbackAutoScroll: function _handleFallbackAutoScroll(evt) {\n        this._handleAutoScroll(evt, true);\n      },\n      _handleAutoScroll: function _handleAutoScroll(evt, fallback) {\n        var _this = this;\n        var x = (evt.touches ? evt.touches[0] : evt).clientX,\n          y = (evt.touches ? evt.touches[0] : evt).clientY,\n          elem = document.elementFromPoint(x, y);\n        touchEvt$1 = evt;\n\n        // IE does not seem to have native autoscroll,\n        // Edge's autoscroll seems too conditional,\n        // MACOS Safari does not have autoscroll,\n        // Firefox and Chrome are good\n        if (fallback || this.options.forceAutoScrollFallback || Edge || IE11OrLess || Safari) {\n          autoScroll(evt, this.options, elem, fallback);\n\n          // Listener for pointer element change\n          var ogElemScroller = getParentAutoScrollElement(elem, true);\n          if (scrolling && (!pointerElemChangedInterval || x !== lastAutoScrollX || y !== lastAutoScrollY)) {\n            pointerElemChangedInterval && clearPointerElemChangedInterval();\n            // Detect for pointer elem change, emulating native DnD behaviour\n            pointerElemChangedInterval = setInterval(function () {\n              var newElem = getParentAutoScrollElement(document.elementFromPoint(x, y), true);\n              if (newElem !== ogElemScroller) {\n                ogElemScroller = newElem;\n                clearAutoScrolls();\n              }\n              autoScroll(evt, _this.options, newElem, fallback);\n            }, 10);\n            lastAutoScrollX = x;\n            lastAutoScrollY = y;\n          }\n        } else {\n          // if DnD is enabled (and browser has good autoscrolling), first autoscroll will already scroll, so get parent autoscroll of first autoscroll\n          if (!this.options.bubbleScroll || getParentAutoScrollElement(elem, true) === getWindowScrollingElement()) {\n            clearAutoScrolls();\n            return;\n          }\n          autoScroll(evt, this.options, getParentAutoScrollElement(elem, false), false);\n        }\n      }\n    };\n    return _extends(AutoScroll, {\n      pluginName: 'scroll',\n      initializeByDefault: true\n    });\n  }\n  function clearAutoScrolls() {\n    autoScrolls.forEach(function (autoScroll) {\n      clearInterval(autoScroll.pid);\n    });\n    autoScrolls = [];\n  }\n  function clearPointerElemChangedInterval() {\n    clearInterval(pointerElemChangedInterval);\n  }\n  var autoScroll = throttle(function (evt, options, rootEl, isFallback) {\n    // Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521\n    if (!options.scroll) return;\n    var x = (evt.touches ? evt.touches[0] : evt).clientX,\n      y = (evt.touches ? evt.touches[0] : evt).clientY,\n      sens = options.scrollSensitivity,\n      speed = options.scrollSpeed,\n      winScroller = getWindowScrollingElement();\n    var scrollThisInstance = false,\n      scrollCustomFn;\n\n    // New scroll root, set scrollEl\n    if (scrollRootEl !== rootEl) {\n      scrollRootEl = rootEl;\n      clearAutoScrolls();\n      scrollEl = options.scroll;\n      scrollCustomFn = options.scrollFn;\n      if (scrollEl === true) {\n        scrollEl = getParentAutoScrollElement(rootEl, true);\n      }\n    }\n    var layersOut = 0;\n    var currentParent = scrollEl;\n    do {\n      var el = currentParent,\n        rect = getRect(el),\n        top = rect.top,\n        bottom = rect.bottom,\n        left = rect.left,\n        right = rect.right,\n        width = rect.width,\n        height = rect.height,\n        canScrollX = void 0,\n        canScrollY = void 0,\n        scrollWidth = el.scrollWidth,\n        scrollHeight = el.scrollHeight,\n        elCSS = css(el),\n        scrollPosX = el.scrollLeft,\n        scrollPosY = el.scrollTop;\n      if (el === winScroller) {\n        canScrollX = width < scrollWidth && (elCSS.overflowX === 'auto' || elCSS.overflowX === 'scroll' || elCSS.overflowX === 'visible');\n        canScrollY = height < scrollHeight && (elCSS.overflowY === 'auto' || elCSS.overflowY === 'scroll' || elCSS.overflowY === 'visible');\n      } else {\n        canScrollX = width < scrollWidth && (elCSS.overflowX === 'auto' || elCSS.overflowX === 'scroll');\n        canScrollY = height < scrollHeight && (elCSS.overflowY === 'auto' || elCSS.overflowY === 'scroll');\n      }\n      var vx = canScrollX && (Math.abs(right - x) <= sens && scrollPosX + width < scrollWidth) - (Math.abs(left - x) <= sens && !!scrollPosX);\n      var vy = canScrollY && (Math.abs(bottom - y) <= sens && scrollPosY + height < scrollHeight) - (Math.abs(top - y) <= sens && !!scrollPosY);\n      if (!autoScrolls[layersOut]) {\n        for (var i = 0; i <= layersOut; i++) {\n          if (!autoScrolls[i]) {\n            autoScrolls[i] = {};\n          }\n        }\n      }\n      if (autoScrolls[layersOut].vx != vx || autoScrolls[layersOut].vy != vy || autoScrolls[layersOut].el !== el) {\n        autoScrolls[layersOut].el = el;\n        autoScrolls[layersOut].vx = vx;\n        autoScrolls[layersOut].vy = vy;\n        clearInterval(autoScrolls[layersOut].pid);\n        if (vx != 0 || vy != 0) {\n          scrollThisInstance = true;\n          /* jshint loopfunc:true */\n          autoScrolls[layersOut].pid = setInterval(function () {\n            // emulate drag over during autoscroll (fallback), emulating native DnD behaviour\n            if (isFallback && this.layer === 0) {\n              Sortable.active._onTouchMove(touchEvt$1); // To move ghost if it is positioned absolutely\n            }\n            var scrollOffsetY = autoScrolls[this.layer].vy ? autoScrolls[this.layer].vy * speed : 0;\n            var scrollOffsetX = autoScrolls[this.layer].vx ? autoScrolls[this.layer].vx * speed : 0;\n            if (typeof scrollCustomFn === 'function') {\n              if (scrollCustomFn.call(Sortable.dragged.parentNode[expando], scrollOffsetX, scrollOffsetY, evt, touchEvt$1, autoScrolls[this.layer].el) !== 'continue') {\n                return;\n              }\n            }\n            scrollBy(autoScrolls[this.layer].el, scrollOffsetX, scrollOffsetY);\n          }.bind({\n            layer: layersOut\n          }), 24);\n        }\n      }\n      layersOut++;\n    } while (options.bubbleScroll && currentParent !== winScroller && (currentParent = getParentAutoScrollElement(currentParent, false)));\n    scrolling = scrollThisInstance; // in case another function catches scrolling as false in between when it is not\n  }, 30);\n\n  var drop = function drop(_ref) {\n    var originalEvent = _ref.originalEvent,\n      putSortable = _ref.putSortable,\n      dragEl = _ref.dragEl,\n      activeSortable = _ref.activeSortable,\n      dispatchSortableEvent = _ref.dispatchSortableEvent,\n      hideGhostForTarget = _ref.hideGhostForTarget,\n      unhideGhostForTarget = _ref.unhideGhostForTarget;\n    if (!originalEvent) return;\n    var toSortable = putSortable || activeSortable;\n    hideGhostForTarget();\n    var touch = originalEvent.changedTouches && originalEvent.changedTouches.length ? originalEvent.changedTouches[0] : originalEvent;\n    var target = document.elementFromPoint(touch.clientX, touch.clientY);\n    unhideGhostForTarget();\n    if (toSortable && !toSortable.el.contains(target)) {\n      dispatchSortableEvent('spill');\n      this.onSpill({\n        dragEl: dragEl,\n        putSortable: putSortable\n      });\n    }\n  };\n  function Revert() {}\n  Revert.prototype = {\n    startIndex: null,\n    dragStart: function dragStart(_ref2) {\n      var oldDraggableIndex = _ref2.oldDraggableIndex;\n      this.startIndex = oldDraggableIndex;\n    },\n    onSpill: function onSpill(_ref3) {\n      var dragEl = _ref3.dragEl,\n        putSortable = _ref3.putSortable;\n      this.sortable.captureAnimationState();\n      if (putSortable) {\n        putSortable.captureAnimationState();\n      }\n      var nextSibling = getChild(this.sortable.el, this.startIndex, this.options);\n      if (nextSibling) {\n        this.sortable.el.insertBefore(dragEl, nextSibling);\n      } else {\n        this.sortable.el.appendChild(dragEl);\n      }\n      this.sortable.animateAll();\n      if (putSortable) {\n        putSortable.animateAll();\n      }\n    },\n    drop: drop\n  };\n  _extends(Revert, {\n    pluginName: 'revertOnSpill'\n  });\n  function Remove() {}\n  Remove.prototype = {\n    onSpill: function onSpill(_ref4) {\n      var dragEl = _ref4.dragEl,\n        putSortable = _ref4.putSortable;\n      var parentSortable = putSortable || this.sortable;\n      parentSortable.captureAnimationState();\n      dragEl.parentNode && dragEl.parentNode.removeChild(dragEl);\n      parentSortable.animateAll();\n    },\n    drop: drop\n  };\n  _extends(Remove, {\n    pluginName: 'removeOnSpill'\n  });\n\n  var lastSwapEl;\n  function SwapPlugin() {\n    function Swap() {\n      this.defaults = {\n        swapClass: 'sortable-swap-highlight'\n      };\n    }\n    Swap.prototype = {\n      dragStart: function dragStart(_ref) {\n        var dragEl = _ref.dragEl;\n        lastSwapEl = dragEl;\n      },\n      dragOverValid: function dragOverValid(_ref2) {\n        var completed = _ref2.completed,\n          target = _ref2.target,\n          onMove = _ref2.onMove,\n          activeSortable = _ref2.activeSortable,\n          changed = _ref2.changed,\n          cancel = _ref2.cancel;\n        if (!activeSortable.options.swap) return;\n        var el = this.sortable.el,\n          options = this.options;\n        if (target && target !== el) {\n          var prevSwapEl = lastSwapEl;\n          if (onMove(target) !== false) {\n            toggleClass(target, options.swapClass, true);\n            lastSwapEl = target;\n          } else {\n            lastSwapEl = null;\n          }\n          if (prevSwapEl && prevSwapEl !== lastSwapEl) {\n            toggleClass(prevSwapEl, options.swapClass, false);\n          }\n        }\n        changed();\n        completed(true);\n        cancel();\n      },\n      drop: function drop(_ref3) {\n        var activeSortable = _ref3.activeSortable,\n          putSortable = _ref3.putSortable,\n          dragEl = _ref3.dragEl;\n        var toSortable = putSortable || this.sortable;\n        var options = this.options;\n        lastSwapEl && toggleClass(lastSwapEl, options.swapClass, false);\n        if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {\n          if (dragEl !== lastSwapEl) {\n            toSortable.captureAnimationState();\n            if (toSortable !== activeSortable) activeSortable.captureAnimationState();\n            swapNodes(dragEl, lastSwapEl);\n            toSortable.animateAll();\n            if (toSortable !== activeSortable) activeSortable.animateAll();\n          }\n        }\n      },\n      nulling: function nulling() {\n        lastSwapEl = null;\n      }\n    };\n    return _extends(Swap, {\n      pluginName: 'swap',\n      eventProperties: function eventProperties() {\n        return {\n          swapItem: lastSwapEl\n        };\n      }\n    });\n  }\n  function swapNodes(n1, n2) {\n    var p1 = n1.parentNode,\n      p2 = n2.parentNode,\n      i1,\n      i2;\n    if (!p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1)) return;\n    i1 = index(n1);\n    i2 = index(n2);\n    if (p1.isEqualNode(p2) && i1 < i2) {\n      i2++;\n    }\n    p1.insertBefore(n2, p1.children[i1]);\n    p2.insertBefore(n1, p2.children[i2]);\n  }\n\n  var multiDragElements = [],\n    multiDragClones = [],\n    lastMultiDragSelect,\n    // for selection with modifier key down (SHIFT)\n    multiDragSortable,\n    initialFolding = false,\n    // Initial multi-drag fold when drag started\n    folding = false,\n    // Folding any other time\n    dragStarted = false,\n    dragEl$1,\n    clonesFromRect,\n    clonesHidden;\n  function MultiDragPlugin() {\n    function MultiDrag(sortable) {\n      // Bind all private methods\n      for (var fn in this) {\n        if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {\n          this[fn] = this[fn].bind(this);\n        }\n      }\n      if (!sortable.options.avoidImplicitDeselect) {\n        if (sortable.options.supportPointer) {\n          on(document, 'pointerup', this._deselectMultiDrag);\n        } else {\n          on(document, 'mouseup', this._deselectMultiDrag);\n          on(document, 'touchend', this._deselectMultiDrag);\n        }\n      }\n      on(document, 'keydown', this._checkKeyDown);\n      on(document, 'keyup', this._checkKeyUp);\n      this.defaults = {\n        selectedClass: 'sortable-selected',\n        multiDragKey: null,\n        avoidImplicitDeselect: false,\n        setData: function setData(dataTransfer, dragEl) {\n          var data = '';\n          if (multiDragElements.length && multiDragSortable === sortable) {\n            multiDragElements.forEach(function (multiDragElement, i) {\n              data += (!i ? '' : ', ') + multiDragElement.textContent;\n            });\n          } else {\n            data = dragEl.textContent;\n          }\n          dataTransfer.setData('Text', data);\n        }\n      };\n    }\n    MultiDrag.prototype = {\n      multiDragKeyDown: false,\n      isMultiDrag: false,\n      delayStartGlobal: function delayStartGlobal(_ref) {\n        var dragged = _ref.dragEl;\n        dragEl$1 = dragged;\n      },\n      delayEnded: function delayEnded() {\n        this.isMultiDrag = ~multiDragElements.indexOf(dragEl$1);\n      },\n      setupClone: function setupClone(_ref2) {\n        var sortable = _ref2.sortable,\n          cancel = _ref2.cancel;\n        if (!this.isMultiDrag) return;\n        for (var i = 0; i < multiDragElements.length; i++) {\n          multiDragClones.push(clone(multiDragElements[i]));\n          multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;\n          multiDragClones[i].draggable = false;\n          multiDragClones[i].style['will-change'] = '';\n          toggleClass(multiDragClones[i], this.options.selectedClass, false);\n          multiDragElements[i] === dragEl$1 && toggleClass(multiDragClones[i], this.options.chosenClass, false);\n        }\n        sortable._hideClone();\n        cancel();\n      },\n      clone: function clone(_ref3) {\n        var sortable = _ref3.sortable,\n          rootEl = _ref3.rootEl,\n          dispatchSortableEvent = _ref3.dispatchSortableEvent,\n          cancel = _ref3.cancel;\n        if (!this.isMultiDrag) return;\n        if (!this.options.removeCloneOnHide) {\n          if (multiDragElements.length && multiDragSortable === sortable) {\n            insertMultiDragClones(true, rootEl);\n            dispatchSortableEvent('clone');\n            cancel();\n          }\n        }\n      },\n      showClone: function showClone(_ref4) {\n        var cloneNowShown = _ref4.cloneNowShown,\n          rootEl = _ref4.rootEl,\n          cancel = _ref4.cancel;\n        if (!this.isMultiDrag) return;\n        insertMultiDragClones(false, rootEl);\n        multiDragClones.forEach(function (clone) {\n          css(clone, 'display', '');\n        });\n        cloneNowShown();\n        clonesHidden = false;\n        cancel();\n      },\n      hideClone: function hideClone(_ref5) {\n        var _this = this;\n        var sortable = _ref5.sortable,\n          cloneNowHidden = _ref5.cloneNowHidden,\n          cancel = _ref5.cancel;\n        if (!this.isMultiDrag) return;\n        multiDragClones.forEach(function (clone) {\n          css(clone, 'display', 'none');\n          if (_this.options.removeCloneOnHide && clone.parentNode) {\n            clone.parentNode.removeChild(clone);\n          }\n        });\n        cloneNowHidden();\n        clonesHidden = true;\n        cancel();\n      },\n      dragStartGlobal: function dragStartGlobal(_ref6) {\n        var sortable = _ref6.sortable;\n        if (!this.isMultiDrag && multiDragSortable) {\n          multiDragSortable.multiDrag._deselectMultiDrag();\n        }\n        multiDragElements.forEach(function (multiDragElement) {\n          multiDragElement.sortableIndex = index(multiDragElement);\n        });\n\n        // Sort multi-drag elements\n        multiDragElements = multiDragElements.sort(function (a, b) {\n          return a.sortableIndex - b.sortableIndex;\n        });\n        dragStarted = true;\n      },\n      dragStarted: function dragStarted(_ref7) {\n        var _this2 = this;\n        var sortable = _ref7.sortable;\n        if (!this.isMultiDrag) return;\n        if (this.options.sort) {\n          // Capture rects,\n          // hide multi drag elements (by positioning them absolute),\n          // set multi drag elements rects to dragRect,\n          // show multi drag elements,\n          // animate to rects,\n          // unset rects & remove from DOM\n\n          sortable.captureAnimationState();\n          if (this.options.animation) {\n            multiDragElements.forEach(function (multiDragElement) {\n              if (multiDragElement === dragEl$1) return;\n              css(multiDragElement, 'position', 'absolute');\n            });\n            var dragRect = getRect(dragEl$1, false, true, true);\n            multiDragElements.forEach(function (multiDragElement) {\n              if (multiDragElement === dragEl$1) return;\n              setRect(multiDragElement, dragRect);\n            });\n            folding = true;\n            initialFolding = true;\n          }\n        }\n        sortable.animateAll(function () {\n          folding = false;\n          initialFolding = false;\n          if (_this2.options.animation) {\n            multiDragElements.forEach(function (multiDragElement) {\n              unsetRect(multiDragElement);\n            });\n          }\n\n          // Remove all auxiliary multidrag items from el, if sorting enabled\n          if (_this2.options.sort) {\n            removeMultiDragElements();\n          }\n        });\n      },\n      dragOver: function dragOver(_ref8) {\n        var target = _ref8.target,\n          completed = _ref8.completed,\n          cancel = _ref8.cancel;\n        if (folding && ~multiDragElements.indexOf(target)) {\n          completed(false);\n          cancel();\n        }\n      },\n      revert: function revert(_ref9) {\n        var fromSortable = _ref9.fromSortable,\n          rootEl = _ref9.rootEl,\n          sortable = _ref9.sortable,\n          dragRect = _ref9.dragRect;\n        if (multiDragElements.length > 1) {\n          // Setup unfold animation\n          multiDragElements.forEach(function (multiDragElement) {\n            sortable.addAnimationState({\n              target: multiDragElement,\n              rect: folding ? getRect(multiDragElement) : dragRect\n            });\n            unsetRect(multiDragElement);\n            multiDragElement.fromRect = dragRect;\n            fromSortable.removeAnimationState(multiDragElement);\n          });\n          folding = false;\n          insertMultiDragElements(!this.options.removeCloneOnHide, rootEl);\n        }\n      },\n      dragOverCompleted: function dragOverCompleted(_ref10) {\n        var sortable = _ref10.sortable,\n          isOwner = _ref10.isOwner,\n          insertion = _ref10.insertion,\n          activeSortable = _ref10.activeSortable,\n          parentEl = _ref10.parentEl,\n          putSortable = _ref10.putSortable;\n        var options = this.options;\n        if (insertion) {\n          // Clones must be hidden before folding animation to capture dragRectAbsolute properly\n          if (isOwner) {\n            activeSortable._hideClone();\n          }\n          initialFolding = false;\n          // If leaving sort:false root, or already folding - Fold to new location\n          if (options.animation && multiDragElements.length > 1 && (folding || !isOwner && !activeSortable.options.sort && !putSortable)) {\n            // Fold: Set all multi drag elements's rects to dragEl's rect when multi-drag elements are invisible\n            var dragRectAbsolute = getRect(dragEl$1, false, true, true);\n            multiDragElements.forEach(function (multiDragElement) {\n              if (multiDragElement === dragEl$1) return;\n              setRect(multiDragElement, dragRectAbsolute);\n\n              // Move element(s) to end of parentEl so that it does not interfere with multi-drag clones insertion if they are inserted\n              // while folding, and so that we can capture them again because old sortable will no longer be fromSortable\n              parentEl.appendChild(multiDragElement);\n            });\n            folding = true;\n          }\n\n          // Clones must be shown (and check to remove multi drags) after folding when interfering multiDragElements are moved out\n          if (!isOwner) {\n            // Only remove if not folding (folding will remove them anyways)\n            if (!folding) {\n              removeMultiDragElements();\n            }\n            if (multiDragElements.length > 1) {\n              var clonesHiddenBefore = clonesHidden;\n              activeSortable._showClone(sortable);\n\n              // Unfold animation for clones if showing from hidden\n              if (activeSortable.options.animation && !clonesHidden && clonesHiddenBefore) {\n                multiDragClones.forEach(function (clone) {\n                  activeSortable.addAnimationState({\n                    target: clone,\n                    rect: clonesFromRect\n                  });\n                  clone.fromRect = clonesFromRect;\n                  clone.thisAnimationDuration = null;\n                });\n              }\n            } else {\n              activeSortable._showClone(sortable);\n            }\n          }\n        }\n      },\n      dragOverAnimationCapture: function dragOverAnimationCapture(_ref11) {\n        var dragRect = _ref11.dragRect,\n          isOwner = _ref11.isOwner,\n          activeSortable = _ref11.activeSortable;\n        multiDragElements.forEach(function (multiDragElement) {\n          multiDragElement.thisAnimationDuration = null;\n        });\n        if (activeSortable.options.animation && !isOwner && activeSortable.multiDrag.isMultiDrag) {\n          clonesFromRect = _extends({}, dragRect);\n          var dragMatrix = matrix(dragEl$1, true);\n          clonesFromRect.top -= dragMatrix.f;\n          clonesFromRect.left -= dragMatrix.e;\n        }\n      },\n      dragOverAnimationComplete: function dragOverAnimationComplete() {\n        if (folding) {\n          folding = false;\n          removeMultiDragElements();\n        }\n      },\n      drop: function drop(_ref12) {\n        var evt = _ref12.originalEvent,\n          rootEl = _ref12.rootEl,\n          parentEl = _ref12.parentEl,\n          sortable = _ref12.sortable,\n          dispatchSortableEvent = _ref12.dispatchSortableEvent,\n          oldIndex = _ref12.oldIndex,\n          putSortable = _ref12.putSortable;\n        var toSortable = putSortable || this.sortable;\n        if (!evt) return;\n        var options = this.options,\n          children = parentEl.children;\n\n        // Multi-drag selection\n        if (!dragStarted) {\n          if (options.multiDragKey && !this.multiDragKeyDown) {\n            this._deselectMultiDrag();\n          }\n          toggleClass(dragEl$1, options.selectedClass, !~multiDragElements.indexOf(dragEl$1));\n          if (!~multiDragElements.indexOf(dragEl$1)) {\n            multiDragElements.push(dragEl$1);\n            dispatchEvent({\n              sortable: sortable,\n              rootEl: rootEl,\n              name: 'select',\n              targetEl: dragEl$1,\n              originalEvent: evt\n            });\n\n            // Modifier activated, select from last to dragEl\n            if (evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {\n              var lastIndex = index(lastMultiDragSelect),\n                currentIndex = index(dragEl$1);\n              if (~lastIndex && ~currentIndex && lastIndex !== currentIndex) {\n                // Must include lastMultiDragSelect (select it), in case modified selection from no selection\n                // (but previous selection existed)\n                var n, i;\n                if (currentIndex > lastIndex) {\n                  i = lastIndex;\n                  n = currentIndex;\n                } else {\n                  i = currentIndex;\n                  n = lastIndex + 1;\n                }\n                for (; i < n; i++) {\n                  if (~multiDragElements.indexOf(children[i])) continue;\n                  toggleClass(children[i], options.selectedClass, true);\n                  multiDragElements.push(children[i]);\n                  dispatchEvent({\n                    sortable: sortable,\n                    rootEl: rootEl,\n                    name: 'select',\n                    targetEl: children[i],\n                    originalEvent: evt\n                  });\n                }\n              }\n            } else {\n              lastMultiDragSelect = dragEl$1;\n            }\n            multiDragSortable = toSortable;\n          } else {\n            multiDragElements.splice(multiDragElements.indexOf(dragEl$1), 1);\n            lastMultiDragSelect = null;\n            dispatchEvent({\n              sortable: sortable,\n              rootEl: rootEl,\n              name: 'deselect',\n              targetEl: dragEl$1,\n              originalEvent: evt\n            });\n          }\n        }\n\n        // Multi-drag drop\n        if (dragStarted && this.isMultiDrag) {\n          folding = false;\n          // Do not \"unfold\" after around dragEl if reverted\n          if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {\n            var dragRect = getRect(dragEl$1),\n              multiDragIndex = index(dragEl$1, ':not(.' + this.options.selectedClass + ')');\n            if (!initialFolding && options.animation) dragEl$1.thisAnimationDuration = null;\n            toSortable.captureAnimationState();\n            if (!initialFolding) {\n              if (options.animation) {\n                dragEl$1.fromRect = dragRect;\n                multiDragElements.forEach(function (multiDragElement) {\n                  multiDragElement.thisAnimationDuration = null;\n                  if (multiDragElement !== dragEl$1) {\n                    var rect = folding ? getRect(multiDragElement) : dragRect;\n                    multiDragElement.fromRect = rect;\n\n                    // Prepare unfold animation\n                    toSortable.addAnimationState({\n                      target: multiDragElement,\n                      rect: rect\n                    });\n                  }\n                });\n              }\n\n              // Multi drag elements are not necessarily removed from the DOM on drop, so to reinsert\n              // properly they must all be removed\n              removeMultiDragElements();\n              multiDragElements.forEach(function (multiDragElement) {\n                if (children[multiDragIndex]) {\n                  parentEl.insertBefore(multiDragElement, children[multiDragIndex]);\n                } else {\n                  parentEl.appendChild(multiDragElement);\n                }\n                multiDragIndex++;\n              });\n\n              // If initial folding is done, the elements may have changed position because they are now\n              // unfolding around dragEl, even though dragEl may not have his index changed, so update event\n              // must be fired here as Sortable will not.\n              if (oldIndex === index(dragEl$1)) {\n                var update = false;\n                multiDragElements.forEach(function (multiDragElement) {\n                  if (multiDragElement.sortableIndex !== index(multiDragElement)) {\n                    update = true;\n                    return;\n                  }\n                });\n                if (update) {\n                  dispatchSortableEvent('update');\n                  dispatchSortableEvent('sort');\n                }\n              }\n            }\n\n            // Must be done after capturing individual rects (scroll bar)\n            multiDragElements.forEach(function (multiDragElement) {\n              unsetRect(multiDragElement);\n            });\n            toSortable.animateAll();\n          }\n          multiDragSortable = toSortable;\n        }\n\n        // Remove clones if necessary\n        if (rootEl === parentEl || putSortable && putSortable.lastPutMode !== 'clone') {\n          multiDragClones.forEach(function (clone) {\n            clone.parentNode && clone.parentNode.removeChild(clone);\n          });\n        }\n      },\n      nullingGlobal: function nullingGlobal() {\n        this.isMultiDrag = dragStarted = false;\n        multiDragClones.length = 0;\n      },\n      destroyGlobal: function destroyGlobal() {\n        this._deselectMultiDrag();\n        off(document, 'pointerup', this._deselectMultiDrag);\n        off(document, 'mouseup', this._deselectMultiDrag);\n        off(document, 'touchend', this._deselectMultiDrag);\n        off(document, 'keydown', this._checkKeyDown);\n        off(document, 'keyup', this._checkKeyUp);\n      },\n      _deselectMultiDrag: function _deselectMultiDrag(evt) {\n        if (typeof dragStarted !== \"undefined\" && dragStarted) return;\n\n        // Only deselect if selection is in this sortable\n        if (multiDragSortable !== this.sortable) return;\n\n        // Only deselect if target is not item in this sortable\n        if (evt && closest(evt.target, this.options.draggable, this.sortable.el, false)) return;\n\n        // Only deselect if left click\n        if (evt && evt.button !== 0) return;\n        while (multiDragElements.length) {\n          var el = multiDragElements[0];\n          toggleClass(el, this.options.selectedClass, false);\n          multiDragElements.shift();\n          dispatchEvent({\n            sortable: this.sortable,\n            rootEl: this.sortable.el,\n            name: 'deselect',\n            targetEl: el,\n            originalEvent: evt\n          });\n        }\n      },\n      _checkKeyDown: function _checkKeyDown(evt) {\n        if (evt.key === this.options.multiDragKey) {\n          this.multiDragKeyDown = true;\n        }\n      },\n      _checkKeyUp: function _checkKeyUp(evt) {\n        if (evt.key === this.options.multiDragKey) {\n          this.multiDragKeyDown = false;\n        }\n      }\n    };\n    return _extends(MultiDrag, {\n      // Static methods & properties\n      pluginName: 'multiDrag',\n      utils: {\n        /**\r\n         * Selects the provided multi-drag item\r\n         * @param  {HTMLElement} el    The element to be selected\r\n         */\n        select: function select(el) {\n          var sortable = el.parentNode[expando];\n          if (!sortable || !sortable.options.multiDrag || ~multiDragElements.indexOf(el)) return;\n          if (multiDragSortable && multiDragSortable !== sortable) {\n            multiDragSortable.multiDrag._deselectMultiDrag();\n            multiDragSortable = sortable;\n          }\n          toggleClass(el, sortable.options.selectedClass, true);\n          multiDragElements.push(el);\n        },\n        /**\r\n         * Deselects the provided multi-drag item\r\n         * @param  {HTMLElement} el    The element to be deselected\r\n         */\n        deselect: function deselect(el) {\n          var sortable = el.parentNode[expando],\n            index = multiDragElements.indexOf(el);\n          if (!sortable || !sortable.options.multiDrag || !~index) return;\n          toggleClass(el, sortable.options.selectedClass, false);\n          multiDragElements.splice(index, 1);\n        }\n      },\n      eventProperties: function eventProperties() {\n        var _this3 = this;\n        var oldIndicies = [],\n          newIndicies = [];\n        multiDragElements.forEach(function (multiDragElement) {\n          oldIndicies.push({\n            multiDragElement: multiDragElement,\n            index: multiDragElement.sortableIndex\n          });\n\n          // multiDragElements will already be sorted if folding\n          var newIndex;\n          if (folding && multiDragElement !== dragEl$1) {\n            newIndex = -1;\n          } else if (folding) {\n            newIndex = index(multiDragElement, ':not(.' + _this3.options.selectedClass + ')');\n          } else {\n            newIndex = index(multiDragElement);\n          }\n          newIndicies.push({\n            multiDragElement: multiDragElement,\n            index: newIndex\n          });\n        });\n        return {\n          items: _toConsumableArray(multiDragElements),\n          clones: [].concat(multiDragClones),\n          oldIndicies: oldIndicies,\n          newIndicies: newIndicies\n        };\n      },\n      optionListeners: {\n        multiDragKey: function multiDragKey(key) {\n          key = key.toLowerCase();\n          if (key === 'ctrl') {\n            key = 'Control';\n          } else if (key.length > 1) {\n            key = key.charAt(0).toUpperCase() + key.substr(1);\n          }\n          return key;\n        }\n      }\n    });\n  }\n  function insertMultiDragElements(clonesInserted, rootEl) {\n    multiDragElements.forEach(function (multiDragElement, i) {\n      var target = rootEl.children[multiDragElement.sortableIndex + (clonesInserted ? Number(i) : 0)];\n      if (target) {\n        rootEl.insertBefore(multiDragElement, target);\n      } else {\n        rootEl.appendChild(multiDragElement);\n      }\n    });\n  }\n\n  /**\r\n   * Insert multi-drag clones\r\n   * @param  {[Boolean]} elementsInserted  Whether the multi-drag elements are inserted\r\n   * @param  {HTMLElement} rootEl\r\n   */\n  function insertMultiDragClones(elementsInserted, rootEl) {\n    multiDragClones.forEach(function (clone, i) {\n      var target = rootEl.children[clone.sortableIndex + (elementsInserted ? Number(i) : 0)];\n      if (target) {\n        rootEl.insertBefore(clone, target);\n      } else {\n        rootEl.appendChild(clone);\n      }\n    });\n  }\n  function removeMultiDragElements() {\n    multiDragElements.forEach(function (multiDragElement) {\n      if (multiDragElement === dragEl$1) return;\n      multiDragElement.parentNode && multiDragElement.parentNode.removeChild(multiDragElement);\n    });\n  }\n\n  Sortable.mount(new AutoScrollPlugin());\n  Sortable.mount(Remove, Revert);\n\n  Sortable.mount(new SwapPlugin());\n  Sortable.mount(new MultiDragPlugin());\n\n  return Sortable;\n\n})));\n\n\n//# sourceURL=webpack://Materialize/./node_modules/sortablejs/Sortable.js?");
+{
+/**!
+ * Sortable 1.15.2
+ * @author	RubaXa   <trash@rubaxa.org>
+ * @author	owenm    <owen23355@gmail.com>
+ * @license MIT
+ */
+(function (global, factory) {
+   true ? module.exports = factory() :
+  0;
+}(this, (function () { 'use strict';
+
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+      keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread2(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+      if (i % 2) {
+        ownKeys(Object(source), true).forEach(function (key) {
+          _defineProperty(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+    return target;
+  }
+  function _typeof(obj) {
+    "@babel/helpers - typeof";
+
+    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+      _typeof = function (obj) {
+        return typeof obj;
+      };
+    } else {
+      _typeof = function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+    }
+    return _typeof(obj);
+  }
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+    return obj;
+  }
+  function _extends() {
+    _extends = Object.assign || function (target) {
+      for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
+        for (var key in source) {
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+      return target;
+    };
+    return _extends.apply(this, arguments);
+  }
+  function _objectWithoutPropertiesLoose(source, excluded) {
+    if (source == null) return {};
+    var target = {};
+    var sourceKeys = Object.keys(source);
+    var key, i;
+    for (i = 0; i < sourceKeys.length; i++) {
+      key = sourceKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      target[key] = source[key];
+    }
+    return target;
+  }
+  function _objectWithoutProperties(source, excluded) {
+    if (source == null) return {};
+    var target = _objectWithoutPropertiesLoose(source, excluded);
+    var key, i;
+    if (Object.getOwnPropertySymbols) {
+      var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+      for (i = 0; i < sourceSymbolKeys.length; i++) {
+        key = sourceSymbolKeys[i];
+        if (excluded.indexOf(key) >= 0) continue;
+        if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+        target[key] = source[key];
+      }
+    }
+    return target;
+  }
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+  }
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+  }
+  function _iterableToArray(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
+  }
+  function _unsupportedIterableToArray(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(o);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  }
+  function _arrayLikeToArray(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+    return arr2;
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  var version = "1.15.2";
+
+  function userAgent(pattern) {
+    if (typeof window !== 'undefined' && window.navigator) {
+      return !! /*@__PURE__*/navigator.userAgent.match(pattern);
+    }
+  }
+  var IE11OrLess = userAgent(/(?:Trident.*rv[ :]?11\.|msie|iemobile|Windows Phone)/i);
+  var Edge = userAgent(/Edge/i);
+  var FireFox = userAgent(/firefox/i);
+  var Safari = userAgent(/safari/i) && !userAgent(/chrome/i) && !userAgent(/android/i);
+  var IOS = userAgent(/iP(ad|od|hone)/i);
+  var ChromeForAndroid = userAgent(/chrome/i) && userAgent(/android/i);
+
+  var captureMode = {
+    capture: false,
+    passive: false
+  };
+  function on(el, event, fn) {
+    el.addEventListener(event, fn, !IE11OrLess && captureMode);
+  }
+  function off(el, event, fn) {
+    el.removeEventListener(event, fn, !IE11OrLess && captureMode);
+  }
+  function matches( /**HTMLElement*/el, /**String*/selector) {
+    if (!selector) return;
+    selector[0] === '>' && (selector = selector.substring(1));
+    if (el) {
+      try {
+        if (el.matches) {
+          return el.matches(selector);
+        } else if (el.msMatchesSelector) {
+          return el.msMatchesSelector(selector);
+        } else if (el.webkitMatchesSelector) {
+          return el.webkitMatchesSelector(selector);
+        }
+      } catch (_) {
+        return false;
+      }
+    }
+    return false;
+  }
+  function getParentOrHost(el) {
+    return el.host && el !== document && el.host.nodeType ? el.host : el.parentNode;
+  }
+  function closest( /**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, includeCTX) {
+    if (el) {
+      ctx = ctx || document;
+      do {
+        if (selector != null && (selector[0] === '>' ? el.parentNode === ctx && matches(el, selector) : matches(el, selector)) || includeCTX && el === ctx) {
+          return el;
+        }
+        if (el === ctx) break;
+        /* jshint boss:true */
+      } while (el = getParentOrHost(el));
+    }
+    return null;
+  }
+  var R_SPACE = /\s+/g;
+  function toggleClass(el, name, state) {
+    if (el && name) {
+      if (el.classList) {
+        el.classList[state ? 'add' : 'remove'](name);
+      } else {
+        var className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ');
+        el.className = (className + (state ? ' ' + name : '')).replace(R_SPACE, ' ');
+      }
+    }
+  }
+  function css(el, prop, val) {
+    var style = el && el.style;
+    if (style) {
+      if (val === void 0) {
+        if (document.defaultView && document.defaultView.getComputedStyle) {
+          val = document.defaultView.getComputedStyle(el, '');
+        } else if (el.currentStyle) {
+          val = el.currentStyle;
+        }
+        return prop === void 0 ? val : val[prop];
+      } else {
+        if (!(prop in style) && prop.indexOf('webkit') === -1) {
+          prop = '-webkit-' + prop;
+        }
+        style[prop] = val + (typeof val === 'string' ? '' : 'px');
+      }
+    }
+  }
+  function matrix(el, selfOnly) {
+    var appliedTransforms = '';
+    if (typeof el === 'string') {
+      appliedTransforms = el;
+    } else {
+      do {
+        var transform = css(el, 'transform');
+        if (transform && transform !== 'none') {
+          appliedTransforms = transform + ' ' + appliedTransforms;
+        }
+        /* jshint boss:true */
+      } while (!selfOnly && (el = el.parentNode));
+    }
+    var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix || window.MSCSSMatrix;
+    /*jshint -W056 */
+    return matrixFn && new matrixFn(appliedTransforms);
+  }
+  function find(ctx, tagName, iterator) {
+    if (ctx) {
+      var list = ctx.getElementsByTagName(tagName),
+        i = 0,
+        n = list.length;
+      if (iterator) {
+        for (; i < n; i++) {
+          iterator(list[i], i);
+        }
+      }
+      return list;
+    }
+    return [];
+  }
+  function getWindowScrollingElement() {
+    var scrollingElement = document.scrollingElement;
+    if (scrollingElement) {
+      return scrollingElement;
+    } else {
+      return document.documentElement;
+    }
+  }
+
+  /**
+   * Returns the "bounding client rect" of given element
+   * @param  {HTMLElement} el                       The element whose boundingClientRect is wanted
+   * @param  {[Boolean]} relativeToContainingBlock  Whether the rect should be relative to the containing block of (including) the container
+   * @param  {[Boolean]} relativeToNonStaticParent  Whether the rect should be relative to the relative parent of (including) the contaienr
+   * @param  {[Boolean]} undoScale                  Whether the container's scale() should be undone
+   * @param  {[HTMLElement]} container              The parent the element will be placed in
+   * @return {Object}                               The boundingClientRect of el, with specified adjustments
+   */
+  function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoScale, container) {
+    if (!el.getBoundingClientRect && el !== window) return;
+    var elRect, top, left, bottom, right, height, width;
+    if (el !== window && el.parentNode && el !== getWindowScrollingElement()) {
+      elRect = el.getBoundingClientRect();
+      top = elRect.top;
+      left = elRect.left;
+      bottom = elRect.bottom;
+      right = elRect.right;
+      height = elRect.height;
+      width = elRect.width;
+    } else {
+      top = 0;
+      left = 0;
+      bottom = window.innerHeight;
+      right = window.innerWidth;
+      height = window.innerHeight;
+      width = window.innerWidth;
+    }
+    if ((relativeToContainingBlock || relativeToNonStaticParent) && el !== window) {
+      // Adjust for translate()
+      container = container || el.parentNode;
+
+      // solves #1123 (see: https://stackoverflow.com/a/37953806/6088312)
+      // Not needed on <= IE11
+      if (!IE11OrLess) {
+        do {
+          if (container && container.getBoundingClientRect && (css(container, 'transform') !== 'none' || relativeToNonStaticParent && css(container, 'position') !== 'static')) {
+            var containerRect = container.getBoundingClientRect();
+
+            // Set relative to edges of padding box of container
+            top -= containerRect.top + parseInt(css(container, 'border-top-width'));
+            left -= containerRect.left + parseInt(css(container, 'border-left-width'));
+            bottom = top + elRect.height;
+            right = left + elRect.width;
+            break;
+          }
+          /* jshint boss:true */
+        } while (container = container.parentNode);
+      }
+    }
+    if (undoScale && el !== window) {
+      // Adjust for scale()
+      var elMatrix = matrix(container || el),
+        scaleX = elMatrix && elMatrix.a,
+        scaleY = elMatrix && elMatrix.d;
+      if (elMatrix) {
+        top /= scaleY;
+        left /= scaleX;
+        width /= scaleX;
+        height /= scaleY;
+        bottom = top + height;
+        right = left + width;
+      }
+    }
+    return {
+      top: top,
+      left: left,
+      bottom: bottom,
+      right: right,
+      width: width,
+      height: height
+    };
+  }
+
+  /**
+   * Checks if a side of an element is scrolled past a side of its parents
+   * @param  {HTMLElement}  el           The element who's side being scrolled out of view is in question
+   * @param  {String}       elSide       Side of the element in question ('top', 'left', 'right', 'bottom')
+   * @param  {String}       parentSide   Side of the parent in question ('top', 'left', 'right', 'bottom')
+   * @return {HTMLElement}               The parent scroll element that the el's side is scrolled past, or null if there is no such element
+   */
+  function isScrolledPast(el, elSide, parentSide) {
+    var parent = getParentAutoScrollElement(el, true),
+      elSideVal = getRect(el)[elSide];
+
+    /* jshint boss:true */
+    while (parent) {
+      var parentSideVal = getRect(parent)[parentSide],
+        visible = void 0;
+      if (parentSide === 'top' || parentSide === 'left') {
+        visible = elSideVal >= parentSideVal;
+      } else {
+        visible = elSideVal <= parentSideVal;
+      }
+      if (!visible) return parent;
+      if (parent === getWindowScrollingElement()) break;
+      parent = getParentAutoScrollElement(parent, false);
+    }
+    return false;
+  }
+
+  /**
+   * Gets nth child of el, ignoring hidden children, sortable's elements (does not ignore clone if it's visible)
+   * and non-draggable elements
+   * @param  {HTMLElement} el       The parent element
+   * @param  {Number} childNum      The index of the child
+   * @param  {Object} options       Parent Sortable's options
+   * @return {HTMLElement}          The child at index childNum, or null if not found
+   */
+  function getChild(el, childNum, options, includeDragEl) {
+    var currentChild = 0,
+      i = 0,
+      children = el.children;
+    while (i < children.length) {
+      if (children[i].style.display !== 'none' && children[i] !== Sortable.ghost && (includeDragEl || children[i] !== Sortable.dragged) && closest(children[i], options.draggable, el, false)) {
+        if (currentChild === childNum) {
+          return children[i];
+        }
+        currentChild++;
+      }
+      i++;
+    }
+    return null;
+  }
+
+  /**
+   * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)
+   * @param  {HTMLElement} el       Parent element
+   * @param  {selector} selector    Any other elements that should be ignored
+   * @return {HTMLElement}          The last child, ignoring ghostEl
+   */
+  function lastChild(el, selector) {
+    var last = el.lastElementChild;
+    while (last && (last === Sortable.ghost || css(last, 'display') === 'none' || selector && !matches(last, selector))) {
+      last = last.previousElementSibling;
+    }
+    return last || null;
+  }
+
+  /**
+   * Returns the index of an element within its parent for a selected set of
+   * elements
+   * @param  {HTMLElement} el
+   * @param  {selector} selector
+   * @return {number}
+   */
+  function index(el, selector) {
+    var index = 0;
+    if (!el || !el.parentNode) {
+      return -1;
+    }
+
+    /* jshint boss:true */
+    while (el = el.previousElementSibling) {
+      if (el.nodeName.toUpperCase() !== 'TEMPLATE' && el !== Sortable.clone && (!selector || matches(el, selector))) {
+        index++;
+      }
+    }
+    return index;
+  }
+
+  /**
+   * Returns the scroll offset of the given element, added with all the scroll offsets of parent elements.
+   * The value is returned in real pixels.
+   * @param  {HTMLElement} el
+   * @return {Array}             Offsets in the format of [left, top]
+   */
+  function getRelativeScrollOffset(el) {
+    var offsetLeft = 0,
+      offsetTop = 0,
+      winScroller = getWindowScrollingElement();
+    if (el) {
+      do {
+        var elMatrix = matrix(el),
+          scaleX = elMatrix.a,
+          scaleY = elMatrix.d;
+        offsetLeft += el.scrollLeft * scaleX;
+        offsetTop += el.scrollTop * scaleY;
+      } while (el !== winScroller && (el = el.parentNode));
+    }
+    return [offsetLeft, offsetTop];
+  }
+
+  /**
+   * Returns the index of the object within the given array
+   * @param  {Array} arr   Array that may or may not hold the object
+   * @param  {Object} obj  An object that has a key-value pair unique to and identical to a key-value pair in the object you want to find
+   * @return {Number}      The index of the object in the array, or -1
+   */
+  function indexOfObject(arr, obj) {
+    for (var i in arr) {
+      if (!arr.hasOwnProperty(i)) continue;
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key) && obj[key] === arr[i][key]) return Number(i);
+      }
+    }
+    return -1;
+  }
+  function getParentAutoScrollElement(el, includeSelf) {
+    // skip to window
+    if (!el || !el.getBoundingClientRect) return getWindowScrollingElement();
+    var elem = el;
+    var gotSelf = false;
+    do {
+      // we don't need to get elem css if it isn't even overflowing in the first place (performance)
+      if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {
+        var elemCSS = css(elem);
+        if (elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') || elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')) {
+          if (!elem.getBoundingClientRect || elem === document.body) return getWindowScrollingElement();
+          if (gotSelf || includeSelf) return elem;
+          gotSelf = true;
+        }
+      }
+      /* jshint boss:true */
+    } while (elem = elem.parentNode);
+    return getWindowScrollingElement();
+  }
+  function extend(dst, src) {
+    if (dst && src) {
+      for (var key in src) {
+        if (src.hasOwnProperty(key)) {
+          dst[key] = src[key];
+        }
+      }
+    }
+    return dst;
+  }
+  function isRectEqual(rect1, rect2) {
+    return Math.round(rect1.top) === Math.round(rect2.top) && Math.round(rect1.left) === Math.round(rect2.left) && Math.round(rect1.height) === Math.round(rect2.height) && Math.round(rect1.width) === Math.round(rect2.width);
+  }
+  var _throttleTimeout;
+  function throttle(callback, ms) {
+    return function () {
+      if (!_throttleTimeout) {
+        var args = arguments,
+          _this = this;
+        if (args.length === 1) {
+          callback.call(_this, args[0]);
+        } else {
+          callback.apply(_this, args);
+        }
+        _throttleTimeout = setTimeout(function () {
+          _throttleTimeout = void 0;
+        }, ms);
+      }
+    };
+  }
+  function cancelThrottle() {
+    clearTimeout(_throttleTimeout);
+    _throttleTimeout = void 0;
+  }
+  function scrollBy(el, x, y) {
+    el.scrollLeft += x;
+    el.scrollTop += y;
+  }
+  function clone(el) {
+    var Polymer = window.Polymer;
+    var $ = window.jQuery || window.Zepto;
+    if (Polymer && Polymer.dom) {
+      return Polymer.dom(el).cloneNode(true);
+    } else if ($) {
+      return $(el).clone(true)[0];
+    } else {
+      return el.cloneNode(true);
+    }
+  }
+  function setRect(el, rect) {
+    css(el, 'position', 'absolute');
+    css(el, 'top', rect.top);
+    css(el, 'left', rect.left);
+    css(el, 'width', rect.width);
+    css(el, 'height', rect.height);
+  }
+  function unsetRect(el) {
+    css(el, 'position', '');
+    css(el, 'top', '');
+    css(el, 'left', '');
+    css(el, 'width', '');
+    css(el, 'height', '');
+  }
+  function getChildContainingRectFromElement(container, options, ghostEl) {
+    var rect = {};
+    Array.from(container.children).forEach(function (child) {
+      var _rect$left, _rect$top, _rect$right, _rect$bottom;
+      if (!closest(child, options.draggable, container, false) || child.animated || child === ghostEl) return;
+      var childRect = getRect(child);
+      rect.left = Math.min((_rect$left = rect.left) !== null && _rect$left !== void 0 ? _rect$left : Infinity, childRect.left);
+      rect.top = Math.min((_rect$top = rect.top) !== null && _rect$top !== void 0 ? _rect$top : Infinity, childRect.top);
+      rect.right = Math.max((_rect$right = rect.right) !== null && _rect$right !== void 0 ? _rect$right : -Infinity, childRect.right);
+      rect.bottom = Math.max((_rect$bottom = rect.bottom) !== null && _rect$bottom !== void 0 ? _rect$bottom : -Infinity, childRect.bottom);
+    });
+    rect.width = rect.right - rect.left;
+    rect.height = rect.bottom - rect.top;
+    rect.x = rect.left;
+    rect.y = rect.top;
+    return rect;
+  }
+  var expando = 'Sortable' + new Date().getTime();
+
+  function AnimationStateManager() {
+    var animationStates = [],
+      animationCallbackId;
+    return {
+      captureAnimationState: function captureAnimationState() {
+        animationStates = [];
+        if (!this.options.animation) return;
+        var children = [].slice.call(this.el.children);
+        children.forEach(function (child) {
+          if (css(child, 'display') === 'none' || child === Sortable.ghost) return;
+          animationStates.push({
+            target: child,
+            rect: getRect(child)
+          });
+          var fromRect = _objectSpread2({}, animationStates[animationStates.length - 1].rect);
+
+          // If animating: compensate for current animation
+          if (child.thisAnimationDuration) {
+            var childMatrix = matrix(child, true);
+            if (childMatrix) {
+              fromRect.top -= childMatrix.f;
+              fromRect.left -= childMatrix.e;
+            }
+          }
+          child.fromRect = fromRect;
+        });
+      },
+      addAnimationState: function addAnimationState(state) {
+        animationStates.push(state);
+      },
+      removeAnimationState: function removeAnimationState(target) {
+        animationStates.splice(indexOfObject(animationStates, {
+          target: target
+        }), 1);
+      },
+      animateAll: function animateAll(callback) {
+        var _this = this;
+        if (!this.options.animation) {
+          clearTimeout(animationCallbackId);
+          if (typeof callback === 'function') callback();
+          return;
+        }
+        var animating = false,
+          animationTime = 0;
+        animationStates.forEach(function (state) {
+          var time = 0,
+            target = state.target,
+            fromRect = target.fromRect,
+            toRect = getRect(target),
+            prevFromRect = target.prevFromRect,
+            prevToRect = target.prevToRect,
+            animatingRect = state.rect,
+            targetMatrix = matrix(target, true);
+          if (targetMatrix) {
+            // Compensate for current animation
+            toRect.top -= targetMatrix.f;
+            toRect.left -= targetMatrix.e;
+          }
+          target.toRect = toRect;
+          if (target.thisAnimationDuration) {
+            // Could also check if animatingRect is between fromRect and toRect
+            if (isRectEqual(prevFromRect, toRect) && !isRectEqual(fromRect, toRect) &&
+            // Make sure animatingRect is on line between toRect & fromRect
+            (animatingRect.top - toRect.top) / (animatingRect.left - toRect.left) === (fromRect.top - toRect.top) / (fromRect.left - toRect.left)) {
+              // If returning to same place as started from animation and on same axis
+              time = calculateRealTime(animatingRect, prevFromRect, prevToRect, _this.options);
+            }
+          }
+
+          // if fromRect != toRect: animate
+          if (!isRectEqual(toRect, fromRect)) {
+            target.prevFromRect = fromRect;
+            target.prevToRect = toRect;
+            if (!time) {
+              time = _this.options.animation;
+            }
+            _this.animate(target, animatingRect, toRect, time);
+          }
+          if (time) {
+            animating = true;
+            animationTime = Math.max(animationTime, time);
+            clearTimeout(target.animationResetTimer);
+            target.animationResetTimer = setTimeout(function () {
+              target.animationTime = 0;
+              target.prevFromRect = null;
+              target.fromRect = null;
+              target.prevToRect = null;
+              target.thisAnimationDuration = null;
+            }, time);
+            target.thisAnimationDuration = time;
+          }
+        });
+        clearTimeout(animationCallbackId);
+        if (!animating) {
+          if (typeof callback === 'function') callback();
+        } else {
+          animationCallbackId = setTimeout(function () {
+            if (typeof callback === 'function') callback();
+          }, animationTime);
+        }
+        animationStates = [];
+      },
+      animate: function animate(target, currentRect, toRect, duration) {
+        if (duration) {
+          css(target, 'transition', '');
+          css(target, 'transform', '');
+          var elMatrix = matrix(this.el),
+            scaleX = elMatrix && elMatrix.a,
+            scaleY = elMatrix && elMatrix.d,
+            translateX = (currentRect.left - toRect.left) / (scaleX || 1),
+            translateY = (currentRect.top - toRect.top) / (scaleY || 1);
+          target.animatingX = !!translateX;
+          target.animatingY = !!translateY;
+          css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0)');
+          this.forRepaintDummy = repaint(target); // repaint
+
+          css(target, 'transition', 'transform ' + duration + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
+          css(target, 'transform', 'translate3d(0,0,0)');
+          typeof target.animated === 'number' && clearTimeout(target.animated);
+          target.animated = setTimeout(function () {
+            css(target, 'transition', '');
+            css(target, 'transform', '');
+            target.animated = false;
+            target.animatingX = false;
+            target.animatingY = false;
+          }, duration);
+        }
+      }
+    };
+  }
+  function repaint(target) {
+    return target.offsetWidth;
+  }
+  function calculateRealTime(animatingRect, fromRect, toRect, options) {
+    return Math.sqrt(Math.pow(fromRect.top - animatingRect.top, 2) + Math.pow(fromRect.left - animatingRect.left, 2)) / Math.sqrt(Math.pow(fromRect.top - toRect.top, 2) + Math.pow(fromRect.left - toRect.left, 2)) * options.animation;
+  }
+
+  var plugins = [];
+  var defaults = {
+    initializeByDefault: true
+  };
+  var PluginManager = {
+    mount: function mount(plugin) {
+      // Set default static properties
+      for (var option in defaults) {
+        if (defaults.hasOwnProperty(option) && !(option in plugin)) {
+          plugin[option] = defaults[option];
+        }
+      }
+      plugins.forEach(function (p) {
+        if (p.pluginName === plugin.pluginName) {
+          throw "Sortable: Cannot mount plugin ".concat(plugin.pluginName, " more than once");
+        }
+      });
+      plugins.push(plugin);
+    },
+    pluginEvent: function pluginEvent(eventName, sortable, evt) {
+      var _this = this;
+      this.eventCanceled = false;
+      evt.cancel = function () {
+        _this.eventCanceled = true;
+      };
+      var eventNameGlobal = eventName + 'Global';
+      plugins.forEach(function (plugin) {
+        if (!sortable[plugin.pluginName]) return;
+        // Fire global events if it exists in this sortable
+        if (sortable[plugin.pluginName][eventNameGlobal]) {
+          sortable[plugin.pluginName][eventNameGlobal](_objectSpread2({
+            sortable: sortable
+          }, evt));
+        }
+
+        // Only fire plugin event if plugin is enabled in this sortable,
+        // and plugin has event defined
+        if (sortable.options[plugin.pluginName] && sortable[plugin.pluginName][eventName]) {
+          sortable[plugin.pluginName][eventName](_objectSpread2({
+            sortable: sortable
+          }, evt));
+        }
+      });
+    },
+    initializePlugins: function initializePlugins(sortable, el, defaults, options) {
+      plugins.forEach(function (plugin) {
+        var pluginName = plugin.pluginName;
+        if (!sortable.options[pluginName] && !plugin.initializeByDefault) return;
+        var initialized = new plugin(sortable, el, sortable.options);
+        initialized.sortable = sortable;
+        initialized.options = sortable.options;
+        sortable[pluginName] = initialized;
+
+        // Add default options from plugin
+        _extends(defaults, initialized.defaults);
+      });
+      for (var option in sortable.options) {
+        if (!sortable.options.hasOwnProperty(option)) continue;
+        var modified = this.modifyOption(sortable, option, sortable.options[option]);
+        if (typeof modified !== 'undefined') {
+          sortable.options[option] = modified;
+        }
+      }
+    },
+    getEventProperties: function getEventProperties(name, sortable) {
+      var eventProperties = {};
+      plugins.forEach(function (plugin) {
+        if (typeof plugin.eventProperties !== 'function') return;
+        _extends(eventProperties, plugin.eventProperties.call(sortable[plugin.pluginName], name));
+      });
+      return eventProperties;
+    },
+    modifyOption: function modifyOption(sortable, name, value) {
+      var modifiedValue;
+      plugins.forEach(function (plugin) {
+        // Plugin must exist on the Sortable
+        if (!sortable[plugin.pluginName]) return;
+
+        // If static option listener exists for this option, call in the context of the Sortable's instance of this plugin
+        if (plugin.optionListeners && typeof plugin.optionListeners[name] === 'function') {
+          modifiedValue = plugin.optionListeners[name].call(sortable[plugin.pluginName], value);
+        }
+      });
+      return modifiedValue;
+    }
+  };
+
+  function dispatchEvent(_ref) {
+    var sortable = _ref.sortable,
+      rootEl = _ref.rootEl,
+      name = _ref.name,
+      targetEl = _ref.targetEl,
+      cloneEl = _ref.cloneEl,
+      toEl = _ref.toEl,
+      fromEl = _ref.fromEl,
+      oldIndex = _ref.oldIndex,
+      newIndex = _ref.newIndex,
+      oldDraggableIndex = _ref.oldDraggableIndex,
+      newDraggableIndex = _ref.newDraggableIndex,
+      originalEvent = _ref.originalEvent,
+      putSortable = _ref.putSortable,
+      extraEventProperties = _ref.extraEventProperties;
+    sortable = sortable || rootEl && rootEl[expando];
+    if (!sortable) return;
+    var evt,
+      options = sortable.options,
+      onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);
+    // Support for new CustomEvent feature
+    if (window.CustomEvent && !IE11OrLess && !Edge) {
+      evt = new CustomEvent(name, {
+        bubbles: true,
+        cancelable: true
+      });
+    } else {
+      evt = document.createEvent('Event');
+      evt.initEvent(name, true, true);
+    }
+    evt.to = toEl || rootEl;
+    evt.from = fromEl || rootEl;
+    evt.item = targetEl || rootEl;
+    evt.clone = cloneEl;
+    evt.oldIndex = oldIndex;
+    evt.newIndex = newIndex;
+    evt.oldDraggableIndex = oldDraggableIndex;
+    evt.newDraggableIndex = newDraggableIndex;
+    evt.originalEvent = originalEvent;
+    evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;
+    var allEventProperties = _objectSpread2(_objectSpread2({}, extraEventProperties), PluginManager.getEventProperties(name, sortable));
+    for (var option in allEventProperties) {
+      evt[option] = allEventProperties[option];
+    }
+    if (rootEl) {
+      rootEl.dispatchEvent(evt);
+    }
+    if (options[onName]) {
+      options[onName].call(sortable, evt);
+    }
+  }
+
+  var _excluded = ["evt"];
+  var pluginEvent = function pluginEvent(eventName, sortable) {
+    var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+      originalEvent = _ref.evt,
+      data = _objectWithoutProperties(_ref, _excluded);
+    PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, _objectSpread2({
+      dragEl: dragEl,
+      parentEl: parentEl,
+      ghostEl: ghostEl,
+      rootEl: rootEl,
+      nextEl: nextEl,
+      lastDownEl: lastDownEl,
+      cloneEl: cloneEl,
+      cloneHidden: cloneHidden,
+      dragStarted: moved,
+      putSortable: putSortable,
+      activeSortable: Sortable.active,
+      originalEvent: originalEvent,
+      oldIndex: oldIndex,
+      oldDraggableIndex: oldDraggableIndex,
+      newIndex: newIndex,
+      newDraggableIndex: newDraggableIndex,
+      hideGhostForTarget: _hideGhostForTarget,
+      unhideGhostForTarget: _unhideGhostForTarget,
+      cloneNowHidden: function cloneNowHidden() {
+        cloneHidden = true;
+      },
+      cloneNowShown: function cloneNowShown() {
+        cloneHidden = false;
+      },
+      dispatchSortableEvent: function dispatchSortableEvent(name) {
+        _dispatchEvent({
+          sortable: sortable,
+          name: name,
+          originalEvent: originalEvent
+        });
+      }
+    }, data));
+  };
+  function _dispatchEvent(info) {
+    dispatchEvent(_objectSpread2({
+      putSortable: putSortable,
+      cloneEl: cloneEl,
+      targetEl: dragEl,
+      rootEl: rootEl,
+      oldIndex: oldIndex,
+      oldDraggableIndex: oldDraggableIndex,
+      newIndex: newIndex,
+      newDraggableIndex: newDraggableIndex
+    }, info));
+  }
+  var dragEl,
+    parentEl,
+    ghostEl,
+    rootEl,
+    nextEl,
+    lastDownEl,
+    cloneEl,
+    cloneHidden,
+    oldIndex,
+    newIndex,
+    oldDraggableIndex,
+    newDraggableIndex,
+    activeGroup,
+    putSortable,
+    awaitingDragStarted = false,
+    ignoreNextClick = false,
+    sortables = [],
+    tapEvt,
+    touchEvt,
+    lastDx,
+    lastDy,
+    tapDistanceLeft,
+    tapDistanceTop,
+    moved,
+    lastTarget,
+    lastDirection,
+    pastFirstInvertThresh = false,
+    isCircumstantialInvert = false,
+    targetMoveDistance,
+    // For positioning ghost absolutely
+    ghostRelativeParent,
+    ghostRelativeParentInitialScroll = [],
+    // (left, top)
+
+    _silent = false,
+    savedInputChecked = [];
+
+  /** @const */
+  var documentExists = typeof document !== 'undefined',
+    PositionGhostAbsolutely = IOS,
+    CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
+    // This will not pass for IE9, because IE9 DnD only works on anchors
+    supportDraggable = documentExists && !ChromeForAndroid && !IOS && 'draggable' in document.createElement('div'),
+    supportCssPointerEvents = function () {
+      if (!documentExists) return;
+      // false when <= IE11
+      if (IE11OrLess) {
+        return false;
+      }
+      var el = document.createElement('x');
+      el.style.cssText = 'pointer-events:auto';
+      return el.style.pointerEvents === 'auto';
+    }(),
+    _detectDirection = function _detectDirection(el, options) {
+      var elCSS = css(el),
+        elWidth = parseInt(elCSS.width) - parseInt(elCSS.paddingLeft) - parseInt(elCSS.paddingRight) - parseInt(elCSS.borderLeftWidth) - parseInt(elCSS.borderRightWidth),
+        child1 = getChild(el, 0, options),
+        child2 = getChild(el, 1, options),
+        firstChildCSS = child1 && css(child1),
+        secondChildCSS = child2 && css(child2),
+        firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + getRect(child1).width,
+        secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + getRect(child2).width;
+      if (elCSS.display === 'flex') {
+        return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse' ? 'vertical' : 'horizontal';
+      }
+      if (elCSS.display === 'grid') {
+        return elCSS.gridTemplateColumns.split(' ').length <= 1 ? 'vertical' : 'horizontal';
+      }
+      if (child1 && firstChildCSS["float"] && firstChildCSS["float"] !== 'none') {
+        var touchingSideChild2 = firstChildCSS["float"] === 'left' ? 'left' : 'right';
+        return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ? 'vertical' : 'horizontal';
+      }
+      return child1 && (firstChildCSS.display === 'block' || firstChildCSS.display === 'flex' || firstChildCSS.display === 'table' || firstChildCSS.display === 'grid' || firstChildWidth >= elWidth && elCSS[CSSFloatProperty] === 'none' || child2 && elCSS[CSSFloatProperty] === 'none' && firstChildWidth + secondChildWidth > elWidth) ? 'vertical' : 'horizontal';
+    },
+    _dragElInRowColumn = function _dragElInRowColumn(dragRect, targetRect, vertical) {
+      var dragElS1Opp = vertical ? dragRect.left : dragRect.top,
+        dragElS2Opp = vertical ? dragRect.right : dragRect.bottom,
+        dragElOppLength = vertical ? dragRect.width : dragRect.height,
+        targetS1Opp = vertical ? targetRect.left : targetRect.top,
+        targetS2Opp = vertical ? targetRect.right : targetRect.bottom,
+        targetOppLength = vertical ? targetRect.width : targetRect.height;
+      return dragElS1Opp === targetS1Opp || dragElS2Opp === targetS2Opp || dragElS1Opp + dragElOppLength / 2 === targetS1Opp + targetOppLength / 2;
+    },
+    /**
+     * Detects first nearest empty sortable to X and Y position using emptyInsertThreshold.
+     * @param  {Number} x      X position
+     * @param  {Number} y      Y position
+     * @return {HTMLElement}   Element of the first found nearest Sortable
+     */
+    _detectNearestEmptySortable = function _detectNearestEmptySortable(x, y) {
+      var ret;
+      sortables.some(function (sortable) {
+        var threshold = sortable[expando].options.emptyInsertThreshold;
+        if (!threshold || lastChild(sortable)) return;
+        var rect = getRect(sortable),
+          insideHorizontally = x >= rect.left - threshold && x <= rect.right + threshold,
+          insideVertically = y >= rect.top - threshold && y <= rect.bottom + threshold;
+        if (insideHorizontally && insideVertically) {
+          return ret = sortable;
+        }
+      });
+      return ret;
+    },
+    _prepareGroup = function _prepareGroup(options) {
+      function toFn(value, pull) {
+        return function (to, from, dragEl, evt) {
+          var sameGroup = to.options.group.name && from.options.group.name && to.options.group.name === from.options.group.name;
+          if (value == null && (pull || sameGroup)) {
+            // Default pull value
+            // Default pull and put value if same group
+            return true;
+          } else if (value == null || value === false) {
+            return false;
+          } else if (pull && value === 'clone') {
+            return value;
+          } else if (typeof value === 'function') {
+            return toFn(value(to, from, dragEl, evt), pull)(to, from, dragEl, evt);
+          } else {
+            var otherGroup = (pull ? to : from).options.group.name;
+            return value === true || typeof value === 'string' && value === otherGroup || value.join && value.indexOf(otherGroup) > -1;
+          }
+        };
+      }
+      var group = {};
+      var originalGroup = options.group;
+      if (!originalGroup || _typeof(originalGroup) != 'object') {
+        originalGroup = {
+          name: originalGroup
+        };
+      }
+      group.name = originalGroup.name;
+      group.checkPull = toFn(originalGroup.pull, true);
+      group.checkPut = toFn(originalGroup.put);
+      group.revertClone = originalGroup.revertClone;
+      options.group = group;
+    },
+    _hideGhostForTarget = function _hideGhostForTarget() {
+      if (!supportCssPointerEvents && ghostEl) {
+        css(ghostEl, 'display', 'none');
+      }
+    },
+    _unhideGhostForTarget = function _unhideGhostForTarget() {
+      if (!supportCssPointerEvents && ghostEl) {
+        css(ghostEl, 'display', '');
+      }
+    };
+
+  // #1184 fix - Prevent click event on fallback if dragged but item not changed position
+  if (documentExists && !ChromeForAndroid) {
+    document.addEventListener('click', function (evt) {
+      if (ignoreNextClick) {
+        evt.preventDefault();
+        evt.stopPropagation && evt.stopPropagation();
+        evt.stopImmediatePropagation && evt.stopImmediatePropagation();
+        ignoreNextClick = false;
+        return false;
+      }
+    }, true);
+  }
+  var nearestEmptyInsertDetectEvent = function nearestEmptyInsertDetectEvent(evt) {
+    if (dragEl) {
+      evt = evt.touches ? evt.touches[0] : evt;
+      var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
+      if (nearest) {
+        // Create imitation event
+        var event = {};
+        for (var i in evt) {
+          if (evt.hasOwnProperty(i)) {
+            event[i] = evt[i];
+          }
+        }
+        event.target = event.rootEl = nearest;
+        event.preventDefault = void 0;
+        event.stopPropagation = void 0;
+        nearest[expando]._onDragOver(event);
+      }
+    }
+  };
+  var _checkOutsideTargetEl = function _checkOutsideTargetEl(evt) {
+    if (dragEl) {
+      dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
+    }
+  };
+
+  /**
+   * @class  Sortable
+   * @param  {HTMLElement}  el
+   * @param  {Object}       [options]
+   */
+  function Sortable(el, options) {
+    if (!(el && el.nodeType && el.nodeType === 1)) {
+      throw "Sortable: `el` must be an HTMLElement, not ".concat({}.toString.call(el));
+    }
+    this.el = el; // root element
+    this.options = options = _extends({}, options);
+
+    // Export instance
+    el[expando] = this;
+    var defaults = {
+      group: null,
+      sort: true,
+      disabled: false,
+      store: null,
+      handle: null,
+      draggable: /^[uo]l$/i.test(el.nodeName) ? '>li' : '>*',
+      swapThreshold: 1,
+      // percentage; 0 <= x <= 1
+      invertSwap: false,
+      // invert always
+      invertedSwapThreshold: null,
+      // will be set to same as swapThreshold if default
+      removeCloneOnHide: true,
+      direction: function direction() {
+        return _detectDirection(el, this.options);
+      },
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      dragClass: 'sortable-drag',
+      ignore: 'a, img',
+      filter: null,
+      preventOnFilter: true,
+      animation: 0,
+      easing: null,
+      setData: function setData(dataTransfer, dragEl) {
+        dataTransfer.setData('Text', dragEl.textContent);
+      },
+      dropBubble: false,
+      dragoverBubble: false,
+      dataIdAttr: 'data-id',
+      delay: 0,
+      delayOnTouchOnly: false,
+      touchStartThreshold: (Number.parseInt ? Number : window).parseInt(window.devicePixelRatio, 10) || 1,
+      forceFallback: false,
+      fallbackClass: 'sortable-fallback',
+      fallbackOnBody: false,
+      fallbackTolerance: 0,
+      fallbackOffset: {
+        x: 0,
+        y: 0
+      },
+      supportPointer: Sortable.supportPointer !== false && 'PointerEvent' in window && !Safari,
+      emptyInsertThreshold: 5
+    };
+    PluginManager.initializePlugins(this, el, defaults);
+
+    // Set default options
+    for (var name in defaults) {
+      !(name in options) && (options[name] = defaults[name]);
+    }
+    _prepareGroup(options);
+
+    // Bind all private methods
+    for (var fn in this) {
+      if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
+        this[fn] = this[fn].bind(this);
+      }
+    }
+
+    // Setup drag mode
+    this.nativeDraggable = options.forceFallback ? false : supportDraggable;
+    if (this.nativeDraggable) {
+      // Touch start threshold cannot be greater than the native dragstart threshold
+      this.options.touchStartThreshold = 1;
+    }
+
+    // Bind events
+    if (options.supportPointer) {
+      on(el, 'pointerdown', this._onTapStart);
+    } else {
+      on(el, 'mousedown', this._onTapStart);
+      on(el, 'touchstart', this._onTapStart);
+    }
+    if (this.nativeDraggable) {
+      on(el, 'dragover', this);
+      on(el, 'dragenter', this);
+    }
+    sortables.push(this.el);
+
+    // Restore sorting
+    options.store && options.store.get && this.sort(options.store.get(this) || []);
+
+    // Add animation state manager
+    _extends(this, AnimationStateManager());
+  }
+  Sortable.prototype = /** @lends Sortable.prototype */{
+    constructor: Sortable,
+    _isOutsideThisEl: function _isOutsideThisEl(target) {
+      if (!this.el.contains(target) && target !== this.el) {
+        lastTarget = null;
+      }
+    },
+    _getDirection: function _getDirection(evt, target) {
+      return typeof this.options.direction === 'function' ? this.options.direction.call(this, evt, target, dragEl) : this.options.direction;
+    },
+    _onTapStart: function _onTapStart( /** Event|TouchEvent */evt) {
+      if (!evt.cancelable) return;
+      var _this = this,
+        el = this.el,
+        options = this.options,
+        preventOnFilter = options.preventOnFilter,
+        type = evt.type,
+        touch = evt.touches && evt.touches[0] || evt.pointerType && evt.pointerType === 'touch' && evt,
+        target = (touch || evt).target,
+        originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0] || evt.composedPath && evt.composedPath()[0]) || target,
+        filter = options.filter;
+      _saveInputCheckedState(el);
+
+      // Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
+      if (dragEl) {
+        return;
+      }
+      if (/mousedown|pointerdown/.test(type) && evt.button !== 0 || options.disabled) {
+        return; // only left button and enabled
+      }
+
+      // cancel dnd if original target is content editable
+      if (originalTarget.isContentEditable) {
+        return;
+      }
+
+      // Safari ignores further event handling after mousedown
+      if (!this.nativeDraggable && Safari && target && target.tagName.toUpperCase() === 'SELECT') {
+        return;
+      }
+      target = closest(target, options.draggable, el, false);
+      if (target && target.animated) {
+        return;
+      }
+      if (lastDownEl === target) {
+        // Ignoring duplicate `down`
+        return;
+      }
+
+      // Get the index of the dragged element within its parent
+      oldIndex = index(target);
+      oldDraggableIndex = index(target, options.draggable);
+
+      // Check filter
+      if (typeof filter === 'function') {
+        if (filter.call(this, evt, target, this)) {
+          _dispatchEvent({
+            sortable: _this,
+            rootEl: originalTarget,
+            name: 'filter',
+            targetEl: target,
+            toEl: el,
+            fromEl: el
+          });
+          pluginEvent('filter', _this, {
+            evt: evt
+          });
+          preventOnFilter && evt.cancelable && evt.preventDefault();
+          return; // cancel dnd
+        }
+      } else if (filter) {
+        filter = filter.split(',').some(function (criteria) {
+          criteria = closest(originalTarget, criteria.trim(), el, false);
+          if (criteria) {
+            _dispatchEvent({
+              sortable: _this,
+              rootEl: criteria,
+              name: 'filter',
+              targetEl: target,
+              fromEl: el,
+              toEl: el
+            });
+            pluginEvent('filter', _this, {
+              evt: evt
+            });
+            return true;
+          }
+        });
+        if (filter) {
+          preventOnFilter && evt.cancelable && evt.preventDefault();
+          return; // cancel dnd
+        }
+      }
+      if (options.handle && !closest(originalTarget, options.handle, el, false)) {
+        return;
+      }
+
+      // Prepare `dragstart`
+      this._prepareDragStart(evt, touch, target);
+    },
+    _prepareDragStart: function _prepareDragStart( /** Event */evt, /** Touch */touch, /** HTMLElement */target) {
+      var _this = this,
+        el = _this.el,
+        options = _this.options,
+        ownerDocument = el.ownerDocument,
+        dragStartFn;
+      if (target && !dragEl && target.parentNode === el) {
+        var dragRect = getRect(target);
+        rootEl = el;
+        dragEl = target;
+        parentEl = dragEl.parentNode;
+        nextEl = dragEl.nextSibling;
+        lastDownEl = target;
+        activeGroup = options.group;
+        Sortable.dragged = dragEl;
+        tapEvt = {
+          target: dragEl,
+          clientX: (touch || evt).clientX,
+          clientY: (touch || evt).clientY
+        };
+        tapDistanceLeft = tapEvt.clientX - dragRect.left;
+        tapDistanceTop = tapEvt.clientY - dragRect.top;
+        this._lastX = (touch || evt).clientX;
+        this._lastY = (touch || evt).clientY;
+        dragEl.style['will-change'] = 'all';
+        dragStartFn = function dragStartFn() {
+          pluginEvent('delayEnded', _this, {
+            evt: evt
+          });
+          if (Sortable.eventCanceled) {
+            _this._onDrop();
+            return;
+          }
+          // Delayed drag has been triggered
+          // we can re-enable the events: touchmove/mousemove
+          _this._disableDelayedDragEvents();
+          if (!FireFox && _this.nativeDraggable) {
+            dragEl.draggable = true;
+          }
+
+          // Bind the events: dragstart/dragend
+          _this._triggerDragStart(evt, touch);
+
+          // Drag start event
+          _dispatchEvent({
+            sortable: _this,
+            name: 'choose',
+            originalEvent: evt
+          });
+
+          // Chosen item
+          toggleClass(dragEl, options.chosenClass, true);
+        };
+
+        // Disable "draggable"
+        options.ignore.split(',').forEach(function (criteria) {
+          find(dragEl, criteria.trim(), _disableDraggable);
+        });
+        on(ownerDocument, 'dragover', nearestEmptyInsertDetectEvent);
+        on(ownerDocument, 'mousemove', nearestEmptyInsertDetectEvent);
+        on(ownerDocument, 'touchmove', nearestEmptyInsertDetectEvent);
+        on(ownerDocument, 'mouseup', _this._onDrop);
+        on(ownerDocument, 'touchend', _this._onDrop);
+        on(ownerDocument, 'touchcancel', _this._onDrop);
+
+        // Make dragEl draggable (must be before delay for FireFox)
+        if (FireFox && this.nativeDraggable) {
+          this.options.touchStartThreshold = 4;
+          dragEl.draggable = true;
+        }
+        pluginEvent('delayStart', this, {
+          evt: evt
+        });
+
+        // Delay is impossible for native DnD in Edge or IE
+        if (options.delay && (!options.delayOnTouchOnly || touch) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
+          if (Sortable.eventCanceled) {
+            this._onDrop();
+            return;
+          }
+          // If the user moves the pointer or let go the click or touch
+          // before the delay has been reached:
+          // disable the delayed drag
+          on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
+          on(ownerDocument, 'touchend', _this._disableDelayedDrag);
+          on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
+          on(ownerDocument, 'mousemove', _this._delayedDragTouchMoveHandler);
+          on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);
+          options.supportPointer && on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);
+          _this._dragStartTimer = setTimeout(dragStartFn, options.delay);
+        } else {
+          dragStartFn();
+        }
+      }
+    },
+    _delayedDragTouchMoveHandler: function _delayedDragTouchMoveHandler( /** TouchEvent|PointerEvent **/e) {
+      var touch = e.touches ? e.touches[0] : e;
+      if (Math.max(Math.abs(touch.clientX - this._lastX), Math.abs(touch.clientY - this._lastY)) >= Math.floor(this.options.touchStartThreshold / (this.nativeDraggable && window.devicePixelRatio || 1))) {
+        this._disableDelayedDrag();
+      }
+    },
+    _disableDelayedDrag: function _disableDelayedDrag() {
+      dragEl && _disableDraggable(dragEl);
+      clearTimeout(this._dragStartTimer);
+      this._disableDelayedDragEvents();
+    },
+    _disableDelayedDragEvents: function _disableDelayedDragEvents() {
+      var ownerDocument = this.el.ownerDocument;
+      off(ownerDocument, 'mouseup', this._disableDelayedDrag);
+      off(ownerDocument, 'touchend', this._disableDelayedDrag);
+      off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
+      off(ownerDocument, 'mousemove', this._delayedDragTouchMoveHandler);
+      off(ownerDocument, 'touchmove', this._delayedDragTouchMoveHandler);
+      off(ownerDocument, 'pointermove', this._delayedDragTouchMoveHandler);
+    },
+    _triggerDragStart: function _triggerDragStart( /** Event */evt, /** Touch */touch) {
+      touch = touch || evt.pointerType == 'touch' && evt;
+      if (!this.nativeDraggable || touch) {
+        if (this.options.supportPointer) {
+          on(document, 'pointermove', this._onTouchMove);
+        } else if (touch) {
+          on(document, 'touchmove', this._onTouchMove);
+        } else {
+          on(document, 'mousemove', this._onTouchMove);
+        }
+      } else {
+        on(dragEl, 'dragend', this);
+        on(rootEl, 'dragstart', this._onDragStart);
+      }
+      try {
+        if (document.selection) {
+          // Timeout neccessary for IE9
+          _nextTick(function () {
+            document.selection.empty();
+          });
+        } else {
+          window.getSelection().removeAllRanges();
+        }
+      } catch (err) {}
+    },
+    _dragStarted: function _dragStarted(fallback, evt) {
+      awaitingDragStarted = false;
+      if (rootEl && dragEl) {
+        pluginEvent('dragStarted', this, {
+          evt: evt
+        });
+        if (this.nativeDraggable) {
+          on(document, 'dragover', _checkOutsideTargetEl);
+        }
+        var options = this.options;
+
+        // Apply effect
+        !fallback && toggleClass(dragEl, options.dragClass, false);
+        toggleClass(dragEl, options.ghostClass, true);
+        Sortable.active = this;
+        fallback && this._appendGhost();
+
+        // Drag start event
+        _dispatchEvent({
+          sortable: this,
+          name: 'start',
+          originalEvent: evt
+        });
+      } else {
+        this._nulling();
+      }
+    },
+    _emulateDragOver: function _emulateDragOver() {
+      if (touchEvt) {
+        this._lastX = touchEvt.clientX;
+        this._lastY = touchEvt.clientY;
+        _hideGhostForTarget();
+        var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+        var parent = target;
+        while (target && target.shadowRoot) {
+          target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+          if (target === parent) break;
+          parent = target;
+        }
+        dragEl.parentNode[expando]._isOutsideThisEl(target);
+        if (parent) {
+          do {
+            if (parent[expando]) {
+              var inserted = void 0;
+              inserted = parent[expando]._onDragOver({
+                clientX: touchEvt.clientX,
+                clientY: touchEvt.clientY,
+                target: target,
+                rootEl: parent
+              });
+              if (inserted && !this.options.dragoverBubble) {
+                break;
+              }
+            }
+            target = parent; // store last element
+          }
+          /* jshint boss:true */ while (parent = parent.parentNode);
+        }
+        _unhideGhostForTarget();
+      }
+    },
+    _onTouchMove: function _onTouchMove( /**TouchEvent*/evt) {
+      if (tapEvt) {
+        var options = this.options,
+          fallbackTolerance = options.fallbackTolerance,
+          fallbackOffset = options.fallbackOffset,
+          touch = evt.touches ? evt.touches[0] : evt,
+          ghostMatrix = ghostEl && matrix(ghostEl, true),
+          scaleX = ghostEl && ghostMatrix && ghostMatrix.a,
+          scaleY = ghostEl && ghostMatrix && ghostMatrix.d,
+          relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && getRelativeScrollOffset(ghostRelativeParent),
+          dx = (touch.clientX - tapEvt.clientX + fallbackOffset.x) / (scaleX || 1) + (relativeScrollOffset ? relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0] : 0) / (scaleX || 1),
+          dy = (touch.clientY - tapEvt.clientY + fallbackOffset.y) / (scaleY || 1) + (relativeScrollOffset ? relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1] : 0) / (scaleY || 1);
+
+        // only set the status to dragging, when we are actually dragging
+        if (!Sortable.active && !awaitingDragStarted) {
+          if (fallbackTolerance && Math.max(Math.abs(touch.clientX - this._lastX), Math.abs(touch.clientY - this._lastY)) < fallbackTolerance) {
+            return;
+          }
+          this._onDragStart(evt, true);
+        }
+        if (ghostEl) {
+          if (ghostMatrix) {
+            ghostMatrix.e += dx - (lastDx || 0);
+            ghostMatrix.f += dy - (lastDy || 0);
+          } else {
+            ghostMatrix = {
+              a: 1,
+              b: 0,
+              c: 0,
+              d: 1,
+              e: dx,
+              f: dy
+            };
+          }
+          var cssMatrix = "matrix(".concat(ghostMatrix.a, ",").concat(ghostMatrix.b, ",").concat(ghostMatrix.c, ",").concat(ghostMatrix.d, ",").concat(ghostMatrix.e, ",").concat(ghostMatrix.f, ")");
+          css(ghostEl, 'webkitTransform', cssMatrix);
+          css(ghostEl, 'mozTransform', cssMatrix);
+          css(ghostEl, 'msTransform', cssMatrix);
+          css(ghostEl, 'transform', cssMatrix);
+          lastDx = dx;
+          lastDy = dy;
+          touchEvt = touch;
+        }
+        evt.cancelable && evt.preventDefault();
+      }
+    },
+    _appendGhost: function _appendGhost() {
+      // Bug if using scale(): https://stackoverflow.com/questions/2637058
+      // Not being adjusted for
+      if (!ghostEl) {
+        var container = this.options.fallbackOnBody ? document.body : rootEl,
+          rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container),
+          options = this.options;
+
+        // Position absolutely
+        if (PositionGhostAbsolutely) {
+          // Get relatively positioned parent
+          ghostRelativeParent = container;
+          while (css(ghostRelativeParent, 'position') === 'static' && css(ghostRelativeParent, 'transform') === 'none' && ghostRelativeParent !== document) {
+            ghostRelativeParent = ghostRelativeParent.parentNode;
+          }
+          if (ghostRelativeParent !== document.body && ghostRelativeParent !== document.documentElement) {
+            if (ghostRelativeParent === document) ghostRelativeParent = getWindowScrollingElement();
+            rect.top += ghostRelativeParent.scrollTop;
+            rect.left += ghostRelativeParent.scrollLeft;
+          } else {
+            ghostRelativeParent = getWindowScrollingElement();
+          }
+          ghostRelativeParentInitialScroll = getRelativeScrollOffset(ghostRelativeParent);
+        }
+        ghostEl = dragEl.cloneNode(true);
+        toggleClass(ghostEl, options.ghostClass, false);
+        toggleClass(ghostEl, options.fallbackClass, true);
+        toggleClass(ghostEl, options.dragClass, true);
+        css(ghostEl, 'transition', '');
+        css(ghostEl, 'transform', '');
+        css(ghostEl, 'box-sizing', 'border-box');
+        css(ghostEl, 'margin', 0);
+        css(ghostEl, 'top', rect.top);
+        css(ghostEl, 'left', rect.left);
+        css(ghostEl, 'width', rect.width);
+        css(ghostEl, 'height', rect.height);
+        css(ghostEl, 'opacity', '0.8');
+        css(ghostEl, 'position', PositionGhostAbsolutely ? 'absolute' : 'fixed');
+        css(ghostEl, 'zIndex', '100000');
+        css(ghostEl, 'pointerEvents', 'none');
+        Sortable.ghost = ghostEl;
+        container.appendChild(ghostEl);
+
+        // Set transform-origin
+        css(ghostEl, 'transform-origin', tapDistanceLeft / parseInt(ghostEl.style.width) * 100 + '% ' + tapDistanceTop / parseInt(ghostEl.style.height) * 100 + '%');
+      }
+    },
+    _onDragStart: function _onDragStart( /**Event*/evt, /**boolean*/fallback) {
+      var _this = this;
+      var dataTransfer = evt.dataTransfer;
+      var options = _this.options;
+      pluginEvent('dragStart', this, {
+        evt: evt
+      });
+      if (Sortable.eventCanceled) {
+        this._onDrop();
+        return;
+      }
+      pluginEvent('setupClone', this);
+      if (!Sortable.eventCanceled) {
+        cloneEl = clone(dragEl);
+        cloneEl.removeAttribute("id");
+        cloneEl.draggable = false;
+        cloneEl.style['will-change'] = '';
+        this._hideClone();
+        toggleClass(cloneEl, this.options.chosenClass, false);
+        Sortable.clone = cloneEl;
+      }
+
+      // #1143: IFrame support workaround
+      _this.cloneId = _nextTick(function () {
+        pluginEvent('clone', _this);
+        if (Sortable.eventCanceled) return;
+        if (!_this.options.removeCloneOnHide) {
+          rootEl.insertBefore(cloneEl, dragEl);
+        }
+        _this._hideClone();
+        _dispatchEvent({
+          sortable: _this,
+          name: 'clone'
+        });
+      });
+      !fallback && toggleClass(dragEl, options.dragClass, true);
+
+      // Set proper drop events
+      if (fallback) {
+        ignoreNextClick = true;
+        _this._loopId = setInterval(_this._emulateDragOver, 50);
+      } else {
+        // Undo what was set in _prepareDragStart before drag started
+        off(document, 'mouseup', _this._onDrop);
+        off(document, 'touchend', _this._onDrop);
+        off(document, 'touchcancel', _this._onDrop);
+        if (dataTransfer) {
+          dataTransfer.effectAllowed = 'move';
+          options.setData && options.setData.call(_this, dataTransfer, dragEl);
+        }
+        on(document, 'drop', _this);
+
+        // #1276 fix:
+        css(dragEl, 'transform', 'translateZ(0)');
+      }
+      awaitingDragStarted = true;
+      _this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback, evt));
+      on(document, 'selectstart', _this);
+      moved = true;
+      if (Safari) {
+        css(document.body, 'user-select', 'none');
+      }
+    },
+    // Returns true - if no further action is needed (either inserted or another condition)
+    _onDragOver: function _onDragOver( /**Event*/evt) {
+      var el = this.el,
+        target = evt.target,
+        dragRect,
+        targetRect,
+        revert,
+        options = this.options,
+        group = options.group,
+        activeSortable = Sortable.active,
+        isOwner = activeGroup === group,
+        canSort = options.sort,
+        fromSortable = putSortable || activeSortable,
+        vertical,
+        _this = this,
+        completedFired = false;
+      if (_silent) return;
+      function dragOverEvent(name, extra) {
+        pluginEvent(name, _this, _objectSpread2({
+          evt: evt,
+          isOwner: isOwner,
+          axis: vertical ? 'vertical' : 'horizontal',
+          revert: revert,
+          dragRect: dragRect,
+          targetRect: targetRect,
+          canSort: canSort,
+          fromSortable: fromSortable,
+          target: target,
+          completed: completed,
+          onMove: function onMove(target, after) {
+            return _onMove(rootEl, el, dragEl, dragRect, target, getRect(target), evt, after);
+          },
+          changed: changed
+        }, extra));
+      }
+
+      // Capture animation state
+      function capture() {
+        dragOverEvent('dragOverAnimationCapture');
+        _this.captureAnimationState();
+        if (_this !== fromSortable) {
+          fromSortable.captureAnimationState();
+        }
+      }
+
+      // Return invocation when dragEl is inserted (or completed)
+      function completed(insertion) {
+        dragOverEvent('dragOverCompleted', {
+          insertion: insertion
+        });
+        if (insertion) {
+          // Clones must be hidden before folding animation to capture dragRectAbsolute properly
+          if (isOwner) {
+            activeSortable._hideClone();
+          } else {
+            activeSortable._showClone(_this);
+          }
+          if (_this !== fromSortable) {
+            // Set ghost class to new sortable's ghost class
+            toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+            toggleClass(dragEl, options.ghostClass, true);
+          }
+          if (putSortable !== _this && _this !== Sortable.active) {
+            putSortable = _this;
+          } else if (_this === Sortable.active && putSortable) {
+            putSortable = null;
+          }
+
+          // Animation
+          if (fromSortable === _this) {
+            _this._ignoreWhileAnimating = target;
+          }
+          _this.animateAll(function () {
+            dragOverEvent('dragOverAnimationComplete');
+            _this._ignoreWhileAnimating = null;
+          });
+          if (_this !== fromSortable) {
+            fromSortable.animateAll();
+            fromSortable._ignoreWhileAnimating = null;
+          }
+        }
+
+        // Null lastTarget if it is not inside a previously swapped element
+        if (target === dragEl && !dragEl.animated || target === el && !target.animated) {
+          lastTarget = null;
+        }
+
+        // no bubbling and not fallback
+        if (!options.dragoverBubble && !evt.rootEl && target !== document) {
+          dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
+
+          // Do not detect for empty insert if already inserted
+          !insertion && nearestEmptyInsertDetectEvent(evt);
+        }
+        !options.dragoverBubble && evt.stopPropagation && evt.stopPropagation();
+        return completedFired = true;
+      }
+
+      // Call when dragEl has been inserted
+      function changed() {
+        newIndex = index(dragEl);
+        newDraggableIndex = index(dragEl, options.draggable);
+        _dispatchEvent({
+          sortable: _this,
+          name: 'change',
+          toEl: el,
+          newIndex: newIndex,
+          newDraggableIndex: newDraggableIndex,
+          originalEvent: evt
+        });
+      }
+      if (evt.preventDefault !== void 0) {
+        evt.cancelable && evt.preventDefault();
+      }
+      target = closest(target, options.draggable, el, true);
+      dragOverEvent('dragOver');
+      if (Sortable.eventCanceled) return completedFired;
+      if (dragEl.contains(evt.target) || target.animated && target.animatingX && target.animatingY || _this._ignoreWhileAnimating === target) {
+        return completed(false);
+      }
+      ignoreNextClick = false;
+      if (activeSortable && !options.disabled && (isOwner ? canSort || (revert = parentEl !== rootEl) // Reverting item into the original list
+      : putSortable === this || (this.lastPutMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) && group.checkPut(this, activeSortable, dragEl, evt))) {
+        vertical = this._getDirection(evt, target) === 'vertical';
+        dragRect = getRect(dragEl);
+        dragOverEvent('dragOverValid');
+        if (Sortable.eventCanceled) return completedFired;
+        if (revert) {
+          parentEl = rootEl; // actualization
+          capture();
+          this._hideClone();
+          dragOverEvent('revert');
+          if (!Sortable.eventCanceled) {
+            if (nextEl) {
+              rootEl.insertBefore(dragEl, nextEl);
+            } else {
+              rootEl.appendChild(dragEl);
+            }
+          }
+          return completed(true);
+        }
+        var elLastChild = lastChild(el, options.draggable);
+        if (!elLastChild || _ghostIsLast(evt, vertical, this) && !elLastChild.animated) {
+          // Insert to end of list
+
+          // If already at end of list: Do not insert
+          if (elLastChild === dragEl) {
+            return completed(false);
+          }
+
+          // if there is a last element, it is the target
+          if (elLastChild && el === evt.target) {
+            target = elLastChild;
+          }
+          if (target) {
+            targetRect = getRect(target);
+          }
+          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
+            capture();
+            if (elLastChild && elLastChild.nextSibling) {
+              // the last draggable element is not the last node
+              el.insertBefore(dragEl, elLastChild.nextSibling);
+            } else {
+              el.appendChild(dragEl);
+            }
+            parentEl = el; // actualization
+
+            changed();
+            return completed(true);
+          }
+        } else if (elLastChild && _ghostIsFirst(evt, vertical, this)) {
+          // Insert to start of list
+          var firstChild = getChild(el, 0, options, true);
+          if (firstChild === dragEl) {
+            return completed(false);
+          }
+          target = firstChild;
+          targetRect = getRect(target);
+          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, false) !== false) {
+            capture();
+            el.insertBefore(dragEl, firstChild);
+            parentEl = el; // actualization
+
+            changed();
+            return completed(true);
+          }
+        } else if (target.parentNode === el) {
+          targetRect = getRect(target);
+          var direction = 0,
+            targetBeforeFirstSwap,
+            differentLevel = dragEl.parentNode !== el,
+            differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical),
+            side1 = vertical ? 'top' : 'left',
+            scrolledPastTop = isScrolledPast(target, 'top', 'top') || isScrolledPast(dragEl, 'top', 'top'),
+            scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
+          if (lastTarget !== target) {
+            targetBeforeFirstSwap = targetRect[side1];
+            pastFirstInvertThresh = false;
+            isCircumstantialInvert = !differentRowCol && options.invertSwap || differentLevel;
+          }
+          direction = _getSwapDirection(evt, target, targetRect, vertical, differentRowCol ? 1 : options.swapThreshold, options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold, isCircumstantialInvert, lastTarget === target);
+          var sibling;
+          if (direction !== 0) {
+            // Check if target is beside dragEl in respective direction (ignoring hidden elements)
+            var dragIndex = index(dragEl);
+            do {
+              dragIndex -= direction;
+              sibling = parentEl.children[dragIndex];
+            } while (sibling && (css(sibling, 'display') === 'none' || sibling === ghostEl));
+          }
+          // If dragEl is already beside target: Do not insert
+          if (direction === 0 || sibling === target) {
+            return completed(false);
+          }
+          lastTarget = target;
+          lastDirection = direction;
+          var nextSibling = target.nextElementSibling,
+            after = false;
+          after = direction === 1;
+          var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
+          if (moveVector !== false) {
+            if (moveVector === 1 || moveVector === -1) {
+              after = moveVector === 1;
+            }
+            _silent = true;
+            setTimeout(_unsilent, 30);
+            capture();
+            if (after && !nextSibling) {
+              el.appendChild(dragEl);
+            } else {
+              target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+            }
+
+            // Undo chrome's scroll adjustment (has no effect on other browsers)
+            if (scrolledPastTop) {
+              scrollBy(scrolledPastTop, 0, scrollBefore - scrolledPastTop.scrollTop);
+            }
+            parentEl = dragEl.parentNode; // actualization
+
+            // must be done before animation
+            if (targetBeforeFirstSwap !== undefined && !isCircumstantialInvert) {
+              targetMoveDistance = Math.abs(targetBeforeFirstSwap - getRect(target)[side1]);
+            }
+            changed();
+            return completed(true);
+          }
+        }
+        if (el.contains(dragEl)) {
+          return completed(false);
+        }
+      }
+      return false;
+    },
+    _ignoreWhileAnimating: null,
+    _offMoveEvents: function _offMoveEvents() {
+      off(document, 'mousemove', this._onTouchMove);
+      off(document, 'touchmove', this._onTouchMove);
+      off(document, 'pointermove', this._onTouchMove);
+      off(document, 'dragover', nearestEmptyInsertDetectEvent);
+      off(document, 'mousemove', nearestEmptyInsertDetectEvent);
+      off(document, 'touchmove', nearestEmptyInsertDetectEvent);
+    },
+    _offUpEvents: function _offUpEvents() {
+      var ownerDocument = this.el.ownerDocument;
+      off(ownerDocument, 'mouseup', this._onDrop);
+      off(ownerDocument, 'touchend', this._onDrop);
+      off(ownerDocument, 'pointerup', this._onDrop);
+      off(ownerDocument, 'touchcancel', this._onDrop);
+      off(document, 'selectstart', this);
+    },
+    _onDrop: function _onDrop( /**Event*/evt) {
+      var el = this.el,
+        options = this.options;
+
+      // Get the index of the dragged element within its parent
+      newIndex = index(dragEl);
+      newDraggableIndex = index(dragEl, options.draggable);
+      pluginEvent('drop', this, {
+        evt: evt
+      });
+      parentEl = dragEl && dragEl.parentNode;
+
+      // Get again after plugin event
+      newIndex = index(dragEl);
+      newDraggableIndex = index(dragEl, options.draggable);
+      if (Sortable.eventCanceled) {
+        this._nulling();
+        return;
+      }
+      awaitingDragStarted = false;
+      isCircumstantialInvert = false;
+      pastFirstInvertThresh = false;
+      clearInterval(this._loopId);
+      clearTimeout(this._dragStartTimer);
+      _cancelNextTick(this.cloneId);
+      _cancelNextTick(this._dragStartId);
+
+      // Unbind events
+      if (this.nativeDraggable) {
+        off(document, 'drop', this);
+        off(el, 'dragstart', this._onDragStart);
+      }
+      this._offMoveEvents();
+      this._offUpEvents();
+      if (Safari) {
+        css(document.body, 'user-select', '');
+      }
+      css(dragEl, 'transform', '');
+      if (evt) {
+        if (moved) {
+          evt.cancelable && evt.preventDefault();
+          !options.dropBubble && evt.stopPropagation();
+        }
+        ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
+        if (rootEl === parentEl || putSortable && putSortable.lastPutMode !== 'clone') {
+          // Remove clone(s)
+          cloneEl && cloneEl.parentNode && cloneEl.parentNode.removeChild(cloneEl);
+        }
+        if (dragEl) {
+          if (this.nativeDraggable) {
+            off(dragEl, 'dragend', this);
+          }
+          _disableDraggable(dragEl);
+          dragEl.style['will-change'] = '';
+
+          // Remove classes
+          // ghostClass is added in dragStarted
+          if (moved && !awaitingDragStarted) {
+            toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : this.options.ghostClass, false);
+          }
+          toggleClass(dragEl, this.options.chosenClass, false);
+
+          // Drag stop event
+          _dispatchEvent({
+            sortable: this,
+            name: 'unchoose',
+            toEl: parentEl,
+            newIndex: null,
+            newDraggableIndex: null,
+            originalEvent: evt
+          });
+          if (rootEl !== parentEl) {
+            if (newIndex >= 0) {
+              // Add event
+              _dispatchEvent({
+                rootEl: parentEl,
+                name: 'add',
+                toEl: parentEl,
+                fromEl: rootEl,
+                originalEvent: evt
+              });
+
+              // Remove event
+              _dispatchEvent({
+                sortable: this,
+                name: 'remove',
+                toEl: parentEl,
+                originalEvent: evt
+              });
+
+              // drag from one list and drop into another
+              _dispatchEvent({
+                rootEl: parentEl,
+                name: 'sort',
+                toEl: parentEl,
+                fromEl: rootEl,
+                originalEvent: evt
+              });
+              _dispatchEvent({
+                sortable: this,
+                name: 'sort',
+                toEl: parentEl,
+                originalEvent: evt
+              });
+            }
+            putSortable && putSortable.save();
+          } else {
+            if (newIndex !== oldIndex) {
+              if (newIndex >= 0) {
+                // drag & drop within the same list
+                _dispatchEvent({
+                  sortable: this,
+                  name: 'update',
+                  toEl: parentEl,
+                  originalEvent: evt
+                });
+                _dispatchEvent({
+                  sortable: this,
+                  name: 'sort',
+                  toEl: parentEl,
+                  originalEvent: evt
+                });
+              }
+            }
+          }
+          if (Sortable.active) {
+            /* jshint eqnull:true */
+            if (newIndex == null || newIndex === -1) {
+              newIndex = oldIndex;
+              newDraggableIndex = oldDraggableIndex;
+            }
+            _dispatchEvent({
+              sortable: this,
+              name: 'end',
+              toEl: parentEl,
+              originalEvent: evt
+            });
+
+            // Save sorting
+            this.save();
+          }
+        }
+      }
+      this._nulling();
+    },
+    _nulling: function _nulling() {
+      pluginEvent('nulling', this);
+      rootEl = dragEl = parentEl = ghostEl = nextEl = cloneEl = lastDownEl = cloneHidden = tapEvt = touchEvt = moved = newIndex = newDraggableIndex = oldIndex = oldDraggableIndex = lastTarget = lastDirection = putSortable = activeGroup = Sortable.dragged = Sortable.ghost = Sortable.clone = Sortable.active = null;
+      savedInputChecked.forEach(function (el) {
+        el.checked = true;
+      });
+      savedInputChecked.length = lastDx = lastDy = 0;
+    },
+    handleEvent: function handleEvent( /**Event*/evt) {
+      switch (evt.type) {
+        case 'drop':
+        case 'dragend':
+          this._onDrop(evt);
+          break;
+        case 'dragenter':
+        case 'dragover':
+          if (dragEl) {
+            this._onDragOver(evt);
+            _globalDragOver(evt);
+          }
+          break;
+        case 'selectstart':
+          evt.preventDefault();
+          break;
+      }
+    },
+    /**
+     * Serializes the item into an array of string.
+     * @returns {String[]}
+     */
+    toArray: function toArray() {
+      var order = [],
+        el,
+        children = this.el.children,
+        i = 0,
+        n = children.length,
+        options = this.options;
+      for (; i < n; i++) {
+        el = children[i];
+        if (closest(el, options.draggable, this.el, false)) {
+          order.push(el.getAttribute(options.dataIdAttr) || _generateId(el));
+        }
+      }
+      return order;
+    },
+    /**
+     * Sorts the elements according to the array.
+     * @param  {String[]}  order  order of the items
+     */
+    sort: function sort(order, useAnimation) {
+      var items = {},
+        rootEl = this.el;
+      this.toArray().forEach(function (id, i) {
+        var el = rootEl.children[i];
+        if (closest(el, this.options.draggable, rootEl, false)) {
+          items[id] = el;
+        }
+      }, this);
+      useAnimation && this.captureAnimationState();
+      order.forEach(function (id) {
+        if (items[id]) {
+          rootEl.removeChild(items[id]);
+          rootEl.appendChild(items[id]);
+        }
+      });
+      useAnimation && this.animateAll();
+    },
+    /**
+     * Save the current sorting
+     */
+    save: function save() {
+      var store = this.options.store;
+      store && store.set && store.set(this);
+    },
+    /**
+     * For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
+     * @param   {HTMLElement}  el
+     * @param   {String}       [selector]  default: `options.draggable`
+     * @returns {HTMLElement|null}
+     */
+    closest: function closest$1(el, selector) {
+      return closest(el, selector || this.options.draggable, this.el, false);
+    },
+    /**
+     * Set/get option
+     * @param   {string} name
+     * @param   {*}      [value]
+     * @returns {*}
+     */
+    option: function option(name, value) {
+      var options = this.options;
+      if (value === void 0) {
+        return options[name];
+      } else {
+        var modifiedValue = PluginManager.modifyOption(this, name, value);
+        if (typeof modifiedValue !== 'undefined') {
+          options[name] = modifiedValue;
+        } else {
+          options[name] = value;
+        }
+        if (name === 'group') {
+          _prepareGroup(options);
+        }
+      }
+    },
+    /**
+     * Destroy
+     */
+    destroy: function destroy() {
+      pluginEvent('destroy', this);
+      var el = this.el;
+      el[expando] = null;
+      off(el, 'mousedown', this._onTapStart);
+      off(el, 'touchstart', this._onTapStart);
+      off(el, 'pointerdown', this._onTapStart);
+      if (this.nativeDraggable) {
+        off(el, 'dragover', this);
+        off(el, 'dragenter', this);
+      }
+      // Remove draggable attributes
+      Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
+        el.removeAttribute('draggable');
+      });
+      this._onDrop();
+      this._disableDelayedDragEvents();
+      sortables.splice(sortables.indexOf(this.el), 1);
+      this.el = el = null;
+    },
+    _hideClone: function _hideClone() {
+      if (!cloneHidden) {
+        pluginEvent('hideClone', this);
+        if (Sortable.eventCanceled) return;
+        css(cloneEl, 'display', 'none');
+        if (this.options.removeCloneOnHide && cloneEl.parentNode) {
+          cloneEl.parentNode.removeChild(cloneEl);
+        }
+        cloneHidden = true;
+      }
+    },
+    _showClone: function _showClone(putSortable) {
+      if (putSortable.lastPutMode !== 'clone') {
+        this._hideClone();
+        return;
+      }
+      if (cloneHidden) {
+        pluginEvent('showClone', this);
+        if (Sortable.eventCanceled) return;
+
+        // show clone at dragEl or original position
+        if (dragEl.parentNode == rootEl && !this.options.group.revertClone) {
+          rootEl.insertBefore(cloneEl, dragEl);
+        } else if (nextEl) {
+          rootEl.insertBefore(cloneEl, nextEl);
+        } else {
+          rootEl.appendChild(cloneEl);
+        }
+        if (this.options.group.revertClone) {
+          this.animate(dragEl, cloneEl);
+        }
+        css(cloneEl, 'display', '');
+        cloneHidden = false;
+      }
+    }
+  };
+  function _globalDragOver( /**Event*/evt) {
+    if (evt.dataTransfer) {
+      evt.dataTransfer.dropEffect = 'move';
+    }
+    evt.cancelable && evt.preventDefault();
+  }
+  function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvent, willInsertAfter) {
+    var evt,
+      sortable = fromEl[expando],
+      onMoveFn = sortable.options.onMove,
+      retVal;
+    // Support for new CustomEvent feature
+    if (window.CustomEvent && !IE11OrLess && !Edge) {
+      evt = new CustomEvent('move', {
+        bubbles: true,
+        cancelable: true
+      });
+    } else {
+      evt = document.createEvent('Event');
+      evt.initEvent('move', true, true);
+    }
+    evt.to = toEl;
+    evt.from = fromEl;
+    evt.dragged = dragEl;
+    evt.draggedRect = dragRect;
+    evt.related = targetEl || toEl;
+    evt.relatedRect = targetRect || getRect(toEl);
+    evt.willInsertAfter = willInsertAfter;
+    evt.originalEvent = originalEvent;
+    fromEl.dispatchEvent(evt);
+    if (onMoveFn) {
+      retVal = onMoveFn.call(sortable, evt, originalEvent);
+    }
+    return retVal;
+  }
+  function _disableDraggable(el) {
+    el.draggable = false;
+  }
+  function _unsilent() {
+    _silent = false;
+  }
+  function _ghostIsFirst(evt, vertical, sortable) {
+    var firstElRect = getRect(getChild(sortable.el, 0, sortable.options, true));
+    var childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);
+    var spacer = 10;
+    return vertical ? evt.clientX < childContainingRect.left - spacer || evt.clientY < firstElRect.top && evt.clientX < firstElRect.right : evt.clientY < childContainingRect.top - spacer || evt.clientY < firstElRect.bottom && evt.clientX < firstElRect.left;
+  }
+  function _ghostIsLast(evt, vertical, sortable) {
+    var lastElRect = getRect(lastChild(sortable.el, sortable.options.draggable));
+    var childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);
+    var spacer = 10;
+    return vertical ? evt.clientX > childContainingRect.right + spacer || evt.clientY > lastElRect.bottom && evt.clientX > lastElRect.left : evt.clientY > childContainingRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top;
+  }
+  function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
+    var mouseOnAxis = vertical ? evt.clientY : evt.clientX,
+      targetLength = vertical ? targetRect.height : targetRect.width,
+      targetS1 = vertical ? targetRect.top : targetRect.left,
+      targetS2 = vertical ? targetRect.bottom : targetRect.right,
+      invert = false;
+    if (!invertSwap) {
+      // Never invert or create dragEl shadow when target movemenet causes mouse to move past the end of regular swapThreshold
+      if (isLastTarget && targetMoveDistance < targetLength * swapThreshold) {
+        // multiplied only by swapThreshold because mouse will already be inside target by (1 - threshold) * targetLength / 2
+        // check if past first invert threshold on side opposite of lastDirection
+        if (!pastFirstInvertThresh && (lastDirection === 1 ? mouseOnAxis > targetS1 + targetLength * invertedSwapThreshold / 2 : mouseOnAxis < targetS2 - targetLength * invertedSwapThreshold / 2)) {
+          // past first invert threshold, do not restrict inverted threshold to dragEl shadow
+          pastFirstInvertThresh = true;
+        }
+        if (!pastFirstInvertThresh) {
+          // dragEl shadow (target move distance shadow)
+          if (lastDirection === 1 ? mouseOnAxis < targetS1 + targetMoveDistance // over dragEl shadow
+          : mouseOnAxis > targetS2 - targetMoveDistance) {
+            return -lastDirection;
+          }
+        } else {
+          invert = true;
+        }
+      } else {
+        // Regular
+        if (mouseOnAxis > targetS1 + targetLength * (1 - swapThreshold) / 2 && mouseOnAxis < targetS2 - targetLength * (1 - swapThreshold) / 2) {
+          return _getInsertDirection(target);
+        }
+      }
+    }
+    invert = invert || invertSwap;
+    if (invert) {
+      // Invert of regular
+      if (mouseOnAxis < targetS1 + targetLength * invertedSwapThreshold / 2 || mouseOnAxis > targetS2 - targetLength * invertedSwapThreshold / 2) {
+        return mouseOnAxis > targetS1 + targetLength / 2 ? 1 : -1;
+      }
+    }
+    return 0;
+  }
+
+  /**
+   * Gets the direction dragEl must be swapped relative to target in order to make it
+   * seem that dragEl has been "inserted" into that element's position
+   * @param  {HTMLElement} target       The target whose position dragEl is being inserted at
+   * @return {Number}                   Direction dragEl must be swapped
+   */
+  function _getInsertDirection(target) {
+    if (index(dragEl) < index(target)) {
+      return 1;
+    } else {
+      return -1;
+    }
+  }
+
+  /**
+   * Generate id
+   * @param   {HTMLElement} el
+   * @returns {String}
+   * @private
+   */
+  function _generateId(el) {
+    var str = el.tagName + el.className + el.src + el.href + el.textContent,
+      i = str.length,
+      sum = 0;
+    while (i--) {
+      sum += str.charCodeAt(i);
+    }
+    return sum.toString(36);
+  }
+  function _saveInputCheckedState(root) {
+    savedInputChecked.length = 0;
+    var inputs = root.getElementsByTagName('input');
+    var idx = inputs.length;
+    while (idx--) {
+      var el = inputs[idx];
+      el.checked && savedInputChecked.push(el);
+    }
+  }
+  function _nextTick(fn) {
+    return setTimeout(fn, 0);
+  }
+  function _cancelNextTick(id) {
+    return clearTimeout(id);
+  }
+
+  // Fixed #973:
+  if (documentExists) {
+    on(document, 'touchmove', function (evt) {
+      if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
+        evt.preventDefault();
+      }
+    });
+  }
+
+  // Export utils
+  Sortable.utils = {
+    on: on,
+    off: off,
+    css: css,
+    find: find,
+    is: function is(el, selector) {
+      return !!closest(el, selector, el, false);
+    },
+    extend: extend,
+    throttle: throttle,
+    closest: closest,
+    toggleClass: toggleClass,
+    clone: clone,
+    index: index,
+    nextTick: _nextTick,
+    cancelNextTick: _cancelNextTick,
+    detectDirection: _detectDirection,
+    getChild: getChild
+  };
+
+  /**
+   * Get the Sortable instance of an element
+   * @param  {HTMLElement} element The element
+   * @return {Sortable|undefined}         The instance of Sortable
+   */
+  Sortable.get = function (element) {
+    return element[expando];
+  };
+
+  /**
+   * Mount a plugin to Sortable
+   * @param  {...SortablePlugin|SortablePlugin[]} plugins       Plugins being mounted
+   */
+  Sortable.mount = function () {
+    for (var _len = arguments.length, plugins = new Array(_len), _key = 0; _key < _len; _key++) {
+      plugins[_key] = arguments[_key];
+    }
+    if (plugins[0].constructor === Array) plugins = plugins[0];
+    plugins.forEach(function (plugin) {
+      if (!plugin.prototype || !plugin.prototype.constructor) {
+        throw "Sortable: Mounted plugin must be a constructor function, not ".concat({}.toString.call(plugin));
+      }
+      if (plugin.utils) Sortable.utils = _objectSpread2(_objectSpread2({}, Sortable.utils), plugin.utils);
+      PluginManager.mount(plugin);
+    });
+  };
+
+  /**
+   * Create sortable instance
+   * @param {HTMLElement}  el
+   * @param {Object}      [options]
+   */
+  Sortable.create = function (el, options) {
+    return new Sortable(el, options);
+  };
+
+  // Export
+  Sortable.version = version;
+
+  var autoScrolls = [],
+    scrollEl,
+    scrollRootEl,
+    scrolling = false,
+    lastAutoScrollX,
+    lastAutoScrollY,
+    touchEvt$1,
+    pointerElemChangedInterval;
+  function AutoScrollPlugin() {
+    function AutoScroll() {
+      this.defaults = {
+        scroll: true,
+        forceAutoScrollFallback: false,
+        scrollSensitivity: 30,
+        scrollSpeed: 10,
+        bubbleScroll: true
+      };
+
+      // Bind all private methods
+      for (var fn in this) {
+        if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
+          this[fn] = this[fn].bind(this);
+        }
+      }
+    }
+    AutoScroll.prototype = {
+      dragStarted: function dragStarted(_ref) {
+        var originalEvent = _ref.originalEvent;
+        if (this.sortable.nativeDraggable) {
+          on(document, 'dragover', this._handleAutoScroll);
+        } else {
+          if (this.options.supportPointer) {
+            on(document, 'pointermove', this._handleFallbackAutoScroll);
+          } else if (originalEvent.touches) {
+            on(document, 'touchmove', this._handleFallbackAutoScroll);
+          } else {
+            on(document, 'mousemove', this._handleFallbackAutoScroll);
+          }
+        }
+      },
+      dragOverCompleted: function dragOverCompleted(_ref2) {
+        var originalEvent = _ref2.originalEvent;
+        // For when bubbling is canceled and using fallback (fallback 'touchmove' always reached)
+        if (!this.options.dragOverBubble && !originalEvent.rootEl) {
+          this._handleAutoScroll(originalEvent);
+        }
+      },
+      drop: function drop() {
+        if (this.sortable.nativeDraggable) {
+          off(document, 'dragover', this._handleAutoScroll);
+        } else {
+          off(document, 'pointermove', this._handleFallbackAutoScroll);
+          off(document, 'touchmove', this._handleFallbackAutoScroll);
+          off(document, 'mousemove', this._handleFallbackAutoScroll);
+        }
+        clearPointerElemChangedInterval();
+        clearAutoScrolls();
+        cancelThrottle();
+      },
+      nulling: function nulling() {
+        touchEvt$1 = scrollRootEl = scrollEl = scrolling = pointerElemChangedInterval = lastAutoScrollX = lastAutoScrollY = null;
+        autoScrolls.length = 0;
+      },
+      _handleFallbackAutoScroll: function _handleFallbackAutoScroll(evt) {
+        this._handleAutoScroll(evt, true);
+      },
+      _handleAutoScroll: function _handleAutoScroll(evt, fallback) {
+        var _this = this;
+        var x = (evt.touches ? evt.touches[0] : evt).clientX,
+          y = (evt.touches ? evt.touches[0] : evt).clientY,
+          elem = document.elementFromPoint(x, y);
+        touchEvt$1 = evt;
+
+        // IE does not seem to have native autoscroll,
+        // Edge's autoscroll seems too conditional,
+        // MACOS Safari does not have autoscroll,
+        // Firefox and Chrome are good
+        if (fallback || this.options.forceAutoScrollFallback || Edge || IE11OrLess || Safari) {
+          autoScroll(evt, this.options, elem, fallback);
+
+          // Listener for pointer element change
+          var ogElemScroller = getParentAutoScrollElement(elem, true);
+          if (scrolling && (!pointerElemChangedInterval || x !== lastAutoScrollX || y !== lastAutoScrollY)) {
+            pointerElemChangedInterval && clearPointerElemChangedInterval();
+            // Detect for pointer elem change, emulating native DnD behaviour
+            pointerElemChangedInterval = setInterval(function () {
+              var newElem = getParentAutoScrollElement(document.elementFromPoint(x, y), true);
+              if (newElem !== ogElemScroller) {
+                ogElemScroller = newElem;
+                clearAutoScrolls();
+              }
+              autoScroll(evt, _this.options, newElem, fallback);
+            }, 10);
+            lastAutoScrollX = x;
+            lastAutoScrollY = y;
+          }
+        } else {
+          // if DnD is enabled (and browser has good autoscrolling), first autoscroll will already scroll, so get parent autoscroll of first autoscroll
+          if (!this.options.bubbleScroll || getParentAutoScrollElement(elem, true) === getWindowScrollingElement()) {
+            clearAutoScrolls();
+            return;
+          }
+          autoScroll(evt, this.options, getParentAutoScrollElement(elem, false), false);
+        }
+      }
+    };
+    return _extends(AutoScroll, {
+      pluginName: 'scroll',
+      initializeByDefault: true
+    });
+  }
+  function clearAutoScrolls() {
+    autoScrolls.forEach(function (autoScroll) {
+      clearInterval(autoScroll.pid);
+    });
+    autoScrolls = [];
+  }
+  function clearPointerElemChangedInterval() {
+    clearInterval(pointerElemChangedInterval);
+  }
+  var autoScroll = throttle(function (evt, options, rootEl, isFallback) {
+    // Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
+    if (!options.scroll) return;
+    var x = (evt.touches ? evt.touches[0] : evt).clientX,
+      y = (evt.touches ? evt.touches[0] : evt).clientY,
+      sens = options.scrollSensitivity,
+      speed = options.scrollSpeed,
+      winScroller = getWindowScrollingElement();
+    var scrollThisInstance = false,
+      scrollCustomFn;
+
+    // New scroll root, set scrollEl
+    if (scrollRootEl !== rootEl) {
+      scrollRootEl = rootEl;
+      clearAutoScrolls();
+      scrollEl = options.scroll;
+      scrollCustomFn = options.scrollFn;
+      if (scrollEl === true) {
+        scrollEl = getParentAutoScrollElement(rootEl, true);
+      }
+    }
+    var layersOut = 0;
+    var currentParent = scrollEl;
+    do {
+      var el = currentParent,
+        rect = getRect(el),
+        top = rect.top,
+        bottom = rect.bottom,
+        left = rect.left,
+        right = rect.right,
+        width = rect.width,
+        height = rect.height,
+        canScrollX = void 0,
+        canScrollY = void 0,
+        scrollWidth = el.scrollWidth,
+        scrollHeight = el.scrollHeight,
+        elCSS = css(el),
+        scrollPosX = el.scrollLeft,
+        scrollPosY = el.scrollTop;
+      if (el === winScroller) {
+        canScrollX = width < scrollWidth && (elCSS.overflowX === 'auto' || elCSS.overflowX === 'scroll' || elCSS.overflowX === 'visible');
+        canScrollY = height < scrollHeight && (elCSS.overflowY === 'auto' || elCSS.overflowY === 'scroll' || elCSS.overflowY === 'visible');
+      } else {
+        canScrollX = width < scrollWidth && (elCSS.overflowX === 'auto' || elCSS.overflowX === 'scroll');
+        canScrollY = height < scrollHeight && (elCSS.overflowY === 'auto' || elCSS.overflowY === 'scroll');
+      }
+      var vx = canScrollX && (Math.abs(right - x) <= sens && scrollPosX + width < scrollWidth) - (Math.abs(left - x) <= sens && !!scrollPosX);
+      var vy = canScrollY && (Math.abs(bottom - y) <= sens && scrollPosY + height < scrollHeight) - (Math.abs(top - y) <= sens && !!scrollPosY);
+      if (!autoScrolls[layersOut]) {
+        for (var i = 0; i <= layersOut; i++) {
+          if (!autoScrolls[i]) {
+            autoScrolls[i] = {};
+          }
+        }
+      }
+      if (autoScrolls[layersOut].vx != vx || autoScrolls[layersOut].vy != vy || autoScrolls[layersOut].el !== el) {
+        autoScrolls[layersOut].el = el;
+        autoScrolls[layersOut].vx = vx;
+        autoScrolls[layersOut].vy = vy;
+        clearInterval(autoScrolls[layersOut].pid);
+        if (vx != 0 || vy != 0) {
+          scrollThisInstance = true;
+          /* jshint loopfunc:true */
+          autoScrolls[layersOut].pid = setInterval(function () {
+            // emulate drag over during autoscroll (fallback), emulating native DnD behaviour
+            if (isFallback && this.layer === 0) {
+              Sortable.active._onTouchMove(touchEvt$1); // To move ghost if it is positioned absolutely
+            }
+            var scrollOffsetY = autoScrolls[this.layer].vy ? autoScrolls[this.layer].vy * speed : 0;
+            var scrollOffsetX = autoScrolls[this.layer].vx ? autoScrolls[this.layer].vx * speed : 0;
+            if (typeof scrollCustomFn === 'function') {
+              if (scrollCustomFn.call(Sortable.dragged.parentNode[expando], scrollOffsetX, scrollOffsetY, evt, touchEvt$1, autoScrolls[this.layer].el) !== 'continue') {
+                return;
+              }
+            }
+            scrollBy(autoScrolls[this.layer].el, scrollOffsetX, scrollOffsetY);
+          }.bind({
+            layer: layersOut
+          }), 24);
+        }
+      }
+      layersOut++;
+    } while (options.bubbleScroll && currentParent !== winScroller && (currentParent = getParentAutoScrollElement(currentParent, false)));
+    scrolling = scrollThisInstance; // in case another function catches scrolling as false in between when it is not
+  }, 30);
+
+  var drop = function drop(_ref) {
+    var originalEvent = _ref.originalEvent,
+      putSortable = _ref.putSortable,
+      dragEl = _ref.dragEl,
+      activeSortable = _ref.activeSortable,
+      dispatchSortableEvent = _ref.dispatchSortableEvent,
+      hideGhostForTarget = _ref.hideGhostForTarget,
+      unhideGhostForTarget = _ref.unhideGhostForTarget;
+    if (!originalEvent) return;
+    var toSortable = putSortable || activeSortable;
+    hideGhostForTarget();
+    var touch = originalEvent.changedTouches && originalEvent.changedTouches.length ? originalEvent.changedTouches[0] : originalEvent;
+    var target = document.elementFromPoint(touch.clientX, touch.clientY);
+    unhideGhostForTarget();
+    if (toSortable && !toSortable.el.contains(target)) {
+      dispatchSortableEvent('spill');
+      this.onSpill({
+        dragEl: dragEl,
+        putSortable: putSortable
+      });
+    }
+  };
+  function Revert() {}
+  Revert.prototype = {
+    startIndex: null,
+    dragStart: function dragStart(_ref2) {
+      var oldDraggableIndex = _ref2.oldDraggableIndex;
+      this.startIndex = oldDraggableIndex;
+    },
+    onSpill: function onSpill(_ref3) {
+      var dragEl = _ref3.dragEl,
+        putSortable = _ref3.putSortable;
+      this.sortable.captureAnimationState();
+      if (putSortable) {
+        putSortable.captureAnimationState();
+      }
+      var nextSibling = getChild(this.sortable.el, this.startIndex, this.options);
+      if (nextSibling) {
+        this.sortable.el.insertBefore(dragEl, nextSibling);
+      } else {
+        this.sortable.el.appendChild(dragEl);
+      }
+      this.sortable.animateAll();
+      if (putSortable) {
+        putSortable.animateAll();
+      }
+    },
+    drop: drop
+  };
+  _extends(Revert, {
+    pluginName: 'revertOnSpill'
+  });
+  function Remove() {}
+  Remove.prototype = {
+    onSpill: function onSpill(_ref4) {
+      var dragEl = _ref4.dragEl,
+        putSortable = _ref4.putSortable;
+      var parentSortable = putSortable || this.sortable;
+      parentSortable.captureAnimationState();
+      dragEl.parentNode && dragEl.parentNode.removeChild(dragEl);
+      parentSortable.animateAll();
+    },
+    drop: drop
+  };
+  _extends(Remove, {
+    pluginName: 'removeOnSpill'
+  });
+
+  var lastSwapEl;
+  function SwapPlugin() {
+    function Swap() {
+      this.defaults = {
+        swapClass: 'sortable-swap-highlight'
+      };
+    }
+    Swap.prototype = {
+      dragStart: function dragStart(_ref) {
+        var dragEl = _ref.dragEl;
+        lastSwapEl = dragEl;
+      },
+      dragOverValid: function dragOverValid(_ref2) {
+        var completed = _ref2.completed,
+          target = _ref2.target,
+          onMove = _ref2.onMove,
+          activeSortable = _ref2.activeSortable,
+          changed = _ref2.changed,
+          cancel = _ref2.cancel;
+        if (!activeSortable.options.swap) return;
+        var el = this.sortable.el,
+          options = this.options;
+        if (target && target !== el) {
+          var prevSwapEl = lastSwapEl;
+          if (onMove(target) !== false) {
+            toggleClass(target, options.swapClass, true);
+            lastSwapEl = target;
+          } else {
+            lastSwapEl = null;
+          }
+          if (prevSwapEl && prevSwapEl !== lastSwapEl) {
+            toggleClass(prevSwapEl, options.swapClass, false);
+          }
+        }
+        changed();
+        completed(true);
+        cancel();
+      },
+      drop: function drop(_ref3) {
+        var activeSortable = _ref3.activeSortable,
+          putSortable = _ref3.putSortable,
+          dragEl = _ref3.dragEl;
+        var toSortable = putSortable || this.sortable;
+        var options = this.options;
+        lastSwapEl && toggleClass(lastSwapEl, options.swapClass, false);
+        if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
+          if (dragEl !== lastSwapEl) {
+            toSortable.captureAnimationState();
+            if (toSortable !== activeSortable) activeSortable.captureAnimationState();
+            swapNodes(dragEl, lastSwapEl);
+            toSortable.animateAll();
+            if (toSortable !== activeSortable) activeSortable.animateAll();
+          }
+        }
+      },
+      nulling: function nulling() {
+        lastSwapEl = null;
+      }
+    };
+    return _extends(Swap, {
+      pluginName: 'swap',
+      eventProperties: function eventProperties() {
+        return {
+          swapItem: lastSwapEl
+        };
+      }
+    });
+  }
+  function swapNodes(n1, n2) {
+    var p1 = n1.parentNode,
+      p2 = n2.parentNode,
+      i1,
+      i2;
+    if (!p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1)) return;
+    i1 = index(n1);
+    i2 = index(n2);
+    if (p1.isEqualNode(p2) && i1 < i2) {
+      i2++;
+    }
+    p1.insertBefore(n2, p1.children[i1]);
+    p2.insertBefore(n1, p2.children[i2]);
+  }
+
+  var multiDragElements = [],
+    multiDragClones = [],
+    lastMultiDragSelect,
+    // for selection with modifier key down (SHIFT)
+    multiDragSortable,
+    initialFolding = false,
+    // Initial multi-drag fold when drag started
+    folding = false,
+    // Folding any other time
+    dragStarted = false,
+    dragEl$1,
+    clonesFromRect,
+    clonesHidden;
+  function MultiDragPlugin() {
+    function MultiDrag(sortable) {
+      // Bind all private methods
+      for (var fn in this) {
+        if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
+          this[fn] = this[fn].bind(this);
+        }
+      }
+      if (!sortable.options.avoidImplicitDeselect) {
+        if (sortable.options.supportPointer) {
+          on(document, 'pointerup', this._deselectMultiDrag);
+        } else {
+          on(document, 'mouseup', this._deselectMultiDrag);
+          on(document, 'touchend', this._deselectMultiDrag);
+        }
+      }
+      on(document, 'keydown', this._checkKeyDown);
+      on(document, 'keyup', this._checkKeyUp);
+      this.defaults = {
+        selectedClass: 'sortable-selected',
+        multiDragKey: null,
+        avoidImplicitDeselect: false,
+        setData: function setData(dataTransfer, dragEl) {
+          var data = '';
+          if (multiDragElements.length && multiDragSortable === sortable) {
+            multiDragElements.forEach(function (multiDragElement, i) {
+              data += (!i ? '' : ', ') + multiDragElement.textContent;
+            });
+          } else {
+            data = dragEl.textContent;
+          }
+          dataTransfer.setData('Text', data);
+        }
+      };
+    }
+    MultiDrag.prototype = {
+      multiDragKeyDown: false,
+      isMultiDrag: false,
+      delayStartGlobal: function delayStartGlobal(_ref) {
+        var dragged = _ref.dragEl;
+        dragEl$1 = dragged;
+      },
+      delayEnded: function delayEnded() {
+        this.isMultiDrag = ~multiDragElements.indexOf(dragEl$1);
+      },
+      setupClone: function setupClone(_ref2) {
+        var sortable = _ref2.sortable,
+          cancel = _ref2.cancel;
+        if (!this.isMultiDrag) return;
+        for (var i = 0; i < multiDragElements.length; i++) {
+          multiDragClones.push(clone(multiDragElements[i]));
+          multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
+          multiDragClones[i].draggable = false;
+          multiDragClones[i].style['will-change'] = '';
+          toggleClass(multiDragClones[i], this.options.selectedClass, false);
+          multiDragElements[i] === dragEl$1 && toggleClass(multiDragClones[i], this.options.chosenClass, false);
+        }
+        sortable._hideClone();
+        cancel();
+      },
+      clone: function clone(_ref3) {
+        var sortable = _ref3.sortable,
+          rootEl = _ref3.rootEl,
+          dispatchSortableEvent = _ref3.dispatchSortableEvent,
+          cancel = _ref3.cancel;
+        if (!this.isMultiDrag) return;
+        if (!this.options.removeCloneOnHide) {
+          if (multiDragElements.length && multiDragSortable === sortable) {
+            insertMultiDragClones(true, rootEl);
+            dispatchSortableEvent('clone');
+            cancel();
+          }
+        }
+      },
+      showClone: function showClone(_ref4) {
+        var cloneNowShown = _ref4.cloneNowShown,
+          rootEl = _ref4.rootEl,
+          cancel = _ref4.cancel;
+        if (!this.isMultiDrag) return;
+        insertMultiDragClones(false, rootEl);
+        multiDragClones.forEach(function (clone) {
+          css(clone, 'display', '');
+        });
+        cloneNowShown();
+        clonesHidden = false;
+        cancel();
+      },
+      hideClone: function hideClone(_ref5) {
+        var _this = this;
+        var sortable = _ref5.sortable,
+          cloneNowHidden = _ref5.cloneNowHidden,
+          cancel = _ref5.cancel;
+        if (!this.isMultiDrag) return;
+        multiDragClones.forEach(function (clone) {
+          css(clone, 'display', 'none');
+          if (_this.options.removeCloneOnHide && clone.parentNode) {
+            clone.parentNode.removeChild(clone);
+          }
+        });
+        cloneNowHidden();
+        clonesHidden = true;
+        cancel();
+      },
+      dragStartGlobal: function dragStartGlobal(_ref6) {
+        var sortable = _ref6.sortable;
+        if (!this.isMultiDrag && multiDragSortable) {
+          multiDragSortable.multiDrag._deselectMultiDrag();
+        }
+        multiDragElements.forEach(function (multiDragElement) {
+          multiDragElement.sortableIndex = index(multiDragElement);
+        });
+
+        // Sort multi-drag elements
+        multiDragElements = multiDragElements.sort(function (a, b) {
+          return a.sortableIndex - b.sortableIndex;
+        });
+        dragStarted = true;
+      },
+      dragStarted: function dragStarted(_ref7) {
+        var _this2 = this;
+        var sortable = _ref7.sortable;
+        if (!this.isMultiDrag) return;
+        if (this.options.sort) {
+          // Capture rects,
+          // hide multi drag elements (by positioning them absolute),
+          // set multi drag elements rects to dragRect,
+          // show multi drag elements,
+          // animate to rects,
+          // unset rects & remove from DOM
+
+          sortable.captureAnimationState();
+          if (this.options.animation) {
+            multiDragElements.forEach(function (multiDragElement) {
+              if (multiDragElement === dragEl$1) return;
+              css(multiDragElement, 'position', 'absolute');
+            });
+            var dragRect = getRect(dragEl$1, false, true, true);
+            multiDragElements.forEach(function (multiDragElement) {
+              if (multiDragElement === dragEl$1) return;
+              setRect(multiDragElement, dragRect);
+            });
+            folding = true;
+            initialFolding = true;
+          }
+        }
+        sortable.animateAll(function () {
+          folding = false;
+          initialFolding = false;
+          if (_this2.options.animation) {
+            multiDragElements.forEach(function (multiDragElement) {
+              unsetRect(multiDragElement);
+            });
+          }
+
+          // Remove all auxiliary multidrag items from el, if sorting enabled
+          if (_this2.options.sort) {
+            removeMultiDragElements();
+          }
+        });
+      },
+      dragOver: function dragOver(_ref8) {
+        var target = _ref8.target,
+          completed = _ref8.completed,
+          cancel = _ref8.cancel;
+        if (folding && ~multiDragElements.indexOf(target)) {
+          completed(false);
+          cancel();
+        }
+      },
+      revert: function revert(_ref9) {
+        var fromSortable = _ref9.fromSortable,
+          rootEl = _ref9.rootEl,
+          sortable = _ref9.sortable,
+          dragRect = _ref9.dragRect;
+        if (multiDragElements.length > 1) {
+          // Setup unfold animation
+          multiDragElements.forEach(function (multiDragElement) {
+            sortable.addAnimationState({
+              target: multiDragElement,
+              rect: folding ? getRect(multiDragElement) : dragRect
+            });
+            unsetRect(multiDragElement);
+            multiDragElement.fromRect = dragRect;
+            fromSortable.removeAnimationState(multiDragElement);
+          });
+          folding = false;
+          insertMultiDragElements(!this.options.removeCloneOnHide, rootEl);
+        }
+      },
+      dragOverCompleted: function dragOverCompleted(_ref10) {
+        var sortable = _ref10.sortable,
+          isOwner = _ref10.isOwner,
+          insertion = _ref10.insertion,
+          activeSortable = _ref10.activeSortable,
+          parentEl = _ref10.parentEl,
+          putSortable = _ref10.putSortable;
+        var options = this.options;
+        if (insertion) {
+          // Clones must be hidden before folding animation to capture dragRectAbsolute properly
+          if (isOwner) {
+            activeSortable._hideClone();
+          }
+          initialFolding = false;
+          // If leaving sort:false root, or already folding - Fold to new location
+          if (options.animation && multiDragElements.length > 1 && (folding || !isOwner && !activeSortable.options.sort && !putSortable)) {
+            // Fold: Set all multi drag elements's rects to dragEl's rect when multi-drag elements are invisible
+            var dragRectAbsolute = getRect(dragEl$1, false, true, true);
+            multiDragElements.forEach(function (multiDragElement) {
+              if (multiDragElement === dragEl$1) return;
+              setRect(multiDragElement, dragRectAbsolute);
+
+              // Move element(s) to end of parentEl so that it does not interfere with multi-drag clones insertion if they are inserted
+              // while folding, and so that we can capture them again because old sortable will no longer be fromSortable
+              parentEl.appendChild(multiDragElement);
+            });
+            folding = true;
+          }
+
+          // Clones must be shown (and check to remove multi drags) after folding when interfering multiDragElements are moved out
+          if (!isOwner) {
+            // Only remove if not folding (folding will remove them anyways)
+            if (!folding) {
+              removeMultiDragElements();
+            }
+            if (multiDragElements.length > 1) {
+              var clonesHiddenBefore = clonesHidden;
+              activeSortable._showClone(sortable);
+
+              // Unfold animation for clones if showing from hidden
+              if (activeSortable.options.animation && !clonesHidden && clonesHiddenBefore) {
+                multiDragClones.forEach(function (clone) {
+                  activeSortable.addAnimationState({
+                    target: clone,
+                    rect: clonesFromRect
+                  });
+                  clone.fromRect = clonesFromRect;
+                  clone.thisAnimationDuration = null;
+                });
+              }
+            } else {
+              activeSortable._showClone(sortable);
+            }
+          }
+        }
+      },
+      dragOverAnimationCapture: function dragOverAnimationCapture(_ref11) {
+        var dragRect = _ref11.dragRect,
+          isOwner = _ref11.isOwner,
+          activeSortable = _ref11.activeSortable;
+        multiDragElements.forEach(function (multiDragElement) {
+          multiDragElement.thisAnimationDuration = null;
+        });
+        if (activeSortable.options.animation && !isOwner && activeSortable.multiDrag.isMultiDrag) {
+          clonesFromRect = _extends({}, dragRect);
+          var dragMatrix = matrix(dragEl$1, true);
+          clonesFromRect.top -= dragMatrix.f;
+          clonesFromRect.left -= dragMatrix.e;
+        }
+      },
+      dragOverAnimationComplete: function dragOverAnimationComplete() {
+        if (folding) {
+          folding = false;
+          removeMultiDragElements();
+        }
+      },
+      drop: function drop(_ref12) {
+        var evt = _ref12.originalEvent,
+          rootEl = _ref12.rootEl,
+          parentEl = _ref12.parentEl,
+          sortable = _ref12.sortable,
+          dispatchSortableEvent = _ref12.dispatchSortableEvent,
+          oldIndex = _ref12.oldIndex,
+          putSortable = _ref12.putSortable;
+        var toSortable = putSortable || this.sortable;
+        if (!evt) return;
+        var options = this.options,
+          children = parentEl.children;
+
+        // Multi-drag selection
+        if (!dragStarted) {
+          if (options.multiDragKey && !this.multiDragKeyDown) {
+            this._deselectMultiDrag();
+          }
+          toggleClass(dragEl$1, options.selectedClass, !~multiDragElements.indexOf(dragEl$1));
+          if (!~multiDragElements.indexOf(dragEl$1)) {
+            multiDragElements.push(dragEl$1);
+            dispatchEvent({
+              sortable: sortable,
+              rootEl: rootEl,
+              name: 'select',
+              targetEl: dragEl$1,
+              originalEvent: evt
+            });
+
+            // Modifier activated, select from last to dragEl
+            if (evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
+              var lastIndex = index(lastMultiDragSelect),
+                currentIndex = index(dragEl$1);
+              if (~lastIndex && ~currentIndex && lastIndex !== currentIndex) {
+                // Must include lastMultiDragSelect (select it), in case modified selection from no selection
+                // (but previous selection existed)
+                var n, i;
+                if (currentIndex > lastIndex) {
+                  i = lastIndex;
+                  n = currentIndex;
+                } else {
+                  i = currentIndex;
+                  n = lastIndex + 1;
+                }
+                for (; i < n; i++) {
+                  if (~multiDragElements.indexOf(children[i])) continue;
+                  toggleClass(children[i], options.selectedClass, true);
+                  multiDragElements.push(children[i]);
+                  dispatchEvent({
+                    sortable: sortable,
+                    rootEl: rootEl,
+                    name: 'select',
+                    targetEl: children[i],
+                    originalEvent: evt
+                  });
+                }
+              }
+            } else {
+              lastMultiDragSelect = dragEl$1;
+            }
+            multiDragSortable = toSortable;
+          } else {
+            multiDragElements.splice(multiDragElements.indexOf(dragEl$1), 1);
+            lastMultiDragSelect = null;
+            dispatchEvent({
+              sortable: sortable,
+              rootEl: rootEl,
+              name: 'deselect',
+              targetEl: dragEl$1,
+              originalEvent: evt
+            });
+          }
+        }
+
+        // Multi-drag drop
+        if (dragStarted && this.isMultiDrag) {
+          folding = false;
+          // Do not "unfold" after around dragEl if reverted
+          if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
+            var dragRect = getRect(dragEl$1),
+              multiDragIndex = index(dragEl$1, ':not(.' + this.options.selectedClass + ')');
+            if (!initialFolding && options.animation) dragEl$1.thisAnimationDuration = null;
+            toSortable.captureAnimationState();
+            if (!initialFolding) {
+              if (options.animation) {
+                dragEl$1.fromRect = dragRect;
+                multiDragElements.forEach(function (multiDragElement) {
+                  multiDragElement.thisAnimationDuration = null;
+                  if (multiDragElement !== dragEl$1) {
+                    var rect = folding ? getRect(multiDragElement) : dragRect;
+                    multiDragElement.fromRect = rect;
+
+                    // Prepare unfold animation
+                    toSortable.addAnimationState({
+                      target: multiDragElement,
+                      rect: rect
+                    });
+                  }
+                });
+              }
+
+              // Multi drag elements are not necessarily removed from the DOM on drop, so to reinsert
+              // properly they must all be removed
+              removeMultiDragElements();
+              multiDragElements.forEach(function (multiDragElement) {
+                if (children[multiDragIndex]) {
+                  parentEl.insertBefore(multiDragElement, children[multiDragIndex]);
+                } else {
+                  parentEl.appendChild(multiDragElement);
+                }
+                multiDragIndex++;
+              });
+
+              // If initial folding is done, the elements may have changed position because they are now
+              // unfolding around dragEl, even though dragEl may not have his index changed, so update event
+              // must be fired here as Sortable will not.
+              if (oldIndex === index(dragEl$1)) {
+                var update = false;
+                multiDragElements.forEach(function (multiDragElement) {
+                  if (multiDragElement.sortableIndex !== index(multiDragElement)) {
+                    update = true;
+                    return;
+                  }
+                });
+                if (update) {
+                  dispatchSortableEvent('update');
+                  dispatchSortableEvent('sort');
+                }
+              }
+            }
+
+            // Must be done after capturing individual rects (scroll bar)
+            multiDragElements.forEach(function (multiDragElement) {
+              unsetRect(multiDragElement);
+            });
+            toSortable.animateAll();
+          }
+          multiDragSortable = toSortable;
+        }
+
+        // Remove clones if necessary
+        if (rootEl === parentEl || putSortable && putSortable.lastPutMode !== 'clone') {
+          multiDragClones.forEach(function (clone) {
+            clone.parentNode && clone.parentNode.removeChild(clone);
+          });
+        }
+      },
+      nullingGlobal: function nullingGlobal() {
+        this.isMultiDrag = dragStarted = false;
+        multiDragClones.length = 0;
+      },
+      destroyGlobal: function destroyGlobal() {
+        this._deselectMultiDrag();
+        off(document, 'pointerup', this._deselectMultiDrag);
+        off(document, 'mouseup', this._deselectMultiDrag);
+        off(document, 'touchend', this._deselectMultiDrag);
+        off(document, 'keydown', this._checkKeyDown);
+        off(document, 'keyup', this._checkKeyUp);
+      },
+      _deselectMultiDrag: function _deselectMultiDrag(evt) {
+        if (typeof dragStarted !== "undefined" && dragStarted) return;
+
+        // Only deselect if selection is in this sortable
+        if (multiDragSortable !== this.sortable) return;
+
+        // Only deselect if target is not item in this sortable
+        if (evt && closest(evt.target, this.options.draggable, this.sortable.el, false)) return;
+
+        // Only deselect if left click
+        if (evt && evt.button !== 0) return;
+        while (multiDragElements.length) {
+          var el = multiDragElements[0];
+          toggleClass(el, this.options.selectedClass, false);
+          multiDragElements.shift();
+          dispatchEvent({
+            sortable: this.sortable,
+            rootEl: this.sortable.el,
+            name: 'deselect',
+            targetEl: el,
+            originalEvent: evt
+          });
+        }
+      },
+      _checkKeyDown: function _checkKeyDown(evt) {
+        if (evt.key === this.options.multiDragKey) {
+          this.multiDragKeyDown = true;
+        }
+      },
+      _checkKeyUp: function _checkKeyUp(evt) {
+        if (evt.key === this.options.multiDragKey) {
+          this.multiDragKeyDown = false;
+        }
+      }
+    };
+    return _extends(MultiDrag, {
+      // Static methods & properties
+      pluginName: 'multiDrag',
+      utils: {
+        /**
+         * Selects the provided multi-drag item
+         * @param  {HTMLElement} el    The element to be selected
+         */
+        select: function select(el) {
+          var sortable = el.parentNode[expando];
+          if (!sortable || !sortable.options.multiDrag || ~multiDragElements.indexOf(el)) return;
+          if (multiDragSortable && multiDragSortable !== sortable) {
+            multiDragSortable.multiDrag._deselectMultiDrag();
+            multiDragSortable = sortable;
+          }
+          toggleClass(el, sortable.options.selectedClass, true);
+          multiDragElements.push(el);
+        },
+        /**
+         * Deselects the provided multi-drag item
+         * @param  {HTMLElement} el    The element to be deselected
+         */
+        deselect: function deselect(el) {
+          var sortable = el.parentNode[expando],
+            index = multiDragElements.indexOf(el);
+          if (!sortable || !sortable.options.multiDrag || !~index) return;
+          toggleClass(el, sortable.options.selectedClass, false);
+          multiDragElements.splice(index, 1);
+        }
+      },
+      eventProperties: function eventProperties() {
+        var _this3 = this;
+        var oldIndicies = [],
+          newIndicies = [];
+        multiDragElements.forEach(function (multiDragElement) {
+          oldIndicies.push({
+            multiDragElement: multiDragElement,
+            index: multiDragElement.sortableIndex
+          });
+
+          // multiDragElements will already be sorted if folding
+          var newIndex;
+          if (folding && multiDragElement !== dragEl$1) {
+            newIndex = -1;
+          } else if (folding) {
+            newIndex = index(multiDragElement, ':not(.' + _this3.options.selectedClass + ')');
+          } else {
+            newIndex = index(multiDragElement);
+          }
+          newIndicies.push({
+            multiDragElement: multiDragElement,
+            index: newIndex
+          });
+        });
+        return {
+          items: _toConsumableArray(multiDragElements),
+          clones: [].concat(multiDragClones),
+          oldIndicies: oldIndicies,
+          newIndicies: newIndicies
+        };
+      },
+      optionListeners: {
+        multiDragKey: function multiDragKey(key) {
+          key = key.toLowerCase();
+          if (key === 'ctrl') {
+            key = 'Control';
+          } else if (key.length > 1) {
+            key = key.charAt(0).toUpperCase() + key.substr(1);
+          }
+          return key;
+        }
+      }
+    });
+  }
+  function insertMultiDragElements(clonesInserted, rootEl) {
+    multiDragElements.forEach(function (multiDragElement, i) {
+      var target = rootEl.children[multiDragElement.sortableIndex + (clonesInserted ? Number(i) : 0)];
+      if (target) {
+        rootEl.insertBefore(multiDragElement, target);
+      } else {
+        rootEl.appendChild(multiDragElement);
+      }
+    });
+  }
+
+  /**
+   * Insert multi-drag clones
+   * @param  {[Boolean]} elementsInserted  Whether the multi-drag elements are inserted
+   * @param  {HTMLElement} rootEl
+   */
+  function insertMultiDragClones(elementsInserted, rootEl) {
+    multiDragClones.forEach(function (clone, i) {
+      var target = rootEl.children[clone.sortableIndex + (elementsInserted ? Number(i) : 0)];
+      if (target) {
+        rootEl.insertBefore(clone, target);
+      } else {
+        rootEl.appendChild(clone);
+      }
+    });
+  }
+  function removeMultiDragElements() {
+    multiDragElements.forEach(function (multiDragElement) {
+      if (multiDragElement === dragEl$1) return;
+      multiDragElement.parentNode && multiDragElement.parentNode.removeChild(multiDragElement);
+    });
+  }
+
+  Sortable.mount(new AutoScrollPlugin());
+  Sortable.mount(Remove, Revert);
+
+  Sortable.mount(new SwapPlugin());
+  Sortable.mount(new MultiDragPlugin());
+
+  return Sortable;
+
+})));
+}
 
 /***/ })
 

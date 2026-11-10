@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 프로젝트 시험. 실행: scripts/test.sh (CodeIgniter 본체 시험은 tests/phpunit.xml) -->
+<phpunit bootstrap="tests/app/bootstrap.php" cacheResult="false" colors="true" failOnWarning="true" beStrictAboutOutputDuringTests="true">
+    <testsuites>
+        <testsuite name="unit">
+            <directory suffix="Test.php">tests/app/unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory suffix="Test.php">tests/app/integration</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

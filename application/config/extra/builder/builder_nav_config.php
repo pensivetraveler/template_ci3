@@ -5,75 +5,78 @@ $config['builder_nav_top_base'] = [
 
 ];
 
-$config['builder_nav_side_base'] = [
-	'code' => '',
-	'icon' => '',
-	'title' => 'Sample',
-	'route' => '/admin/',
-	'method' => 'dashboard',
-	'router' => 'index',
-	'params' => [
-		'layout' => 'side-menu',
-	],
-	'className' => [],
-	'authCheck' => false,
-	'authParams' => [],
-	'subMenu' => [],
+$config['builder_nav_menu_base'] = [
+    'code' => '',
+    'icon' => '',
+    'title' => '',
+    'class' => '',
+    'method' => '',
+    'attr' => [
+        'className' => [],
+        'target' => '_self',
+        'href' => '',
+    ],
+    'params' => [
+        'layout' => 'side-menu',
+    ],
+    'authParams' => [],
+    'subMenu' => [],
+    'isSubMenu' => false,
+    'isLogin' => true,
+    'isAuth' => true,
+    'isSuper' => false,
+    'isUse' => true,
 ];
 
 $config['builder_nav_top_sample'] = [
 
 ];
 
-$config['builder_nav_side_sample'] = [
-	'dashboard' => [
-		'icon' => 'ri-home-smile-line',
-		'title' => 'Home',
-		'route' => '/admin/dashboard',
-		'method' => 'dashboard',
-		'params' => [
-			'layout' => 'side-menu',
-		],
-	],
-	'welcome' => [
-		'icon' => 'ri-user-line',
-		'title' => 'Welcome',
-		'route' => '',
-		'method' => 'dashboard',
-		'params' => [
-			'layout' => 'side-menu',
-		],
-		'subMenu' => [
-			'Welcome Sub 1' => [
-				'icon' => '',
-				'title' => 'Welcome Sub 1',
-				'route' => '/admin/',
-				'params' => [
-					'welcome' => 1,
-				],
-				'className' => [],
-			],
-			'Welcome Sub 2' => [
-				'icon' => '',
-				'title' => 'Welcome Sub 2',
-				'route' => '/admin/',
-				'params' => [
-					'welcome' => 2,
-				],
-				'className' => [],
-			],
-
-		],
-	],
-	'user' => [
-		'icon' => 'ri-user-line',
-		'title' => 'User',
-		'route' => '/admin/users',
-		'method' => 'dashboard',
-		'params' => [
-			'layout' => 'side-menu',
-		],
-	],
-
+/***
+ * sample nav configs
+ */
+$config['builder_nav_menu_sample'] = [
+    [
+        'icon' => 'ri-home-smile-line',
+        'title' => 'Home',
+        'class' => 'dashboard',
+        'params' => [
+            'layout' => 'side-menu',
+        ],
+    ],
+    [
+        'icon' => 'ri-user-line',
+        'title' => 'Welcome',
+        'class' => 'dashboard',
+        'params' => [
+            'layout' => 'side-menu',
+        ],
+        'isSubMenu' => true,
+        'subMenu' => [
+            [
+                'icon' => '',
+                'title' => 'Welcome Sub 1',
+                'class' => 'dashboard',
+                'params' => [
+                    'layout' => 'side-menu',
+                ],
+            ],
+            [
+                'icon' => '',
+                'title' => 'Welcome Sub 2',
+                'class' => 'dashboard',
+                'params' => [
+                    'layout' => 'side-menu',
+                ],
+            ],
+        ],
+    ],
+    [
+        'icon' => 'ri-user-line',
+        'title' => 'User',
+        'class' => 'users',
+        'params' => [
+            'layout' => 'side-menu',
+        ],
+    ],
 ];
-

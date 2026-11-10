@@ -78,7 +78,7 @@ function setErrorModalContent(modal, error, key = 0) {
         summary += `
 							<div class="d-flex align-items-center ${className}">
 								<span class="fw-medium mx-2">${summaryKey}:</span>
-								<span>${error.summary[key]}</span>
+								<span>${escapeHtml(error.summary[key])}</span>
 							</div>
 						`;
     }
@@ -90,10 +90,10 @@ function setErrorModalContent(modal, error, key = 0) {
 								<span class="timeline-point timeline-point-primary"></span>
 								<div class="timeline-event">
 									<div class="timeline-header mb-3">
-										<h6 class="mb-0">File: ${item.file}</h6>
+										<h6 class="mb-0">File: ${escapeHtml(item.file)}</h6>
 									</div>
-									<p class="mb-2">Line: ${item.line}</p>
-									<p>Function: ${item.func}</p>
+									<p class="mb-2">Line: ${escapeHtml(item.line)}</p>
+									<p>Function: ${escapeHtml(item.func)}</p>
 								</div>
 							</li>
 						`;

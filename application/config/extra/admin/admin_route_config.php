@@ -1,0 +1,471 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+
+$config['admin_route_config_loaded'] = true;
+
+$config['route_config'] = [
+    'auth' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'login',
+            'allowNoLogin' => true,
+            'includes' => [
+                'head' => true,
+                'header' => false,
+                'modalPrepend' => true,
+                'modalAppend' => false,
+                'footer' => false,
+                'tail' => true,
+            ],
+        ],
+        'methods' => [
+            'login' => [
+                'category' => 'form',
+                'type' => 'auth',
+                'subtype' => 'login',
+            ],
+            'findId' => [
+                'category' => 'form',
+                'type' => 'auth',
+                'subtype' => 'find_id',
+            ],
+            'findPassword' => [
+                'category' => 'form',
+                'type' => 'auth',
+                'subtype' => 'find_password',
+            ],
+            'resetPassword' => [
+                'category' => 'form',
+                'type' => 'auth',
+                'subtype' => 'reset_password',
+            ],
+        ],
+    ],
+	'dashboard' => [
+		'category' => 'page',
+        'type' => 'page',
+		'subtype' => 'base',
+		'properties' => [
+			'baseMethod' => 'view',
+			'allows' => ['view'],
+            'noIdentifier' => true,
+		],
+        'methods' => [
+            'view' => [
+                'category' => 'view',
+                'type' => 'dashboard',
+                'subtype' => 'base',
+            ],
+        ]
+	],
+    'administrators' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => false,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => true,
+                ],
+            ],
+        ],
+    ],
+    'partners' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => false,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => true,
+                ],
+            ],
+        ],
+    ],
+    'partnerAuth' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'add' => false,
+                    'excel' => false,
+                    'fillDefault' => [
+                        'text' => 'Fill Default Auth',
+                        'classes' => ['btn','btn-outline-primary','waves-effect','waves-light','my-5','me-2'],
+                        'action' => 'fillDefaultAuth',
+                        'params' => ['field' => 'partner_id'],
+                    ],
+                    'resetDB' => [
+                        'text' => 'DB 초기화',
+                        'classes' => ['btn','btn-warning','waves-effect','waves-light','my-5'],
+                        'action' => 'resetMenuAuthDB',
+                    ],
+                ],
+                'actions' => [
+                    'view' => false,
+                    'edit' => false,
+                    'delete' => false,
+                ],
+                'properties' => [
+                    'formExist' => false,
+                ],
+            ],
+        ],
+    ],
+    'categories' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => false,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => true,
+                ],
+            ],
+        ],
+    ],
+    // 게시판 관리: 게시판(tbl_board) 목록 + 옆 폼으로 등록·수정 (카테고리와 같은 방식), 조회는 모달 상세
+    'boards' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => true,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => true,
+                    // view 설정이 없으면 폼 설정의 필드를 읽기 전용으로 보여 준다
+                    'viewConfig' => true,
+                ],
+            ],
+        ],
+    ],
+    // 게시글 관리: 목록(게시판 필터) → 등록·수정 페이지, 상세(본문 + 댓글)
+    'articles' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => true,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => false,
+                ],
+            ],
+            'add' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'base',
+                'mode' => 'create',
+            ],
+            'edit' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'base',
+                'mode' => 'update',
+            ],
+            'view' => [
+                'category' => 'view',
+                'type' => 'base',
+                'subtype' => 'article',
+                'properties' => [
+                    'isComments' => true,
+                ],
+            ],
+        ],
+    ],
+    'companies' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'resourceConfig' => 'company',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => false,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => true,
+                    'formConfig' => 'company',
+                ]
+            ]
+        ]
+    ],
+    'projects' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'list',
+            'allows' => ['list','add','edit'],
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                ],
+                'actions' => [
+                    'view' => false,
+                    'excel' => false,
+                ],
+                'properties' => [
+                    'formExist' => false,
+                ],
+            ],
+            'add' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'grid',
+                'mode' => 'create',
+            ],
+            'edit' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'grid',
+                'mode' => 'update',
+            ],
+        ],
+    ],
+    'myinfo' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'baseMethod' => 'edit',
+        ],
+        'methods' => [
+            'edit' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'base',
+                'resourceConfig' => 'myinfo',
+                'mode' => 'update',
+            ],
+        ],
+    ],
+    'visitors' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'noIndex' => true,
+            'noIdentifier' => true,
+        ],
+        'methods' => [
+            'list' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'buttons' => [
+                    'excel' => false,
+                    'add' => false,
+                ],
+                'actions' => [
+                    'edit' => false,
+                    'view' => false,
+                    'excel' => false,
+                    'delete' => false,
+                ],
+                'properties' => [
+                    'formExist' => true,
+                ],
+            ],
+        ]
+    ],
+    'logs' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'noIndex' => true,
+            'noIdentifier' => true,
+        ],
+        'methods' => [
+            'userAccess' => [
+                'category' => 'list',
+                'type' => 'log',
+                'subtype' => 'access',
+                'buttons' => [
+                    'excel' => false,
+                    'add' => false,
+                ],
+                'actions' => [
+                    'edit' => false,
+                    'view' => false,
+                    'excel' => false,
+                    'delete' => false,
+                ],
+            ],
+            'errors' => [
+                'category' => 'list',
+                'type' => 'log',
+                'subtype' => 'error',
+            ]
+        ]
+    ],
+    'system' => [
+        'category' => 'page',
+        'type' => 'page',
+        'subtype' => 'base',
+        'properties' => [
+            'noIndex' => true,
+            'noIdentifier' => true,
+            'baseMethod' => 'sysCfg',
+        ],
+        'methods' => [
+            'sysCfg' => [
+                'category' => 'form',
+                'type' => 'base',
+                'subtype' => 'side',
+                'resourceConfig' => 'sys_cfg',
+                'mode' => 'update',
+            ],
+            'sysCode' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'resourceConfig' => 'sys_code',
+                'actions' => [
+                    'edit' => true,
+                ],
+                'buttons' => [
+                    'add' => true,
+                    'excel' => false,
+                    'editBigCd' => [
+                        'text' => 'Edit Big Cd',
+                        'classes' => 'edit-big-cd btn btn-outline-primary waves-effect waves-light me-4',
+                    ],
+                    'deleteBigCd' => [
+                        'text' => 'Delete Big Cd',
+                        'classes' => 'delete-big-cd btn btn-outline-danger waves-effect waves-light me-4',
+                    ],
+                ],
+                'properties' => [
+                    'formExist' => true,
+                    'formConfig' => 'sys_code'
+                ],
+            ],
+            'menuList' => [
+                'category' => 'form',
+                'type' => 'menu',
+                'subtype' => 'menu_list',
+                'resourceConfig' => 'menu_list',
+            ],
+            'menuAuth' => [
+                'category' => 'list',
+                'type' => 'table',
+                'subtype' => 'datatable',
+                'actions' => [
+                    'view' => false,
+                    'edit' => false,
+                    'delete' => false,
+                ],
+                'buttons' => [
+                    'add' => false,
+                    'excel' => false,
+                    'fillDefault' => [
+                        'text' => 'Fill Default Auth',
+                        'classes' => ['btn','btn-outline-primary','waves-effect','waves-light','me-2'],
+                        'action' => 'fillDefaultAuth',
+                        'params' => ['field' => 'grade_cd'],
+                    ],
+                    'resetDB' => [
+                        'text' => 'DB 초기화',
+                        'classes' => ['btn','btn-warning','waves-effect','waves-light'],
+                        'action' => 'resetMenuAuthDB',
+                    ],
+                ],
+                'properties' => [
+                    'filterConfig' => 'menu_auth',
+                    'isRowNumber' => false,
+                ],
+                'resourceConfig' => 'menu_auth',
+            ],
+        ],
+    ],
+];

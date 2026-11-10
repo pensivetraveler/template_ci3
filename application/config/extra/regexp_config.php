@@ -6,6 +6,18 @@ $config['regexp'] = [
         'exp' => "^[\-+]?[0-9]*\.?[0-9]+$",
         'flags' => ''
     ],
+    'alpha_lowercase' => [
+        'exp' => "^[a-z]+$",
+        'flags' => ''
+    ],
+    'alpha_uppercase' => [
+        'exp' => "^[A-Z]+$",
+        'flags' => ''
+    ],
+    'alpha' => [
+        'exp' => "^[a-zA-Z]+$",
+        'flags' => ''
+    ],
     'alpha_numeric' => [
         'exp' => "^[a-zA-Z0-9]+$",
         'flags' => ''

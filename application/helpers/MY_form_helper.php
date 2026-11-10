@@ -42,7 +42,9 @@ if ( ! function_exists('form_options_by_field'))
     function form_options_by_field(string $field = 'default'): array
     {
         $CI =& get_instance();
-        return $CI->config->get(implode('.', ['options', $field]), [], false);
+        $options = $CI->config->get(implode('.', ['options', $field]), [], false);
+        if($field === 'blank') return [];
+        return is_empty($options) ? form_options_by_field() : $options;
     }
 }
 
@@ -120,8 +122,8 @@ if ( ! function_exists('get_group_field_id'))
             if ($group_attr['group_repeater']) $list[] = $index;
         }
 
-        $prefix = $CI->sideForm?$CI->config->item('form_side_prefix'):$CI->config->item('form_page_prefix');
-        return $prefix.array_to_hyphens($list);
+        $prefix = $CI->listForm?$CI->config->item('form_side_prefix'):$CI->config->item('form_page_prefix');
+        return get_form_item_id(array_to_hyphens($list), $prefix);
     }
 }
 
@@ -139,56 +141,52 @@ if ( ! function_exists('replace_field_id_index'))
     }
 }
 
-if ( ! function_exists('custom_password_verify'))
-{
-    function custom_password_verify($password, $hash, $decryption = false)
-    {
-        if(!$decryption) return password_verify($password, $hash);
-
-        $CI =& get_instance();
-        return $CI->encryption->decrypt($password) === $hash;
-    }
-
-}
-
 if ( ! function_exists('get_starred_id'))
 {
-    function get_starred_id($id) {
-        $len = strlen($id);
-        $res = substr($id, 0, 2);
-        $res .= substr($id, 2, min($len-2,3));
-        if(strlen($id) > 5) {
-            $res .= substr($id, 5);
-        }
-        return $res;
+    function get_starred_id($id): string
+    {
+        $len = mb_strlen($id);
+        if ($len <= 2) return str_repeat('*', $len);
+        return mb_substr($id, 0, 2) . str_repeat('*', $len - 2);
     }
 }
 
 if ( ! function_exists('get_starred_password'))
 {
-    function get_starred_password($password) {
-        $len = strlen($password);
-        $res = substr($password, 0, 2);
-        $res .= substr($password, 2, min($len-2,5));
-        if(strlen($password) > 7) {
-            $res .= substr($password, 7);
-        }
-        return $res;
+    function get_starred_password($password): string
+    {
+        $len = mb_strlen($password);
+        if ($len <= 2) return str_repeat('*', $len);
+        return mb_substr($password, 0, 2) . str_repeat('*', $len - 2);
     }
 }
 
 if (!function_exists('generate_uuid_v4')) {
-    function generate_uuid_v4()
+    function generate_uuid_v4(): string
     {
-        // 16바이트(128비트) 난수 생성
-        $data = openssl_random_pseudo_bytes(16);
+        if (\PHP_VERSION_ID >= 70000) {
+            $data = random_bytes(16);
+        } else {
+            $data = openssl_random_pseudo_bytes(16, $strong);
 
-        // UUID version 4 설정 (0100xxxx)
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
-        // UUID variant 설정 (10xxxxxx)
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+            if ($data === false || $strong !== true) {
+                throw new Exception('Unable to generate secure random bytes.');
+            }
+        }
 
-        // 16진수 문자열로 포맷
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+
+        return vsprintf(
+            '%s%s-%s-%s-%s-%s%s%s',
+            str_split(bin2hex($data), 4)
+        );
+    }
+}
+
+if (!function_exists('generate_api_key')) {
+    function generate_api_key($length = 32): string
+    {
+        return bin2hex(random_bytes($length / 2));
     }
 }

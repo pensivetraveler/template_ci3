@@ -15,13 +15,8 @@ class Model_Board extends Model_Common
 	public array   $intList = ['board_id','attach_max'];
 	public array   $fileList = [];
 
-	public bool    $isAutoincrement = true;
+	public bool    $isAutoIncrement = true;
 	public bool    $isCreatedId = true;
 	public bool    $isCreatedDt = true;
 	public bool    $isUpdatedDt = true;
-
-	function __construct()
-	{
-		parent::__construct();
-	}
 }

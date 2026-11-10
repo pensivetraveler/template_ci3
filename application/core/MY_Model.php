@@ -3,27 +3,48 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Model extends CI_Model
 {
-    public string $table = '';
-    public string $identifier = '';
-    public array $primaryKeyList = [];
-    public array $uniqueKeyList = [];
-    public array $notNullList = [];
-    public array $nullList = [];
-    public array $strList = [];
-    public array $intList = [];
-    public array $fileList = [];
+    public string  $dbprefix = '';
+    public string  $table = '';
+    public string  $identifier = '';
+    public string  $filteringDateColumn = '';
+    public array   $primaryKeyList = [];
+    public array   $uniqueKeyList = [];
+    public array   $foreignKeyList = [];
+    public array   $notNullList = [];
+    public array   $nullList = [];
+    public array $multilineList = []; // 줄바꿈을 유지하는 칸 (MY_Builder_API 가 공백을 합치지 않음)
+    public array   $strList = [];
+    public array   $intList = [];
+    public array   $fileList = [];
+    public array   $defaultOrderBy = [];
 
-	public bool    $isAutoincrement = false;
-	public bool    $isDelYn = false;
-	public bool    $isUseYn = false;
-	public bool    $isCreatedDt = false;
-	public bool    $isCreatedId = false;
-	public bool    $isUpdatedDt = false;
+    public bool    $isAutoIncrement = false;
+    public bool    $isDelYn = false;
+    public bool    $isUseYn = false;
+    public bool    $isCreatedDt = false;
+    public bool    $isCreatedId = false;
+    public bool    $isUpdatedDt = false;
 
-	function __construct()
+    public bool    $useDelYnAsBase = true;
+    public bool    $useUseYnAsBase = true;
+
+    function __construct()
     {
         log_message('info', 'Model Class Initialized');
         $this->load->database();
+
+        if($this->isAutoIncrement && !$this->identifier) {
+            if(!count($this->primaryKeyList))
+                show_error('Primary key list is empty.');
+
+            $this->identifier = $this->primaryKeyList[0];
+        }
+
+        if($this->isCreatedDt && !$this->filteringDateColumn) {
+            $this->filteringDateColumn = CREATED_DT_COLUMN_NAME;
+        }
+
+        $this->dbprefix = $this->db->dbprefix;
     }
 
     /*
@@ -48,9 +69,10 @@ class MY_Model extends CI_Model
 
     public function addSqlSet($dto)
     {
+        // 값은 escape, 컬럼명은 identifier 보호 (문자열 보간 금지)
         $sql = " SET ";
         foreach ($dto as $key=>$value){
-            $sql .= " {$key} = '{$value}',";
+            $sql .= " ".$this->db->protect_identifiers($key)." = ".$this->db->escape($value).",";
         }
         return substr($sql, 0, -1);
     }
@@ -59,14 +81,15 @@ class MY_Model extends CI_Model
     {
         $sql = " WHERE 1=1 ";
         foreach ($dto as $key=>$value){
-            $sql .= " AND {$key} = '{$value}' ";
+            $sql .= " AND ".$this->db->protect_identifiers($key)." = ".$this->db->escape($value)." ";
         }
         return $sql;
     }
 
     public function querySql($sql, $params, $returnBool = false)
     {
-        $insert = (strpos($sql, "INSERT INTO") !== -1);
+        // strpos 는 못 찾으면 false 를 돌려주므로 !== -1 은 항상 참이었다 (UPDATE/DELETE 도 insert_id 반환)
+        $insert = stripos(ltrim($sql), 'INSERT') === 0;
 
         $this->db->trans_begin();
 
@@ -96,7 +119,7 @@ class MY_Model extends CI_Model
     public function getDataPDO($table, $select = [], $where = [])
     {
         $this->db->where($where);
-        if(count($select) > 0) $this->db->select($select);
+        if(count($select) > 0) $this->select($table, $select);
 
         $result = $this->db->get($table)->row();
 
@@ -114,17 +137,17 @@ class MY_Model extends CI_Model
     public function getListPDO($table, $select = [], $where = [])
     {
         $this->db->where($where);
-        if(count($select) > 0) $this->db->select($select);
+        if(count($select) > 0) $this->select($table, $select);
 
-		$result = $this->db->get($table)->result();
+        $result = $this->db->get($table)->result();
 
-		if(count($select) === 1) {
-			return array_map(function ($curr) use ($select) {
-				return $curr->{$select[0]};
-			}, $result);
-		}else{
-			return $result;
-		}
+        if(count($select) === 1) {
+            return array_map(function ($curr) use ($select) {
+                return $curr->{$select[0]};
+            }, $result);
+        }else{
+            return $result;
+        }
     }
 
     public function getCntPDO($table, $where = [])
@@ -140,7 +163,7 @@ class MY_Model extends CI_Model
         if($this->db->insert_batch($table, $set)){
             return $this->afterTrans(true, true);
         }else{
-            return $this->db->error();
+            return $this->failTrans();
         }
     }
 
@@ -154,7 +177,7 @@ class MY_Model extends CI_Model
         if($this->db->insert($table)){
             return $this->afterTrans(true, $returnBool);
         }else{
-            return $this->db->error();
+            return $this->failTrans();
         }
     }
 
@@ -169,7 +192,7 @@ class MY_Model extends CI_Model
         if($this->db->update($table)){
             return $this->afterTrans(false, $returnBool);
         }else{
-            return $this->db->error();
+            return $this->failTrans();
         }
     }
 
@@ -180,6 +203,24 @@ class MY_Model extends CI_Model
         $this->db->delete($table, $where);
 
         return $this->afterTrans(false, $returnBool);
+    }
+
+    /**
+     * 쿼리 실패(db_debug=FALSE) 시 트랜잭션을 되돌리고 false 를 돌려준다.
+     * 예전에는 db->error() 배열(truthy)을 돌려줘 호출부가 성공으로 처리했다.
+     */
+    /** 마지막으로 실패한 쓰기의 DB 오류 번호 */
+    public int $lastDbErrorCode = 0;
+
+    protected function failTrans(): bool
+    {
+        $error = $this->db->error();
+        $this->lastDbErrorCode = (int)($error['code'] ?? 0);
+        $query_log = $this->db->last_query();
+        log_message('error', " query failed : [".($error['code'] ?? '')."] ".($error['message'] ?? '')." '$query_log' ");
+        $this->db->trans_rollback();
+
+        return false;
     }
 
     public function afterTrans($insert = true, $returnBool = false)
@@ -209,61 +250,253 @@ class MY_Model extends CI_Model
     | 사용 공통 함수
     |--------------------------------------------------------------------------
     */
-	public function where($table, $where, $like = [])
+    protected function getColumnName($table, $column)
     {
-		if(count($where) > 0) {
-			foreach ($where as $key=>$val) {
-				if(is_numeric($key)) {
-					$this->db->where($table.'.'.$val);
-				}else{
-					if(is_array($val)) {
-						$this->db->where_in($table.'.'.$key, $val);
-					}else{
-						$this->db->where($table.'.'.$key, $val);
-					}
-				}
-			}
-		}
+        list($table, $column) = resolve_select_column_table($table, $column);
+        return $table.'.'.$column;
+    }
 
-        if(count($like) > 0) {
+    public function select($table, $data)
+    {
+        if(empty($data) || $data === '*') {
+            $this->db->select("$table.*");
+        }else{
+            if(is_array($data)){
+                if(!is_list_type($data)) {
+                    trigger_error(__METHOD__.' : Select Array Data must be list type', E_USER_ERROR);
+                }
+                $fields = $data;
+            }else{
+                $fields = explode(',', $data);
+            }
+
+            foreach ($fields as $field){
+                $parsed = parse_select_column($field);
+                if($parsed['type'] === 'invalid') {
+                    trigger_error(__METHOD__.' : Please Check The Column Name - '.$parsed['raw'], E_USER_ERROR);
+                }else if($parsed['type'] === 'plain'){
+                    list($table, $column) = resolve_select_column_table($table, $parsed['column']);
+                    $this->db->select($table.'.'.$column);
+                }else if($parsed['type'] === 'alias' || $parsed['type'] === 'alias_backtick'){
+                    list($table, $column) = resolve_select_column_table($table, $parsed['column']);
+                    $this->db->select("$table.$column as {$parsed['alias']}", false);
+                }else{
+                    // $parsed['type'] === 'alias_expr'
+                    $this->db->select("{$parsed['column']} as {$parsed['alias']}", false);
+                }
+            }
+        }
+    }
+
+    public function where($table, $data)
+    {
+        if(!empty($data)) {
+            if(is_list_type($data)) {
+                foreach ($data as $item) {
+                    $this->where($table, $item);
+                }
+            }else{
+                foreach ($data as $key=>$val) {
+                    $column = $this->getColumnName($table, $key);
+                    if(is_array($val)) {
+                        $this->db->where_in($column, $val);
+                    }else{
+                        $this->db->where($column, $val);
+                    }
+                }
+            }
+        }
+        if($this->useDelYnAsBase && $this->isDelYn) $this->db->where($table.".".DEL_YN_COLUMN_NAME, 'N');
+        if($this->useUseYnAsBase && $this->isUseYn && !array_key_exists(USE_YN_COLUMN_NAME, $data)) $this->db->where($table.".".USE_YN_COLUMN_NAME, 'Y');
+    }
+
+    public function like($table, $data = [])
+    {
+        if(!empty($data)) {
+            if(is_list_type($data)) {
+                foreach ($data as $item) {
+                    $this->like($table, $item);
+                }
+            }else{
+                foreach ($data as $key=>$val) {
+                    $column = $this->getColumnName($table, $key);
+                    if(is_array($val)) {
+                        $this->db->group_start();
+                        foreach ($val as $i=>$subVal) {
+                            if($i === 0) {
+                                $this->db->like($column, $subVal, 'both');
+                            }else{
+                                $this->db->or_like($column, $subVal, 'both');
+                            }
+                        }
+                        $this->db->group_end();
+                    }else{
+                        $this->db->like($column, $val, 'both');
+                    }
+                }
+            }
+        }
+    }
+
+    public function orLike($table, $keys, $vals)
+    {
+        if(count($keys) > 0) {
             $this->db->group_start();
-            foreach ($like as $key=>$val) {
-                if($key === 0) $this->db->like($key, $val, 'both');
-                $this->db->or_like($key, $val, 'both');
+            if(is_array($keys) && is_array($vals)) {
+                show_error('Only One among Keys and Vals can be array type.');
+            }elseif (is_array($keys) && !is_array($vals)) {
+                foreach ($keys as $i=>$key) {
+                    $column = $this->getColumnName($table, $key);
+                    if($i === 0) {
+                        $this->db->like($column, $vals, 'both');
+                    }else{
+                        $this->db->or_like($column, $vals, 'both');
+                    }
+                }
+            }elseif (!is_array($keys) && is_array($vals)) {
+                $column = $this->getColumnName($table, $keys);
+                foreach ($vals as $i=>$val) {
+                    if($i === 0) {
+                        $this->db->like($column, $val, 'both');
+                    }else{
+                        $this->db->or_like($column, $val, 'both');
+                    }
+                }
+            }else{
+                $this->like($table, [$keys => $vals]);
             }
             $this->db->group_end();
         }
     }
 
-    public function limit($data)
+    public function whereIn($table, $data = [])
     {
-        if(count($data) > 0){
-            if(array_key_exists('limit', $data)){
-                $offset = (array_key_exists('offset', $data))?$data['offset']:0;
-                $this->db->limit($data['limit'], $offset);
-			}else{
-				$this->db->limit($data[0], $data[1]);
-			}
+        if(!empty($data)) {
+            if(is_list_type($data)) {
+                foreach ($data as $item) {
+                    $this->whereIn($table, $item);
+                }
+            }else{
+                foreach ($data as $key=>$val) {
+                    $column = $this->getColumnName($table, $key);
+                    if(is_array($val)) {
+                        $this->db->where_in($column, $val);
+                    }else{
+                        $this->db->where_in($column, [$val]);
+                    }
+                }
+            }
         }
     }
 
-    public function orderBy($data)
+    public function whereNot($table, $data = [])
     {
-        if(count($data) > 0) {
-            if(is_list_type($data)) {
-                foreach ($data as $k=>$v) {
-                    foreach ($v as $key => $value) $this->db->order_by($key, $value);
-                }
-            }else{
-                foreach ($data as $key => $value) $this->db->order_by($key, $value);
+        if(is_list_type($data)) {
+            foreach ($data as $item) {
+                $this->whereNot($table, $item);
             }
         }else{
-			if($this->identifier && $this->isAutoincrement === true) {
-				$this->orderBy(["$this->table.$this->identifier" => 'DESC']);
-			}else if($this->isCreatedDt) {
-				$this->orderBy(["$this->table.".CREATED_DT_COLUMN_NAME => 'DESC']);
-			}
-		}
+            foreach ($data as $key=>$val) {
+                $column = $this->getColumnName($table, $key);
+                if(is_array($val)) {
+                    $this->db->where_not_in($column, $val);
+                }else{
+                    $this->db->where_not_in($column, [$val]);
+                }
+            }
+        }
+    }
+
+    public function limit($data)
+    {
+        if(!empty($data)) {
+            if(array_key_exists('limit', $data)){
+                $offset = (array_key_exists('offset', $data))?$data['offset']:0;
+                $this->db->limit($data['limit'], $offset);
+            }else{
+                $this->db->limit($data[0], $data[1]);
+            }
+        }
+    }
+
+    public function join($table, $data = [], $alias = null)
+    {
+        if(!empty($data)) {
+            if(is_list_type($data)){
+                foreach ($data as $item) $this->join($table, $item);
+            }else{
+                if(!qb_join_exists($this->db, $data['table'])) {
+                    if(is_empty($data, 'select')) {
+                        foreach ($data['matches'] as $key=>$val) {
+                            $this->select($data['table'], $key);
+                        }
+                    }else if(is_string($data['select'])){
+                        $this->select($data['table'], $data['select']);
+                    }else{
+                        foreach ($data['select'] as $select) {
+                            $this->select($data['table'], $select);
+                        }
+                    }
+
+                    $matchQuery = '';
+                    $i = 0;
+                    foreach ($data['matches'] as $key=>$val) {
+                        if($i > 0) $matchQuery .= " AND ";
+                        $matchQuery .= " {$data['table']}.{$key} = {$table}.{$val} ";
+                        $i++;
+                    }
+
+                    if(!qb_join_exists($this->db, $data['table'], $matchQuery, $data['direction']??'left')) {
+                        $this->db->join(
+                            $data['table'],
+                            $matchQuery,
+                            $data['direction']??'left'
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    public function orderBy($table, $data = [])
+    {
+        if(!empty($data)) {
+            if(is_list_type($data)) {
+                foreach ($data as $item) {
+                    foreach ($item as $key => $val) {
+                        $column = $this->getColumnName($table, $key);
+                        $this->db->order_by($column, $val);
+                    }
+                }
+            }else{
+                foreach ($data as $key => $val) {
+                    $column = $this->getColumnName($table, $key);
+                    $this->db->order_by($column, $val);
+                }
+            }
+        }else{
+            if(!empty($this->defaultOrderBy)) {
+                $this->orderBy($table, $this->defaultOrderBy);
+            }else if($this->identifier && $this->isAutoIncrement === true) {
+                $this->db->order_by("$table.$this->identifier", 'DESC');
+            }else if($this->isCreatedDt) {
+                $this->db->order_by("$table.".CREATED_DT_COLUMN_NAME, 'DESC');
+            }
+        }
+    }
+
+    public function groupBy($table, $data = [])
+    {
+        if(!empty($data)) {
+            if(is_array($data)) {
+                foreach ($data as $item) {
+                    $this->groupBy($table, $item);
+                }
+            }else{
+                $column = $this->getColumnName($table, $data);
+                $this->db->group_by($column);
+            }
+        }
     }
 
     /*
@@ -273,8 +506,8 @@ class MY_Model extends CI_Model
     */
     public function getTableInfo($table = '')
     {
-		if(!$table) $table = $this->table;
-		return $this->getListQuery("
+        if(!$table) $table = $this->table;
+        return $this->getListQuery("
 			SELECT * 
 			FROM
 			    INFORMATION_SCHEMA.columns
@@ -283,23 +516,23 @@ class MY_Model extends CI_Model
 				AND table_schema = ?
 				AND table_name = ?
 		", [
-			$this->db->database,
-			$this->db->dbprefix.$table
-		]);
+            $this->db->database,
+            $this->db->dbprefix.$table
+        ]);
     }
 
     public function getTableColumns($table = ''): array
-	{
-		if(!$table) $table = $this->table;
+    {
+        if(!$table) $table = $this->table;
         $result = array_map(function($item) {
-			return (array)$item;
-		}, $this->getTableInfo($table));
+            return (array)$item;
+        }, $this->getTableInfo($table));
         return array_column($result, 'COLUMN_NAME');
     }
 
     public function getTableFields($table = '')
     {
-		if(!$table) $table = $this->table;
-		return $this->db->list_fields($table);
+        if(!$table) $table = $this->table;
+        return $this->db->list_fields($table);
     }
 }

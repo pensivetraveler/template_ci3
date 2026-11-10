@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -26,7 +18,1359 @@ return /******/ (function() { // webpackBootstrap
   \*************************************************************/
 /***/ (function(__unused_webpack_module, exports) {
 
-eval("\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n/**\n * Implement Luhn validation algorithm\n * Credit to https://gist.github.com/ShirtlessKirk/2134376\n *\n * @see http://en.wikipedia.org/wiki/Luhn\n * @param {string} value\n * @returns {boolean}\n */\nfunction luhn(value) {\n    var length = value.length;\n    var prodArr = [\n        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],\n        [0, 2, 4, 6, 8, 1, 3, 5, 7, 9],\n    ];\n    var mul = 0;\n    var sum = 0;\n    while (length--) {\n        sum += prodArr[mul][parseInt(value.charAt(length), 10)];\n        mul = 1 - mul;\n    }\n    return sum % 10 === 0 && sum > 0;\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n/**\n * Implement modulus 11, 10 (ISO 7064) algorithm\n *\n * @param {string} value\n * @returns {boolean}\n */\nfunction mod11And10(value) {\n    var length = value.length;\n    var check = 5;\n    for (var i = 0; i < length; i++) {\n        check = ((((check || 10) * 2) % 11) + parseInt(value.charAt(i), 10)) % 10;\n    }\n    return check === 1;\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n/**\n * Implements Mod 37, 36 (ISO 7064) algorithm\n *\n * @param {string} value\n * @param {string} [alphabet]\n * @returns {boolean}\n */\nfunction mod37And36(value, alphabet) {\n    if (alphabet === void 0) { alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'; }\n    var length = value.length;\n    var modulus = alphabet.length;\n    var check = Math.floor(modulus / 2);\n    for (var i = 0; i < length; i++) {\n        check = ((((check || modulus) * 2) % (modulus + 1)) + alphabet.indexOf(value.charAt(i))) % modulus;\n    }\n    return check === 1;\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nfunction transform(input) {\n    return input\n        .split('')\n        .map(function (c) {\n        var code = c.charCodeAt(0);\n        // 65, 66, ..., 90 are the char code of A, B, ..., Z\n        return code >= 65 && code <= 90\n            ? // Replace A, B, C, ..., Z with 10, 11, ..., 35\n                code - 55\n            : c;\n    })\n        .join('')\n        .split('')\n        .map(function (c) { return parseInt(c, 10); });\n}\nfunction mod97And10(input) {\n    var digits = transform(input);\n    var temp = 0;\n    var length = digits.length;\n    for (var i = 0; i < length - 1; ++i) {\n        temp = ((temp + digits[i]) * 10) % 97;\n    }\n    temp += digits[length - 1];\n    return temp % 97 === 1;\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n/**\n * Implement Verhoeff validation algorithm\n * Credit to Sergey Petushkov, 2014\n *\n * @see https://en.wikipedia.org/wiki/Verhoeff_algorithm\n * @param {string} value\n * @returns {boolean}\n */\nfunction verhoeff(value) {\n    // Multiplication table d\n    var d = [\n        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],\n        [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],\n        [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],\n        [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],\n        [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],\n        [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],\n        [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],\n        [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],\n        [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],\n        [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],\n    ];\n    // Permutation table p\n    var p = [\n        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],\n        [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],\n        [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],\n        [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],\n        [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],\n        [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],\n        [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],\n        [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],\n    ];\n    // Inverse table inv\n    var invertedArray = value.reverse();\n    var c = 0;\n    for (var i = 0; i < invertedArray.length; i++) {\n        c = d[c][p[i % 8][invertedArray[i]]];\n    }\n    return c === 0;\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar index$1 = {\n    luhn: luhn,\n    mod11And10: mod11And10,\n    mod37And36: mod37And36,\n    mod97And10: mod97And10,\n    verhoeff: verhoeff,\n};\n\n/******************************************************************************\r\nCopyright (c) Microsoft Corporation.\r\n\r\nPermission to use, copy, modify, and/or distribute this software for any\r\npurpose with or without fee is hereby granted.\r\n\r\nTHE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH\r\nREGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY\r\nAND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,\r\nINDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM\r\nLOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR\r\nOTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR\r\nPERFORMANCE OF THIS SOFTWARE.\r\n***************************************************************************** */\r\n/* global Reflect, Promise */\r\n\r\n\r\nfunction __spreadArray(to, from, pack) {\r\n    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {\r\n        if (ar || !(i in from)) {\r\n            if (!ar) ar = Array.prototype.slice.call(from, 0, i);\r\n            ar[i] = from[i];\r\n        }\r\n    }\r\n    return to.concat(ar || Array.prototype.slice.call(from));\r\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n/**\n * @param {HTMLElement} form The form element\n * @param {string} field The field name\n * @param {HTMLElement} element The field element\n * @param {HTMLElement[]} elements The list of elements which have the same name as `field`\n * @return {string}\n */\nfunction getFieldValue(form, field, element, elements) {\n    var type = (element.getAttribute('type') || '').toLowerCase();\n    var tagName = element.tagName.toLowerCase();\n    if (tagName === 'textarea') {\n        return element.value;\n    }\n    if (tagName === 'select') {\n        var select = element;\n        var index = select.selectedIndex;\n        return index >= 0 ? select.options.item(index).value : '';\n    }\n    if (tagName === 'input') {\n        if ('radio' === type || 'checkbox' === type) {\n            var checked = elements.filter(function (ele) { return ele.checked; }).length;\n            return checked === 0 ? '' : checked + '';\n        }\n        else {\n            return element.value;\n        }\n    }\n    return '';\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nfunction emitter() {\n    return {\n        fns: {},\n        clear: function () {\n            this.fns = {};\n        },\n        emit: function (event) {\n            var args = [];\n            for (var _i = 1; _i < arguments.length; _i++) {\n                args[_i - 1] = arguments[_i];\n            }\n            (this.fns[event] || []).map(function (handler) { return handler.apply(handler, args); });\n        },\n        off: function (event, func) {\n            if (this.fns[event]) {\n                var index = this.fns[event].indexOf(func);\n                if (index >= 0) {\n                    this.fns[event].splice(index, 1);\n                }\n            }\n        },\n        on: function (event, func) {\n            (this.fns[event] = this.fns[event] || []).push(func);\n        },\n    };\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nfunction filter() {\n    return {\n        filters: {},\n        add: function (name, func) {\n            (this.filters[name] = this.filters[name] || []).push(func);\n        },\n        clear: function () {\n            this.filters = {};\n        },\n        execute: function (name, defaultValue, args) {\n            if (!this.filters[name] || !this.filters[name].length) {\n                return defaultValue;\n            }\n            var result = defaultValue;\n            var filters = this.filters[name];\n            var count = filters.length;\n            for (var i = 0; i < count; i++) {\n                result = filters[i].apply(result, args);\n            }\n            return result;\n        },\n        remove: function (name, func) {\n            if (this.filters[name]) {\n                this.filters[name] = this.filters[name].filter(function (f) { return f !== func; });\n            }\n        },\n    };\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar Core = /** @class */ (function () {\n    function Core(form, fields) {\n        this.fields = {};\n        this.elements = {};\n        this.ee = emitter();\n        this.filter = filter();\n        this.plugins = {};\n        // Store the result of validation for each field\n        this.results = new Map();\n        this.validators = {};\n        this.form = form;\n        this.fields = fields;\n    }\n    Core.prototype.on = function (event, func) {\n        this.ee.on(event, func);\n        return this;\n    };\n    Core.prototype.off = function (event, func) {\n        this.ee.off(event, func);\n        return this;\n    };\n    Core.prototype.emit = function (event) {\n        var _a;\n        var args = [];\n        for (var _i = 1; _i < arguments.length; _i++) {\n            args[_i - 1] = arguments[_i];\n        }\n        (_a = this.ee).emit.apply(_a, __spreadArray([event], args, false));\n        return this;\n    };\n    Core.prototype.registerPlugin = function (name, plugin) {\n        // Check if whether the plugin is registered\n        if (this.plugins[name]) {\n            throw new Error(\"The plguin \".concat(name, \" is registered\"));\n        }\n        // Install the plugin\n        plugin.setCore(this);\n        plugin.install();\n        this.plugins[name] = plugin;\n        return this;\n    };\n    Core.prototype.deregisterPlugin = function (name) {\n        var plugin = this.plugins[name];\n        if (plugin) {\n            plugin.uninstall();\n        }\n        delete this.plugins[name];\n        return this;\n    };\n    Core.prototype.enablePlugin = function (name) {\n        var plugin = this.plugins[name];\n        if (plugin) {\n            plugin.enable();\n        }\n        return this;\n    };\n    Core.prototype.disablePlugin = function (name) {\n        var plugin = this.plugins[name];\n        if (plugin) {\n            plugin.disable();\n        }\n        return this;\n    };\n    Core.prototype.isPluginEnabled = function (name) {\n        var plugin = this.plugins[name];\n        return plugin ? plugin.isPluginEnabled() : false;\n    };\n    Core.prototype.registerValidator = function (name, func) {\n        if (this.validators[name]) {\n            throw new Error(\"The validator \".concat(name, \" is registered\"));\n        }\n        this.validators[name] = func;\n        return this;\n    };\n    /**\n     * Add a filter\n     *\n     * @param {string} name The name of filter\n     * @param {Function} func The filter function\n     * @return {Core}\n     */\n    Core.prototype.registerFilter = function (name, func) {\n        this.filter.add(name, func);\n        return this;\n    };\n    /**\n     * Remove a filter\n     *\n     * @param {string} name The name of filter\n     * @param {Function} func The filter function\n     * @return {Core}\n     */\n    Core.prototype.deregisterFilter = function (name, func) {\n        this.filter.remove(name, func);\n        return this;\n    };\n    /**\n     * Execute a filter\n     *\n     * @param {string} name The name of filter\n     * @param {T} defaultValue The default value returns by the filter\n     * @param {array} args The filter arguments\n     * @returns {T}\n     */\n    Core.prototype.executeFilter = function (name, defaultValue, args) {\n        return this.filter.execute(name, defaultValue, args);\n    };\n    /**\n     * Add a field\n     *\n     * @param {string} field The field name\n     * @param {FieldOptions} options The field options. The options will be merged with the original validator rules\n     * if the field is already defined\n     * @return {Core}\n     */\n    Core.prototype.addField = function (field, options) {\n        var opts = Object.assign({}, {\n            selector: '',\n            validators: {},\n        }, options);\n        // Merge the options\n        this.fields[field] = this.fields[field]\n            ? {\n                selector: opts.selector || this.fields[field].selector,\n                validators: Object.assign({}, this.fields[field].validators, opts.validators),\n            }\n            : opts;\n        this.elements[field] = this.queryElements(field);\n        this.emit('core.field.added', {\n            elements: this.elements[field],\n            field: field,\n            options: this.fields[field],\n        });\n        return this;\n    };\n    /**\n     * Remove given field by name\n     *\n     * @param {string} field The field name\n     * @return {Core}\n     */\n    Core.prototype.removeField = function (field) {\n        if (!this.fields[field]) {\n            throw new Error(\"The field \".concat(field, \" validators are not defined. Please ensure the field is added first\"));\n        }\n        var elements = this.elements[field];\n        var options = this.fields[field];\n        delete this.elements[field];\n        delete this.fields[field];\n        this.emit('core.field.removed', {\n            elements: elements,\n            field: field,\n            options: options,\n        });\n        return this;\n    };\n    /**\n     * Validate all fields\n     *\n     * @return {Promise<string>}\n     */\n    Core.prototype.validate = function () {\n        var _this = this;\n        this.emit('core.form.validating', {\n            formValidation: this,\n        });\n        return this.filter.execute('validate-pre', Promise.resolve(), []).then(function () {\n            return Promise.all(Object.keys(_this.fields).map(function (field) { return _this.validateField(field); })).then(function (results) {\n                // `results` is an array of `Valid`, `Invalid` and `NotValidated`\n                switch (true) {\n                    case results.indexOf('Invalid') !== -1:\n                        _this.emit('core.form.invalid', {\n                            formValidation: _this,\n                        });\n                        return Promise.resolve('Invalid');\n                    case results.indexOf('NotValidated') !== -1:\n                        _this.emit('core.form.notvalidated', {\n                            formValidation: _this,\n                        });\n                        return Promise.resolve('NotValidated');\n                    default:\n                        _this.emit('core.form.valid', {\n                            formValidation: _this,\n                        });\n                        return Promise.resolve('Valid');\n                }\n            });\n        });\n    };\n    /**\n     * Validate a particular field\n     *\n     * @param {string} field The field name\n     * @return {Promise<string>}\n     */\n    Core.prototype.validateField = function (field) {\n        var _this = this;\n        // Stop validation process if the field is already validated\n        var result = this.results.get(field);\n        if (result === 'Valid' || result === 'Invalid') {\n            return Promise.resolve(result);\n        }\n        this.emit('core.field.validating', field);\n        var elements = this.elements[field];\n        if (elements.length === 0) {\n            this.emit('core.field.valid', field);\n            return Promise.resolve('Valid');\n        }\n        var type = elements[0].getAttribute('type');\n        if ('radio' === type || 'checkbox' === type || elements.length === 1) {\n            return this.validateElement(field, elements[0]);\n        }\n        else {\n            return Promise.all(elements.map(function (ele) { return _this.validateElement(field, ele); })).then(function (results) {\n                // `results` is an array of `Valid`, `Invalid` and `NotValidated`\n                switch (true) {\n                    case results.indexOf('Invalid') !== -1:\n                        _this.emit('core.field.invalid', field);\n                        _this.results.set(field, 'Invalid');\n                        return Promise.resolve('Invalid');\n                    case results.indexOf('NotValidated') !== -1:\n                        _this.emit('core.field.notvalidated', field);\n                        _this.results.delete(field);\n                        return Promise.resolve('NotValidated');\n                    default:\n                        _this.emit('core.field.valid', field);\n                        _this.results.set(field, 'Valid');\n                        return Promise.resolve('Valid');\n                }\n            });\n        }\n    };\n    /**\n     * Validate particular element\n     *\n     * @param {string} field The field name\n     * @param {HTMLElement} ele The field element\n     * @return {Promise<string>}\n     */\n    Core.prototype.validateElement = function (field, ele) {\n        var _this = this;\n        // Reset validation result\n        this.results.delete(field);\n        var elements = this.elements[field];\n        var ignored = this.filter.execute('element-ignored', false, [field, ele, elements]);\n        if (ignored) {\n            this.emit('core.element.ignored', {\n                element: ele,\n                elements: elements,\n                field: field,\n            });\n            return Promise.resolve('Ignored');\n        }\n        var validatorList = this.fields[field].validators;\n        this.emit('core.element.validating', {\n            element: ele,\n            elements: elements,\n            field: field,\n        });\n        var promises = Object.keys(validatorList).map(function (v) {\n            return function () { return _this.executeValidator(field, ele, v, validatorList[v]); };\n        });\n        return this.waterfall(promises)\n            .then(function (results) {\n            // `results` is an array of `Valid` or `Invalid`\n            var isValid = results.indexOf('Invalid') === -1;\n            _this.emit('core.element.validated', {\n                element: ele,\n                elements: elements,\n                field: field,\n                valid: isValid,\n            });\n            var type = ele.getAttribute('type');\n            if ('radio' === type || 'checkbox' === type || elements.length === 1) {\n                _this.emit(isValid ? 'core.field.valid' : 'core.field.invalid', field);\n            }\n            return Promise.resolve(isValid ? 'Valid' : 'Invalid');\n        })\n            .catch(function (reason) {\n            // reason is `NotValidated`\n            _this.emit('core.element.notvalidated', {\n                element: ele,\n                elements: elements,\n                field: field,\n            });\n            return Promise.resolve(reason);\n        });\n    };\n    /**\n     * Perform given validator on field\n     *\n     * @param {string} field The field name\n     * @param {HTMLElement} ele The field element\n     * @param {string} v The validator name\n     * @param {ValidatorOptions} opts The validator options\n     * @return {Promise<string>}\n     */\n    Core.prototype.executeValidator = function (field, ele, v, opts) {\n        var _this = this;\n        var elements = this.elements[field];\n        var name = this.filter.execute('validator-name', v, [v, field]);\n        opts.message = this.filter.execute('validator-message', opts.message, [this.locale, field, name]);\n        // Simply pass the validator if\n        // - it isn't defined yet\n        // - or the associated validator isn't enabled\n        if (!this.validators[name] || opts.enabled === false) {\n            this.emit('core.validator.validated', {\n                element: ele,\n                elements: elements,\n                field: field,\n                result: this.normalizeResult(field, name, { valid: true }),\n                validator: name,\n            });\n            return Promise.resolve('Valid');\n        }\n        var validator = this.validators[name];\n        // Get the field value\n        var value = this.getElementValue(field, ele, name);\n        var willValidate = this.filter.execute('field-should-validate', true, [field, ele, value, v]);\n        if (!willValidate) {\n            this.emit('core.validator.notvalidated', {\n                element: ele,\n                elements: elements,\n                field: field,\n                validator: v,\n            });\n            return Promise.resolve('NotValidated');\n        }\n        this.emit('core.validator.validating', {\n            element: ele,\n            elements: elements,\n            field: field,\n            validator: v,\n        });\n        // Perform validation\n        var result = validator().validate({\n            element: ele,\n            elements: elements,\n            field: field,\n            l10n: this.localization,\n            options: opts,\n            value: value,\n        });\n        // Check whether the result is a `Promise`\n        var isPromise = 'function' === typeof result['then'];\n        if (isPromise) {\n            return result.then(function (r) {\n                var data = _this.normalizeResult(field, v, r);\n                _this.emit('core.validator.validated', {\n                    element: ele,\n                    elements: elements,\n                    field: field,\n                    result: data,\n                    validator: v,\n                });\n                return data.valid ? 'Valid' : 'Invalid';\n            });\n        }\n        else {\n            var data = this.normalizeResult(field, v, result);\n            this.emit('core.validator.validated', {\n                element: ele,\n                elements: elements,\n                field: field,\n                result: data,\n                validator: v,\n            });\n            return Promise.resolve(data.valid ? 'Valid' : 'Invalid');\n        }\n    };\n    Core.prototype.getElementValue = function (field, ele, validator) {\n        var defaultValue = getFieldValue(this.form, field, ele, this.elements[field]);\n        return this.filter.execute('field-value', defaultValue, [defaultValue, field, ele, validator]);\n    };\n    // Some getter methods\n    Core.prototype.getElements = function (field) {\n        return this.elements[field];\n    };\n    Core.prototype.getFields = function () {\n        return this.fields;\n    };\n    Core.prototype.getFormElement = function () {\n        return this.form;\n    };\n    Core.prototype.getLocale = function () {\n        return this.locale;\n    };\n    Core.prototype.getPlugin = function (name) {\n        return this.plugins[name];\n    };\n    /**\n     * Update the field status\n     *\n     * @param {string} field The field name\n     * @param {string} status The new status\n     * @param {string} [validator] The validator name. If it isn't specified, all validators will be updated\n     * @return {Core}\n     */\n    Core.prototype.updateFieldStatus = function (field, status, validator) {\n        var _this = this;\n        var elements = this.elements[field];\n        var type = elements[0].getAttribute('type');\n        var list = 'radio' === type || 'checkbox' === type ? [elements[0]] : elements;\n        list.forEach(function (ele) { return _this.updateElementStatus(field, ele, status, validator); });\n        if (!validator) {\n            switch (status) {\n                case 'NotValidated':\n                    this.emit('core.field.notvalidated', field);\n                    this.results.delete(field);\n                    break;\n                case 'Validating':\n                    this.emit('core.field.validating', field);\n                    this.results.delete(field);\n                    break;\n                case 'Valid':\n                    this.emit('core.field.valid', field);\n                    this.results.set(field, 'Valid');\n                    break;\n                case 'Invalid':\n                    this.emit('core.field.invalid', field);\n                    this.results.set(field, 'Invalid');\n                    break;\n            }\n        }\n        else if (status === 'Invalid') {\n            // We need to mark the field as invalid because it doesn't pass the `validator`\n            this.emit('core.field.invalid', field);\n            this.results.set(field, 'Invalid');\n        }\n        return this;\n    };\n    /**\n     * Update the element status\n     *\n     * @param {string} field The field name\n     * @param {HTMLElement} ele The field element\n     * @param {string} status The new status\n     * @param {string} [validator] The validator name. If it isn't specified, all validators will be updated\n     * @return {Core}\n     */\n    Core.prototype.updateElementStatus = function (field, ele, status, validator) {\n        var _this = this;\n        var elements = this.elements[field];\n        var fieldValidators = this.fields[field].validators;\n        var validatorArr = validator ? [validator] : Object.keys(fieldValidators);\n        switch (status) {\n            case 'NotValidated':\n                validatorArr.forEach(function (v) {\n                    return _this.emit('core.validator.notvalidated', {\n                        element: ele,\n                        elements: elements,\n                        field: field,\n                        validator: v,\n                    });\n                });\n                this.emit('core.element.notvalidated', {\n                    element: ele,\n                    elements: elements,\n                    field: field,\n                });\n                break;\n            case 'Validating':\n                validatorArr.forEach(function (v) {\n                    return _this.emit('core.validator.validating', {\n                        element: ele,\n                        elements: elements,\n                        field: field,\n                        validator: v,\n                    });\n                });\n                this.emit('core.element.validating', {\n                    element: ele,\n                    elements: elements,\n                    field: field,\n                });\n                break;\n            case 'Valid':\n                validatorArr.forEach(function (v) {\n                    return _this.emit('core.validator.validated', {\n                        element: ele,\n                        elements: elements,\n                        field: field,\n                        result: {\n                            message: fieldValidators[v].message,\n                            valid: true,\n                        },\n                        validator: v,\n                    });\n                });\n                this.emit('core.element.validated', {\n                    element: ele,\n                    elements: elements,\n                    field: field,\n                    valid: true,\n                });\n                break;\n            case 'Invalid':\n                validatorArr.forEach(function (v) {\n                    return _this.emit('core.validator.validated', {\n                        element: ele,\n                        elements: elements,\n                        field: field,\n                        result: {\n                            message: fieldValidators[v].message,\n                            valid: false,\n                        },\n                        validator: v,\n                    });\n                });\n                this.emit('core.element.validated', {\n                    element: ele,\n                    elements: elements,\n                    field: field,\n                    valid: false,\n                });\n                break;\n        }\n        return this;\n    };\n    /**\n     * Reset the form. It also clears all the messages, hide the feedback icons, etc.\n     *\n     * @param {boolean} reset If true, the method resets field value to empty\n     * or remove `checked`, `selected` attributes\n     * @return {Core}\n     */\n    Core.prototype.resetForm = function (reset) {\n        var _this = this;\n        Object.keys(this.fields).forEach(function (field) { return _this.resetField(field, reset); });\n        this.emit('core.form.reset', {\n            formValidation: this,\n            reset: reset,\n        });\n        return this;\n    };\n    /**\n     * Reset the field. It also clears all the messages, hide the feedback icons, etc.\n     *\n     * @param {string} field The field name\n     * @param {boolean} reset If true, the method resets field value to empty\n     * or remove `checked`, `selected` attributes\n     * @return {Core}\n     */\n    Core.prototype.resetField = function (field, reset) {\n        // Reset the field element value if needed\n        if (reset) {\n            var elements = this.elements[field];\n            var type_1 = elements[0].getAttribute('type');\n            elements.forEach(function (ele) {\n                if ('radio' === type_1 || 'checkbox' === type_1) {\n                    ele.removeAttribute('selected');\n                    ele.removeAttribute('checked');\n                    ele.checked = false;\n                }\n                else {\n                    ele.setAttribute('value', '');\n                    if (ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {\n                        ele.value = '';\n                    }\n                }\n            });\n        }\n        // Mark the field as not validated yet\n        this.updateFieldStatus(field, 'NotValidated');\n        this.emit('core.field.reset', {\n            field: field,\n            reset: reset,\n        });\n        return this;\n    };\n    /**\n     * Revalidate a particular field. It's useful when the field value is effected by third parties\n     * (for example, attach another UI library to the field).\n     * Since there isn't an automatic way for FormValidation to know when the field value is modified in those cases,\n     * we need to revalidate the field manually.\n     *\n     * @param {string} field The field name\n     * @return {Promise<string>}\n     */\n    Core.prototype.revalidateField = function (field) {\n        if (!this.fields[field]) {\n            return Promise.resolve('Ignored');\n        }\n        this.updateFieldStatus(field, 'NotValidated');\n        return this.validateField(field);\n    };\n    /**\n     * Disable particular validator for given field\n     *\n     * @param {string} field The field name\n     * @param {string} validator The validator name. If it isn't specified, all validators will be disabled\n     * @return {Core}\n     */\n    Core.prototype.disableValidator = function (field, validator) {\n        if (!this.fields[field]) {\n            return this;\n        }\n        var elements = this.elements[field];\n        this.toggleValidator(false, field, validator);\n        this.emit('core.validator.disabled', {\n            elements: elements,\n            field: field,\n            formValidation: this,\n            validator: validator,\n        });\n        return this;\n    };\n    /**\n     * Enable particular validator for given field\n     *\n     * @param {string} field The field name\n     * @param {string} validator The validator name. If it isn't specified, all validators will be enabled\n     * @return {Core}\n     */\n    Core.prototype.enableValidator = function (field, validator) {\n        if (!this.fields[field]) {\n            return this;\n        }\n        var elements = this.elements[field];\n        this.toggleValidator(true, field, validator);\n        this.emit('core.validator.enabled', {\n            elements: elements,\n            field: field,\n            formValidation: this,\n            validator: validator,\n        });\n        return this;\n    };\n    /**\n     * Update option of particular validator for given field\n     *\n     * @param {string} field The field name\n     * @param {string} validator The validator name\n     * @param {string} name The option's name\n     * @param {unknown} value The option's value\n     * @return {Core}\n     */\n    Core.prototype.updateValidatorOption = function (field, validator, name, value) {\n        if (this.fields[field] && this.fields[field].validators && this.fields[field].validators[validator]) {\n            this.fields[field].validators[validator][name] = value;\n        }\n        return this;\n    };\n    Core.prototype.setFieldOptions = function (field, options) {\n        this.fields[field] = options;\n        return this;\n    };\n    Core.prototype.destroy = function () {\n        var _this = this;\n        // Remove plugins and filters\n        Object.keys(this.plugins).forEach(function (id) { return _this.plugins[id].uninstall(); });\n        this.ee.clear();\n        this.filter.clear();\n        this.results.clear();\n        this.plugins = {};\n        return this;\n    };\n    Core.prototype.setLocale = function (locale, localization) {\n        this.locale = locale;\n        this.localization = localization;\n        return this;\n    };\n    Core.prototype.waterfall = function (promises) {\n        return promises.reduce(function (p, c) {\n            return p.then(function (res) {\n                return c().then(function (result) {\n                    res.push(result);\n                    return res;\n                });\n            });\n        }, Promise.resolve([]));\n    };\n    Core.prototype.queryElements = function (field) {\n        var selector = this.fields[field].selector\n            ? // Check if the selector is an ID selector which starts with `#`\n                '#' === this.fields[field].selector.charAt(0)\n                    ? \"[id=\\\"\".concat(this.fields[field].selector.substring(1), \"\\\"]\")\n                    : this.fields[field].selector\n            : \"[name=\\\"\".concat(field.replace(/\"/g, '\\\\\"'), \"\\\"]\");\n        return [].slice.call(this.form.querySelectorAll(selector));\n    };\n    Core.prototype.normalizeResult = function (field, validator, result) {\n        var opts = this.fields[field].validators[validator];\n        return Object.assign({}, result, {\n            message: result.message ||\n                (opts ? opts.message : '') ||\n                (this.localization && this.localization[validator] && this.localization[validator]['default']\n                    ? this.localization[validator]['default']\n                    : '') ||\n                \"The field \".concat(field, \" is not valid\"),\n        });\n    };\n    Core.prototype.toggleValidator = function (enabled, field, validator) {\n        var _this = this;\n        var validatorArr = this.fields[field].validators;\n        if (validator && validatorArr && validatorArr[validator]) {\n            this.fields[field].validators[validator].enabled = enabled;\n        }\n        else if (!validator) {\n            Object.keys(validatorArr).forEach(function (v) { return (_this.fields[field].validators[v].enabled = enabled); });\n        }\n        return this.updateFieldStatus(field, 'NotValidated', validator);\n    };\n    return Core;\n}());\nfunction formValidation(form, options) {\n    var opts = Object.assign({}, {\n        fields: {},\n        locale: 'en_US',\n        plugins: {},\n        init: function (_) { },\n    }, options);\n    var core = new Core(form, opts.fields);\n    core.setLocale(opts.locale, opts.localization);\n    // Register plugins\n    Object.keys(opts.plugins).forEach(function (name) { return core.registerPlugin(name, opts.plugins[name]); });\n    // It's the single point that users can do a particular task before adding fields\n    // Some initialization tasks must be done at that point\n    opts.init(core);\n    // and add fields\n    Object.keys(opts.fields).forEach(function (field) { return core.addField(field, opts.fields[field]); });\n    return core;\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar Plugin = /** @class */ (function () {\n    function Plugin(opts) {\n        this.opts = opts;\n        this.isEnabled = true;\n    }\n    Plugin.prototype.setCore = function (core) {\n        this.core = core;\n        return this;\n    };\n    Plugin.prototype.enable = function () {\n        this.isEnabled = true;\n        this.onEnabled();\n        return this;\n    };\n    Plugin.prototype.disable = function () {\n        this.isEnabled = false;\n        this.onDisabled();\n        return this;\n    };\n    Plugin.prototype.isPluginEnabled = function () {\n        return this.isEnabled;\n    };\n    Plugin.prototype.onEnabled = function () { }; // eslint-disable-line @typescript-eslint/no-empty-function\n    Plugin.prototype.onDisabled = function () { }; // eslint-disable-line @typescript-eslint/no-empty-function\n    Plugin.prototype.install = function () { }; // eslint-disable-line @typescript-eslint/no-empty-function\n    Plugin.prototype.uninstall = function () { }; // eslint-disable-line @typescript-eslint/no-empty-function\n    return Plugin;\n}());\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n/**\n * Execute a callback function\n *\n * @param {Function | string} functionName Can be\n * - name of global function\n * - name of namespace function (such as A.B.C)\n * - a function\n * @param {any[]} args The callback arguments\n * @return {any}\n */\nfunction call(functionName, args) {\n    if ('function' === typeof functionName) {\n        return functionName.apply(this, args);\n    }\n    else if ('string' === typeof functionName) {\n        // Node that it doesn't support node.js based environment because we are trying to access `window`\n        var name_1 = functionName;\n        if ('()' === name_1.substring(name_1.length - 2)) {\n            name_1 = name_1.substring(0, name_1.length - 2);\n        }\n        var ns = name_1.split('.');\n        var func = ns.pop();\n        var context_1 = window;\n        for (var _i = 0, ns_1 = ns; _i < ns_1.length; _i++) {\n            var t = ns_1[_i];\n            context_1 = context_1[t];\n        }\n        return typeof context_1[func] === 'undefined' ? null : context_1[func].apply(this, args);\n    }\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar addClass = function (element, classes) {\n    classes.split(' ').forEach(function (clazz) {\n        if (element.classList) {\n            element.classList.add(clazz);\n        }\n        else if (\" \".concat(element.className, \" \").indexOf(\" \".concat(clazz, \" \"))) {\n            element.className += \" \".concat(clazz);\n        }\n    });\n};\nvar removeClass = function (element, classes) {\n    classes.split(' ').forEach(function (clazz) {\n        element.classList\n            ? element.classList.remove(clazz)\n            : (element.className = element.className.replace(clazz, ''));\n    });\n};\nvar classSet = function (element, classes) {\n    var adding = [];\n    var removing = [];\n    Object.keys(classes).forEach(function (clazz) {\n        if (clazz) {\n            classes[clazz] ? adding.push(clazz) : removing.push(clazz);\n        }\n    });\n    // Always remove before adding class because there might be a class which belong to both sets.\n    // For example, the element will have class `a` after calling\n    //  ```\n    //  classSet(element, {\n    //      'a a1 a2': true,\n    //      'a b1 b2': false\n    //  })\n    //  ```\n    removing.forEach(function (clazz) { return removeClass(element, clazz); });\n    adding.forEach(function (clazz) { return addClass(element, clazz); });\n};\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar matches = function (element, selector) {\n    var nativeMatches = element.matches ||\n        element.webkitMatchesSelector ||\n        element['mozMatchesSelector'] ||\n        element['msMatchesSelector'];\n    if (nativeMatches) {\n        return nativeMatches.call(element, selector);\n    }\n    // In case `matchesselector` isn't supported (such as IE10)\n    // See http://caniuse.com/matchesselector\n    var nodes = [].slice.call(element.parentElement.querySelectorAll(selector));\n    return nodes.indexOf(element) >= 0;\n};\nvar closest = function (element, selector) {\n    var ele = element;\n    while (ele) {\n        if (matches(ele, selector)) {\n            break;\n        }\n        ele = ele.parentElement;\n    }\n    return ele;\n};\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar generateString = function (length) {\n    return Array(length)\n        .fill('')\n        .map(function (v) { return Math.random().toString(36).charAt(2); })\n        .join('');\n};\nvar fetch = function (url, options) {\n    var toQuery = function (obj) {\n        return Object.keys(obj)\n            .map(function (k) { return \"\".concat(encodeURIComponent(k), \"=\").concat(encodeURIComponent(obj[k])); })\n            .join('&');\n    };\n    return new Promise(function (resolve, reject) {\n        var opts = Object.assign({}, {\n            crossDomain: false,\n            headers: {},\n            method: 'GET',\n            params: {},\n        }, options);\n        // Build the params for GET request\n        var params = Object.keys(opts.params)\n            .map(function (k) { return \"\".concat(encodeURIComponent(k), \"=\").concat(encodeURIComponent(opts.params[k])); })\n            .join('&');\n        var hasQuery = url.indexOf('?') > -1;\n        var requestUrl = 'GET' === opts.method ? \"\".concat(url).concat(hasQuery ? '&' : '?').concat(params) : url;\n        if (opts.crossDomain) {\n            // User is making cross domain request\n            var script_1 = document.createElement('script');\n            // In some very fast systems, the different `Date.now()` invocations can return the same value\n            // which leads to the issue where there are multiple remove validators are used, for example.\n            // Appending it with a generated random string can fix the value\n            var callback_1 = \"___FormValidationFetch_\".concat(generateString(12), \"___\");\n            window[callback_1] = function (data) {\n                delete window[callback_1];\n                resolve(data);\n            };\n            script_1.src = \"\".concat(requestUrl).concat(hasQuery ? '&' : '?', \"callback=\").concat(callback_1);\n            script_1.async = true;\n            script_1.addEventListener('load', function () {\n                script_1.parentNode.removeChild(script_1);\n            });\n            script_1.addEventListener('error', function () { return reject; });\n            document.head.appendChild(script_1);\n        }\n        else {\n            var request_1 = new XMLHttpRequest();\n            request_1.open(opts.method, requestUrl);\n            // Set the headers\n            request_1.setRequestHeader('X-Requested-With', 'XMLHttpRequest');\n            if ('POST' === opts.method) {\n                request_1.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');\n            }\n            Object.keys(opts.headers).forEach(function (k) { return request_1.setRequestHeader(k, opts.headers[k]); });\n            request_1.addEventListener('load', function () {\n                // Cannot use arrow function here due to the `this` scope\n                resolve(JSON.parse(this.responseText));\n            });\n            request_1.addEventListener('error', function () { return reject; });\n            // GET request will ignore the passed data here\n            request_1.send(toQuery(opts.params));\n        }\n    });\n};\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n/**\n * Format a string\n * It's used to format the error message\n * format('The field must between %s and %s', [10, 20]) = 'The field must between 10 and 20'\n *\n * @param {string} message\n * @param {string|string[]} parameters\n * @returns {string}\n */\nvar format = function (message, parameters) {\n    var params = Array.isArray(parameters) ? parameters : [parameters];\n    var output = message;\n    params.forEach(function (p) {\n        output = output.replace('%s', p);\n    });\n    return output;\n};\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar hasClass = function (element, clazz) {\n    return element.classList\n        ? element.classList.contains(clazz)\n        : new RegExp(\"(^| )\".concat(clazz, \"( |$)\"), 'gi').test(element.className);\n};\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n/**\n * Validate a date\n *\n * @param {string} year The full year in 4 digits\n * @param {string} month The month number\n * @param {string} day The day number\n * @param {boolean} [notInFuture] If true, the date must not be in the future\n * @returns {boolean}\n */\nvar isValidDate = function (year, month, day, notInFuture) {\n    if (isNaN(year) || isNaN(month) || isNaN(day)) {\n        return false;\n    }\n    if (year < 1000 || year > 9999 || month <= 0 || month > 12) {\n        return false;\n    }\n    var numDays = [\n        31,\n        // Update the number of days in Feb of leap year\n        year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0) ? 29 : 28,\n        31,\n        30,\n        31,\n        30,\n        31,\n        31,\n        30,\n        31,\n        30,\n        31,\n    ];\n    // Check the day\n    if (day <= 0 || day > numDays[month - 1]) {\n        return false;\n    }\n    if (notInFuture === true) {\n        var currentDate = new Date();\n        var currentYear = currentDate.getFullYear();\n        var currentMonth = currentDate.getMonth();\n        var currentDay = currentDate.getDate();\n        return (year < currentYear ||\n            (year === currentYear && month - 1 < currentMonth) ||\n            (year === currentYear && month - 1 === currentMonth && day < currentDay));\n    }\n    return true;\n};\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar removeUndefined = function (obj) {\n    return obj\n        ? Object.entries(obj).reduce(function (a, _a) {\n            var k = _a[0], v = _a[1];\n            return (v === undefined ? a : ((a[k] = v), a));\n        }, {})\n        : {};\n};\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar index = {\n    call: call,\n    classSet: classSet,\n    closest: closest,\n    fetch: fetch,\n    format: format,\n    hasClass: hasClass,\n    isValidDate: isValidDate,\n    removeUndefined: removeUndefined,\n};\n\nexports.Plugin = Plugin;\nexports.algorithms = index$1;\nexports.formValidation = formValidation;\nexports.utils = index;\n\n\n//# sourceURL=webpack://Materialize/./node_modules/@form-validation/core/lib/cjs/index.js?");
+{
+
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+/**
+ * Implement Luhn validation algorithm
+ * Credit to https://gist.github.com/ShirtlessKirk/2134376
+ *
+ * @see http://en.wikipedia.org/wiki/Luhn
+ * @param {string} value
+ * @returns {boolean}
+ */
+function luhn(value) {
+    var length = value.length;
+    var prodArr = [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [0, 2, 4, 6, 8, 1, 3, 5, 7, 9],
+    ];
+    var mul = 0;
+    var sum = 0;
+    while (length--) {
+        sum += prodArr[mul][parseInt(value.charAt(length), 10)];
+        mul = 1 - mul;
+    }
+    return sum % 10 === 0 && sum > 0;
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+/**
+ * Implement modulus 11, 10 (ISO 7064) algorithm
+ *
+ * @param {string} value
+ * @returns {boolean}
+ */
+function mod11And10(value) {
+    var length = value.length;
+    var check = 5;
+    for (var i = 0; i < length; i++) {
+        check = ((((check || 10) * 2) % 11) + parseInt(value.charAt(i), 10)) % 10;
+    }
+    return check === 1;
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+/**
+ * Implements Mod 37, 36 (ISO 7064) algorithm
+ *
+ * @param {string} value
+ * @param {string} [alphabet]
+ * @returns {boolean}
+ */
+function mod37And36(value, alphabet) {
+    if (alphabet === void 0) { alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'; }
+    var length = value.length;
+    var modulus = alphabet.length;
+    var check = Math.floor(modulus / 2);
+    for (var i = 0; i < length; i++) {
+        check = ((((check || modulus) * 2) % (modulus + 1)) + alphabet.indexOf(value.charAt(i))) % modulus;
+    }
+    return check === 1;
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+function transform(input) {
+    return input
+        .split('')
+        .map(function (c) {
+        var code = c.charCodeAt(0);
+        // 65, 66, ..., 90 are the char code of A, B, ..., Z
+        return code >= 65 && code <= 90
+            ? // Replace A, B, C, ..., Z with 10, 11, ..., 35
+                code - 55
+            : c;
+    })
+        .join('')
+        .split('')
+        .map(function (c) { return parseInt(c, 10); });
+}
+function mod97And10(input) {
+    var digits = transform(input);
+    var temp = 0;
+    var length = digits.length;
+    for (var i = 0; i < length - 1; ++i) {
+        temp = ((temp + digits[i]) * 10) % 97;
+    }
+    temp += digits[length - 1];
+    return temp % 97 === 1;
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+/**
+ * Implement Verhoeff validation algorithm
+ * Credit to Sergey Petushkov, 2014
+ *
+ * @see https://en.wikipedia.org/wiki/Verhoeff_algorithm
+ * @param {string} value
+ * @returns {boolean}
+ */
+function verhoeff(value) {
+    // Multiplication table d
+    var d = [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+        [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+        [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+        [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+        [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+        [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+        [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+        [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+        [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+    ];
+    // Permutation table p
+    var p = [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+        [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+        [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+        [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+        [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+        [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+        [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
+    ];
+    // Inverse table inv
+    var invertedArray = value.reverse();
+    var c = 0;
+    for (var i = 0; i < invertedArray.length; i++) {
+        c = d[c][p[i % 8][invertedArray[i]]];
+    }
+    return c === 0;
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var index$1 = {
+    luhn: luhn,
+    mod11And10: mod11And10,
+    mod37And36: mod37And36,
+    mod97And10: mod97And10,
+    verhoeff: verhoeff,
+};
+
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+/**
+ * @param {HTMLElement} form The form element
+ * @param {string} field The field name
+ * @param {HTMLElement} element The field element
+ * @param {HTMLElement[]} elements The list of elements which have the same name as `field`
+ * @return {string}
+ */
+function getFieldValue(form, field, element, elements) {
+    var type = (element.getAttribute('type') || '').toLowerCase();
+    var tagName = element.tagName.toLowerCase();
+    if (tagName === 'textarea') {
+        return element.value;
+    }
+    if (tagName === 'select') {
+        var select = element;
+        var index = select.selectedIndex;
+        return index >= 0 ? select.options.item(index).value : '';
+    }
+    if (tagName === 'input') {
+        if ('radio' === type || 'checkbox' === type) {
+            var checked = elements.filter(function (ele) { return ele.checked; }).length;
+            return checked === 0 ? '' : checked + '';
+        }
+        else {
+            return element.value;
+        }
+    }
+    return '';
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+function emitter() {
+    return {
+        fns: {},
+        clear: function () {
+            this.fns = {};
+        },
+        emit: function (event) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            (this.fns[event] || []).map(function (handler) { return handler.apply(handler, args); });
+        },
+        off: function (event, func) {
+            if (this.fns[event]) {
+                var index = this.fns[event].indexOf(func);
+                if (index >= 0) {
+                    this.fns[event].splice(index, 1);
+                }
+            }
+        },
+        on: function (event, func) {
+            (this.fns[event] = this.fns[event] || []).push(func);
+        },
+    };
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+function filter() {
+    return {
+        filters: {},
+        add: function (name, func) {
+            (this.filters[name] = this.filters[name] || []).push(func);
+        },
+        clear: function () {
+            this.filters = {};
+        },
+        execute: function (name, defaultValue, args) {
+            if (!this.filters[name] || !this.filters[name].length) {
+                return defaultValue;
+            }
+            var result = defaultValue;
+            var filters = this.filters[name];
+            var count = filters.length;
+            for (var i = 0; i < count; i++) {
+                result = filters[i].apply(result, args);
+            }
+            return result;
+        },
+        remove: function (name, func) {
+            if (this.filters[name]) {
+                this.filters[name] = this.filters[name].filter(function (f) { return f !== func; });
+            }
+        },
+    };
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var Core = /** @class */ (function () {
+    function Core(form, fields) {
+        this.fields = {};
+        this.elements = {};
+        this.ee = emitter();
+        this.filter = filter();
+        this.plugins = {};
+        // Store the result of validation for each field
+        this.results = new Map();
+        this.validators = {};
+        this.form = form;
+        this.fields = fields;
+    }
+    Core.prototype.on = function (event, func) {
+        this.ee.on(event, func);
+        return this;
+    };
+    Core.prototype.off = function (event, func) {
+        this.ee.off(event, func);
+        return this;
+    };
+    Core.prototype.emit = function (event) {
+        var _a;
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        (_a = this.ee).emit.apply(_a, __spreadArray([event], args, false));
+        return this;
+    };
+    Core.prototype.registerPlugin = function (name, plugin) {
+        // Check if whether the plugin is registered
+        if (this.plugins[name]) {
+            throw new Error("The plguin ".concat(name, " is registered"));
+        }
+        // Install the plugin
+        plugin.setCore(this);
+        plugin.install();
+        this.plugins[name] = plugin;
+        return this;
+    };
+    Core.prototype.deregisterPlugin = function (name) {
+        var plugin = this.plugins[name];
+        if (plugin) {
+            plugin.uninstall();
+        }
+        delete this.plugins[name];
+        return this;
+    };
+    Core.prototype.enablePlugin = function (name) {
+        var plugin = this.plugins[name];
+        if (plugin) {
+            plugin.enable();
+        }
+        return this;
+    };
+    Core.prototype.disablePlugin = function (name) {
+        var plugin = this.plugins[name];
+        if (plugin) {
+            plugin.disable();
+        }
+        return this;
+    };
+    Core.prototype.isPluginEnabled = function (name) {
+        var plugin = this.plugins[name];
+        return plugin ? plugin.isPluginEnabled() : false;
+    };
+    Core.prototype.registerValidator = function (name, func) {
+        if (this.validators[name]) {
+            throw new Error("The validator ".concat(name, " is registered"));
+        }
+        this.validators[name] = func;
+        return this;
+    };
+    /**
+     * Add a filter
+     *
+     * @param {string} name The name of filter
+     * @param {Function} func The filter function
+     * @return {Core}
+     */
+    Core.prototype.registerFilter = function (name, func) {
+        this.filter.add(name, func);
+        return this;
+    };
+    /**
+     * Remove a filter
+     *
+     * @param {string} name The name of filter
+     * @param {Function} func The filter function
+     * @return {Core}
+     */
+    Core.prototype.deregisterFilter = function (name, func) {
+        this.filter.remove(name, func);
+        return this;
+    };
+    /**
+     * Execute a filter
+     *
+     * @param {string} name The name of filter
+     * @param {T} defaultValue The default value returns by the filter
+     * @param {array} args The filter arguments
+     * @returns {T}
+     */
+    Core.prototype.executeFilter = function (name, defaultValue, args) {
+        return this.filter.execute(name, defaultValue, args);
+    };
+    /**
+     * Add a field
+     *
+     * @param {string} field The field name
+     * @param {FieldOptions} options The field options. The options will be merged with the original validator rules
+     * if the field is already defined
+     * @return {Core}
+     */
+    Core.prototype.addField = function (field, options) {
+        var opts = Object.assign({}, {
+            selector: '',
+            validators: {},
+        }, options);
+        // Merge the options
+        this.fields[field] = this.fields[field]
+            ? {
+                selector: opts.selector || this.fields[field].selector,
+                validators: Object.assign({}, this.fields[field].validators, opts.validators),
+            }
+            : opts;
+        this.elements[field] = this.queryElements(field);
+        this.emit('core.field.added', {
+            elements: this.elements[field],
+            field: field,
+            options: this.fields[field],
+        });
+        return this;
+    };
+    /**
+     * Remove given field by name
+     *
+     * @param {string} field The field name
+     * @return {Core}
+     */
+    Core.prototype.removeField = function (field) {
+        if (!this.fields[field]) {
+            throw new Error("The field ".concat(field, " validators are not defined. Please ensure the field is added first"));
+        }
+        var elements = this.elements[field];
+        var options = this.fields[field];
+        delete this.elements[field];
+        delete this.fields[field];
+        this.emit('core.field.removed', {
+            elements: elements,
+            field: field,
+            options: options,
+        });
+        return this;
+    };
+    /**
+     * Validate all fields
+     *
+     * @return {Promise<string>}
+     */
+    Core.prototype.validate = function () {
+        var _this = this;
+        this.emit('core.form.validating', {
+            formValidation: this,
+        });
+        return this.filter.execute('validate-pre', Promise.resolve(), []).then(function () {
+            return Promise.all(Object.keys(_this.fields).map(function (field) { return _this.validateField(field); })).then(function (results) {
+                // `results` is an array of `Valid`, `Invalid` and `NotValidated`
+                switch (true) {
+                    case results.indexOf('Invalid') !== -1:
+                        _this.emit('core.form.invalid', {
+                            formValidation: _this,
+                        });
+                        return Promise.resolve('Invalid');
+                    case results.indexOf('NotValidated') !== -1:
+                        _this.emit('core.form.notvalidated', {
+                            formValidation: _this,
+                        });
+                        return Promise.resolve('NotValidated');
+                    default:
+                        _this.emit('core.form.valid', {
+                            formValidation: _this,
+                        });
+                        return Promise.resolve('Valid');
+                }
+            });
+        });
+    };
+    /**
+     * Validate a particular field
+     *
+     * @param {string} field The field name
+     * @return {Promise<string>}
+     */
+    Core.prototype.validateField = function (field) {
+        var _this = this;
+        // Stop validation process if the field is already validated
+        var result = this.results.get(field);
+        if (result === 'Valid' || result === 'Invalid') {
+            return Promise.resolve(result);
+        }
+        this.emit('core.field.validating', field);
+        var elements = this.elements[field];
+        if (elements.length === 0) {
+            this.emit('core.field.valid', field);
+            return Promise.resolve('Valid');
+        }
+        var type = elements[0].getAttribute('type');
+        if ('radio' === type || 'checkbox' === type || elements.length === 1) {
+            return this.validateElement(field, elements[0]);
+        }
+        else {
+            return Promise.all(elements.map(function (ele) { return _this.validateElement(field, ele); })).then(function (results) {
+                // `results` is an array of `Valid`, `Invalid` and `NotValidated`
+                switch (true) {
+                    case results.indexOf('Invalid') !== -1:
+                        _this.emit('core.field.invalid', field);
+                        _this.results.set(field, 'Invalid');
+                        return Promise.resolve('Invalid');
+                    case results.indexOf('NotValidated') !== -1:
+                        _this.emit('core.field.notvalidated', field);
+                        _this.results.delete(field);
+                        return Promise.resolve('NotValidated');
+                    default:
+                        _this.emit('core.field.valid', field);
+                        _this.results.set(field, 'Valid');
+                        return Promise.resolve('Valid');
+                }
+            });
+        }
+    };
+    /**
+     * Validate particular element
+     *
+     * @param {string} field The field name
+     * @param {HTMLElement} ele The field element
+     * @return {Promise<string>}
+     */
+    Core.prototype.validateElement = function (field, ele) {
+        var _this = this;
+        // Reset validation result
+        this.results.delete(field);
+        var elements = this.elements[field];
+        var ignored = this.filter.execute('element-ignored', false, [field, ele, elements]);
+        if (ignored) {
+            this.emit('core.element.ignored', {
+                element: ele,
+                elements: elements,
+                field: field,
+            });
+            return Promise.resolve('Ignored');
+        }
+        var validatorList = this.fields[field].validators;
+        this.emit('core.element.validating', {
+            element: ele,
+            elements: elements,
+            field: field,
+        });
+        var promises = Object.keys(validatorList).map(function (v) {
+            return function () { return _this.executeValidator(field, ele, v, validatorList[v]); };
+        });
+        return this.waterfall(promises)
+            .then(function (results) {
+            // `results` is an array of `Valid` or `Invalid`
+            var isValid = results.indexOf('Invalid') === -1;
+            _this.emit('core.element.validated', {
+                element: ele,
+                elements: elements,
+                field: field,
+                valid: isValid,
+            });
+            var type = ele.getAttribute('type');
+            if ('radio' === type || 'checkbox' === type || elements.length === 1) {
+                _this.emit(isValid ? 'core.field.valid' : 'core.field.invalid', field);
+            }
+            return Promise.resolve(isValid ? 'Valid' : 'Invalid');
+        })
+            .catch(function (reason) {
+            // reason is `NotValidated`
+            _this.emit('core.element.notvalidated', {
+                element: ele,
+                elements: elements,
+                field: field,
+            });
+            return Promise.resolve(reason);
+        });
+    };
+    /**
+     * Perform given validator on field
+     *
+     * @param {string} field The field name
+     * @param {HTMLElement} ele The field element
+     * @param {string} v The validator name
+     * @param {ValidatorOptions} opts The validator options
+     * @return {Promise<string>}
+     */
+    Core.prototype.executeValidator = function (field, ele, v, opts) {
+        var _this = this;
+        var elements = this.elements[field];
+        var name = this.filter.execute('validator-name', v, [v, field]);
+        opts.message = this.filter.execute('validator-message', opts.message, [this.locale, field, name]);
+        // Simply pass the validator if
+        // - it isn't defined yet
+        // - or the associated validator isn't enabled
+        if (!this.validators[name] || opts.enabled === false) {
+            this.emit('core.validator.validated', {
+                element: ele,
+                elements: elements,
+                field: field,
+                result: this.normalizeResult(field, name, { valid: true }),
+                validator: name,
+            });
+            return Promise.resolve('Valid');
+        }
+        var validator = this.validators[name];
+        // Get the field value
+        var value = this.getElementValue(field, ele, name);
+        var willValidate = this.filter.execute('field-should-validate', true, [field, ele, value, v]);
+        if (!willValidate) {
+            this.emit('core.validator.notvalidated', {
+                element: ele,
+                elements: elements,
+                field: field,
+                validator: v,
+            });
+            return Promise.resolve('NotValidated');
+        }
+        this.emit('core.validator.validating', {
+            element: ele,
+            elements: elements,
+            field: field,
+            validator: v,
+        });
+        // Perform validation
+        var result = validator().validate({
+            element: ele,
+            elements: elements,
+            field: field,
+            l10n: this.localization,
+            options: opts,
+            value: value,
+        });
+        // Check whether the result is a `Promise`
+        var isPromise = 'function' === typeof result['then'];
+        if (isPromise) {
+            return result.then(function (r) {
+                var data = _this.normalizeResult(field, v, r);
+                _this.emit('core.validator.validated', {
+                    element: ele,
+                    elements: elements,
+                    field: field,
+                    result: data,
+                    validator: v,
+                });
+                return data.valid ? 'Valid' : 'Invalid';
+            });
+        }
+        else {
+            var data = this.normalizeResult(field, v, result);
+            this.emit('core.validator.validated', {
+                element: ele,
+                elements: elements,
+                field: field,
+                result: data,
+                validator: v,
+            });
+            return Promise.resolve(data.valid ? 'Valid' : 'Invalid');
+        }
+    };
+    Core.prototype.getElementValue = function (field, ele, validator) {
+        var defaultValue = getFieldValue(this.form, field, ele, this.elements[field]);
+        return this.filter.execute('field-value', defaultValue, [defaultValue, field, ele, validator]);
+    };
+    // Some getter methods
+    Core.prototype.getElements = function (field) {
+        return this.elements[field];
+    };
+    Core.prototype.getFields = function () {
+        return this.fields;
+    };
+    Core.prototype.getFormElement = function () {
+        return this.form;
+    };
+    Core.prototype.getLocale = function () {
+        return this.locale;
+    };
+    Core.prototype.getPlugin = function (name) {
+        return this.plugins[name];
+    };
+    /**
+     * Update the field status
+     *
+     * @param {string} field The field name
+     * @param {string} status The new status
+     * @param {string} [validator] The validator name. If it isn't specified, all validators will be updated
+     * @return {Core}
+     */
+    Core.prototype.updateFieldStatus = function (field, status, validator) {
+        var _this = this;
+        var elements = this.elements[field];
+        var type = elements[0].getAttribute('type');
+        var list = 'radio' === type || 'checkbox' === type ? [elements[0]] : elements;
+        list.forEach(function (ele) { return _this.updateElementStatus(field, ele, status, validator); });
+        if (!validator) {
+            switch (status) {
+                case 'NotValidated':
+                    this.emit('core.field.notvalidated', field);
+                    this.results.delete(field);
+                    break;
+                case 'Validating':
+                    this.emit('core.field.validating', field);
+                    this.results.delete(field);
+                    break;
+                case 'Valid':
+                    this.emit('core.field.valid', field);
+                    this.results.set(field, 'Valid');
+                    break;
+                case 'Invalid':
+                    this.emit('core.field.invalid', field);
+                    this.results.set(field, 'Invalid');
+                    break;
+            }
+        }
+        else if (status === 'Invalid') {
+            // We need to mark the field as invalid because it doesn't pass the `validator`
+            this.emit('core.field.invalid', field);
+            this.results.set(field, 'Invalid');
+        }
+        return this;
+    };
+    /**
+     * Update the element status
+     *
+     * @param {string} field The field name
+     * @param {HTMLElement} ele The field element
+     * @param {string} status The new status
+     * @param {string} [validator] The validator name. If it isn't specified, all validators will be updated
+     * @return {Core}
+     */
+    Core.prototype.updateElementStatus = function (field, ele, status, validator) {
+        var _this = this;
+        var elements = this.elements[field];
+        var fieldValidators = this.fields[field].validators;
+        var validatorArr = validator ? [validator] : Object.keys(fieldValidators);
+        switch (status) {
+            case 'NotValidated':
+                validatorArr.forEach(function (v) {
+                    return _this.emit('core.validator.notvalidated', {
+                        element: ele,
+                        elements: elements,
+                        field: field,
+                        validator: v,
+                    });
+                });
+                this.emit('core.element.notvalidated', {
+                    element: ele,
+                    elements: elements,
+                    field: field,
+                });
+                break;
+            case 'Validating':
+                validatorArr.forEach(function (v) {
+                    return _this.emit('core.validator.validating', {
+                        element: ele,
+                        elements: elements,
+                        field: field,
+                        validator: v,
+                    });
+                });
+                this.emit('core.element.validating', {
+                    element: ele,
+                    elements: elements,
+                    field: field,
+                });
+                break;
+            case 'Valid':
+                validatorArr.forEach(function (v) {
+                    return _this.emit('core.validator.validated', {
+                        element: ele,
+                        elements: elements,
+                        field: field,
+                        result: {
+                            message: fieldValidators[v].message,
+                            valid: true,
+                        },
+                        validator: v,
+                    });
+                });
+                this.emit('core.element.validated', {
+                    element: ele,
+                    elements: elements,
+                    field: field,
+                    valid: true,
+                });
+                break;
+            case 'Invalid':
+                validatorArr.forEach(function (v) {
+                    return _this.emit('core.validator.validated', {
+                        element: ele,
+                        elements: elements,
+                        field: field,
+                        result: {
+                            message: fieldValidators[v].message,
+                            valid: false,
+                        },
+                        validator: v,
+                    });
+                });
+                this.emit('core.element.validated', {
+                    element: ele,
+                    elements: elements,
+                    field: field,
+                    valid: false,
+                });
+                break;
+        }
+        return this;
+    };
+    /**
+     * Reset the form. It also clears all the messages, hide the feedback icons, etc.
+     *
+     * @param {boolean} reset If true, the method resets field value to empty
+     * or remove `checked`, `selected` attributes
+     * @return {Core}
+     */
+    Core.prototype.resetForm = function (reset) {
+        var _this = this;
+        Object.keys(this.fields).forEach(function (field) { return _this.resetField(field, reset); });
+        this.emit('core.form.reset', {
+            formValidation: this,
+            reset: reset,
+        });
+        return this;
+    };
+    /**
+     * Reset the field. It also clears all the messages, hide the feedback icons, etc.
+     *
+     * @param {string} field The field name
+     * @param {boolean} reset If true, the method resets field value to empty
+     * or remove `checked`, `selected` attributes
+     * @return {Core}
+     */
+    Core.prototype.resetField = function (field, reset) {
+        // Reset the field element value if needed
+        if (reset) {
+            var elements = this.elements[field];
+            var type_1 = elements[0].getAttribute('type');
+            elements.forEach(function (ele) {
+                if ('radio' === type_1 || 'checkbox' === type_1) {
+                    ele.removeAttribute('selected');
+                    ele.removeAttribute('checked');
+                    ele.checked = false;
+                }
+                else {
+                    ele.setAttribute('value', '');
+                    if (ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {
+                        ele.value = '';
+                    }
+                }
+            });
+        }
+        // Mark the field as not validated yet
+        this.updateFieldStatus(field, 'NotValidated');
+        this.emit('core.field.reset', {
+            field: field,
+            reset: reset,
+        });
+        return this;
+    };
+    /**
+     * Revalidate a particular field. It's useful when the field value is effected by third parties
+     * (for example, attach another UI library to the field).
+     * Since there isn't an automatic way for FormValidation to know when the field value is modified in those cases,
+     * we need to revalidate the field manually.
+     *
+     * @param {string} field The field name
+     * @return {Promise<string>}
+     */
+    Core.prototype.revalidateField = function (field) {
+        if (!this.fields[field]) {
+            return Promise.resolve('Ignored');
+        }
+        this.updateFieldStatus(field, 'NotValidated');
+        return this.validateField(field);
+    };
+    /**
+     * Disable particular validator for given field
+     *
+     * @param {string} field The field name
+     * @param {string} validator The validator name. If it isn't specified, all validators will be disabled
+     * @return {Core}
+     */
+    Core.prototype.disableValidator = function (field, validator) {
+        if (!this.fields[field]) {
+            return this;
+        }
+        var elements = this.elements[field];
+        this.toggleValidator(false, field, validator);
+        this.emit('core.validator.disabled', {
+            elements: elements,
+            field: field,
+            formValidation: this,
+            validator: validator,
+        });
+        return this;
+    };
+    /**
+     * Enable particular validator for given field
+     *
+     * @param {string} field The field name
+     * @param {string} validator The validator name. If it isn't specified, all validators will be enabled
+     * @return {Core}
+     */
+    Core.prototype.enableValidator = function (field, validator) {
+        if (!this.fields[field]) {
+            return this;
+        }
+        var elements = this.elements[field];
+        this.toggleValidator(true, field, validator);
+        this.emit('core.validator.enabled', {
+            elements: elements,
+            field: field,
+            formValidation: this,
+            validator: validator,
+        });
+        return this;
+    };
+    /**
+     * Update option of particular validator for given field
+     *
+     * @param {string} field The field name
+     * @param {string} validator The validator name
+     * @param {string} name The option's name
+     * @param {unknown} value The option's value
+     * @return {Core}
+     */
+    Core.prototype.updateValidatorOption = function (field, validator, name, value) {
+        if (this.fields[field] && this.fields[field].validators && this.fields[field].validators[validator]) {
+            this.fields[field].validators[validator][name] = value;
+        }
+        return this;
+    };
+    Core.prototype.setFieldOptions = function (field, options) {
+        this.fields[field] = options;
+        return this;
+    };
+    Core.prototype.destroy = function () {
+        var _this = this;
+        // Remove plugins and filters
+        Object.keys(this.plugins).forEach(function (id) { return _this.plugins[id].uninstall(); });
+        this.ee.clear();
+        this.filter.clear();
+        this.results.clear();
+        this.plugins = {};
+        return this;
+    };
+    Core.prototype.setLocale = function (locale, localization) {
+        this.locale = locale;
+        this.localization = localization;
+        return this;
+    };
+    Core.prototype.waterfall = function (promises) {
+        return promises.reduce(function (p, c) {
+            return p.then(function (res) {
+                return c().then(function (result) {
+                    res.push(result);
+                    return res;
+                });
+            });
+        }, Promise.resolve([]));
+    };
+    Core.prototype.queryElements = function (field) {
+        var selector = this.fields[field].selector
+            ? // Check if the selector is an ID selector which starts with `#`
+                '#' === this.fields[field].selector.charAt(0)
+                    ? "[id=\"".concat(this.fields[field].selector.substring(1), "\"]")
+                    : this.fields[field].selector
+            : "[name=\"".concat(field.replace(/"/g, '\\"'), "\"]");
+        return [].slice.call(this.form.querySelectorAll(selector));
+    };
+    Core.prototype.normalizeResult = function (field, validator, result) {
+        var opts = this.fields[field].validators[validator];
+        return Object.assign({}, result, {
+            message: result.message ||
+                (opts ? opts.message : '') ||
+                (this.localization && this.localization[validator] && this.localization[validator]['default']
+                    ? this.localization[validator]['default']
+                    : '') ||
+                "The field ".concat(field, " is not valid"),
+        });
+    };
+    Core.prototype.toggleValidator = function (enabled, field, validator) {
+        var _this = this;
+        var validatorArr = this.fields[field].validators;
+        if (validator && validatorArr && validatorArr[validator]) {
+            this.fields[field].validators[validator].enabled = enabled;
+        }
+        else if (!validator) {
+            Object.keys(validatorArr).forEach(function (v) { return (_this.fields[field].validators[v].enabled = enabled); });
+        }
+        return this.updateFieldStatus(field, 'NotValidated', validator);
+    };
+    return Core;
+}());
+function formValidation(form, options) {
+    var opts = Object.assign({}, {
+        fields: {},
+        locale: 'en_US',
+        plugins: {},
+        init: function (_) { },
+    }, options);
+    var core = new Core(form, opts.fields);
+    core.setLocale(opts.locale, opts.localization);
+    // Register plugins
+    Object.keys(opts.plugins).forEach(function (name) { return core.registerPlugin(name, opts.plugins[name]); });
+    // It's the single point that users can do a particular task before adding fields
+    // Some initialization tasks must be done at that point
+    opts.init(core);
+    // and add fields
+    Object.keys(opts.fields).forEach(function (field) { return core.addField(field, opts.fields[field]); });
+    return core;
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var Plugin = /** @class */ (function () {
+    function Plugin(opts) {
+        this.opts = opts;
+        this.isEnabled = true;
+    }
+    Plugin.prototype.setCore = function (core) {
+        this.core = core;
+        return this;
+    };
+    Plugin.prototype.enable = function () {
+        this.isEnabled = true;
+        this.onEnabled();
+        return this;
+    };
+    Plugin.prototype.disable = function () {
+        this.isEnabled = false;
+        this.onDisabled();
+        return this;
+    };
+    Plugin.prototype.isPluginEnabled = function () {
+        return this.isEnabled;
+    };
+    Plugin.prototype.onEnabled = function () { }; // eslint-disable-line @typescript-eslint/no-empty-function
+    Plugin.prototype.onDisabled = function () { }; // eslint-disable-line @typescript-eslint/no-empty-function
+    Plugin.prototype.install = function () { }; // eslint-disable-line @typescript-eslint/no-empty-function
+    Plugin.prototype.uninstall = function () { }; // eslint-disable-line @typescript-eslint/no-empty-function
+    return Plugin;
+}());
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+/**
+ * Execute a callback function
+ *
+ * @param {Function | string} functionName Can be
+ * - name of global function
+ * - name of namespace function (such as A.B.C)
+ * - a function
+ * @param {any[]} args The callback arguments
+ * @return {any}
+ */
+function call(functionName, args) {
+    if ('function' === typeof functionName) {
+        return functionName.apply(this, args);
+    }
+    else if ('string' === typeof functionName) {
+        // Node that it doesn't support node.js based environment because we are trying to access `window`
+        var name_1 = functionName;
+        if ('()' === name_1.substring(name_1.length - 2)) {
+            name_1 = name_1.substring(0, name_1.length - 2);
+        }
+        var ns = name_1.split('.');
+        var func = ns.pop();
+        var context_1 = window;
+        for (var _i = 0, ns_1 = ns; _i < ns_1.length; _i++) {
+            var t = ns_1[_i];
+            context_1 = context_1[t];
+        }
+        return typeof context_1[func] === 'undefined' ? null : context_1[func].apply(this, args);
+    }
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var addClass = function (element, classes) {
+    classes.split(' ').forEach(function (clazz) {
+        if (element.classList) {
+            element.classList.add(clazz);
+        }
+        else if (" ".concat(element.className, " ").indexOf(" ".concat(clazz, " "))) {
+            element.className += " ".concat(clazz);
+        }
+    });
+};
+var removeClass = function (element, classes) {
+    classes.split(' ').forEach(function (clazz) {
+        element.classList
+            ? element.classList.remove(clazz)
+            : (element.className = element.className.replace(clazz, ''));
+    });
+};
+var classSet = function (element, classes) {
+    var adding = [];
+    var removing = [];
+    Object.keys(classes).forEach(function (clazz) {
+        if (clazz) {
+            classes[clazz] ? adding.push(clazz) : removing.push(clazz);
+        }
+    });
+    // Always remove before adding class because there might be a class which belong to both sets.
+    // For example, the element will have class `a` after calling
+    //  ```
+    //  classSet(element, {
+    //      'a a1 a2': true,
+    //      'a b1 b2': false
+    //  })
+    //  ```
+    removing.forEach(function (clazz) { return removeClass(element, clazz); });
+    adding.forEach(function (clazz) { return addClass(element, clazz); });
+};
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var matches = function (element, selector) {
+    var nativeMatches = element.matches ||
+        element.webkitMatchesSelector ||
+        element['mozMatchesSelector'] ||
+        element['msMatchesSelector'];
+    if (nativeMatches) {
+        return nativeMatches.call(element, selector);
+    }
+    // In case `matchesselector` isn't supported (such as IE10)
+    // See http://caniuse.com/matchesselector
+    var nodes = [].slice.call(element.parentElement.querySelectorAll(selector));
+    return nodes.indexOf(element) >= 0;
+};
+var closest = function (element, selector) {
+    var ele = element;
+    while (ele) {
+        if (matches(ele, selector)) {
+            break;
+        }
+        ele = ele.parentElement;
+    }
+    return ele;
+};
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var generateString = function (length) {
+    return Array(length)
+        .fill('')
+        .map(function (v) { return Math.random().toString(36).charAt(2); })
+        .join('');
+};
+var fetch = function (url, options) {
+    var toQuery = function (obj) {
+        return Object.keys(obj)
+            .map(function (k) { return "".concat(encodeURIComponent(k), "=").concat(encodeURIComponent(obj[k])); })
+            .join('&');
+    };
+    return new Promise(function (resolve, reject) {
+        var opts = Object.assign({}, {
+            crossDomain: false,
+            headers: {},
+            method: 'GET',
+            params: {},
+        }, options);
+        // Build the params for GET request
+        var params = Object.keys(opts.params)
+            .map(function (k) { return "".concat(encodeURIComponent(k), "=").concat(encodeURIComponent(opts.params[k])); })
+            .join('&');
+        var hasQuery = url.indexOf('?') > -1;
+        var requestUrl = 'GET' === opts.method ? "".concat(url).concat(hasQuery ? '&' : '?').concat(params) : url;
+        if (opts.crossDomain) {
+            // User is making cross domain request
+            var script_1 = document.createElement('script');
+            // In some very fast systems, the different `Date.now()` invocations can return the same value
+            // which leads to the issue where there are multiple remove validators are used, for example.
+            // Appending it with a generated random string can fix the value
+            var callback_1 = "___FormValidationFetch_".concat(generateString(12), "___");
+            window[callback_1] = function (data) {
+                delete window[callback_1];
+                resolve(data);
+            };
+            script_1.src = "".concat(requestUrl).concat(hasQuery ? '&' : '?', "callback=").concat(callback_1);
+            script_1.async = true;
+            script_1.addEventListener('load', function () {
+                script_1.parentNode.removeChild(script_1);
+            });
+            script_1.addEventListener('error', function () { return reject; });
+            document.head.appendChild(script_1);
+        }
+        else {
+            var request_1 = new XMLHttpRequest();
+            request_1.open(opts.method, requestUrl);
+            // Set the headers
+            request_1.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            if ('POST' === opts.method) {
+                request_1.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            }
+            Object.keys(opts.headers).forEach(function (k) { return request_1.setRequestHeader(k, opts.headers[k]); });
+            request_1.addEventListener('load', function () {
+                // Cannot use arrow function here due to the `this` scope
+                resolve(JSON.parse(this.responseText));
+            });
+            request_1.addEventListener('error', function () { return reject; });
+            // GET request will ignore the passed data here
+            request_1.send(toQuery(opts.params));
+        }
+    });
+};
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+/**
+ * Format a string
+ * It's used to format the error message
+ * format('The field must between %s and %s', [10, 20]) = 'The field must between 10 and 20'
+ *
+ * @param {string} message
+ * @param {string|string[]} parameters
+ * @returns {string}
+ */
+var format = function (message, parameters) {
+    var params = Array.isArray(parameters) ? parameters : [parameters];
+    var output = message;
+    params.forEach(function (p) {
+        output = output.replace('%s', p);
+    });
+    return output;
+};
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var hasClass = function (element, clazz) {
+    return element.classList
+        ? element.classList.contains(clazz)
+        : new RegExp("(^| )".concat(clazz, "( |$)"), 'gi').test(element.className);
+};
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+/**
+ * Validate a date
+ *
+ * @param {string} year The full year in 4 digits
+ * @param {string} month The month number
+ * @param {string} day The day number
+ * @param {boolean} [notInFuture] If true, the date must not be in the future
+ * @returns {boolean}
+ */
+var isValidDate = function (year, month, day, notInFuture) {
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+        return false;
+    }
+    if (year < 1000 || year > 9999 || month <= 0 || month > 12) {
+        return false;
+    }
+    var numDays = [
+        31,
+        // Update the number of days in Feb of leap year
+        year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0) ? 29 : 28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31,
+    ];
+    // Check the day
+    if (day <= 0 || day > numDays[month - 1]) {
+        return false;
+    }
+    if (notInFuture === true) {
+        var currentDate = new Date();
+        var currentYear = currentDate.getFullYear();
+        var currentMonth = currentDate.getMonth();
+        var currentDay = currentDate.getDate();
+        return (year < currentYear ||
+            (year === currentYear && month - 1 < currentMonth) ||
+            (year === currentYear && month - 1 === currentMonth && day < currentDay));
+    }
+    return true;
+};
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var removeUndefined = function (obj) {
+    return obj
+        ? Object.entries(obj).reduce(function (a, _a) {
+            var k = _a[0], v = _a[1];
+            return (v === undefined ? a : ((a[k] = v), a));
+        }, {})
+        : {};
+};
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var index = {
+    call: call,
+    classSet: classSet,
+    closest: closest,
+    fetch: fetch,
+    format: format,
+    hasClass: hasClass,
+    isValidDate: isValidDate,
+    removeUndefined: removeUndefined,
+};
+
+exports.Plugin = Plugin;
+exports.algorithms = index$1;
+exports.formValidation = formValidation;
+exports.utils = index;
+}
 
 /***/ }),
 
@@ -36,7 +1380,19 @@ eval("\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best valida
   \*********************************************************/
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
-eval("/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n\n\n\nif (false) {} else {\n    module.exports = __webpack_require__(/*! ./cjs/index.js */ \"./node_modules/@form-validation/core/lib/cjs/index.js\");\n}\n\n\n//# sourceURL=webpack://Materialize/./node_modules/@form-validation/core/lib/index.js?");
+{
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+
+
+if (false) {} else {
+    module.exports = __webpack_require__(/*! ./cjs/index.js */ "./node_modules/@form-validation/core/lib/cjs/index.js");
+}
+}
 
 /***/ }),
 
@@ -46,7 +1402,101 @@ eval("/**\n * FormValidation (https://formvalidation.io)\n * The best validation
   \**************************************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-eval("\n\nvar core = __webpack_require__(/*! @form-validation/core */ \"./node_modules/@form-validation/core/lib/index.js\");\nvar pluginFieldStatus = __webpack_require__(/*! @form-validation/plugin-field-status */ \"./node_modules/@form-validation/plugin-field-status/lib/index.js\");\n\n/******************************************************************************\r\nCopyright (c) Microsoft Corporation.\r\n\r\nPermission to use, copy, modify, and/or distribute this software for any\r\npurpose with or without fee is hereby granted.\r\n\r\nTHE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH\r\nREGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY\r\nAND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,\r\nINDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM\r\nLOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR\r\nOTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR\r\nPERFORMANCE OF THIS SOFTWARE.\r\n***************************************************************************** */\r\n/* global Reflect, Promise */\r\n\r\nvar extendStatics = function(d, b) {\r\n    extendStatics = Object.setPrototypeOf ||\r\n        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||\r\n        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };\r\n    return extendStatics(d, b);\r\n};\r\n\r\nfunction __extends(d, b) {\r\n    if (typeof b !== \"function\" && b !== null)\r\n        throw new TypeError(\"Class extends value \" + String(b) + \" is not a constructor or null\");\r\n    extendStatics(d, b);\r\n    function __() { this.constructor = d; }\r\n    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\r\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar AutoFocus = /** @class */ (function (_super) {\n    __extends(AutoFocus, _super);\n    function AutoFocus(opts) {\n        var _this = _super.call(this, opts) || this;\n        _this.opts = Object.assign({}, {\n            onPrefocus: function () { },\n        }, opts);\n        _this.invalidFormHandler = _this.onFormInvalid.bind(_this);\n        return _this;\n    }\n    AutoFocus.prototype.install = function () {\n        this.core\n            .on('core.form.invalid', this.invalidFormHandler)\n            .registerPlugin(AutoFocus.FIELD_STATUS_PLUGIN, new pluginFieldStatus.FieldStatus());\n    };\n    AutoFocus.prototype.uninstall = function () {\n        this.core.off('core.form.invalid', this.invalidFormHandler).deregisterPlugin(AutoFocus.FIELD_STATUS_PLUGIN);\n    };\n    AutoFocus.prototype.onEnabled = function () {\n        this.core.enablePlugin(AutoFocus.FIELD_STATUS_PLUGIN);\n    };\n    AutoFocus.prototype.onDisabled = function () {\n        this.core.disablePlugin(AutoFocus.FIELD_STATUS_PLUGIN);\n    };\n    AutoFocus.prototype.onFormInvalid = function () {\n        if (!this.isEnabled) {\n            return;\n        }\n        var plugin = this.core.getPlugin(AutoFocus.FIELD_STATUS_PLUGIN);\n        var statuses = plugin.getStatuses();\n        var invalidFields = Object.keys(this.core.getFields()).filter(function (key) { return statuses.get(key) === 'Invalid'; });\n        if (invalidFields.length > 0) {\n            var firstInvalidField = invalidFields[0];\n            var elements = this.core.getElements(firstInvalidField);\n            if (elements.length > 0) {\n                var firstElement = elements[0];\n                var e = {\n                    firstElement: firstElement,\n                    field: firstInvalidField,\n                };\n                this.core.emit('plugins.autofocus.prefocus', e);\n                this.opts.onPrefocus(e);\n                // Focus on the first invalid element\n                firstElement.focus();\n            }\n        }\n    };\n    AutoFocus.FIELD_STATUS_PLUGIN = '___autoFocusFieldStatus';\n    return AutoFocus;\n}(core.Plugin));\n\nexports.AutoFocus = AutoFocus;\n\n\n//# sourceURL=webpack://Materialize/./node_modules/@form-validation/plugin-auto-focus/lib/cjs/index.js?");
+{
+
+
+var core = __webpack_require__(/*! @form-validation/core */ "./node_modules/@form-validation/core/lib/index.js");
+var pluginFieldStatus = __webpack_require__(/*! @form-validation/plugin-field-status */ "./node_modules/@form-validation/plugin-field-status/lib/index.js");
+
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var AutoFocus = /** @class */ (function (_super) {
+    __extends(AutoFocus, _super);
+    function AutoFocus(opts) {
+        var _this = _super.call(this, opts) || this;
+        _this.opts = Object.assign({}, {
+            onPrefocus: function () { },
+        }, opts);
+        _this.invalidFormHandler = _this.onFormInvalid.bind(_this);
+        return _this;
+    }
+    AutoFocus.prototype.install = function () {
+        this.core
+            .on('core.form.invalid', this.invalidFormHandler)
+            .registerPlugin(AutoFocus.FIELD_STATUS_PLUGIN, new pluginFieldStatus.FieldStatus());
+    };
+    AutoFocus.prototype.uninstall = function () {
+        this.core.off('core.form.invalid', this.invalidFormHandler).deregisterPlugin(AutoFocus.FIELD_STATUS_PLUGIN);
+    };
+    AutoFocus.prototype.onEnabled = function () {
+        this.core.enablePlugin(AutoFocus.FIELD_STATUS_PLUGIN);
+    };
+    AutoFocus.prototype.onDisabled = function () {
+        this.core.disablePlugin(AutoFocus.FIELD_STATUS_PLUGIN);
+    };
+    AutoFocus.prototype.onFormInvalid = function () {
+        if (!this.isEnabled) {
+            return;
+        }
+        var plugin = this.core.getPlugin(AutoFocus.FIELD_STATUS_PLUGIN);
+        var statuses = plugin.getStatuses();
+        var invalidFields = Object.keys(this.core.getFields()).filter(function (key) { return statuses.get(key) === 'Invalid'; });
+        if (invalidFields.length > 0) {
+            var firstInvalidField = invalidFields[0];
+            var elements = this.core.getElements(firstInvalidField);
+            if (elements.length > 0) {
+                var firstElement = elements[0];
+                var e = {
+                    firstElement: firstElement,
+                    field: firstInvalidField,
+                };
+                this.core.emit('plugins.autofocus.prefocus', e);
+                this.opts.onPrefocus(e);
+                // Focus on the first invalid element
+                firstElement.focus();
+            }
+        }
+    };
+    AutoFocus.FIELD_STATUS_PLUGIN = '___autoFocusFieldStatus';
+    return AutoFocus;
+}(core.Plugin));
+
+exports.AutoFocus = AutoFocus;
+}
 
 /***/ }),
 
@@ -56,7 +1506,19 @@ eval("\n\nvar core = __webpack_require__(/*! @form-validation/core */ \"./node_m
   \**********************************************************************/
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
-eval("/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n\n\n\nif (false) {} else {\n    module.exports = __webpack_require__(/*! ./cjs/index.js */ \"./node_modules/@form-validation/plugin-auto-focus/lib/cjs/index.js\");\n}\n\n\n//# sourceURL=webpack://Materialize/./node_modules/@form-validation/plugin-auto-focus/lib/index.js?");
+{
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+
+
+if (false) {} else {
+    module.exports = __webpack_require__(/*! ./cjs/index.js */ "./node_modules/@form-validation/plugin-auto-focus/lib/cjs/index.js");
+}
+}
 
 /***/ }),
 
@@ -66,7 +1528,130 @@ eval("/**\n * FormValidation (https://formvalidation.io)\n * The best validation
   \****************************************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-eval("\n\nvar core = __webpack_require__(/*! @form-validation/core */ \"./node_modules/@form-validation/core/lib/index.js\");\n\n/******************************************************************************\r\nCopyright (c) Microsoft Corporation.\r\n\r\nPermission to use, copy, modify, and/or distribute this software for any\r\npurpose with or without fee is hereby granted.\r\n\r\nTHE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH\r\nREGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY\r\nAND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,\r\nINDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM\r\nLOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR\r\nOTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR\r\nPERFORMANCE OF THIS SOFTWARE.\r\n***************************************************************************** */\r\n/* global Reflect, Promise */\r\n\r\nvar extendStatics = function(d, b) {\r\n    extendStatics = Object.setPrototypeOf ||\r\n        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||\r\n        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };\r\n    return extendStatics(d, b);\r\n};\r\n\r\nfunction __extends(d, b) {\r\n    if (typeof b !== \"function\" && b !== null)\r\n        throw new TypeError(\"Class extends value \" + String(b) + \" is not a constructor or null\");\r\n    extendStatics(d, b);\r\n    function __() { this.constructor = d; }\r\n    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\r\n}\n\n/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\nvar FieldStatus = /** @class */ (function (_super) {\n    __extends(FieldStatus, _super);\n    function FieldStatus(opts) {\n        var _this = _super.call(this, opts) || this;\n        _this.statuses = new Map();\n        _this.opts = Object.assign({}, {\n            onStatusChanged: function () { },\n        }, opts);\n        _this.elementValidatingHandler = _this.onElementValidating.bind(_this);\n        _this.elementValidatedHandler = _this.onElementValidated.bind(_this);\n        _this.elementNotValidatedHandler = _this.onElementNotValidated.bind(_this);\n        _this.elementIgnoredHandler = _this.onElementIgnored.bind(_this);\n        _this.fieldAddedHandler = _this.onFieldAdded.bind(_this);\n        _this.fieldRemovedHandler = _this.onFieldRemoved.bind(_this);\n        return _this;\n    }\n    FieldStatus.prototype.install = function () {\n        this.core\n            .on('core.element.validating', this.elementValidatingHandler)\n            .on('core.element.validated', this.elementValidatedHandler)\n            .on('core.element.notvalidated', this.elementNotValidatedHandler)\n            .on('core.element.ignored', this.elementIgnoredHandler)\n            .on('core.field.added', this.fieldAddedHandler)\n            .on('core.field.removed', this.fieldRemovedHandler);\n    };\n    FieldStatus.prototype.uninstall = function () {\n        this.statuses.clear();\n        this.core\n            .off('core.element.validating', this.elementValidatingHandler)\n            .off('core.element.validated', this.elementValidatedHandler)\n            .off('core.element.notvalidated', this.elementNotValidatedHandler)\n            .off('core.element.ignored', this.elementIgnoredHandler)\n            .off('core.field.added', this.fieldAddedHandler)\n            .off('core.field.removed', this.fieldRemovedHandler);\n    };\n    FieldStatus.prototype.areFieldsValid = function () {\n        return Array.from(this.statuses.values()).every(function (value) {\n            return value === 'Valid' || value === 'NotValidated' || value === 'Ignored';\n        });\n    };\n    FieldStatus.prototype.getStatuses = function () {\n        return this.isEnabled ? this.statuses : new Map();\n    };\n    FieldStatus.prototype.onFieldAdded = function (e) {\n        this.statuses.set(e.field, 'NotValidated');\n    };\n    FieldStatus.prototype.onFieldRemoved = function (e) {\n        if (this.statuses.has(e.field)) {\n            this.statuses.delete(e.field);\n        }\n        this.handleStatusChanged(this.areFieldsValid());\n    };\n    FieldStatus.prototype.onElementValidating = function (e) {\n        this.statuses.set(e.field, 'Validating');\n        this.handleStatusChanged(false);\n    };\n    FieldStatus.prototype.onElementValidated = function (e) {\n        this.statuses.set(e.field, e.valid ? 'Valid' : 'Invalid');\n        if (e.valid) {\n            this.handleStatusChanged(this.areFieldsValid());\n        }\n        else {\n            this.handleStatusChanged(false);\n        }\n    };\n    FieldStatus.prototype.onElementNotValidated = function (e) {\n        this.statuses.set(e.field, 'NotValidated');\n        this.handleStatusChanged(false);\n    };\n    FieldStatus.prototype.onElementIgnored = function (e) {\n        this.statuses.set(e.field, 'Ignored');\n        this.handleStatusChanged(this.areFieldsValid());\n    };\n    FieldStatus.prototype.handleStatusChanged = function (areFieldsValid) {\n        if (this.isEnabled) {\n            this.opts.onStatusChanged(areFieldsValid);\n        }\n    };\n    return FieldStatus;\n}(core.Plugin));\n\nexports.FieldStatus = FieldStatus;\n\n\n//# sourceURL=webpack://Materialize/./node_modules/@form-validation/plugin-field-status/lib/cjs/index.js?");
+{
+
+
+var core = __webpack_require__(/*! @form-validation/core */ "./node_modules/@form-validation/core/lib/index.js");
+
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+var FieldStatus = /** @class */ (function (_super) {
+    __extends(FieldStatus, _super);
+    function FieldStatus(opts) {
+        var _this = _super.call(this, opts) || this;
+        _this.statuses = new Map();
+        _this.opts = Object.assign({}, {
+            onStatusChanged: function () { },
+        }, opts);
+        _this.elementValidatingHandler = _this.onElementValidating.bind(_this);
+        _this.elementValidatedHandler = _this.onElementValidated.bind(_this);
+        _this.elementNotValidatedHandler = _this.onElementNotValidated.bind(_this);
+        _this.elementIgnoredHandler = _this.onElementIgnored.bind(_this);
+        _this.fieldAddedHandler = _this.onFieldAdded.bind(_this);
+        _this.fieldRemovedHandler = _this.onFieldRemoved.bind(_this);
+        return _this;
+    }
+    FieldStatus.prototype.install = function () {
+        this.core
+            .on('core.element.validating', this.elementValidatingHandler)
+            .on('core.element.validated', this.elementValidatedHandler)
+            .on('core.element.notvalidated', this.elementNotValidatedHandler)
+            .on('core.element.ignored', this.elementIgnoredHandler)
+            .on('core.field.added', this.fieldAddedHandler)
+            .on('core.field.removed', this.fieldRemovedHandler);
+    };
+    FieldStatus.prototype.uninstall = function () {
+        this.statuses.clear();
+        this.core
+            .off('core.element.validating', this.elementValidatingHandler)
+            .off('core.element.validated', this.elementValidatedHandler)
+            .off('core.element.notvalidated', this.elementNotValidatedHandler)
+            .off('core.element.ignored', this.elementIgnoredHandler)
+            .off('core.field.added', this.fieldAddedHandler)
+            .off('core.field.removed', this.fieldRemovedHandler);
+    };
+    FieldStatus.prototype.areFieldsValid = function () {
+        return Array.from(this.statuses.values()).every(function (value) {
+            return value === 'Valid' || value === 'NotValidated' || value === 'Ignored';
+        });
+    };
+    FieldStatus.prototype.getStatuses = function () {
+        return this.isEnabled ? this.statuses : new Map();
+    };
+    FieldStatus.prototype.onFieldAdded = function (e) {
+        this.statuses.set(e.field, 'NotValidated');
+    };
+    FieldStatus.prototype.onFieldRemoved = function (e) {
+        if (this.statuses.has(e.field)) {
+            this.statuses.delete(e.field);
+        }
+        this.handleStatusChanged(this.areFieldsValid());
+    };
+    FieldStatus.prototype.onElementValidating = function (e) {
+        this.statuses.set(e.field, 'Validating');
+        this.handleStatusChanged(false);
+    };
+    FieldStatus.prototype.onElementValidated = function (e) {
+        this.statuses.set(e.field, e.valid ? 'Valid' : 'Invalid');
+        if (e.valid) {
+            this.handleStatusChanged(this.areFieldsValid());
+        }
+        else {
+            this.handleStatusChanged(false);
+        }
+    };
+    FieldStatus.prototype.onElementNotValidated = function (e) {
+        this.statuses.set(e.field, 'NotValidated');
+        this.handleStatusChanged(false);
+    };
+    FieldStatus.prototype.onElementIgnored = function (e) {
+        this.statuses.set(e.field, 'Ignored');
+        this.handleStatusChanged(this.areFieldsValid());
+    };
+    FieldStatus.prototype.handleStatusChanged = function (areFieldsValid) {
+        if (this.isEnabled) {
+            this.opts.onStatusChanged(areFieldsValid);
+        }
+    };
+    return FieldStatus;
+}(core.Plugin));
+
+exports.FieldStatus = FieldStatus;
+}
 
 /***/ }),
 
@@ -76,7 +1661,19 @@ eval("\n\nvar core = __webpack_require__(/*! @form-validation/core */ \"./node_m
   \************************************************************************/
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
-eval("/**\n * FormValidation (https://formvalidation.io)\n * The best validation library for JavaScript\n * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>\n */\n\n\n\nif (false) {} else {\n    module.exports = __webpack_require__(/*! ./cjs/index.js */ \"./node_modules/@form-validation/plugin-field-status/lib/cjs/index.js\");\n}\n\n\n//# sourceURL=webpack://Materialize/./node_modules/@form-validation/plugin-field-status/lib/index.js?");
+{
+/**
+ * FormValidation (https://formvalidation.io)
+ * The best validation library for JavaScript
+ * (c) 2013 - 2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+
+
+if (false) {} else {
+    module.exports = __webpack_require__(/*! ./cjs/index.js */ "./node_modules/@form-validation/plugin-field-status/lib/cjs/index.js");
+}
+}
 
 /***/ }),
 
@@ -86,7 +1683,17 @@ eval("/**\n * FormValidation (https://formvalidation.io)\n * The best validation
   \*********************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   AutoFocus: function() { return /* reexport safe */ _form_validation_plugin_auto_focus__WEBPACK_IMPORTED_MODULE_0__.AutoFocus; }\n/* harmony export */ });\n/* harmony import */ var _form_validation_plugin_auto_focus__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @form-validation/plugin-auto-focus */ \"./node_modules/@form-validation/plugin-auto-focus/lib/index.js\");\n\ntry {\n  FormValidation.plugins.AutoFocus = _form_validation_plugin_auto_focus__WEBPACK_IMPORTED_MODULE_0__.AutoFocus;\n} catch (e) {}\n\n\n//# sourceURL=webpack://Materialize/./libs/@form-validation/auto-focus.js?");
+{
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AutoFocus: function() { return /* reexport safe */ _form_validation_plugin_auto_focus__WEBPACK_IMPORTED_MODULE_0__.AutoFocus; }
+/* harmony export */ });
+/* harmony import */ var _form_validation_plugin_auto_focus__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @form-validation/plugin-auto-focus */ "./node_modules/@form-validation/plugin-auto-focus/lib/index.js");
+
+try {
+  FormValidation.plugins.AutoFocus = _form_validation_plugin_auto_focus__WEBPACK_IMPORTED_MODULE_0__.AutoFocus;
+} catch (e) {}
+}
 
 /***/ })
 

@@ -23,12 +23,13 @@ $lang['Complete'] = '완료';
 $lang['Search'] = '검색';
 $lang['Check'] = '확인';
 $lang['Confirm'] = '확인';
-$lang['Submit'] = '전송';
+$lang['Submit'] = '저장';
 $lang['Enter The Extra Address'] = '상세주소를 입력하세요.';
 $lang['Data Not Exist'] = '데이터가 존재하지 않습니다.';
 $lang['An Error Occurred'] = '에러가 발생했습니다.';
 $lang['Registered Successfully'] = '데이터가 등록되었습니다.';
 $lang['Your Data Is Updated'] = '데이터가 수정되었습니다.';
+$lang['Your Data Is Refreshed'] = '데이터가 갱신되었습니다.';
 $lang['Delete Completed'] = '데이터가 삭제되었습니다.';
 $lang['Enter The 6-digit Code With Numbers'] = '숫자로 된 6자리 코드를 입력해주세요.';
 $lang['out of'] = '/';
@@ -40,6 +41,7 @@ $lang['Enter The Whole YouTube Link'] = '유튜브 전체 링크를 입력하세
 $lang['Upload File Only'] = '%s 파일만 업로드하세요.';
 $lang['Store'] = '스토어';
 $lang['Download'] = '다운로드';
+$lang['Redirect'] = '이동하기';
 $lang['Uploads List'] = '%s 목록';
 $lang['Would you like to cancel the operation?'] = '작업을 취소하시겠습니까?';
 $lang['Comments'] = '댓글';
@@ -55,6 +57,7 @@ $lang['m ago'] = '분 전';
 $lang['just now'] = '방금 전';
 $lang['My Info'] = '내 정보';
 $lang['Find ID'] = '아이디 찾기';
+$lang['Reset Password'] = '비밀번호 재설정';
 $lang['Find Password'] = '비밀번호 찾기';
 $lang['Administrator'] = '관리자';
 $lang['Registration'] = '등록';
@@ -62,3 +65,66 @@ $lang['Add Event'] = '일정 등록';
 $lang['System Administrator Registration'] = '시스템 관리자 추가';
 $lang['ADD DB SQL'] = 'DB 셋업';
 $lang['Check The User Table'] = 'User 테이블을 점검해주세요.';
+$lang['Verify Admin Account'] = '관리자 계정을 입력해주세요.';
+$lang['Settings'] = '설정';
+$lang['Add Record'] = '등록';
+$lang['Edit Record'] = '수정';
+$lang['Data replication has been completed'] = '데이터 복제가 완료되었습니다.';
+$lang['Drop files here or click to upload'] = '파일을 드래그하거나 클릭하여 업로드하세요.';
+$lang['Drop file here or click to upload'] = '파일 하나를 드래그하거나 클릭하여 업로드하세요.';
+$lang['No logs found'] = '기록된 로그가 없습니다.';
+$lang['No logs match the current filters'] = '검색 조건에 부합된 로그가 존재하지 않습니다.';
+$lang['No Option Available'] = '선택 가능한 옵션이 없습니다.';
+
+/**
+ * system
+ */
+$lang['Add New Menu'] = '메뉴 추가';
+$lang['Add New SubMenu'] = '하위메뉴 추가';
+$lang['Add Menu Code'] = '코드 생성';
+$lang['Show Config'] = 'Config 보기';
+$lang['Hide Config'] = 'Config 숨김';
+$lang['Refresh Menu'] = '메뉴 갱신';
+$lang['Caching'] = '캐싱';
+$lang['Import Menus From Config'] = '설정에서 빠진 메뉴 가져오기';
+$lang['Fill Default Auth'] = '기본 권한으로 채우기';
+$lang['Menus without saved auth will get the default auth.'] = '저장된 권한이 없는 메뉴에 기본 권한을 넣습니다. 이미 저장된 메뉴는 바뀌지 않습니다.';
+$lang['Request Failed'] = '요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.';
+$lang['Select'] = '선택';
+$lang['Select a target first'] = '등급 또는 파트너를 먼저 선택해 주세요.';
+$lang['Filled'] = '채운 메뉴';
+$lang['Add Row'] = '추가';
+$lang['Delete Selected'] = '선택 삭제';
+$lang['No rows selected'] = '선택한 행이 없습니다.';
+$lang['Deleted'] = '삭제';
+$lang['Failed'] = '실패';
+$lang['Recalculate Base Auth'] = '기본 권한 다시 계산';
+$lang['No changes'] = '변경 없음';
+$lang['MenuList'] = '메뉴 목록';
+$lang['MenuConf'] = '메뉴 설정값';
+$lang['MenuCode'] = '코드';
+$lang['Unregistered'] = '미지정';
+
+/**
+ * add system user
+ */
+$lang['id'] = '아이디';
+$lang['password'] = '비밀번호';
+$lang['name'] = '이름';
+
+/**
+ * System Code
+ */
+$lang['Caution'] = '주의';
+$lang['Add Big Cd'] = '카테고리 등록';
+$lang['Edit Big Cd'] = '카테고리 수정';
+$lang['Delete Big Cd'] = '카테고리 삭제';
+$lang['You Should Delete Codes In The Category'] = '카테고리 내 등록된 코드를 먼저 삭제해주세요.';
+$lang['You Should Delete Configs In The Category'] = '카테고리 내 등록된 환경값을 먼저 삭제해 주세요.';
+$lang['You Should Delete Sub Menus First'] = '하위 메뉴를 먼저 삭제해 주세요.';
+$lang['What is System Code'] = '시스템 코드란 ?';
+$lang['What is System Config'] = '환경값 설정이란 ?';
+$lang['View Record'] = '상세 보기';
+$lang['Close'] = '닫기';
+$lang['Open In New Window'] = '새 창으로 열기';
+$lang['File Not Found'] = '파일을 찾을 수 없습니다.';

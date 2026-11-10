@@ -6,20 +6,49 @@ $lang['nav']['View'] = '조회';
 $lang['nav']['Add'] = '등록';
 $lang['nav']['Edit'] = '수정';
 $lang['nav']['Excel'] = '일괄 등록';
+$lang['nav']['Graph'] = '그래프';
+$lang['nav']['Table'] = '테이블';
 
 $lang['nav']['Administrators'] = '관리자';
 $lang['nav']['Administrators Management'] = '관리자 관리';
 
-$lang['nav']['Students'] = '사용자';
-$lang['nav']['Students Management'] = '사용자 관리';
+$lang['nav']['Partners'] = '파트너';
+$lang['nav']['Partners Management'] = '파트너 관리';
 
-$lang['nav']['Works'] = '작업물';
-$lang['nav']['Works Management'] = '작업물 관리';
+$lang['nav']['Partner Auth'] = '파트너 메뉴 권한';
+$lang['nav']['Partner Auth Management'] = '파트너 메뉴 권한';
 
-$lang['nav']['Notices'] = '공지사항';
-$lang['nav']['Notices Management'] = '공지사항 관리';
+$lang['nav']['Categories'] = '카테고리';
+$lang['nav']['Categories Management'] = '카테고리 관리';
+$lang['nav']['Boards'] = '게시판';
+$lang['nav']['Boards Management'] = '게시판 관리';
+$lang['nav']['Articles Management'] = '게시글 관리';
+$lang['nav']['Companies Management'] = '업체 관리';
 
-$lang['nav']['Inquiries'] = 'Q&A';
-$lang['nav']['Inquiries Management'] = 'Q&A 관리';
+$lang['nav']['Visitors'] = '접속자';
+$lang['nav']['Visitors Management'] = '접속자 관리';
 
+$lang['nav']['System'] = '시스템 설정';
+$lang['nav']['System Management'] = '시스템 설정';
+
+$lang['nav']['SysCfg'] = '환경값 설정';
+$lang['nav']['SysCfg Management'] = $lang['nav']['SysCfg'];
+
+
+$lang['nav']['SysCode'] = '시스템 코드';
+$lang['nav']['SysCode Management'] = $lang['nav']['SysCode'];
+
+$lang['nav']['MenuList'] = '메뉴 관리';
+$lang['nav']['MenuList Management'] = $lang['nav']['MenuList'];
+
+$lang['nav']['MenuAuth'] = '메뉴 권한';
+$lang['nav']['MenuAuth Management'] = $lang['nav']['MenuAuth'];
+
+$lang['nav']['Dashboard'] = '대시보드';
 $lang['nav']['MyInfo'] = '내 정보';
+$lang['nav']['Statistics'] = '접속 통계';
+$lang['nav']['Logs'] = '로그';
+$lang['nav']['EmailLogs'] = '이메일 로그';
+$lang['nav']['Help'] = '유지관리 요청';
+$lang['nav']['ErrorLogs'] = '에러 로그';
+$lang['nav']['UserAccess'] = '사용자 로그';

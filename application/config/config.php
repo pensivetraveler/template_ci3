@@ -371,6 +371,8 @@ $config['encryption_key'] = '';
 $config['sess_driver'] = 'files';
 $config['sess_cookie_name'] = 'ci_session';
 $config['sess_samesite'] = 'Lax';
+// 세션 유휴 유지 시간(초)·저장 폴더. .env SESS_EXPIRATION / SESS_SAVE_PATH 가 있으면 MY_Hooks::loadEnv 가 덮어씀
+// (이 파일은 .env 를 읽기 전에 평가되므로 여기서 getenv 로 읽으면 .env 파일 값이 반영되지 않는다)
 $config['sess_expiration'] = 7200;
 $config['sess_save_path'] = NULL;
 $config['sess_match_ip'] = FALSE;
@@ -397,7 +399,7 @@ $config['cookie_prefix']	= '';
 $config['cookie_domain']	= '';
 $config['cookie_path']		= '/';
 $config['cookie_secure']	= FALSE;
-$config['cookie_httponly'] 	= FALSE;
+$config['cookie_httponly'] 	= TRUE;
 $config['cookie_samesite'] 	= 'Lax';
 
 /*
@@ -472,4 +474,4 @@ $config['time_reference'] = 'local';
 | Comma-separated:	'10.0.1.200,192.168.5.0/24'
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
-$config['proxy_ips'] = '';
+$config['proxy_ips'] = getenv('PROXY_IPS') ?: ''; // 예: ALB가 있는 VPC 대역 10.0.0.0/16

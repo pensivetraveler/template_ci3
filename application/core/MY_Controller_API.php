@@ -5,215 +5,352 @@ require_once APPPATH . "libraries/RestController.php"; // ⭐ 추가
 
 class MY_Controller_API extends RestController
 {
-	public function __construct()
+    /**
+     * 현재 요청에 적용된 api_method_config 값 (auth, key, log, limit, time, level, permission)
+     * permission 은 API 권한 검사(TODO.md 2장)를 넣을 때 여기서 읽는다.
+     */
+    protected array $apiMethodFeature = [];
+
+    /**
+     * 이 컨트롤러가 속한 API 폴더 (custom_routes.php 의 api_folders 중 하나, 예: 'api')
+     * 엔드포인트 기능 설정은 config/extra/{폴더}/{폴더}_method_config.php 의 $config['{폴더}_method_config']
+     */
+    protected string $apiFolder = '';
+
+    public function __construct()
     {
+        // RestController 생성자 안에서 인증을 검사하므로, 엔드포인트별 auth 설정은 부모 생성자 전에 넣는다
+        $this->applyApiMethodAuth();
+
         parent::__construct('extra/rest_config');
 
-        if($this->router->class === 'common') redirect('/welcome');
+        $this->applyApiMethodFeatures();
+
+        if(strcasecmp($this->router->class, 'common') === 0) redirect('/welcome');
 
         $this->lang->load('status_code', $this->config->item('language'));
+
         $this->config->set_item('compress_output', FALSE);
     }
 
-    public function index_get($key = 0)
+    public function __destruct()
     {
-        $data = $this->beforeGet();
-
-        $this->afterGet($key, $data);
+        parent::__destruct();
     }
 
-    public function index_post($key = 0)
-    {
-        $dto = $this->beforePost($key);
+    /* --------------------------------------------------------------- */
+    /* api_method_config: 엔드포인트별 REST 기능 설정                    */
+    /* --------------------------------------------------------------- */
 
-        $this->afterPost($key, $dto);
+    /**
+     * 현재 요청(클래스·메서드·HTTP)에 맞는 api_method_config 항목을 합친다.
+     * [*][*] → [*][http] → [메서드][*] → [메서드][http] 순으로 덮어쓴다.
+     */
+    protected function resolveApiMethodFeature(array $classConfig, string $method, string $http): array
+    {
+        $feature = [];
+        foreach ([['*', '*'], ['*', $http], [$method, '*'], [$method, $http]] as [$methodKey, $httpKey]) {
+            if(isset($classConfig[$methodKey][$httpKey]) && is_array($classConfig[$methodKey][$httpKey])) {
+                $feature = array_replace_recursive($feature, $classConfig[$methodKey][$httpKey]);
+            }
+        }
+        return $feature;
     }
 
-    public function index_put($key = 0)
+    /**
+     * 부모 생성자 전에 실행: {API 폴더}_method_config 를 읽어 현재 요청의 기능 설정을 정하고,
+     * auth 값은 rest_config 의 auth_override_class_method_http 에 넣는다.
+     * rest_config 를 먼저 읽어 두므로 RestController 가 다시 읽어 덮어쓰지 않는다 (CI_Config::load 는 같은 파일을 한 번만 읽음).
+     */
+    protected function applyApiMethodAuth(): void
     {
-		$data = $this->beforePut($key);
+        $config =& load_class('Config', 'core');
+        $router =& load_class('Router', 'core');
+        $input =& load_class('Input', 'core');
 
-		$this->afterPut($key, $data);
-    }
+        $this->apiFolder = trim((string)$router->directory, '/');
+        $methodConfigName = $this->apiFolder.'_method_config';
 
-    public function index_patch($key = 0)
-    {
-        if($key === 0) {
-            $this->keyNotExist();
-        }else{
-            $data = $this->beforePatch($key);
+        $config->load('extra/rest_config');
+        if($this->apiFolder !== '') $config->load("extra/{$this->apiFolder}/{$methodConfigName}", false, true);
 
-            $this->afterPatch($key, $data);
+        $class = $router->class;
+        $method = $router->method;
+        $http = strtolower($input->method());
+
+        // 없는 메서드는 RestController 가 index_{http} 로 처리하므로 설정도 index 기준으로 찾는다
+        $featureMethod = method_exists($this, "{$method}_{$http}") ? $method : 'index';
+
+        // URL 대소문자로 설정을 피하지 못하도록 API 이름은 대소문자 없이 찾는다
+        $classConfig = [];
+        foreach (($config->item($methodConfigName) ?: []) as $name => $item) {
+            if(strcasecmp((string)$name, $class) === 0) $classConfig = $item;
+        }
+        $this->apiMethodFeature = $this->resolveApiMethodFeature($classConfig, $featureMethod, $http);
+        $this->apiMethodFeature['_method'] = $featureMethod;
+
+        if(isset($this->apiMethodFeature['auth'])) {
+            $overrides = $config->item('auth_override_class_method_http') ?: [];
+            // RestController::_auth_override_check() 는 router 의 class·method 원본 값으로 찾는다
+            $overrides[$class][$method][$http] = $this->apiMethodFeature['auth'];
+            $config->set_item('auth_override_class_method_http', $overrides);
         }
     }
 
-    public function index_delete($key = 0)
+    /**
+     * 부모 생성자 후에 실행: key·log·limit·time·level 을 $this->methods['{메서드}_{HTTP}'] 로 넣는다.
+     * 컨트롤러가 $this->methods 를 직접 지정한 값이 있으면 그 값이 우선한다.
+     */
+    protected function applyApiMethodFeatures(): void
     {
-		$this->beforeDelete($key);
+        $features = array_intersect_key($this->apiMethodFeature, array_flip(['key', 'log', 'limit', 'time', 'level', 'limit_always']));
+        if(!count($features)) return;
 
-		$this->afterDelete($key);
+        $controllerMethod = $this->apiMethodFeature['_method'].'_'.strtolower($this->input->method());
+        $this->methods[$controllerMethod] = array_merge($features, $this->methods[$controllerMethod] ?? []);
     }
 
     /* --------------------------------------------------------------- */
 
-    protected function beforeGet()
+    public function index_get($key = 0)
     {
-		return $this->input->get();
+        $this->handleGet($key);
     }
 
-    protected function afterGet($key, $data)
+    public function index_post($key = 0)
     {
-		$this->response([
-			'code' => DATA_RETRIEVED,
-			'key' => $key,
-			'data' => $data,
-		]);
+        $this->handlePost($key);
     }
 
-    protected function beforePost($key, $model = null)
+    public function index_put($key = 0)
     {
-		return $this->input->post();
+        $this->handlePut($key);
     }
 
-    protected function afterPost($key, $dto)
+    public function index_patch($key = 0)
     {
-		$this->response([
-			'code' => DATA_RETRIEVED,
-			'key' => $key,
-			'data' => $dto,
-		]);
+        $this->handlePatch($key);
     }
 
-    protected function beforePut($key, $model = null)
+    public function index_delete($key = 0)
     {
-        return $this->put()??$this->input->json();
+        $this->handleDelete($key);
     }
 
-    protected function afterPut($key, $dto)
+    /* --------------------------------------------------------------- */
+
+    protected function handleGet($key = 0)
     {
-		$this->response([
-			'code' => DATA_RETRIEVED,
-			'key' => $key,
-			'data' => $dto,
-		]);
+        list($key, $data) = $this->beforeGet($key);
+
+        $this->afterGet($key, $data);
     }
 
-    protected function beforePatch($key, $model = null)
+    protected function handlePost($key = 0)
     {
-        return $this->patch()??$this->input->json();
+        list($key, $data) = $this->beforePost($key);
+
+        $this->afterPost($key, $data);
     }
 
-    protected function afterPatch($key, $dto)
+    protected function handlePut($key = 0)
     {
-		$this->response([
-			'code' => DATA_RETRIEVED,
-			'key' => $key,
-			'data' => $dto,
-		]);
+        list($key, $data) = $this->beforePut($key);
+
+        $this->afterPut($key, $data);
     }
 
-    protected function beforeDelete($key)
+    protected function handlePatch($key = 0)
     {
-        return $key;
+        list($key, $data) = $this->beforePatch($key);
+
+        $this->afterPatch($key, $data);
     }
 
-    protected function afterDelete($key)
+    protected function handleDelete($key = 0)
     {
-		$this->response([
-			'code' => DATA_RETRIEVED,
-			'key' => $key,
-		]);
+        list($key, $data) = $this->beforeDelete($key);
+
+        $this->afterDelete($key, $data);
     }
 
-	public function response($data = null, $http_code = null)
+    /* --------------------------------------------------------------- */
+
+    protected function beforeGet($key = 0)
     {
-		header('Content-Type: application/json');
+        return [$key, $this->input->get()];
+    }
 
-        if(is_empty($data, 'code') && $http_code === null)
-            show_error('Insufficient response data provided');
+    protected function afterGet($key, $data = [])
+    {
+        $this->response([
+            'code' => DATA_RETRIEVED,
+            'key' => $key,
+            'data' => $data,
+        ]);
+    }
 
-        if($http_code === null) $http_code = floor((int)$data['code']/10);
-        $http_big_code = floor($http_code/100);
+    protected function beforePost($key = 0, $model = null)
+    {
+        return [$key, $this->getRequestBody('post')];
+    }
 
-        $response = new stdClass();
-        $response->code = is_empty($data, 'code')?(int)$http_code*10:$data['code'];
-        $response->msg = is_empty($data, 'msg')?$this->lang->status($response->code):$data['msg'];
-        $response->data = [];
-        if(!is_empty($data, 'data')) {
-            if(is_array($data['data'])) {
-                $response->data = $data['data'];
-            }else{
-                $response->data[] = $data['data'];
-            }
+    protected function afterPost($key, $data = [])
+    {
+        $this->response([
+            'code' => DATA_RETRIEVED,
+            'key' => $key,
+            'data' => $data,
+        ]);
+    }
+
+    protected function beforePut($key = 0, $model = null)
+    {
+        return [$key, $this->getRequestBody('put')];
+    }
+
+    protected function afterPut($key, $data = [])
+    {
+        $this->response([
+            'code' => DATA_RETRIEVED,
+            'key' => $key,
+            'data' => $data,
+        ]);
+    }
+
+    protected function beforePatch($key = 0, $model = null)
+    {
+        return [$key, $this->getRequestBody('patch')];
+    }
+
+    protected function afterPatch($key, $data = [])
+    {
+        $this->response([
+            'code' => DATA_RETRIEVED,
+            'key' => $key,
+            'data' => $data,
+        ]);
+    }
+
+    protected function beforeDelete($key = 0)
+    {
+        return [$key, $this->getRequestBody('delete')];
+    }
+
+    protected function afterDelete($key, $data = [])
+    {
+        $this->response([
+            'code' => DATA_RETRIEVED,
+            'key' => $key,
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * 요청 바디를 읽는다. Content-Type 이 application/json 이면 JSON 바디를, 아니면 form(urlencoded·multipart) 값을 쓴다.
+     * MY_Input::post()/put()/patch()/delete() 는 값이 없어도 빈 배열을 돌려주므로 `?? json()` 폴백은 동작하지 않는다.
+     */
+    protected function getRequestBody(string $method): array
+    {
+        $contentType = strtolower((string)$this->input->server('CONTENT_TYPE'));
+        if(strpos($contentType, 'application/json') === 0) {
+            $json = $this->input->json();
+            if(is_array($json)) return $json;
         }
-        $response->errors = [];
-        if(in_array($http_big_code, [4,5])) {
-            if(is_empty($data, 'errors')) {
-                $response->errors = [[
-                    'location' => 'body',
-                    'param' => null,
-                    'value' => null,
-                    'type' => 'server error',
-                    'msg' => 'error occurred',
-                ]];
-            }else{
-                $response->errors = $data['errors'];
-            }
+
+        $data = $this->input->{$method}();
+        return is_array($data) ? $data : [];
+    }
+
+    /**
+     * 쓰기 요청 하나를 묶는 바깥 트랜잭션이 열려 있는지 (MY_Builder_API::_remap 이 연다)
+     */
+    protected bool $requestTransactionOpen = false;
+
+    protected function beginRequestTransaction(): void
+    {
+        if($this->requestTransactionOpen) return;
+        $this->db->trans_begin();
+        $this->requestTransactionOpen = true;
+    }
+
+    /**
+     * 응답 직전에 바깥 트랜잭션을 끝낸다: 2xx·3xx 커밋, 그 밖 롤백.
+     * 모델의 트랜잭션(MY_Model::addDataPDO 등)은 그 안에 중첩되어 실제 커밋·롤백은 여기서만 일어난다.
+     * 응답 없이 끝나면(show_error·치명적 오류) 커밋하지 않은 트랜잭션은 DB 연결이 닫힐 때 롤백된다.
+     */
+    protected function finishRequestTransaction(int $httpCode): void
+    {
+        if(!$this->requestTransactionOpen) return;
+        $this->requestTransactionOpen = false;
+
+        if($httpCode >= 200 && $httpCode < 400) {
+            $this->db->trans_commit();
+        }else{
+            $this->db->trans_rollback();
         }
+    }
 
-        if(!is_empty($data, 'extra')) foreach ($data['extra'] as $k=>$v) $response->{$k} = $v;
-
+    public function response($data = null, $http_code = null, $exit = true)
+    {
+        // code 없이 부르면 floor(0/10)=0 → RestController 가 200으로 바꾸므로 500으로 응답한다
+        if($http_code === null) $http_code = empty($data['code']) ? RestController::HTTP_INTERNAL_SERVER_ERROR : floor((int)$data['code']/10);
+        $this->finishRequestTransaction((int)$http_code);
+        $response = $this->setResponseData($data, $http_code);
         RestController::response($response, $http_code);
-        $this->output->_display();
-        exit;
+
+        if ($exit) {
+            // 최종 헤더+본문을 즉시 전송
+            $this->output->_display();
+            // FPM 환경이면 클라이언트 요청 마무리(선응답)
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
+            exit; // 이후 코드 실행 방지
+        }
+    }
+
+    public function responseError($error = [], $response = [], $http_code = RestController::HTTP_INTERNAL_SERVER_ERROR)
+    {
+        if(is_list_type($error)) {
+            $errors = $error;
+        }else{
+            $errors = [array_merge([
+                'location' => null,
+                'param' => null,
+                'value' => null,
+                'type' => null,
+                'msg' => null,
+            ], $error)];
+        }
+
+        // 보낸 비밀번호 등을 오류 응답으로 되돌려주지 않는다. 엑셀 오류의 value 는 행 번호라 그대로
+        $errors = array_map(function ($item) {
+            if(is_array($item) && is_string($item['value'] ?? null) && is_sensitive_field($item['param'] ?? '')) $item['value'] = null;
+            return $item;
+        }, $errors);
+
+        if(!is_empty($response, 'code')) $http_code = null;
+        $this->response([
+            'code' => $response['code'] ?? null,
+            'msg' => $response['msg'] ?? null,
+            'data' => mask_sensitive_fields($response['data'] ?? []),
+            'errors' => $errors,
+        ], $http_code);
     }
 
     protected function keyNotExist()
     {
         $this->response([
             'code' => EMPTY_REQUIRED_KEY,
-            'errors' => [
-                'location' => 'keyNotExist',
+            'errors' => [[
+                'location' => __METHOD__,
                 'param' => 'key',
                 'value' => '',
                 'type' => 'missing data',
                 'msg' => 'required',
-            ]
+            ]]
         ], RestController::HTTP_BAD_REQUEST);
-    }
-
-    protected function auth()
-    {
-        $this->validateToken();
-    }
-
-    protected function validateToken()
-    {
-		$headers = array_change_key_case($this->input->request_headers(), CASE_LOWER);
-
-        if (isset($headers['authorization'])) {
-            $decodedToken = $this->authorization_token->validateToken();
-            if($decodedToken['status'] === FALSE){
-                switch ($decodedToken['message']) {
-                    case 'Token Time Expire.':
-                        $this->response([
-                            'code' => TOKEN_EXPIRED,
-                            'data' => ['token' => $headers['authorization']],
-                        ], RestController::HTTP_UNAUTHORIZED);
-                    default:
-                        $this->response([
-                            'code' => WRONG_TOKEN,
-                            'data' => ['token' => $headers['authorization']],
-                        ], RestController::HTTP_UNAUTHORIZED);
-                }
-            }else{
-                return $decodedToken['data'];
-            }
-        }else{
-            $this->response([
-                'code' => EMPTY_TOKEN,
-            ], RestController::HTTP_UNAUTHORIZED);
-        }
     }
 
     protected function uploader($name, $fileDto = null)
@@ -230,13 +367,44 @@ class MY_Controller_API extends RestController
                     'code' => $response['code'],
                     'msg' => strip_tags($response['message']),
                     'data' => $_FILES,
-                    'errors' => [
-                        'location' => 'uploader',
+                    'errors' => [[
+                        'location' => __METHOD__,
                         'param' => $name,
                         'type' => 'upload error',
-                    ]
+                    ]]
                 ], RestController::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
+    }
+
+    public function validateModel($model, $name = '', $db_conn = FALSE): object
+    {
+        $obj = $this->load->model($model, $name, $db_conn);
+
+        $targetModel = $this->{$name?:$model};
+
+        // model check
+        if(!$targetModel->validateModelDefinition()) {
+            $this->response([
+                'code' => MODEL_DATA_NOT_COINCIDENCE,
+                'errors' => [[
+                    'location' => __METHOD__,
+                    'type' => 'model error',
+                    'value' => [
+                        'table' => $targetModel->table,
+                        'identifier' => $targetModel->identifier,
+                        'primaryKeyList' => $targetModel->primaryKeyList,
+                        'isAutoIncrement' => $targetModel->isAutoIncrement,
+                        'columnList' => $targetModel->getColumnList(),
+                        'strList' => $targetModel->strList,
+                        'intList' => $targetModel->intList,
+                        'fileList' => $targetModel->fileList,
+                        'diffList' => $targetModel->determineDiffColumns(),
+                    ]
+                ]]
+            ], RestController::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $obj;
     }
 }
