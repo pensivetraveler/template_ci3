@@ -70,9 +70,11 @@ trait BuilderApiCrudTrait
             }
         }
 
+        // 꺼진 onoff 는 값이 오지 않으므로 'N' 으로 채운다. 이 모델의 컬럼만 — 다른 표에 저장하는 칸(자식 표의 기능 칸 등)까지 채우면
+        // executeAdd 가 결과를 dto 에 합칠 때 화면에서 온 'Y' 를 'N' 으로 덮는다
         foreach ($onoff as $config) {
             $field = $config['field'];
-            if(!array_key_exists($field, $data)) $data[$field] = 'N';
+            if(!array_key_exists($field, $data) && in_array($field, $columnList)) $data[$field] = 'N';
         }
 
         return $data;
