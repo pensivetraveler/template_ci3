@@ -48,15 +48,27 @@ trait BuilderApiDataScopeTrait
     protected function applyDataScope(array $data): array
     {
         foreach ($this->getDataScopeOnce() as $field => $values) {
-            if(isset($data['whereIn'][$field])) {
-                $current = $data['whereIn'][$field];
+            $key = $this->getDataScopeConditionField($field);
+            if(isset($data['whereIn'][$key])) {
+                $current = $data['whereIn'][$key];
                 $current = is_array($current) ? $current : explode(',', (string)$current);
                 $values = array_values(array_intersect($values, array_map('strval', $current)));
             }
             // 허용 값이 없으면 아무 행도 나오지 않게 (IN (NULL))
-            $data['whereIn'][$field] = count($values) ? $values : [null];
+            $data['whereIn'][$key] = count($values) ? $values : [null];
         }
         return $data;
+    }
+
+    /**
+     * 범위 필드의 조회 조건 이름. 메인 Model 컬럼이 아니고 Model_Parent 컬럼이면 '{부모 표}.col'
+     * (조건은 메인 표에 붙으므로 'col' 그대로면 Unknown column). 저장 값 검사(checkDataScopeValues)는 'col' 그대로 쓴다
+     */
+    protected function getDataScopeConditionField(string $field): string
+    {
+        if(strpos($field, '.') !== false || !isset($this->Model_Parent) || !isset($this->Model)) return $field;
+        if(in_array($field, $this->Model->getRequestColumnList(), true)) return $field;
+        return in_array($field, $this->Model_Parent->getRequestColumnList(), true) ? $this->Model_Parent->table.'.'.$field : $field;
     }
 
     /**

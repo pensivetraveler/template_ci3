@@ -781,11 +781,12 @@ $config['api_method_config'] = [
 
 | 경로 | 동작 |
 |---|---|
-| 목록 GET, 내보내기 | `whereIn` 조건 추가 (`beforeList`가 같은 필드 조건을 넣었으면 교집합) |
+| 목록 GET, 내보내기 | `whereIn` 조건 추가 (`beforeList`가 같은 필드 조건을 넣었으면 교집합). 목록은 `beforeList` 앞뒤로 붙여, 그 안에서 세는 건수(datatable `recordsTotal`·`recordsFiltered`)도 범위 안만 센다 |
 | 식별자로 지정한 행 (단건 GET, 수정 POST·PUT·PATCH, DELETE, `$scopeKeyEndpoints`) | 범위 밖이면 404 (`_remap`의 `checkDataScopeTarget()`) |
 | 등록·수정 값 (`add()`·`modify()`) | 범위 필드 값이 범위 밖이면 404, 등록에서 범위 필드가 빠져도 404 |
 | 엑셀 가져오기 | 행마다 등록과 같은 값 검사 |
 
+- 범위 필드가 메인 Model 컬럼이 아니고 `Model_Parent`(join 한 부모 표) 컬럼이면 조회 조건은 `{부모 표}.col`로 붙는다(예: 관리자 목록을 `user_cd`로 나누기 → `user.user_cd`). 필드 이름은 `col` 그대로 주고, 저장 값 검사도 `col`로 한다.
 - 첫 인자가 식별자인 프로젝트 엔드포인트(예: `getDefaultStyle/{id}`)는 엔티티에서 `$scopeKeyEndpoints`에 추가한다.
 - 회사 컬럼이 없고 다른 키로 이어지는 엔티티(예: 로그 → `frame_id`)는 엔티티에서 `getDataScope()`를 오버라이드해 그 키의 허용 값을 반환한다.
 

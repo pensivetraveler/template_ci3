@@ -258,7 +258,9 @@ class MY_Builder_API extends MY_Controller_API
 
     protected function list($data = [], $isResponse = true)
     {
-        $data = $this->applyDataScope($this->beforeList($data));
+        // 범위를 beforeList 앞에도 붙인다: beforeList 안에서 세는 건수(api/Common 의 datatable recordsTotal 등)가 범위 밖 행까지 세지 않게.
+        // 뒤에 한 번 더 붙이는 것은 beforeList 가 같은 필드 조건을 넣어도 범위를 벗어나지 않게 하려는 것 (교집합이라 두 번 붙여도 같음)
+        $data = $this->applyDataScope($this->beforeList($this->applyDataScope($data)));
 
         $data = $this->executeList($data);
 
