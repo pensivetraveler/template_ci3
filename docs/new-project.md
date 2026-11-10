@@ -132,4 +132,4 @@ scripts/test.sh all
 | 프로젝트 | 저장소 | 담당 세션 | 받는 방식 | 기반 커밋 (받은 날) |
 |---|---|---|---|---|
 | koreadesk (외주개발) | `~/Programming/Projects/koreadesk` | "koreadesk 외주 개발" | upstream merge | `05c7a0d` (2026-11-10, koreadesk `0dd248d`) |
-| bizsoft | — | "프레임 관리 다운로드 버튼" 등 | diff 적용(`core: <이전>..<새>`) | 확인 필요 |
+| bizsoft | bizsoft-mig | "프레임 관리 다운로드 버튼" 등 | diff 적용(`core: <이전>..<새>`) | `e467804` (2026-11-04, bizsoft-mig `158598a2` = `1f90a21..e467804`). 먼저 가져온 것: `8bffbd3` 중 common_helper·MY_Hooks·MY_Controller(bizsoft `0ce52cb8`), `a947d75` 와 같은 수정(bizsoft `30dba5b9`) |
