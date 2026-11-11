@@ -306,7 +306,7 @@ admin에서 실제로 쓰는 조합: `list/table/datatable`(administrators 등),
   3. 메뉴가 가리키는 화면은 메뉴 표시만 확인한다
   4. 그 밖의 화면은 `getPageAuthMode()` 자리가 켜져 있어야 한다. 목록은 메뉴 표시만, 상세(`category: view`)는 `read|update`, 그 밖에는 `mode`, 없으면 이름(`add`·`edit`·`view`·`excel`)으로 정한다. **이름도 mode도 없는 사용자 정의 화면은 메뉴 표시만 확인**하므로 권한이 필요하면 `mode`를 적는다. 실패하면 `alert('Not Authorized')` 후 baseMethod
 - list 화면 버튼/액션 권한 필터(`pageAuth` 기준): `buttons.add`→create, `buttons.excel`→import, `actions.view`→read, `actions.edit`→update, `actions.delete`→delete, `exports.*`→export. 시스템 관리자는 `pageAuth=INIT_AUTH_CHAR`(전체 허용).
-- 메뉴 기본 권한(`base_auth`)은 `builder_menu_helper.php` `make_base_auth_from_method()`가 **list category method에 대해서만** 계산한다: C=`buttons.add`, R=`actions.view`, U=`actions.edit`, D=`actions.delete`, E=`exports` 중 하나라도 true, I=`buttons.excel`이 true이고 같은 route에 excel method(키 `excel` 또는 category `excel`)가 있을 때(`route_has_excel_method()`). list가 아니면 `'000000'`. 예: administrators.list → `101100`.
+- 메뉴 기본 권한(`base_auth`)은 `builder_menu_helper.php` `make_base_auth_from_method()`가 **list category method에 대해** 계산한다: C=`buttons.add`, R=`actions.view`, U=`actions.edit`, D=`actions.delete`, E=`exports` 중 하나라도 true, I=`buttons.excel`이 true이고 같은 route에 excel method(키 `excel` 또는 category `excel`)가 있을 때(`route_has_excel_method()`). list가 아니면 `'000000'`이고, 그 화면에 `exports`를 직접 적었을 때만 E 자리를 켠다(`'000010'`, 예: 통계 화면 안의 다운로드 버튼 — API `prepareExports`가 export 권한을 검사한다). 예: administrators.list → `101100`.
 - `category: 'action'` 메서드는 `mode` 자리만 켠다(예: `export` → `000010`, mode 생략 시 `read`). `getMenuBaseAuth()`는 baseMethod 권한에 같은 route의 action 메서드 권한을 합친다. 그래서 다운로드처럼 화면 없는 메서드가 요구하는 권한도 메뉴 권한 화면에서 줄 수 있다.
 
 ### 예시 (`admin_route_config.php` `administrators.list`)

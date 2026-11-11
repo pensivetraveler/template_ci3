@@ -22,9 +22,9 @@ function make_base_auth_from_method(array $method, array $routeMethods = []): st
         return $key === false ? BASE_AUTH_CHAR : substr_replace(BASE_AUTH_CHAR, '1', $key, 1);
     }
 
-    // list category method 만 base_auth 계산 대상
+    // list 가 아닌 화면(view 통계 화면 등)은 exports 를 직접 적은 경우에만 E(내보내기) 자리를 켠다
     if (($method['category'] ?? '') !== 'list') {
-        return '000000';
+        return '0000' . (method_has_exports($method) ? '1' : '0') . '0';
     }
 
     // C: 등록
@@ -40,14 +40,7 @@ function make_base_auth_from_method(array $method, array $routeMethods = []): st
     $d = !empty($method['actions']['delete']) ? '1' : '0';
 
     // E: Export
-    $exports = $method['exports'] ?? [];
-    $e = (
-        !empty($exports['print']) ||
-        !empty($exports['csv']) ||
-        !empty($exports['excel']) ||
-        !empty($exports['pdf']) ||
-        !empty($exports['copy'])
-    ) ? '1' : '0';
+    $e = method_has_exports($method) ? '1' : '0';
 
     // I: Import
     // 현재 구조상 buttons.excel 은 Export 가 아니라 CSV/Excel Import 화면 진입 버튼
@@ -68,6 +61,18 @@ function merge_auth(string $a, string $b): string
     }
 
     return $result;
+}
+
+/**
+ * 화면 설정에 내보내기(print·csv·excel·pdf·copy) 중 하나라도 켜져 있는지
+ */
+function method_has_exports(array $method): bool
+{
+    $exports = $method['exports'] ?? [];
+    foreach (['print', 'csv', 'excel', 'pdf', 'copy'] as $key) {
+        if (!empty($exports[$key])) return true;
+    }
+    return false;
 }
 
 function make_base_auth_from_route(array $route): string
