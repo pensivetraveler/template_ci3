@@ -1,5 +1,8 @@
 -- 인증 토큰 유효 시간을 관리자 > 시스템 > 환경값 설정에서 바꿀 수 있게 tbl_sys_cfg 에 행을 넣는다.
--- common_helper token_lifetime() 이 읽는 순서: 이 행(cmb_cfg = SYS_AUTH_TOKEN_LIFETIME) → .env TOKEN_LIFETIME → 43200(12시간).
+-- ※ 지금 코드는 이 행(SYS_AUTH_TOKEN_LIFETIME)을 읽지 않는다. 2026-11-01-sys-user-category.sql 이 SYS_USER_TOKEN_LIFETIME 으로 옮기므로
+--   이 파일만 실행하면 값이 읽히지 않는다. 기존 DB 는 2026-11-01-user-cfg-to-sys-cfg.sql → 2026-11-01-sys-user-category.sql 까지 날짜 순서로 실행한다.
+--   새 DB 는 docs/schema/seed.sql 에 SYS_USER_TOKEN_LIFETIME 행이 있어 실행할 필요가 없다.
+-- (작성 당시) common_helper token_lifetime() 이 읽는 순서: 이 행 → .env TOKEN_LIFETIME → 43200(12시간). 지금은 이 행 대신 SYS_USER_TOKEN_LIFETIME.
 -- 값은 초 단위 0 이상 정수, 0 이면 만료 없음, 비우면 .env 값을 쓴다. 바꾼 값은 다음 요청부터 모든 토큰(이미 발급된 것 포함)에 적용된다.
 --
 -- 실행 전: 아래 확인 쿼리로 같은 행이 없는지 본다. 행이 이미 있으면 INSERT IGNORE 는 아무것도 바꾸지 않는다.
